@@ -281,68 +281,27 @@ AP.plate.modal = ( function() {
 
         window.vm = new Vue( {
             data: {
-                /** Immagine personalizzata di sfondo per la placca. */
-                backgroundCustomImage: { id: "", url: "" },
-
-                /** Dati del form di dettaglio: item, prodotto, frutti, zone e stato. */
-                detailForm: createDefaultDetailForm(),
-
-                /** Elenco delle linee prodotto disponibili. */
-                lines: [],
-
-                /** Elenco dei modelli disponibili per la linea selezionata. */
-                models: [],
-
-                /** Elenco delle finiture disponibili per il modello selezionato. */
-                finishes: [],
-
-                /** Dati della placca corrente: dimensioni, orientamento, griglia e immagine. */
-                plate: { ...defaultPlate },
-
-                /** Orientamenti disponibili per il telaio selezionato. */
-                availableOrientations: [],
-
-                /** Frutto correntemente selezionato o in interazione. */
-                currentFruit: {},
-
-                /** Etichetta del pulsante comprimi/espandi tutti i frutti. */
-                toggleFruitsLabel: "Comprimi tutti",
-
-                /** Zone di quotazione principali (senza origine). */
-                zones: [],
-
-                /** Sottozone di quotazione (con origine). */
-                subzones: [],
-
-                /** Elenco completo di tutte le zone, incluse le sottozone. */
-                allZones: [],
-
-                /** Flag che indica se la modalità corrente è di modifica. */
-                isEditMode: false,
-
-                /** Flag che indica se la placca è stata disegnata nella griglia. */
-                isPlateDefined: false,
-
-                /** Termine di ricerca per il suggeritore frutti. */
-                fruitSearchTerm: "",
-
-                /** Suggerimenti frutti corrispondenti alla ricerca. */
-                fruitSuggestions: [],
-
-                /** Termine di ricerca per il suggeritore posizioni. */
-                positionSearchTerm: "",
-
-                /** Suggerimenti posizioni corrispondenti alla ricerca. */
-                positionSuggestions: [],
-
-                /** Flag di caricamento per la ricerca frutti. */
-                fruitSuggestLoading: false,
-
-                /** Flag di caricamento per la ricerca posizioni. */
-                positionSuggestLoading: false,
-
-                /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
-                productItemsImages: {},
+                backgroundCustomImage: { id: "", url: "" }, /** Immagine personalizzata di sfondo per la placca. */
+                detailForm: createDefaultDetailForm(), /** Dati del form di dettaglio: item, prodotto, frutti, zone e stato. */
+                lines: [], /** Elenco delle linee prodotto disponibili. */
+                models: [], /** Elenco dei modelli disponibili per la linea selezionata. */
+                finishes: [], /** Elenco delle finiture disponibili per il modello selezionato. */
+                plate: { ...defaultPlate }, /** Dati della placca corrente: dimensioni, orientamento, griglia e immagine. */
+                availableOrientations: [], /** Orientamenti disponibili per il telaio selezionato. */
+                currentFruit: {}, /** Frutto correntemente selezionato o in interazione. */
+                toggleFruitsLabel: "Comprimi tutti", /** Etichetta del pulsante comprimi/espandi tutti i frutti. */
+                zones: [], /** Zone di quotazione principali (senza origine). */
+                subzones: [], /** Sottozone di quotazione (con origine). */
+                allZones: [], /** Elenco completo di tutte le zone, incluse le sottozone. */
+                isEditMode: false, /** Flag che indica se la modalità corrente è di modifica. */
+                isPlateDefined: false, /** Flag che indica se la placca è stata disegnata nella griglia. */
+                fruitSearchTerm: "", /** Termine di ricerca per il suggeritore frutti. */
+                fruitSuggestions: [], /** Suggerimenti frutti corrispondenti alla ricerca. */
+                positionSearchTerm: "", /** Termine di ricerca per il suggeritore posizioni. */
+                positionSuggestions: [], /** Suggerimenti posizioni corrispondenti alla ricerca. */
+                fruitSuggestLoading: false, /** Flag di caricamento per la ricerca frutti. */
+                positionSuggestLoading: false, /** Flag di caricamento per la ricerca posizioni. */
+                productItemsImages: {}, /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
@@ -365,27 +324,27 @@ AP.plate.modal = ( function() {
 
             computed: {
                 /**
-                     * Restituisce il numero totale di frutti presenti nel form.
-                     * @returns {number} Conteggio dei frutti.
-                     */
+                 * Restituisce il numero totale di frutti presenti nel form.
+                 * @returns {number} Conteggio dei frutti.
+                 */
                 getFruitCount: function() {
                     return this.detailForm.data.fruits.length;
                 },
 
                 /**
-                     * Indica se il pulsante di cancellazione superiore deve essere visibile.
-                     * È visibile solo in modalità nuovo inserimento (ID assente).
-                     * @returns {boolean} True se il form è in modalità nuovo inserimento.
-                     */
+                 * Indica se il pulsante di cancellazione superiore deve essere visibile.
+                 * È visibile solo in modalità nuovo inserimento (ID assente).
+                 * @returns {boolean} True se il form è in modalità nuovo inserimento.
+                 */
                 visibleUpperClearButton: function() {
                     return this.detailForm.data.id === "";
                 },
 
                 /**
-                     * Indica se il pulsante di cancellazione inferiore deve essere visibile.
-                     * È visibile solo in modalità nuovo inserimento (ID assente).
-                     * @returns {boolean} True se il form è in modalità nuovo inserimento.
-                     */
+                 * Indica se il pulsante di cancellazione inferiore deve essere visibile.
+                 * È visibile solo in modalità nuovo inserimento (ID assente).
+                 * @returns {boolean} True se il form è in modalità nuovo inserimento.
+                 */
                 visibleLowerClearButton: function() {
                     return this.detailForm.data.id === "";
                 },
@@ -393,10 +352,10 @@ AP.plate.modal = ( function() {
 
             watch: {
                 /**
-                     * Osserva il cambiamento della zona di quotazione selezionata.
-                     * Alla selezione di una nuova zona, carica le relative sottozone.
-                     * @param {string} newZoneId - Identificativo della nuova zona selezionata.
-                     */
+                 * Osserva il cambiamento della zona di quotazione selezionata.
+                 * Alla selezione di una nuova zona, carica le relative sottozone.
+                 * @param {string} newZoneId - Identificativo della nuova zona selezionata.
+                 */
                 "detailForm.data.quotationZoneId": function( newZoneId ) {
                     this.loadSubZones( newZoneId );
                 },
@@ -405,10 +364,10 @@ AP.plate.modal = ( function() {
             methods: {
                 // --- Lifecycle ---
                 /**
-                     * Reimposta il form di dettaglio ai valori predefiniti.
-                     * Sostituisce tutti i dati del form con una nuova istanza pulita,
-                     * resettando frutti e product items.
-                     */
+                 * Reimposta il form di dettaglio ai valori predefiniti.
+                 * Sostituisce tutti i dati del form con una nuova istanza pulita,
+                 * resettando frutti e product items.
+                 */
                 resetDetailForm: function() {
                     const fresh = createDefaultDetailForm();
                     Object.assign( this.detailForm, fresh );
@@ -418,11 +377,11 @@ AP.plate.modal = ( function() {
 
                 // --- Custom Image ---
                 /**
-                     * Attiva o disattiva la modalità immagine personalizzata per la placca.
-                     * Quando attivata, carica l'immagine di sfondo esistente e scambia
-                     * la vista tra designer standard e personalizzato.
-                     * Modifica il DOM mostrando/nascondendo #plate-designer e #plate-custom-designer.
-                     */
+                 * Attiva o disattiva la modalità immagine personalizzata per la placca.
+                 * Quando attivata, carica l'immagine di sfondo esistente e scambia
+                 * la vista tra designer standard e personalizzato.
+                 * Modifica il DOM mostrando/nascondendo #plate-designer e #plate-custom-designer.
+                 */
                 toggleCustomImage: function() {
                     const id = this.detailForm.data.id;
                     if ( id ) {
@@ -440,10 +399,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica l'immagine personalizzata di sfondo per un quotation item.
-                     * Effettua una richiesta AJAX per ottenere le immagini associate all'item.
-                     * @param {string} quotationItemId - Identificativo del quotation item.
-                     */
+                 * Carica l'immagine personalizzata di sfondo per un quotation item.
+                 * Effettua una richiesta AJAX per ottenere le immagini associate all'item.
+                 * @param {string} quotationItemId - Identificativo del quotation item.
+                 */
                 loadBackgroundCustomImage: async function( quotationItemId ) {
                     if ( !quotationItemId ) { return; }
                     await ajax( {
@@ -460,9 +419,9 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Apre il modale di selezione immagini per il quotation item corrente.
-                     * Utilizza l'app file modale passando tipo e identificativo dell'item.
-                     */
+                 * Apre il modale di selezione immagini per il quotation item corrente.
+                 * Utilizza l'app file modale passando tipo e identificativo dell'item.
+                 */
                 openImagesList: function() {
                     const type = "quotationItem";
                     const value = {
@@ -475,9 +434,9 @@ AP.plate.modal = ( function() {
 
                 // --- Lines / Models / Finishes ---
                 /**
-                     * Carica l'elenco delle linee prodotto per la categoria 22.
-                     * Effettua una richiesta AJAX e aggiorna la lista lines.
-                     */
+                 * Carica l'elenco delle linee prodotto per la categoria 22.
+                 * Effettua una richiesta AJAX e aggiorna la lista lines.
+                 */
                 loadLines: async function() {
                     await ajax( {
                         method: "GET",
@@ -491,10 +450,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica l'elenco dei modelli per la linea attualmente selezionata.
-                     * Effettua una richiesta AJAX e aggiorna la lista models.
-                     * Salva la preferenza utente per la linea.
-                     */
+                 * Carica l'elenco dei modelli per la linea attualmente selezionata.
+                 * Effettua una richiesta AJAX e aggiorna la lista models.
+                 * Salva la preferenza utente per la linea.
+                 */
                 loadModels: async function() {
                     const lineId = this.detailForm.data.product.line.id;
                     if ( !lineId ) { return; }
@@ -511,10 +470,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica l'elenco delle finiture per la linea selezionata.
-                     * Effettua una richiesta AJAX e aggiorna la lista finishes.
-                     * Verifica la possibilità di salvare e salva la preferenza utente per il modello.
-                     */
+                 * Carica l'elenco delle finiture per la linea selezionata.
+                 * Effettua una richiesta AJAX e aggiorna la lista finishes.
+                 * Verifica la possibilità di salvare e salva la preferenza utente per il modello.
+                 */
                 loadFinishes: async function() {
                     const modelId = this.detailForm.data.product.model.id;
                     const lineId = this.detailForm.data.product.line.id;
@@ -534,10 +493,10 @@ AP.plate.modal = ( function() {
 
                 // --- Zones ---
                 /**
-                     * Carica l'elenco completo delle zone di quotazione.
-                     * Filtra le zone separando quelle principali (senza origine) dalle sottozone.
-                     * Aggiorna le proprietà allZones, zones e subzones.
-                     */
+                 * Carica l'elenco completo delle zone di quotazione.
+                 * Filtra le zone separando quelle principali (senza origine) dalle sottozone.
+                 * Aggiorna le proprietà allZones, zones e subzones.
+                 */
                 loadZones: async function() {
                     await ajax( {
                         method: "GET",
@@ -555,10 +514,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica le sottozone corrispondenti a una zona padre.
-                     * Resetta la selezione della sottozona corrente.
-                     * @param {string} zoneId - Identificativo della zona padre.
-                     */
+                 * Carica le sottozone corrispondenti a una zona padre.
+                 * Resetta la selezione della sottozona corrente.
+                 * @param {string} zoneId - Identificativo della zona padre.
+                 */
                 loadSubZones: function( zoneId ) {
                     this.detailForm.data.quotationSubzoneId = "";
                     this.detailForm.data.quotationSubzone = null;
@@ -572,9 +531,9 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce il cambiamento della zona di quotazione selezionata.
-                     * Aggiorna l'oggetto quotationZone nel form con i dati completi della zona scelta.
-                     */
+                 * Gestisce il cambiamento della zona di quotazione selezionata.
+                 * Aggiorna l'oggetto quotationZone nel form con i dati completi della zona scelta.
+                 */
                 onZoneChange: function() {
                     const zoneId = this.detailForm.data.quotationZoneId;
                     if ( zoneId ) {
@@ -589,16 +548,16 @@ AP.plate.modal = ( function() {
 
                 // --- Product loading ---
                 /**
-                     * Popola i campi del prodotto nel form di dettaglio a partire dai dati ricevuti.
-                     * Imposta ID, finitura, modello, linea e immagine del prodotto.
-                     * @param {Object} product - Dati del prodotto da mappare.
-                     * @param {string} product.id - Identificativo del prodotto.
-                     * @param {Object} product.finish - Oggetto finitura con proprietà id.
-                     * @param {Object} product.model - Oggetto modello con proprietà id e code.
-                     * @param {Object} product.line - Oggetto linea con proprietà id.
-                     * @param {Object|null} product.horizontalImage - Immagine orizzontale con id e uri.
-                     * @param {Object|null} product.verticalImage - Immagine verticale con id e uri.
-                     */
+                 * Popola i campi del prodotto nel form di dettaglio a partire dai dati ricevuti.
+                 * Imposta ID, finitura, modello, linea e immagine del prodotto.
+                 * @param {Object} product - Dati del prodotto da mappare.
+                 * @param {string} product.id - Identificativo del prodotto.
+                 * @param {Object} product.finish - Oggetto finitura con proprietà id.
+                 * @param {Object} product.model - Oggetto modello con proprietà id e code.
+                 * @param {Object} product.line - Oggetto linea con proprietà id.
+                 * @param {Object|null} product.horizontalImage - Immagine orizzontale con id e uri.
+                 * @param {Object|null} product.verticalImage - Immagine verticale con id e uri.
+                 */
                 populateProduct: function( product ) {
                     const image = product.horizontalImage || product.verticalImage;
                     this.detailForm.data.product.id = product.id || "";
@@ -614,10 +573,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica il prodotto in base a linea, modello e finitura selezionati.
-                     * Effettua una richiesta AJAX per ottenere il prodotto, poi carica i product items
-                     * e configura la placca. Salva la preferenza utente per la finitura.
-                     */
+                 * Carica il prodotto in base a linea, modello e finitura selezionati.
+                 * Effettua una richiesta AJAX per ottenere il prodotto, poi carica i product items
+                 * e configura la placca. Salva la preferenza utente per la finitura.
+                 */
                 loadProduct: async function() {
                     const lineId = this.detailForm.data.product.line.id;
                     const modelId = this.detailForm.data.product.model.id;
@@ -646,12 +605,12 @@ AP.plate.modal = ( function() {
 
                 // --- Plate / Frame ---
                 /**
-                     * Carica i dati del telaio e configura la placca.
-                     * Cerca il telaio corrispondente al codice modello, effettua una richiesta AJAX
-                     * e aggiorna le proprietà della placca (dimensioni, orientamento, griglia, immagine).
-                     * Se viene fornito un orientamento, attiva il cambio orientamento.
-                     * @param {Object} [orientationValue] - Orientamento opzionale da applicare dopo il caricamento.
-                     */
+                 * Carica i dati del telaio e configura la placca.
+                 * Cerca il telaio corrispondente al codice modello, effettua una richiesta AJAX
+                 * e aggiorna le proprietà della placca (dimensioni, orientamento, griglia, immagine).
+                 * Se viene fornito un orientamento, attiva il cambio orientamento.
+                 * @param {Object} [orientationValue] - Orientamento opzionale da applicare dopo il caricamento.
+                 */
                 loadPlate: async function( orientationValue ) {
                     const modelCode = this.detailForm.data.product.model.code;
                     const image = this.detailForm.data.product.image;
@@ -696,11 +655,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Cambia l'orientamento della placca e ricarica la configurazione.
-                     * Effettua una richiesta AJAX per ottenere i dati del telaio con il nuovo orientamento,
-                     * aggiorna la griglia e riconfigura la placca.
-                     * Riapplica le immagini dei product items dopo il cambio.
-                     */
+                 * Cambia l'orientamento della placca e ricarica la configurazione.
+                 * Effettua una richiesta AJAX per ottenere i dati del telaio con il nuovo orientamento,
+                 * aggiorna la griglia e riconfigura la placca.
+                 * Riapplica le immagini dei product items dopo il cambio.
+                 */
                 changeOrientation: async function() {
                     const orientationId = this.detailForm.data.product.orientation.id;
                     const frameId = this.detailForm.data.product.frame.id;
@@ -728,10 +687,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Riapplica le immagini dei product items dopo un cambio di orientamento.
-                     * Scorre tutti gli attributi del prodotto e per ogni valore selezionato
-                     * richiama il metodo changeImage.
-                     */
+                 * Riapplica le immagini dei product items dopo un cambio di orientamento.
+                 * Scorre tutti gli attributi del prodotto e per ogni valore selezionato
+                 * richiama il metodo changeImage.
+                 */
                 reapplyProductItemImages: function() {
                     const items = this.detailForm.data.product.items;
                     for ( let i = 0; i < items.length; i++ ) {
@@ -747,10 +706,10 @@ AP.plate.modal = ( function() {
 
                 // --- Product Items ---
                 /**
-                     * Carica per la prima volta i product items del prodotto selezionato.
-                     * Organizza gli items per attributo raggruppandone i valori.
-                     * Se esiste già un quotation item, ripristina le selezioni salvate.
-                     */
+                 * Carica per la prima volta i product items del prodotto selezionato.
+                 * Organizza gli items per attributo raggruppandone i valori.
+                 * Se esiste già un quotation item, ripristina le selezioni salvate.
+                 */
                 firstLoadProductItems: async function() {
                     const quotationItemId = this.detailForm.data.id;
                     const productId = this.detailForm.data.product.id;
@@ -828,11 +787,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Ripristina le selezioni dei product items a partire dai dati salvati.
-                     * Ordina gli items per orderby e carica ricorsivamente i figli.
-                     * Al termine, applica l'immagine del product item selezionato.
-                     * @param {Array} data - Elenco dei quotation item product items salvati.
-                     */
+                 * Ripristina le selezioni dei product items a partire dai dati salvati.
+                 * Ordina gli items per orderby e carica ricorsivamente i figli.
+                 * Al termine, applica l'immagine del product item selezionato.
+                 * @param {Array} data - Elenco dei quotation item product items salvati.
+                 */
                 restoreProductItemSelections: function( data ) {
                     if ( !data || !data.length ) { return; }
                     data.sort( ( a, b ) => {
@@ -847,9 +806,9 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Applica l'immagine del product item selezionato al designer della placca.
-                     * Scorre gli attributi in ordine inverso e trova il primo valore selezionato.
-                     */
+                 * Applica l'immagine del product item selezionato al designer della placca.
+                 * Scorre gli attributi in ordine inverso e trova il primo valore selezionato.
+                 */
                 applySelectedProductItemImage: function() {
                     const items = this.detailForm.data.product.items;
                     for ( let i = items.length - 1; i >= 0; i-- ) {
@@ -864,13 +823,13 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica i product items figli per un dato attributo e origine.
-                     * Se originId è vuoto, deseleziona i valori dell'attributo e rimuove gli items figli.
-                     * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
-                     * Gestisce la sostituzione degli items esistenti con quelli nuovi.
-                     * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
-                     * @param {string} attributeId - Identificativo dell'attributo da aggiornare.
-                     */
+                 * Carica i product items figli per un dato attributo e origine.
+                 * Se originId è vuoto, deseleziona i valori dell'attributo e rimuove gli items figli.
+                 * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
+                 * Gestisce la sostituzione degli items esistenti con quelli nuovi.
+                 * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
+                 * @param {string} attributeId - Identificativo dell'attributo da aggiornare.
+                 */
                 loadProductItems: async function( originId, attributeId ) {
                     const productId = this.detailForm.data.product.id;
                     const items = this.detailForm.data.product.items;
@@ -962,11 +921,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Cambia l'immagine visualizzata per un product item selezionato.
-                     * Cerca l'immagine corrispondente all'orientamento corrente tra quelle disponibili.
-                     * Se trovata, crea o aggiorna un elemento DOM sovrapposto al designer della placca.
-                     * @param {Object} item - Oggetto valore del product item con productItemId e images.
-                     */
+                 * Cambia l'immagine visualizzata per un product item selezionato.
+                 * Cerca l'immagine corrispondente all'orientamento corrente tra quelle disponibili.
+                 * Se trovata, crea o aggiorna un elemento DOM sovrapposto al designer della placca.
+                 * @param {Object} item - Oggetto valore del product item con productItemId e images.
+                 */
                 changeImage: function( item ) {
                     if ( !item || !item.productItemId ) { return; }
                     let uri = "";
@@ -1006,12 +965,12 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce la selezione di un product item da parte dell'utente.
-                     * Carica i product items figli e aggiorna l'immagine corrispondente.
-                     * @param {string} selectedId - Identificativo del product item selezionato.
-                     * @param {string} attributeId - Identificativo dell'attributo.
-                     * @param {Object} value - Oggetto valore selezionato per l'aggiornamento dell'immagine.
-                     */
+                 * Gestisce la selezione di un product item da parte dell'utente.
+                 * Carica i product items figli e aggiorna l'immagine corrispondente.
+                 * @param {string} selectedId - Identificativo del product item selezionato.
+                 * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {Object} value - Oggetto valore selezionato per l'aggiornamento dell'immagine.
+                 */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
                     await this.loadProductItems( selectedId, attributeId );
                     if ( value ) {
@@ -1021,11 +980,11 @@ AP.plate.modal = ( function() {
 
                 // --- Fruits ---
                 /**
-                     * Gestisce la selezione di un frutto dall'elenco dei suggerimenti.
-                     * Crea un nuovo frutto, lo aggiunge al form, lo disegna nella placca
-                     * e inizializza i suoi product items e l'effetto hover.
-                     * @param {Object} selectedFruit - Dati del frutto selezionato.
-                     */
+                 * Gestisce la selezione di un frutto dall'elenco dei suggerimenti.
+                 * Crea un nuovo frutto, lo aggiunge al form, lo disegna nella placca
+                 * e inizializza i suoi product items e l'effetto hover.
+                 * @param {Object} selectedFruit - Dati del frutto selezionato.
+                 */
                 onSelectFruit: async function( selectedFruit ) {
                     const newFruit = createFruit( { position: 1, fruit: selectedFruit } );
                     this.detailForm.data.fruits.push( newFruit );
@@ -1039,10 +998,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Aggiunge gli effetti hover al DOM per un frutto nella lista e nella griglia.
-                     * All'entrata del mouse colora lo sfondo; all'uscita ripristina il colore originale.
-                     * @param {string} fruitId - Identificativo del frutto.
-                     */
+                 * Aggiunge gli effetti hover al DOM per un frutto nella lista e nella griglia.
+                 * All'entrata del mouse colora lo sfondo; all'uscita ripristina il colore originale.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 */
                 addFruitHover: function( fruitId ) {
                     $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
                         $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "rgba(162, 253, 161, 0.44)" );
@@ -1054,10 +1013,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Rimuove un frutto dalla lista del form e dalla placca.
-                     * Aggiorna sia i dati del form che il controller dei frutti nella griglia.
-                     * @param {Object} fruit - Oggetto frutto da rimuovere.
-                     */
+                 * Rimuove un frutto dalla lista del form e dalla placca.
+                 * Aggiorna sia i dati del form che il controller dei frutti nella griglia.
+                 * @param {Object} fruit - Oggetto frutto da rimuovere.
+                 */
                 removeFruit: function( fruit ) {
                     const idx = this.detailForm.data.fruits.indexOf( fruit );
                     if ( idx > -1 ) {
@@ -1069,17 +1028,17 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Espande o comprime la visualizzazione dei dettagli di un singolo frutto.
-                     * @param {Object} fruit - Oggetto frutto di cui invertire lo stato expanded.
-                     */
+                 * Espande o comprime la visualizzazione dei dettagli di un singolo frutto.
+                 * @param {Object} fruit - Oggetto frutto di cui invertire lo stato expanded.
+                 */
                 toggleFruit: function( fruit ) {
                     fruit.expanded = !fruit.expanded;
                 },
 
                 /**
-                     * Espande o comprime tutti i frutti contemporaneamente.
-                     * Aggiorna l'etichetta del pulsante in base allo stato corrente.
-                     */
+                 * Espande o comprime tutti i frutti contemporaneamente.
+                 * Aggiorna l'etichetta del pulsante in base allo stato corrente.
+                 */
                 toggleFruits: function() {
                     const currentLabel = this.toggleFruitsLabel;
                     const newExpandedState = currentLabel === "Espandi tutti";
@@ -1090,10 +1049,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica i frutti associati a una placca esistente.
-                     * Effettua una richiesta AJAX, crea i frutti e li posiziona nella griglia.
-                     * Carica i product items per ciascun frutto e inizializza gli effetti hover.
-                     */
+                 * Carica i frutti associati a una placca esistente.
+                 * Effettua una richiesta AJAX, crea i frutti e li posiziona nella griglia.
+                 * Carica i product items per ciascun frutto e inizializza gli effetti hover.
+                 */
                 loadFruits: async function() {
                     const id = this.detailForm.data.id;
                     if ( !id ) { return; }
@@ -1144,11 +1103,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica i product items per un frutto specifico.
-                     * Effettua una richiesta AJAX per gli items del prodotto frutto e per i product items salvati.
-                     * Aggiorna la mappa delle immagini e ripristina le selezioni esistenti.
-                     * @param {string} fruitId - Identificativo del frutto.
-                     */
+                 * Carica i product items per un frutto specifico.
+                 * Effettua una richiesta AJAX per gli items del prodotto frutto e per i product items salvati.
+                 * Aggiorna la mappa delle immagini e ripristina le selezioni esistenti.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 */
                 addProductItemsToFruit: async function( fruitId ) {
                     const fruits = this.detailForm.data.fruits;
                     let thisFruit = null;
@@ -1240,11 +1199,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Cambia l'immagine di un frutto in base alle selezioni correnti dei suoi product items.
-                     * Combina gli ID dei product items selezionati e invia una richiesta AJAX
-                     * per trovare l'immagine della combinazione corrispondente.
-                     * @param {string} fruitId - Identificativo del frutto.
-                     */
+                 * Cambia l'immagine di un frutto in base alle selezioni correnti dei suoi product items.
+                 * Combina gli ID dei product items selezionati e invia una richiesta AJAX
+                 * per trovare l'immagine della combinazione corrispondente.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 */
                 changeFruitImage: async function( fruitId ) {
                     const selectedIds = [];
                     const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
@@ -1275,11 +1234,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Restituisce la prima immagine disponibile tra gli ID dei product items forniti.
-                     * Scorre l'elenco e controlla la mappa delle immagini precaricata.
-                     * @param {Array<string>} productItemIds - Elenco degli ID dei product items.
-                     * @returns {string|null} URI della prima immagine trovata o null.
-                     */
+                 * Restituisce la prima immagine disponibile tra gli ID dei product items forniti.
+                 * Scorre l'elenco e controlla la mappa delle immagini precaricata.
+                 * @param {Array<string>} productItemIds - Elenco degli ID dei product items.
+                 * @returns {string|null} URI della prima immagine trovata o null.
+                 */
                 getFirstFruitImage: function( productItemIds ) {
                     for ( const prodctItemId of productItemIds ) {
                         const img = this.productItemsImages[ prodctItemId ];
@@ -1291,13 +1250,13 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Carica i product items figli per un attributo di un frutto specifico.
-                     * Se originId è vuoto, deseleziona i valori dell'attributo e rimuove gli items figli.
-                     * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
-                     * @param {string} fruitId - Identificativo del frutto.
-                     * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
-                     * @param {string} attributeId - Identificativo dell'attributo.
-                     */
+                 * Carica i product items figli per un attributo di un frutto specifico.
+                 * Se originId è vuoto, deseleziona i valori dell'attributo e rimuove gli items figli.
+                 * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
+                 * @param {string} attributeId - Identificativo dell'attributo.
+                 */
                 loadFruitProductItems: async function( fruitId, originId, attributeId ) {
                     let fruit = null;
                     for ( const fr of this.detailForm.data.fruits ) {
@@ -1400,13 +1359,13 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce la selezione di un product item per un frutto.
-                     * Carica i product items figli e aggiorna l'immagine del frutto.
-                     * @param {string} fruitId - Identificativo del frutto.
-                     * @param {string} selectedId - Identificativo del product item selezionato.
-                     * @param {string} attributeId - Identificativo dell'attributo.
-                     * @param {Object} value - Oggetto valore selezionato.
-                     */
+                 * Gestisce la selezione di un product item per un frutto.
+                 * Carica i product items figli e aggiorna l'immagine del frutto.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {string} selectedId - Identificativo del product item selezionato.
+                 * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {Object} value - Oggetto valore selezionato.
+                 */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, attributeId, value ) {
                     await this.loadFruitProductItems( fruitId, selectedId, attributeId );
                     this.changeFruitImage( fruitId );
@@ -1414,9 +1373,9 @@ AP.plate.modal = ( function() {
 
                 // --- Fruit Suggest ---
                 /**
-                     * Inizializza il campo di suggerimento frutti.
-                     * Impedisce l'invio del form alla pressione del tasto Invio.
-                     */
+                 * Inizializza il campo di suggerimento frutti.
+                 * Impedisce l'invio del form alla pressione del tasto Invio.
+                 */
                 initFruitsSuggest: function() {
                     const $suggest = $( "#plate-fruit-suggest" );
                     $suggest.off( "keypress" ).on( "keypress", function( e ) {
@@ -1425,11 +1384,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce l'input di ricerca nel suggeritore frutti.
-                     * Se il termine ha almeno 3 caratteri, effettua una richiesta AJAX
-                     * per ottenere i suggerimenti filtrati per termine e linea.
-                     * Aggiorna la lista fruitSuggestions e il flag di caricamento.
-                     */
+                 * Gestisce l'input di ricerca nel suggeritore frutti.
+                 * Se il termine ha almeno 3 caratteri, effettua una richiesta AJAX
+                 * per ottenere i suggerimenti filtrati per termine e linea.
+                 * Aggiorna la lista fruitSuggestions e il flag di caricamento.
+                 */
                 onFruitSearchInput: function() {
                     const term = this.fruitSearchTerm;
                     if ( term.length < 3 ) {
@@ -1453,10 +1412,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Seleziona un frutto dai suggerimenti e lo aggiunge alla placca.
-                     * Resetta il termine di ricerca e la lista dei suggerimenti.
-                     * @param {Object} item - Frutto selezionato dai suggerimenti.
-                     */
+                 * Seleziona un frutto dai suggerimenti e lo aggiunge alla placca.
+                 * Resetta il termine di ricerca e la lista dei suggerimenti.
+                 * @param {Object} item - Frutto selezionato dai suggerimenti.
+                 */
                 selectFruitSuggestion: function( item ) {
                     this.onSelectFruit( item );
                     this.fruitSearchTerm = "";
@@ -1465,9 +1424,9 @@ AP.plate.modal = ( function() {
 
                 // --- Position Suggest ---
                 /**
-                     * Inizializza il campo di suggerimento posizioni.
-                     * Impedisce l'invio del form alla pressione del tasto Invio.
-                     */
+                 * Inizializza il campo di suggerimento posizioni.
+                 * Impedisce l'invio del form alla pressione del tasto Invio.
+                 */
                 initPositionSuggest: function() {
                     const $suggest = $( "#qt-plate-position-suggest" );
                     $suggest.off( "keypress" ).on( "keypress", function( e ) {
@@ -1476,11 +1435,11 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce l'input di ricerca nel suggeritore posizioni.
-                     * Se il termine ha almeno 2 caratteri ed è selezionata una zona,
-                     * effettua una richiesta AJAX per ottenere i suggerimenti.
-                     * Aggiorna la lista positionSuggestions e il flag di caricamento.
-                     */
+                 * Gestisce l'input di ricerca nel suggeritore posizioni.
+                 * Se il termine ha almeno 2 caratteri ed è selezionata una zona,
+                 * effettua una richiesta AJAX per ottenere i suggerimenti.
+                 * Aggiorna la lista positionSuggestions e il flag di caricamento.
+                 */
                 onPositionSearchInput: function() {
                     const term = this.positionSearchTerm;
                     const zoneId = this.detailForm.data.quotationZoneId;
@@ -1506,10 +1465,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Seleziona una posizione dai suggerimenti e aggiorna il form.
-                     * Imposta il termine di ricerca con il codice della posizione selezionata.
-                     * @param {Object} item - Posizione selezionata con proprietà id e code.
-                     */
+                 * Seleziona una posizione dai suggerimenti e aggiorna il form.
+                 * Imposta il termine di ricerca con il codice della posizione selezionata.
+                 * @param {Object} item - Posizione selezionata con proprietà id e code.
+                 */
                 selectPositionSuggestion: function( item ) {
                     this.detailForm.data.position = item;
                     this.positionSearchTerm = item.code || item.term;
@@ -1517,10 +1476,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Sincronizza il campo position con il termine di ricerca digitato.
-                     * Se l'utente ha digitato un codice che non corrisponde a nessun suggerimento,
-                     * imposta una posizione libera con solo il codice.
-                     */
+                 * Sincronizza il campo position con il termine di ricerca digitato.
+                 * Se l'utente ha digitato un codice che non corrisponde a nessun suggerimento,
+                 * imposta una posizione libera con solo il codice.
+                 */
                 syncPositionFromSearchTerm: function() {
                     if ( this.positionSearchTerm && ( !this.detailForm.data.position || this.detailForm.data.position.code !== this.positionSearchTerm ) ) {
                         this.detailForm.data.position = { id: "", code: this.positionSearchTerm };
@@ -1529,12 +1488,12 @@ AP.plate.modal = ( function() {
 
                 // --- Pricing ---
                 /**
-                     * Calcola e aggiorna il prezzo della placca tramite richiesta al server.
-                     * Se il metodo di prezzo è "Fisso", mostra un avviso e non procede.
-                     * Invia i dati dell'item, il prezzo corrente e l'ID quotazione.
-                     * Applica gli sconti e calcola il totale.
-                     * @returns {Promise<boolean>} Promise che restituisce false se il metodo è fisso.
-                     */
+                 * Calcola e aggiorna il prezzo della placca tramite richiesta al server.
+                 * Se il metodo di prezzo è "Fisso", mostra un avviso e non procede.
+                 * Invia i dati dell'item, il prezzo corrente e l'ID quotazione.
+                 * Applica gli sconti e calcola il totale.
+                 * @returns {Promise<boolean>} Promise che restituisce false se il metodo è fisso.
+                 */
                 updatePricing: async function() {
                     // debugger
                     if ( this.pricing.data.method.id === "F" ) {
@@ -1574,10 +1533,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce il cambiamento del metodo di prezzo tra "Calcolato" e "Fisso".
-                     * In modalità calcolato, azzera il totale e disabilita l'inserimento manuale.
-                     * In modalità fisso, azzera sconti e righe e abilita l'inserimento manuale del totale.
-                     */
+                 * Gestisce il cambiamento del metodo di prezzo tra "Calcolato" e "Fisso".
+                 * In modalità calcolato, azzera il totale e disabilita l'inserimento manuale.
+                 * In modalità fisso, azzera sconti e righe e abilita l'inserimento manuale del totale.
+                 */
                 changePricingMethod: function() {
                     if ( this.pricing.data.method.id === "C" ) {
                         this.pricing.data.total = 0;
@@ -1593,14 +1552,14 @@ AP.plate.modal = ( function() {
 
                 // --- Save ---
                 /**
-                     * Salva la placca sul server.
-                     * Verifica la presenza di almeno un frutto e, in caso di custom image,
-                     * che sia stata selezionata un'immagine.
-                     * Prepara i dati includendo posizioni, zone e fruit positions.
-                     * Genera un'anteprima tramite html2canvas da inviare come base64.
-                     * Al successo, mostra il modale post-salvataggio.
-                     * @returns {Promise<boolean>} Promise che restituisce false se le validazioni falliscono.
-                     */
+                 * Salva la placca sul server.
+                 * Verifica la presenza di almeno un frutto e, in caso di custom image,
+                 * che sia stata selezionata un'immagine.
+                 * Prepara i dati includendo posizioni, zone e fruit positions.
+                 * Genera un'anteprima tramite html2canvas da inviare come base64.
+                 * Al successo, mostra il modale post-salvataggio.
+                 * @returns {Promise<boolean>} Promise che restituisce false se le validazioni falliscono.
+                 */
                 save: async function() {
                     AP.loading.show();
 
@@ -1682,12 +1641,12 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Mostra il modale post-salvataggio per decidere se posizionare
-                     * la placca in pianta o rimanere nella pagina corrente.
-                     * Se la placca è nuova o sono cambiati zona/quantità, mostra il modale.
-                     * Altrimenti reindirizza alla scheda quotazione dopo un breve timeout.
-                     * @param {string} parsedQuotationId - Identificativo della quotazione.
-                     */
+                 * Mostra il modale post-salvataggio per decidere se posizionare
+                 * la placca in pianta o rimanere nella pagina corrente.
+                 * Se la placca è nuova o sono cambiati zona/quantità, mostra il modale.
+                 * Altrimenti reindirizza alla scheda quotazione dopo un breve timeout.
+                 * @param {string} parsedQuotationId - Identificativo della quotazione.
+                 */
                 showPostSaveModal: function( parsedQuotationId ) {
                     const pd = this.detailForm.data;
                     const modal = $( "#posizione-in-pianta-modal" );
@@ -1724,10 +1683,10 @@ AP.plate.modal = ( function() {
 
                 // --- Helpers ---
                 /**
-                     * Prepara e restituisce i dati dell'item per l'invio al server.
-                     * Copia i dati del form e mappa i frutti con le proprietà essenziali.
-                     * @returns {Object} Dati dell'item pronti per la serializzazione.
-                     */
+                 * Prepara e restituisce i dati dell'item per l'invio al server.
+                 * Copia i dati del form e mappa i frutti con le proprietà essenziali.
+                 * @returns {Object} Dati dell'item pronti per la serializzazione.
+                 */
                 getItemData: function() {
                     const data = { ...this.detailForm.data };
                     data.product = { ...data.product };
@@ -1748,17 +1707,17 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Verifica se le condizioni per il salvataggio sono soddisfatte.
-                     * Il salvataggio è abilitato se la quantità è maggiore di zero
-                     * e la finitura del prodotto è stata selezionata.
-                     */
+                 * Verifica se le condizioni per il salvataggio sono soddisfatte.
+                 * Il salvataggio è abilitato se la quantità è maggiore di zero
+                 * e la finitura del prodotto è stata selezionata.
+                 */
                 checkCanSave: function() {
                     this.detailForm.canSave = this.detailForm.data.quantity > 0 && this.detailForm.data.product.finish.id !== "";
                 },
 
                 /**
-                     * Resetta i campi di linea, modello e finitura del prodotto nel form.
-                     */
+                 * Resetta i campi di linea, modello e finitura del prodotto nel form.
+                 */
                 clearForm: function() {
                     this.detailForm.data.product.line.id = "";
                     this.detailForm.data.product.model.id = "";
@@ -1766,9 +1725,9 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Resetta i filtri di linea, modello e finitura.
-                     * Cancella le preferenze utente corrispondenti e verifica la possibilità di salvare.
-                     */
+                 * Resetta i filtri di linea, modello e finitura.
+                 * Cancella le preferenze utente corrispondenti e verifica la possibilità di salvare.
+                 */
                 clearFilters: function() {
                     this.clearForm();
                     AP.deleteUserPref( "plate.lineId" );
@@ -1778,10 +1737,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce il cambio di linea selezionata.
-                     * Resetta modello, finitura, product items, frutti e la placca.
-                     * Svuota il designer e cancella le preferenze utente di modello e finitura.
-                     */
+                 * Gestisce il cambio di linea selezionata.
+                 * Resetta modello, finitura, product items, frutti e la placca.
+                 * Svuota il designer e cancella le preferenze utente di modello e finitura.
+                 */
                 handleLineChange: function() {
                     this.detailForm.data.product.model = { id: "", code: "" };
                     this.detailForm.data.product.finish = { id: "" };
@@ -1796,10 +1755,10 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Gestisce il cambio di modello selezionato.
-                     * Resetta finitura, product items, frutti e la placca.
-                     * Svuota il designer e cancella la preferenza utente per la finitura.
-                     */
+                 * Gestisce il cambio di modello selezionato.
+                 * Resetta finitura, product items, frutti e la placca.
+                 * Svuota il designer e cancella la preferenza utente per la finitura.
+                 */
                 handleModelChange: function() {
                     this.detailForm.data.product.finish = { id: "" };
                     this.detailForm.data.product.items = [];
@@ -1811,8 +1770,8 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                     * Apre la scheda di dettaglio del prodotto corrente in una nuova finestra.
-                     */
+                 * Apre la scheda di dettaglio del prodotto corrente in una nuova finestra.
+                 */
                 goToProduct: function() {
                     const id = this.detailForm.data.product.id;
                     if ( id ) {
