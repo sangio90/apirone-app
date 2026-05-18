@@ -773,27 +773,35 @@ AP.plate.modal = ( function() {
                         },
                     } );
 
-                    // Auto-seleziona il primo valore degli attributi radice e carica i figli
-                    for ( const pi of this.detailForm.data.product.items ) {
-                        if ( pi.level === 0 && !pi.parentItemId && pi.values && pi.values.length ) {
-                            const hasSelection = pi.values.some( ( v ) => { return v.selected; } );
-                            if ( !hasSelection ) {
-                                pi.values[0].selected = true;
-                                await this.loadProductItems( pi.values[0].productItemId, pi.attributeId );
-                            }
-                        }
-                    }
-
                     if ( quotationItemId ) {
+                        let savedData = null;
                         await ajax( {
                             method: "GET",
                             url: BASE + "/quotation-items/" + quotationItemId + "/product-items",
                             callback: {
                                 done: ( xhr ) => {
-                                    this.restoreProductItemSelections( xhr.data );
+                                    savedData = xhr.data;
                                 },
                             },
                         } );
+                        if ( savedData?.length ) {
+                            await this.restoreProductItemSelections( savedData );
+                        }
+                    }
+                    if ( !quotationItemId || !this.detailForm.data.product.items.some( ( pi ) => {
+                        return pi.values?.some( ( v ) => { return v.selected; } );
+                    } ) ) {
+                        // Auto-seleziona il primo valore degli attributi radice e carica i figli
+                        // (solo per nuove placche o quando restore non ha trovato selezioni)
+                        for ( const pi of this.detailForm.data.product.items ) {
+                            if ( pi.level === 0 && !pi.parentItemId && pi.values?.length ) {
+                                const hasSelection = pi.values.some( ( v ) => { return v.selected; } );
+                                if ( !hasSelection ) {
+                                    pi.values[0].selected = true;
+                                    await this.loadProductItems( pi.values[0].productItemId, pi.attributeId );
+                                }
+                            }
+                        }
                     }
                 },
 
@@ -803,16 +811,50 @@ AP.plate.modal = ( function() {
                  * Al termine, applica l'immagine del product item selezionato.
                  * @param {Array} data - Elenco dei quotation item product items salvati.
                  */
-                restoreProductItemSelections: function( data ) {
+                restoreProductItemSelections: async function( data ) {
                     if ( !data || !data.length ) {
                         return;
                     }
-                    data.sort( ( a, b ) => {
-                        return a.productItem.orderby - b.productItem.orderby;
-                    } );
-                    data.forEach( ( qipi ) => {
-                        this.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
-                    } );
+
+                    // In precedenza le selezioni salvate venivano processate
+                    // in ordine crescente di orderby. Questo causava un problema quando un
+                    // attributo figlio (es. INCISIONE COLORE, orderby 90) veniva processato
+                    // PRIMA del suo genitore (es. INCISIONE LOGO, orderby 100).
+                    // Il metodo loadProductItems() per il genitore rimuove TUTTI i figli
+                    // (elementi con level > parent.level) e li ricarica dal server.
+                    // Così facendo, la selezione già applicata al figlio veniva azzerata
+                    // perché il figlio veniva rimosso e reinserito con tutti i valori
+                    // impostati a selected:false.
+                    //
+                    // Soluzione: raggruppare le selezioni per livello (qipi.level) e
+                    // processarle in ordine crescente di livello: prima tutti i genitori
+                    // (livello 0), che caricano la loro intera sottostruttura, poi i figli
+                    // (livello 1+). Così quando un figlio viene processato, il genitore
+                    // non verrà più rieseguito e la selezione non viene azzerata.
+                    const byLevel = {};
+                    let maxLevel = 0;
+                    for ( const qipi of data ) {
+                        const level = qipi.level || 0;
+                        if ( !byLevel[ level ] ) {
+                            byLevel[ level ] = [];
+                        }
+                        byLevel[ level ].push( qipi );
+                        if ( level > maxLevel ) {
+                            maxLevel = level;
+                        }
+                    }
+                    for ( let lv = 0; lv <= maxLevel; lv++ ) {
+                        const qipis = byLevel[ lv ];
+                        if ( !qipis ) {
+                            continue;
+                        }
+                        qipis.sort( ( a, b ) => {
+                            return a.productItem.orderby - b.productItem.orderby;
+                        } );
+                        for ( const qipi of qipis ) {
+                            await this.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, true );
+                        }
+                    }
                     this.$nextTick( () => {
                         this.renderPlateWithFruits();
                     } );
@@ -826,8 +868,10 @@ AP.plate.modal = ( function() {
                  * Gestisce la sostituzione degli items esistenti con quelli nuovi.
                  * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
                  * @param {string} attributeId - Identificativo dell'attributo da aggiornare.
+                 * @param {boolean} [skipAutoSelect=false] - Se true, non auto-seleziona il primo
+                 *   valore dei figli dopo il caricamento.
                  */
-                loadProductItems: async function( originId, attributeId ) {
+                loadProductItems: async function( originId, attributeId, skipAutoSelect ) {
                     const productId = this.detailForm.data.product.id;
                     const items = this.detailForm.data.product.items;
 
@@ -935,30 +979,32 @@ AP.plate.modal = ( function() {
                     } );
 
                     // Auto-seleziona il primo valore di ogni nuovo figlio e carica ricorsivamente
-                    const allItems = this.detailForm.data.product.items;
-                    let parentIdx = -1;
-                    for ( let i = 0; i < allItems.length; i++ ) {
-                        if ( allItems[i].attributeId == attributeId ) {
-                            parentIdx = i;
-                            break;
-                        }
-                    }
-                    if ( parentIdx !== -1 ) {
-                        const parentLevel = allItems[parentIdx].level;
-                        const children = [];
-                        for ( let i = parentIdx + 1; i < allItems.length; i++ ) {
-                            if ( allItems[i].level > parentLevel ) {
-                                children.push( allItems[i] );
-                            } else {
+                    if ( !skipAutoSelect ) {
+                        const allItems = this.detailForm.data.product.items;
+                        let parentIdx = -1;
+                        for ( let i = 0; i < allItems.length; i++ ) {
+                            if ( allItems[i].attributeId == attributeId ) {
+                                parentIdx = i;
                                 break;
                             }
                         }
-                        for ( const child of children ) {
-                            if ( child.values && child.values.length ) {
-                                const hasSelection = child.values.some( ( v ) => { return v.selected; } );
-                                if ( !hasSelection ) {
-                                    child.values[0].selected = true;
-                                    await this.loadProductItems( child.values[0].productItemId, child.attributeId );
+                        if ( parentIdx !== -1 ) {
+                            const parentLevel = allItems[parentIdx].level;
+                            const children = [];
+                            for ( let i = parentIdx + 1; i < allItems.length; i++ ) {
+                                if ( allItems[i].level > parentLevel ) {
+                                    children.push( allItems[i] );
+                                } else {
+                                    break;
+                                }
+                            }
+                            for ( const child of children ) {
+                                if ( child.values && child.values.length ) {
+                                    const hasSelection = child.values.some( ( v ) => { return v.selected; } );
+                                    if ( !hasSelection ) {
+                                        child.values[0].selected = true;
+                                        await this.loadProductItems( child.values[0].productItemId, child.attributeId );
+                                    }
                                 }
                             }
                         }
