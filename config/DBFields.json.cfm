@@ -220,6 +220,11 @@
         "type": "uuid"
     },
 
+    "quotationItem.ordinamento": {
+        "name": "quotation_items.ordinamento",
+        "type": "Numeric"
+    },
+
     "quotationZone.id": {
         "name": "quotation_zone_id",
         "type": "uuid"

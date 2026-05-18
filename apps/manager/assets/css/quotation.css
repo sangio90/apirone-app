@@ -309,3 +309,10 @@ input#input-item-total[readonly] {
 	background-position: center !important;
 	background-size: auto !important;
 }
+
+.qt-sort-placeholder {
+	background: rgb(232, 240, 254);
+	border: 2px dashed rgb(66, 133, 244) !important;
+	border-radius: 4px;
+	visibility: visible !important;
+}

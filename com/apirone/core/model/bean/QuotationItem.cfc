@@ -1,6 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="quantity" type="Numeric";
+	property name="ordinamento" type="Numeric";
 	property name="note" type="String";
 	property name="hash" type="String";
 	property name="special" type="Boolean" default="false";

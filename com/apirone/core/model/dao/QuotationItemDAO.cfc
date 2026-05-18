@@ -20,7 +20,7 @@
 		<cfargument name="quotationZoneId" type="String" required="false">
 		<cfargument name="quotationZoneOriginId" type="String" required="false">
 		<cfargument name="typeId" type="String" required="false">
-		<cfargument name="orderBy" type="String" required="true" default="quotation_items.quotation_item_id">
+		<cfargument name="orderBy" type="String" required="true" default="quotation_items.ordinamento, quotation_items.quotation_item_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
 
@@ -72,6 +72,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="getMaxOrdinamento" returntype="Numeric">
+		<cfargument name="quotationId" type="String" required="true">
+		<cfargument name="typeId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT COALESCE(MAX(quotation_items.ordinamento), 0) AS max_ord
+			FROM quotation_items
+			<cfif arguments.typeId EQ "ART">
+				WHERE quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+				  AND quotation_items.article_id IS NOT NULL
+			<cfelse>
+				INNER JOIN products ON quotation_items.product_id = products.product_id
+				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+				WHERE quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+				  AND product_categories.product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
+			</cfif>
+		</cfquery>
+		<cfreturn Val(local.q.max_ord)>
+	</cffunction>
+
 	<cffunction name="insert" returntype="String">
 		<cfargument name="quotationItem" type="com.apirone.core.model.bean.QuotationItem" required="true">
 
@@ -87,7 +108,8 @@
 				note,
 				quantity,
 				quotation_zone_position_id,
-				"hash"
+				"hash",
+				ordinamento
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
 					orientation_id
@@ -131,7 +153,8 @@
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getHash()#">
 				<cfelse>
 					NULL
-				</cfif>
+				</cfif>,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getOrdinamento()#">
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">
@@ -209,6 +232,16 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getId()#">::uuid
 		</cfquery>
 		<cfreturn arguments.quotationItem.getId()>
+	</cffunction>
+
+	<cffunction name="updateOrdinamento" returntype="void">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="ordinamento" type="Numeric" required="true">
+		<cfquery datasource="apirone">
+			UPDATE quotation_items
+			SET ordinamento = <cfqueryparam cfsqltype="Integer" value="#arguments.ordinamento#">
+			WHERE quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+		</cfquery>
 	</cffunction>
 
 	<cffunction name="updateHash" returntype="Boolean">

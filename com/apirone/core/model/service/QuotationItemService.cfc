@@ -86,6 +86,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	public void function reorder( required Array ids ){
+		var ordinamento = 10;
+		for ( var id in arguments.ids ) {
+			getDao().updateOrdinamento( id, ordinamento );
+			ordinamento += 10;
+		}
+	}
+
 	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemId ){
 		var outcome = super.bean( "Outcome" );
 
@@ -113,6 +121,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 
 			arguments.quotationItem = ensurePosition( arguments.quotationItem );
+
+			if ( !IsNumeric( arguments.quotationItem.getOrdinamento() ) || arguments.quotationItem.getOrdinamento() == 0 ) {
+				if ( !isNull( arguments.quotationItem.getArticle() ) ) {
+					var typeId = "ART";
+				} else if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+					var typeId = "PLA";
+				} else if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+					var typeId = "SEG";
+				} else {
+					var typeId = "ACC";
+				}
+				var maxOrd = getDao().getMaxOrdinamento( arguments.quotationItem.getQuotation().getId(), typeId );
+				arguments.quotationItem.setOrdinamento( maxOrd + 10 );
+			}
 
 			var newId = getDao().insert( arguments.quotationItem );
 
@@ -361,6 +383,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			bean.setNote( record.note );
 			bean.setHash( record.hash );
+			if ( !isNull( record.ordinamento ) ) bean.setOrdinamento( record.ordinamento );
 			bean.setSpecial( BooleanFormat( Val( record.special ) ) );
 			bean.setCustomImage( BooleanFormat( Val( record.custom_image ) ) );
 

@@ -122,19 +122,19 @@
                                     <div class="tab-content" id="nav-tabContent">
                                         <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
+                                                <div id="qt-items-plate" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsSignage" class="row">
+                                                <div id="qt-items-signage" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsSignage" class="row">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-accessory" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsAccessory" class="row">
+                                                <div id="qt-items-accessory" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsAccessory" class="row">
                                                 </div>
                                             </div>
                                         </div>
