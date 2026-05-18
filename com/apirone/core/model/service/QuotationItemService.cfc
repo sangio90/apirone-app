@@ -711,8 +711,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productId = quotationItem.getProduct().getId();
 		var quantity = quotationItem.getQuantity();
 		var productItemIds = [];
-		for (var item in quotationItem.getItems()) {
-			productItemIds.append(item.getProductItem().getId())
+		if (!isNull(quotationItem.getItems())) {
+			for (var item in quotationItem.getItems()) {
+				productItemIds.append(item.getProductItem().getId())
+			}
 		}
 
 		//questa parte serve per replicare le strutture dati che si aspettano getSignagePricing e la getPlatePricing quando chiamate dal client

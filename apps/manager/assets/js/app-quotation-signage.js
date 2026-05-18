@@ -1594,7 +1594,6 @@ AP.signage.modal = ( function() {
                 },
             },
         } );
-		debugger
 		var data = signageResponse.data;
 
 		viewModel.set( "detailForm.title", "Modifica segnaletica" );
