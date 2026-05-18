@@ -94,6 +94,20 @@
 											</td>
 										</tr>
 									</table>
+								<cfelseif !isNull(args.data.quotation.getLead())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Lead: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getLead().getName()#</td>
+										</tr>
+									</table>
+								<cfelseif !isNull(args.data.quotation.getOpportunity())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Opportunità: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getOpportunity().getName()#</td>
+										</tr>
+									</table>
 								</cfif>
 							</td>
 							<td>
