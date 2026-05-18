@@ -109,6 +109,11 @@ AP.quotation.header = ( function() {
 			agente3: null,
 			agente4: null,
 			agente5: null,
+			commission1: null,
+			commission2: null,
+			commission3: null,
+			commission4: null,
+			commission5: null,
         },
         title: "Modifica preventivo",
         totals: {
@@ -133,6 +138,10 @@ AP.quotation.header = ( function() {
         techUsers: new kendo.data.DataSource(),
         canEdit: AP.page.canEdit,
         canSee: AP.page.canSee,
+        agente2Enabled: false,
+        agente3Enabled: false,
+        agente4Enabled: false,
+        agente5Enabled: false,
 
         crmCustomers: new kendo.data.DataSource( {
             serverFiltering: true,
@@ -230,7 +239,7 @@ AP.quotation.header = ( function() {
             } );
         },
 		showAgenti: function() {
-			return !viewModel.get("detailForm.data.nessunAgente")
+			return !viewModel.get("detailForm.data.nessunAgente");
 		},
         changeMode: function( e ) {
             viewModel.set( "mode", e.currentTarget.textContent.toLowerCase() );
@@ -388,7 +397,7 @@ AP.quotation.header = ( function() {
                 status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
                 const parsedData = viewModel.get( "detailForm.data" );
 
-                NM.util.ajax( {
+	                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotations",
                     data: JSON.stringify( parsedData ),
@@ -413,6 +422,23 @@ AP.quotation.header = ( function() {
 
     } );
 
+    function clearAgentiFrom(n) {
+        for (var i = n; i <= 5; i++) {
+            viewModel.set("detailForm.data.agente" + i, null);
+            viewModel.set("detailForm.data.commission" + i, null);
+        }
+    }
+
+    function syncAgentiEnabled() {
+        for (var i = 2; i <= 5; i++) {
+            var prev = viewModel.get("detailForm.data.agente" + (i - 1));
+            var prevId = prev ? (typeof prev === "object" ? prev.id : prev) : "";
+            var enabled = !!(prevId && prevId !== "");
+            viewModel.set("agente" + i + "Enabled", enabled);
+            $("#agente-commission-" + i).prop("disabled", !enabled);
+        }
+    }
+
     pub.config = function() {
         return viewModel.get( "detailForm.data" );
     };
@@ -432,6 +458,7 @@ AP.quotation.header = ( function() {
                     viewModel.set( "detailForm.data", xhr.data );
 
                     setTimeout( function() {
+                        syncAgentiEnabled();
                         AP.loading.hide();
                     }, 1000 );
 
@@ -473,7 +500,9 @@ AP.quotation.header = ( function() {
 			url: "/manager/ajax/accounts",
 			callback: {
 				done: function( xhr ) {
+					xhr.data.unshift( { id: "", name: "-- seleziona" } );
 					viewModel.set( "agentiList", xhr.data );
+					setTimeout( syncAgentiEnabled, 0 );
 				},
 			},
 		} );
@@ -481,15 +510,34 @@ AP.quotation.header = ( function() {
 		viewModel.bind("change", function(e) {
 
 			if (e.field === "detailForm.data.nessunAgente") {
-				const nessunAgente = viewModel.get("detailForm.data.nessunAgente");
-				// debugger
-				if (nessunAgente == true) {
-					viewModel.set("detailForm.data.agente1", null);
-					viewModel.set("detailForm.data.agente2", null);
-					viewModel.set("detailForm.data.agente3", null);
-					viewModel.set("detailForm.data.agente4", null);
-					viewModel.set("detailForm.data.agente5", null);
+				if (viewModel.get("detailForm.data.nessunAgente") == true) {
+					clearAgentiFrom(1);
 				}
+				syncAgentiEnabled();
+			}
+
+			if (e.field === "detailForm.data.agente1") {
+				var a = viewModel.get("detailForm.data.agente1");
+				if (!a || !a.id) clearAgentiFrom(2);
+				syncAgentiEnabled();
+			}
+
+			if (e.field === "detailForm.data.agente2") {
+				var a = viewModel.get("detailForm.data.agente2");
+				if (!a || !a.id) clearAgentiFrom(3);
+				syncAgentiEnabled();
+			}
+
+			if (e.field === "detailForm.data.agente3") {
+				var a = viewModel.get("detailForm.data.agente3");
+				if (!a || !a.id) clearAgentiFrom(4);
+				syncAgentiEnabled();
+			}
+
+			if (e.field === "detailForm.data.agente4") {
+				var a = viewModel.get("detailForm.data.agente4");
+				if (!a || !a.id) clearAgentiFrom(5);
+				syncAgentiEnabled();
 			}
 		});
     };

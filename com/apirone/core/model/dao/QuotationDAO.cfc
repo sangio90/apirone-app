@@ -65,7 +65,12 @@
 				quotations.agente2,
 				quotations.agente3,
 				quotations.agente4,
-				quotations.agente5
+				quotations.agente5,
+				quotations.commission1,
+				quotations.commission2,
+				quotations.commission3,
+				quotations.commission4,
+				quotations.commission5
 			FROM quotations
 				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
@@ -158,7 +163,12 @@
 				agente2,
 				agente3,
 				agente4,
-				agente5
+				agente5,
+				commission1,
+				commission2,
+				commission3,
+				commission4,
+				commission5
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -210,11 +220,56 @@
 				</cfif>,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOwner().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getNessunAgente()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
+				<cfif !IsNull( arguments.quotation.getAgente1() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente2() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente3() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente4() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente5() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission1() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission1()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission2() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission2()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission3() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission3()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission4() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission4()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission5() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
+				<cfelse>
+					NULL
+				</cfif>
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -370,7 +425,43 @@
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
 					<cfelse>
 						NULL
+					</cfif>,
+
+				commission1 =
+					<cfif !IsNull( arguments.quotation.getCommission1() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission1()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission2 =
+					<cfif !IsNull( arguments.quotation.getCommission2() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission2()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission3 =
+					<cfif !IsNull( arguments.quotation.getCommission3() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission3()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission4 =
+					<cfif !IsNull( arguments.quotation.getCommission4() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission4()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission5 =
+					<cfif !IsNull( arguments.quotation.getCommission5() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
+					<cfelse>
+						NULL
 					</cfif>
+
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
 		</cfquery>

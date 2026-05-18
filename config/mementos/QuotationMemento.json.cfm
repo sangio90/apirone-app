@@ -19,7 +19,12 @@
 		"agente2",
 		"agente3",
 		"agente4",
-		"agente5"
+		"agente5",
+		"commission1",
+		"commission2",
+		"commission3",
+		"commission4",
+		"commission5"
 	],
 	profiles = {
 		detail = {
@@ -54,7 +59,12 @@
 				"agente2",
 				"agente3",
 				"agente4",
-				"agente5"
+				"agente5",
+				"commission1",
+				"commission2",
+				"commission3",
+				"commission4",
+				"commission5"
 			]
 		}
 	}

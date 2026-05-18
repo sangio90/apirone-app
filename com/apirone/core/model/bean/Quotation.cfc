@@ -30,6 +30,11 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="agente3" type="String";
 	property name="agente4" type="String";
 	property name="agente5" type="String";
+	property name="commission1" type="Numeric";
+	property name="commission2" type="Numeric";
+	property name="commission3" type="Numeric";
+	property name="commission4" type="Numeric";
+	property name="commission5" type="Numeric";
 
 	public Quotation function init(){
 		return this;

@@ -1067,11 +1067,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
 			bean.setNessunAgente( record.nessun_agente );
-			bean.setAgente1( record.agente1 );
-			bean.setAgente2( record.agente2 );
-			bean.setAgente3( record.agente3 );
-			bean.setAgente4( record.agente4 );
-			bean.setAgente5( record.agente5 );
+			if ( !IsNull( record.agente1 ) && Len( record.agente1 ) ) bean.setAgente1( record.agente1.toString() );
+			if ( !IsNull( record.agente2 ) && Len( record.agente2 ) ) bean.setAgente2( record.agente2.toString() );
+			if ( !IsNull( record.agente3 ) && Len( record.agente3 ) ) bean.setAgente3( record.agente3.toString() );
+			if ( !IsNull( record.agente4 ) && Len( record.agente4 ) ) bean.setAgente4( record.agente4.toString() );
+			if ( !IsNull( record.agente5 ) && Len( record.agente5 ) ) bean.setAgente5( record.agente5.toString() );
+			if ( !IsNull( record.commission1 ) ) bean.setCommission1( record.commission1 );
+			if ( !IsNull( record.commission2 ) ) bean.setCommission2( record.commission2 );
+			if ( !IsNull( record.commission3 ) ) bean.setCommission3( record.commission3 );
+			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
+			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

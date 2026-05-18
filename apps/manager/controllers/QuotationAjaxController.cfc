@@ -164,12 +164,39 @@ component extends="com.apirone.core.controller.AbsController" {
 		quotation.setPaymentMethod( paymentMethod.setId( json.paymentMethod.id ) );
 		quotation.setCurrency( currency.setId( json.currency.id ) );
 
-		quotation.setAgente1( json.agente1?.id );
-		quotation.setAgente2( json.agente2?.id );
-		quotation.setAgente3( json.agente3?.id );
-		quotation.setAgente4( json.agente4?.id );
-		quotation.setAgente5( json.agente5?.id );
 		quotation.setNessunAgente( json.nessunAgente );
+
+		var _ag1 = json.agente1;
+		if ( !isNull(_ag1) ) {
+			if ( isStruct(_ag1) && !isNull(_ag1.id) && len(_ag1.id) ) { quotation.setAgente1( _ag1.id ); }
+			else if ( !isStruct(_ag1) && len(_ag1) ) { quotation.setAgente1( _ag1 ); }
+		}
+		var _ag2 = json.agente2;
+		if ( !isNull(_ag2) ) {
+			if ( isStruct(_ag2) && !isNull(_ag2.id) && len(_ag2.id) ) { quotation.setAgente2( _ag2.id ); }
+			else if ( !isStruct(_ag2) && len(_ag2) ) { quotation.setAgente2( _ag2 ); }
+		}
+		var _ag3 = json.agente3;
+		if ( !isNull(_ag3) ) {
+			if ( isStruct(_ag3) && !isNull(_ag3.id) && len(_ag3.id) ) { quotation.setAgente3( _ag3.id ); }
+			else if ( !isStruct(_ag3) && len(_ag3) ) { quotation.setAgente3( _ag3 ); }
+		}
+		var _ag4 = json.agente4;
+		if ( !isNull(_ag4) ) {
+			if ( isStruct(_ag4) && !isNull(_ag4.id) && len(_ag4.id) ) { quotation.setAgente4( _ag4.id ); }
+			else if ( !isStruct(_ag4) && len(_ag4) ) { quotation.setAgente4( _ag4 ); }
+		}
+		var _ag5 = json.agente5;
+		if ( !isNull(_ag5) ) {
+			if ( isStruct(_ag5) && !isNull(_ag5.id) && len(_ag5.id) ) { quotation.setAgente5( _ag5.id ); }
+			else if ( !isStruct(_ag5) && len(_ag5) ) { quotation.setAgente5( _ag5 ); }
+		}
+
+		if ( !isNull(json.commission1) && isNumeric(json.commission1) ) quotation.setCommission1( json.commission1 );
+		if ( !isNull(json.commission2) && isNumeric(json.commission2) ) quotation.setCommission2( json.commission2 );
+		if ( !isNull(json.commission3) && isNumeric(json.commission3) ) quotation.setCommission3( json.commission3 );
+		if ( !isNull(json.commission4) && isNumeric(json.commission4) ) quotation.setCommission4( json.commission4 );
+		if ( !isNull(json.commission5) && isNumeric(json.commission5) ) quotation.setCommission5( json.commission5 );
 
 		if ( !Len( json.id ) ) {
 

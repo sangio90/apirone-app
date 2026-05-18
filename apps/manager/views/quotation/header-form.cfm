@@ -364,58 +364,93 @@
 				</div>
 
 				<div data-bind="visible: showAgenti">
-					<div class="form-group row mb-3">
+					<div class="form-group row mb-3 align-items-center">
 						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 1</label>
-						<div class="col-sm-9">
+						<div class="col-sm-6">
 							<select name="agente1" class="form-control"
 								data-bind="source: agentiList, value: detailForm.data.agente1"
 								data-value-field="id"
 								data-text-field="name">
 							</select>
 						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+								<input type="number" class="form-control" placeholder="Provv." min="0" max="100" step="0.01" autocomplete="off"
+									data-bind="value: detailForm.data.commission1">
+								<span class="input-group-text">%</span>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-group row mb-3">
+					<div class="form-group row mb-3 align-items-center">
 						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 2</label>
-						<div class="col-sm-9">
+						<div class="col-sm-6">
 							<select name="agente2" class="form-control"
-								data-bind="source: agentiList, value: detailForm.data.agente2"
+								data-bind="source: agentiList, value: detailForm.data.agente2, enabled: agente2Enabled"
 								data-value-field="id"
 								data-text-field="name">
 							</select>
 						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+								<input type="number" id="agente-commission-2" class="form-control" placeholder="Provv." min="0" max="100" step="0.01" autocomplete="off"
+									data-bind="value: detailForm.data.commission2">
+								<span class="input-group-text">%</span>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-group row mb-3">
+					<div class="form-group row mb-3 align-items-center">
 						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 3</label>
-						<div class="col-sm-9">
+						<div class="col-sm-6">
 							<select name="agente3" class="form-control"
-								data-bind="source: agentiList, value: detailForm.data.agente3"
+								data-bind="source: agentiList, value: detailForm.data.agente3, enabled: agente3Enabled"
 								data-value-field="id"
 								data-text-field="name">
 							</select>
 						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+								<input type="number" id="agente-commission-3" class="form-control" placeholder="Provv." min="0" max="100" step="0.01" autocomplete="off"
+									data-bind="value: detailForm.data.commission3">
+								<span class="input-group-text">%</span>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-group row mb-3">
+					<div class="form-group row mb-3 align-items-center">
 						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 4</label>
-						<div class="col-sm-9">
+						<div class="col-sm-6">
 							<select name="agente4" class="form-control"
-								data-bind="source: agentiList, value: detailForm.data.agente4"
+								data-bind="source: agentiList, value: detailForm.data.agente4, enabled: agente4Enabled"
 								data-value-field="id"
 								data-text-field="name">
 							</select>
 						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+								<input type="number" id="agente-commission-4" class="form-control" placeholder="Provv." min="0" max="100" step="0.01" autocomplete="off"
+									data-bind="value: detailForm.data.commission4">
+								<span class="input-group-text">%</span>
+							</div>
+						</div>
 					</div>
 
-					<div class="form-group row mb-3">
+					<div class="form-group row mb-3 align-items-center">
 						<label class="col-sm-3 control-label text-sm-end pt-2">Agente 5</label>
-						<div class="col-sm-9">
+						<div class="col-sm-6">
 							<select name="agente5" class="form-control"
-								data-bind="source: agentiList, value: detailForm.data.agente5"
+								data-bind="source: agentiList, value: detailForm.data.agente5, enabled: agente5Enabled"
 								data-value-field="id"
 								data-text-field="name">
 							</select>
+						</div>
+						<div class="col-sm-3">
+							<div class="input-group">
+								<input type="number" id="agente-commission-5" class="form-control" placeholder="Provv." min="0" max="100" step="0.01" autocomplete="off"
+									data-bind="value: detailForm.data.commission5">
+								<span class="input-group-text">%</span>
+							</div>
 						</div>
 					</div>
 				</div>
