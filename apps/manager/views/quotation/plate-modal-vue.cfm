@@ -431,9 +431,10 @@
                                             <div class="row mb-2">
                                                 <div class="col-12">
                                                     <div class="input-group">
-                                                    <!--- input-group Bootstrap: accosta il campo input al simbolo € come add-on. --->
-                                                        <input class="form-control text-end" name="total" id="input-item-total" style="font-size: 12px;" placeholder="Totale" v-model="pricing.data.total" :disabled="!pricing.isTotalEnabled">
-                                                        <!--- pricing.data.total: importo totale dell'articolo (al netto degli sconti). :disabled="!pricing.isTotalEnabled": disabilitato quando il totale è calcolato automaticamente (metodo "C"). isTotalEnabled è true solo per il metodo "F" (Fisso). --->
+                                                        <!--- input attivo in modalità Fisso, disabilitato in Calcolato. --->
+                                                        <!--- input attivo in modalità Fisso, disabilitato in Calcolato. --->
+                                                        <input v-if="pricing.isTotalEnabled" class="form-control text-end" name="total" id="input-item-total" style="font-size: 12px;" placeholder="Totale" v-model="pricing.data.total">
+                                                        <input v-else class="form-control text-end" style="font-size: 12px;" disabled :value="formatMoney(pricing.data.total) + ' €'">
                                                         <span class="input-group-text"><i class="fas fa-euro-sign"></i></span>
                                                     </div>
                                                 </div>
