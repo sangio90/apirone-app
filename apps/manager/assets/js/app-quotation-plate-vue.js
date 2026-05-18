@@ -2148,6 +2148,9 @@ AP.plate.modal = ( function() {
                 if ( data.quotationItem.price.method ) {
                     window.vm.pricing.data.method = data.quotationItem.price.method;
                 }
+                if ( window.vm.pricing.data.total != null ) {
+                    window.vm.pricing.data.total = Number( window.vm.pricing.data.total ).toFixed( 2 );
+                }
                 window.vm.pricing.isTotalEnabled = data.quotationItem.price.method?.id === "F";
             }
         }
