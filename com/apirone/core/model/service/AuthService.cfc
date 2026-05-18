@@ -85,32 +85,54 @@ component extends="AbsService" accessors="true" {
 		return result;
 	}
 
-	/*
-	public String function sendRecoveryPasswordEmail( required String email ){
-		var emailUtil = new com.wineshipping.core.util.Email();
+	public void function sendRecoveryEmail( required String email ){
+		var account = getAccountService().getByEmail( arguments.email );
+		if ( isNull( account ) ) return;
 
-		var subject = "Cambia password";
-		var key     = getPwdTokenService().createToken( account = getAccountService().getByEmail( arguments.email ) );
+		var sys        = createObject( "java", "java.lang.System" );
+		var rawToken   = lCase( createUUID() ) & lCase( createUUID() );
+		var expiresAt  = DateFormat( DateAdd( "h", 1, Now() ), "yyyy-mm-dd" ) & " " & TimeFormat( DateAdd( "h", 1, Now() ), "HH:mm:ss" );
 
-		emailUtil.send(
-			to      = arguments.email,
-			subject = subject,
-			content = getRecoveryPwdEmailContent( key )
+		getAccountService().storeResetToken(
+			accountId   = account.getId(),
+			hashedToken = Hash( rawToken, "SHA-512" ),
+			expiresAt   = expiresAt
 		);
 
-		return emailUtil.obfuscate( arguments.email );
-	}
-	*/
+		var siteMain  = sys.getProperty( "site.main" );
+		var fromEmail = sys.getProperty( "email.from" );
+		var mailHost  = sys.getProperty( "mailserver.host" );
+		var mailPort  = Val( sys.getProperty( "mailserver.port" ) );
+		var mailUser  = sys.getProperty( "mailserver.username" );
+		var mailPwd   = sys.getProperty( "mailserver.pwd" );
+		var resetUrl  = "#siteMain#/manager/login/reset-password?token=#rawToken#";
+		var body      = getRecoveryPwdEmailContent( resetUrl );
 
-	public String function getRecoveryPwdEmailContent( required String key ){
-		return (
-			"<h2>Clicca al link seguente per cambiare la password. </h2> 
-            <p>
-                <a href=""%client.url*/recover-password/#arguments.key#"">
-                    Cambia password
-                </a>
-            </p>"
-		)
+		try {
+			cfmail(
+				to       = account.getEmail(),
+				from     = fromEmail,
+				subject  = "Recupero password",
+				type     = "html",
+				server   = mailHost,
+				port     = mailPort,
+				username = mailUser,
+				password = mailPwd
+			) {
+				writeOutput( body );
+			}
+		} catch ( any e ) {
+			super.logEvent( event = "auth.RECOVERY_EMAIL_FAILED", message = e.message, payload = { accountId = account.getId() } );
+		}
+	}
+
+	public String function getRecoveryPwdEmailContent( required String resetUrl ){
+		return "
+			<h2>Recupero password</h2>
+			<p>Clicca sul link seguente per impostare una nuova password. Il link è valido per 1 ora.</p>
+			<p><a href=""#arguments.resetUrl#"">Cambia password</a></p>
+			<p>Se non hai richiesto il recupero della password, ignora questa email.</p>
+		";
 	}
 
 }

@@ -234,6 +234,8 @@
 		post( "/login/check" ).toHandler( "AuthController.checkLogin" );
 		post( "/login/recover/check" ).toHandler( "AuthController.checkRecover" );
 		get( "/login/recover" ).toHandler( "AuthController.recover" );
+		post( "/login/reset-password/check" ).toHandler( "AuthController.checkResetPassword" );
+		get( "/login/reset-password" ).toHandler( "AuthController.resetPassword" );
 		get( "/login/pincode" ).toHandler( "AuthController.pincode" );
 		get( "/login" ).toHandler( "AuthController.login" );
 		get( "/logout" ).toHandler( "AuthController.logout" );
