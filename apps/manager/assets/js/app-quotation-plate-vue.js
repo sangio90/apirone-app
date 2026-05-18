@@ -1510,6 +1510,10 @@ AP.plate.modal = ( function() {
 
                 updateFruitAttributeOverlay: function( attributeId, value ) {
                     if ( !value || !attributeId ) { return; }
+                    // Gli attributeId del server sono sempre numerici.
+                    // Se attributeId non è un numero (es. UUID di un frutto),
+                    // significa che non è un attributo valido — salta.
+                    if ( typeof attributeId === "string" && !/^\d+$/.test( attributeId ) ) { return; }
                     const container = $( "#plate-background .attributes" );
                     if ( !container.length ) { return; }
                     $( "#plate-background .attributes #" + attributeId ).remove();
