@@ -381,7 +381,7 @@
                                                             <tr v-for="line in pricing.data.lines" :key="line.name">
                                                             <!--- Itera sulle righe di dettaglio del prezzo calcolato. Ogni riga (line) ha: name (descrizione voce di costo), amount (importo formattato). --->
                                                                 <td><span>{{ line.name }}</span></td>
-                                                                <td width="30" class="text-end" nowrap><span>{{ line.amount }}</span> &euro;</td>
+                                                                <td width="30" class="text-end" nowrap><span>{{ formatMoney(line.amount) }}</span> &euro;</td>
                                                             </tr>
                                                         </tbody>
                                                     </table>

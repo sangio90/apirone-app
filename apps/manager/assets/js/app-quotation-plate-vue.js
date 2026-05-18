@@ -1734,6 +1734,20 @@ AP.plate.modal = ( function() {
                 },
 
                 // --- Save ---
+
+                /**
+                 * Formatta un importo numerico nel formato valuta italiano:
+                 * punto come separatore delle migliaia, virgola per i decimali,
+                 * sempre due cifre decimali.
+                 * @param {*} amount - Valore da formattare (numero o stringa numerica).
+                 * @returns {string} Importo formattato, o stringa vuota se non valido.
+                 */
+                formatMoney: function( amount ) {
+                    if ( amount === null || amount === undefined || amount === "" ) { return ""; }
+                    const num = Number( amount );
+                    if ( isNaN( num ) ) { return String( amount ); }
+                    return num.toLocaleString( "it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 } );
+                },
                 /**
                  * Salva la placca sul server.
                  * Verifica la presenza di almeno un frutto e, in caso di custom image,
