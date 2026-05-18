@@ -1244,39 +1244,56 @@ AP.plate.modal = ( function() {
                         },
                     } );
 
-                    // Auto-seleziona il primo valore degli attributi radice dei frutti e carica i figli
-                    for ( const fi of thisFruit.items ) {
-                        if ( fi.level === 0 && !fi.parentItemId && fi.values && fi.values.length ) {
-                            const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
-                            if ( !hasSelection ) {
-                                fi.values[0].selected = true;
-                                await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.attributeId );
-                            }
-                        }
-                    }
-
+                    // Carica prima le selezioni salvate degli attributi (se presenti)
+                    const savedSelections = [];
                     const qifId = thisFruit.id;
-                    if ( qifId && qifId.length > 0 ) {
+                    if ( typeof qifId === "number" ) {
                         await ajax( {
                             method: "GET",
                             url: BASE + "/quotation-items/fruits/" + qifId + "/product-items",
                             callback: {
                                 done: ( xhr ) => {
                                     if ( xhr.data && xhr.data.length ) {
-                                        xhr.data.sort( ( a, b ) => { return a.productItem.orderby - b.productItem.orderby; } );
-                                        this.$nextTick( () => {
-                                            xhr.data.forEach( ( qipi ) => {
-                                                const sel = $( `#quotation-fruit-row-items_${fruitId} select[data-attribute-id='${qipi.productItem.attribute.id}']` );
-                                                if ( sel.length ) {
-                                                    sel.val( qipi.productItem.id );
-                                                    sel.trigger( "change" );
-                                                }
-                                            } );
-                                        } );
+                                        savedSelections.push( ...xhr.data );
                                     }
                                 },
                             },
                         } );
+                    }
+
+                    // Se i valori degli attributi sono salvati nel db, applica quelli
+                    if ( savedSelections.length > 0 ) {
+                        this._cascadingFruit = true;
+                        savedSelections.sort( ( a, b ) => { return a.productItem.orderby - b.productItem.orderby; } );
+                        for ( const qipi of savedSelections ) {
+                            debugger; // [2] iterazione saved selection
+                            console.log( "qipi:", qipi.productItem.attribute.id, qipi.productItem.id );
+                            for ( const fi of thisFruit.items ) {
+                                if ( fi.attributeId == qipi.productItem.attribute.id ) {
+                                    console.log( "  fi match:", fi.attributeId, fi.attributeName, fi.level );
+                                    const match = fi.values.find( ( v ) => { return v.productItemId == qipi.productItem.id; } );
+                                    console.log( "  match:", match );
+                                    if ( match ) {
+                                        match.selected = true;
+                                        await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.attributeId, true );
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        this._cascadingFruit = false;
+                    } else {
+                        // Altrimenti procede con l'auto-selezione normale:
+                        // auto-seleziona il primo valore degli attributi radice e carica i figli
+                        for ( const fi of thisFruit.items ) {
+                            if ( fi.level === 0 && !fi.parentItemId && fi.values && fi.values.length ) {
+                                const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
+                                if ( !hasSelection ) {
+                                    fi.values[0].selected = true;
+                                    await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.attributeId );
+                                }
+                            }
+                        }
                     }
                 },
 
@@ -1328,8 +1345,11 @@ AP.plate.modal = ( function() {
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
                  * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {boolean} [skipAutoSelect=false] - Se true, non auto-seleziona il primo
+                 *   valore dei figli dopo il caricamento. Utile quando si ripristinano selezioni
+                 *   salvate (il loop chiamante si occupa di selezionare i valori corretti).
                  */
-                loadFruitProductItems: async function( fruitId, originId, attributeId ) {
+                loadFruitProductItems: async function( fruitId, originId, attributeId, skipAutoSelect ) {
                     let fruit = null;
                     for ( const fr of this.detailForm.data.fruits ) {
                         if ( fr.id === fruitId ) {
@@ -1444,26 +1464,29 @@ AP.plate.modal = ( function() {
                     // Auto-seleziona il primo valore di ogni nuovo figlio
                     // Il watcher processFruitCascade si occuperà di caricare ricorsivamente
                     // i figli successivi e di chiamare updateFruitAttributeOverlay.
-                    const updatedFruitItems = fruit.items;
-                    let fruitParentIdx = -1;
-                    for ( let i = 0; i < updatedFruitItems.length; i++ ) {
-                        if ( updatedFruitItems[i].attributeId == attributeId ) {
-                            fruitParentIdx = i;
-                            break;
-                        }
-                    }
-                    if ( fruitParentIdx !== -1 ) {
-                        const fruitParentLevel = updatedFruitItems[fruitParentIdx].level;
-                        for ( let i = fruitParentIdx + 1; i < updatedFruitItems.length; i++ ) {
-                            if ( updatedFruitItems[i].level > fruitParentLevel ) {
-                                if ( updatedFruitItems[i].values && updatedFruitItems[i].values.length ) {
-                                    const hasSelection = updatedFruitItems[i].values.some( ( v ) => { return v.selected; } );
-                                    if ( !hasSelection ) {
-                                        updatedFruitItems[i].values[0].selected = true;
-                                    }
-                                }
-                            } else {
+                    // Se skipAutoSelect è true, salta (il chiamante gestisce le selezioni).
+                    if ( !skipAutoSelect ) {
+                        const updatedFruitItems = fruit.items;
+                        let fruitParentIdx = -1;
+                        for ( let i = 0; i < updatedFruitItems.length; i++ ) {
+                            if ( updatedFruitItems[i].attributeId == attributeId ) {
+                                fruitParentIdx = i;
                                 break;
+                            }
+                        }
+                        if ( fruitParentIdx !== -1 ) {
+                            const fruitParentLevel = updatedFruitItems[fruitParentIdx].level;
+                            for ( let i = fruitParentIdx + 1; i < updatedFruitItems.length; i++ ) {
+                                if ( updatedFruitItems[i].level > fruitParentLevel ) {
+                                    if ( updatedFruitItems[i].values && updatedFruitItems[i].values.length ) {
+                                        const hasSelection = updatedFruitItems[i].values.some( ( v ) => { return v.selected; } );
+                                        if ( !hasSelection ) {
+                                            updatedFruitItems[i].values[0].selected = true;
+                                        }
+                                    }
+                                } else {
+                                    break;
+                                }
                             }
                         }
                     }
