@@ -916,6 +916,7 @@ AP.plate.modal = ( function() {
                                         attr.values.push( {
                                             attributeValue: item.attributeValue,
                                             productItemId: item.id,
+                                            images: item.images,
                                             selected: false,
                                             horizontalImage: item.horizontalImage,
                                             verticalImage: item.verticalImage,
@@ -968,7 +969,7 @@ AP.plate.modal = ( function() {
                  * Cambia l'immagine visualizzata per un product item selezionato.
                  * Cerca l'immagine corrispondente all'orientamento corrente tra quelle disponibili.
                  * Se trovata, crea o aggiorna un elemento DOM sovrapposto al designer della placca.
-                 * @param {Object} item - Oggetto valore del product item con productItemId e images.
+                 * @param {Object} item - Oggetto valore del product item con productItemId, images/horizontalImage/verticalImage.
                  */
                 changeImage: function( item ) {
                     if ( !item || !item.productItemId ) {
@@ -985,11 +986,15 @@ AP.plate.modal = ( function() {
                             }
                         }
                     }
+                    if ( !uri ) {
+                        uri = orientationId === "VER" ? item.verticalImage?.uri : item.horizontalImage?.uri;
+                    }
                     if ( uri ) {
                         const existing = $( `#productItem-image-${item.productItemId}` );
                         if ( existing.length ) {
                             existing.css( "background-image", `url('${uri}')` );
                         } else {
+                            const zIndex = ( item.orderby || 0 ) + 10;
                             $( "<div>" )
                                 .attr( "id", `productItem-image-${item.productItemId}` )
                                 .css( {
@@ -1001,7 +1006,7 @@ AP.plate.modal = ( function() {
                                     left: 0,
                                     width: "100%",
                                     height: "100%",
-                                    "z-index": item.productItemId,
+                                    "z-index": zIndex,
                                 } )
                                 .insertBefore( "#plate-layers" );
                         }
