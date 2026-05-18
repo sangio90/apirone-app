@@ -115,14 +115,14 @@
                                     <nav>
                                         <ul class="nav nav-tabs" role="tablist" id="quotation-plate-product-items-tabs">
                                         <!--- Navigazione a tabs Bootstrap 5 (nav-tabs). role="tablist": accessibilità per screen reader. --->
-                                            <li class="nav-item">
+                                            <li class="nav-item" style="cursor: pointer;">
                                                 <a class="nav-link" :class="{ active: activeTab === 'plate' }" id="plate-product-items-but"
                                                     @click.prevent="activeTab = 'plate'" role="tab">
                                                     Placca
                                                 </a>
                                             </li>
                                             <!--- Tab "Placca": mostra gli attributi configurabili della placca. .active di default perché la placca è il pannello principale. --->
-                                            <li class="nav-item">
+                                            <li class="nav-item" style="cursor: pointer;">
                                                 <a class="nav-link" :class="{ active: activeTab === 'fruits' }" id="plate-fruit-product-items-but"
                                                     @click.prevent="activeTab = 'fruits'" role="tab">
                                                     Frutti <span>(<span>{{ getFruitCount }}</span>)</span>
@@ -378,7 +378,7 @@
                                                 <div class="col-12">
                                                     <table style="width: 100%" class="quotation-table-item-prices-totals">
                                                         <tbody>
-                                                            <tr v-for="line in pricing.data.lines" :key="line.name">
+                                                            <tr v-for="(line, idx) in pricing.data.lines" :key="`price-line-${idx}`">
                                                             <!--- Itera sulle righe di dettaglio del prezzo calcolato. Ogni riga (line) ha: name (descrizione voce di costo), amount (importo formattato). --->
                                                                 <td><span>{{ line.name }}</span></td>
                                                                 <td width="30" class="text-end" nowrap><span>{{ formatMoney(line.amount) }}</span> &euro;</td>
