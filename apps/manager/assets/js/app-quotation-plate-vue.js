@@ -1068,7 +1068,7 @@ AP.plate.modal = ( function() {
                                 for ( const fi of fruit.items ) {
                                     const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
                                     if ( selected && selected.productItemId ) {
-                                        this.updateFruitAttributeOverlay( fi.attributeId, selected );
+                                        this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected );
                                     }
                                 }
                             }
@@ -1256,38 +1256,24 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                 * Cambia l'immagine di un frutto in base alle selezioni correnti dei suoi product items.
-                 * Combina gli ID dei product items selezionati e invia una richiesta AJAX
-                 * per trovare l'immagine della combinazione corrispondente.
+                 * Imposta l'immagine radice del frutto
+                 * sul tag <img> del frutto nella griglia. Se il frutto non ha un'immagine
+                 * radice (es. nessuna immagine definita sul prodotto frutto), nasconde
+                 * completamente il tag <img>.
+                 * NON carica immagini di combinazione dagli attributi selezionati
                  * @param {string} fruitId - Identificativo del frutto.
                  */
-                changeFruitImage: async function( fruitId ) {
-                    const selectedIds = [];
+                changeFruitImage: function( fruitId ) {
                     const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
                     if ( !fruit ) { return; }
-                    const fruitItems = fruit.items || [];
-                    fruitItems.forEach( ( fi ) => {
-                        const sel = fi.values.find( ( v ) => { return v.selected; } );
-                        selectedIds.push( sel ? sel.productItemId : fi.values[0].productItemId );
-                    } );
-                    if ( !selectedIds.length ) { return; }
-                    await ajax( {
-                        method: "POST",
-                        url: BASE + "/combinations/findByListOfProductItemIds",
-                        data: JSON.stringify( { productItemIds: selectedIds } ),
-                        callback: {
-                            done: ( xhr ) => {
-                                let imgSrc = "/assets/main/img/fruit-generic.png";
-                                if ( xhr.status === "SUCCESS" && xhr.data ) {
-                                    imgSrc = xhr.data.horizontalImage || this.getFirstFruitImage( selectedIds ) || imgSrc;
-                                }
-                                const img = $( "#quotation-plate-fruits #" + fruitId + " img" );
-                                if ( img.length ) {
-                                    img.attr( "src", imgSrc );
-                                }
-                            },
-                        },
-                    } );
+                    const img = $( "#quotation-plate-fruits #" + fruitId + " img" );
+                    if ( !img.length ) { return; }
+                    const rootImage = fruit.fruit?.horizontalImage?.uri;
+                    if ( rootImage ) {
+                        img.attr( "src", rootImage ).show();
+                    } else {
+                        img.hide();
+                    }
                 },
 
                 /**
@@ -1498,7 +1484,7 @@ AP.plate.modal = ( function() {
                                 if ( !childrenLoaded ) {
                                     processed.add( key );
                                     await this.loadFruitProductItems( fruit.id, selected.productItemId, item.attributeId );
-                                    this.updateFruitAttributeOverlay( item.attributeId, selected );
+                                    this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected );
                                     cascaded = true;
                                 } else {
                                     processed.add( key );
@@ -1508,20 +1494,16 @@ AP.plate.modal = ( function() {
                     } while ( cascaded );
                 },
 
-                updateFruitAttributeOverlay: function( attributeId, value ) {
+                updateFruitAttributeOverlay: function( fruitId, attributeId, value ) {
                     if ( !value || !attributeId ) { return; }
-                    // Gli attributeId del server sono sempre numerici.
-                    // Se attributeId non è un numero (es. UUID di un frutto),
-                    // significa che non è un attributo valido — salta.
-                    if ( typeof attributeId === "string" && !/^\d+$/.test( attributeId ) ) { return; }
-                    const container = $( "#plate-background .attributes" );
-                    if ( !container.length ) { return; }
-                    $( "#plate-background .attributes #" + attributeId ).remove();
+                    const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
+                    if ( !fruitEl.length ) { return; }
+                    fruitEl.find( "> .fruit-overlay-" + attributeId ).remove();
                     const orientationId = this.detailForm.data.product.orientation.id;
                     const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
                     if ( imageUri ) {
                         const zIndex = ( value.orderby || 0 ) + 1040;
-                        container.append( `<div id="${attributeId}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}')"></div>` );
+                        fruitEl.append( `<div class="fruit-overlay-${attributeId}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
                 },
 
