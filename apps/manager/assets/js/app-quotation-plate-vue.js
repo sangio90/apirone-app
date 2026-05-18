@@ -875,17 +875,24 @@ AP.plate.modal = ( function() {
                                     if ( d.attributeId == attributeId ) { parentIndex = idx; }
                                 } );
 
-                                if ( parentIndex !== -1 ) {
-                                    const parent = items[parentIndex];
-                                    parent.values.forEach( ( v ) => {
-                                        v.selected = v.productItemId == originId;
-                                    } );
+                                // Se l'attributo non è più presente in items (es. race condition
+                                // tra chiamate AJAX asincrone annidate dovute al processFruitCascade
+                                // o a rapide interazioni utente), si esce senza modificare lo stato.
+                                if ( parentIndex === -1 ) {
+                                    this.detailForm.data.product.items = items.slice();
+                                    return;
                                 }
 
-                                // Rimuove i vecchi figli prima di caricare i nuovi
+                                const parent = items[parentIndex];
+                                parent.values.forEach( ( v ) => {
+                                    v.selected = v.productItemId == originId;
+                                } );
+
+                                // Rimuove tutti gli elementi figli (level > parent.level)
+                                // che seguono immediatamente il genitore
                                 const i = parentIndex + 1;
                                 while ( i < items.length ) {
-                                    if ( items[i].level > items[parentIndex].level ) {
+                                    if ( items[i].level > parent.level ) {
                                         items.splice( i, 1 );
                                     } else {
                                         break;
@@ -904,7 +911,7 @@ AP.plate.modal = ( function() {
                                                 attributeName: item.attribute.name,
                                                 parentAttributeId: attributeId,
                                                 parentItemId: originId,
-                                                level: items[parentIndex].level + 1,
+                                                level: parent.level + 1,
                                                 values: [],
                                                 horizontalImage: item.horizontalImage,
                                                 verticalImage: item.verticalImage,
@@ -1109,6 +1116,9 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 xhr.data.forEach( ( thisFruit ) => {
                                     const newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
+                                    if ( thisFruit.positions && thisFruit.positions.length ) {
+                                        newFruit.positionIds = thisFruit.positions.map( ( p ) => { return p.position; } );
+                                    }
                                     fruits.push( newFruit );
                                     this.detailForm.data.fruits.push( newFruit );
 
@@ -1348,17 +1358,20 @@ AP.plate.modal = ( function() {
                                     if ( d.attributeId == attributeId ) { parentIndex = idx; }
                                 } );
 
-                                if ( parentIndex !== -1 ) {
-                                    const parent = fruitItems[parentIndex];
-                                    parent.values.forEach( ( v ) => {
-                                        v.selected = v.productItemId == originId;
-                                    } );
+                                if ( parentIndex === -1 ) {
+                                    fruit.items = fruitItems.slice();
+                                    return;
                                 }
+
+                                const parent = fruitItems[parentIndex];
+                                parent.values.forEach( ( v ) => {
+                                    v.selected = v.productItemId == originId;
+                                } );
 
                                 // Rimuove i vecchi figli prima di caricare i nuovi
                                 const i = parentIndex + 1;
                                 while ( i < fruitItems.length ) {
-                                    if ( fruitItems[i].level > fruitItems[parentIndex].level ) {
+                                    if ( fruitItems[i].level > parent.level ) {
                                         fruitItems.splice( i, 1 );
                                     } else {
                                         break;
@@ -1449,36 +1462,46 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                 * Aggiorna gli overlay delle immagini degli attributi frutto
-                 * all'interno di #plate-background .attributes.
-                 * Rimuove il div esistente per l'attributo e ne crea uno nuovo
-                 * con l'immagine corrispondente all'orientamento corrente,
-                 * usando orderby + 1040 come z-index.
-                 * @param {Object} value - Oggetto valore selezionato con attributeId, orderby, horizontalImage, verticalImage.
-                 */
-                /**
-                 * Processa a cascata tutte le selezioni degli attributi frutto
-                 * che non hanno ancora caricato i figli.
-                 * Itera in un ciclo do-while finché non ci sono più livelli da caricare,
-                 * gestendo sia selezioni manuali (utente) che automatiche (codice).
-                 * Per ogni livello chiama loadFruitProductItems e updateFruitAttributeOverlay.
+                 * Processa a cascata tutte le selezioni di attributi frutto.
+                 * Questo metodo viene chiamato dal watcher su detailForm.data.fruits
+                 * ogni volta che una value diventa selected=true, sia per interazione manuale
+                 * dell'utente che per selezione automatica via codice.
+                 *
+                 * Usa un do-while perché ogni caricamento di figli può generare nuove
+                 * selezioni automatiche (primo valore pre-selezionato), che a loro volta
+                 * potrebbero avere figli da caricare.
+                 *
+                 * processed (Set) traccia le coppie fruitId + attributeId già processate
+                 * per evitare loop infiniti su attributi foglia (senza figli): per questi
+                 * childrenLoaded è sempre false, ma non vanno rieseguiti all'infinito.
+                 *
+                 * childrenLoaded verifica se esistono già items con parentAttributeId
+                 * e parentItemId corrispondenti alla selezione corrente. Se true, significa
+                 * che i figli sono già stati caricati (da un giro precedente del do-while
+                 * o dal flusso manuale handleFruitProductItemSelect -> loadFruitProductItems).
                  */
                 processFruitCascade: async function() {
+                    const processed = new Set();
                     let cascaded;
                     do {
                         cascaded = false;
                         for ( const fruit of this.detailForm.data.fruits ) {
                             if ( !fruit.items ) { continue; }
                             for ( const item of fruit.items ) {
+                                const key = fruit.id + "-" + item.attributeId;
+                                if ( processed.has( key ) ) { continue; }
                                 const selected = item.values && item.values.find( ( v ) => { return v.selected; } );
                                 if ( !selected || !selected.productItemId ) { continue; }
                                 const childrenLoaded = fruit.items.some( ( ci ) => {
                                     return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
                                 } );
                                 if ( !childrenLoaded ) {
+                                    processed.add( key );
                                     await this.loadFruitProductItems( fruit.id, selected.productItemId, item.attributeId );
                                     this.updateFruitAttributeOverlay( item.attributeId, selected );
                                     cascaded = true;
+                                } else {
+                                    processed.add( key );
                                 }
                             }
                         }
