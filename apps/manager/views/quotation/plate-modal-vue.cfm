@@ -195,14 +195,14 @@
                                                     <!--- v-if="fruit.expanded": mostra gli attributi del frutto SOLO quando è espanso. :id dinamico per identificare il contenitore. --->
                                                         <template v-for="fi in fruit.items">
                                                         <!--- Itera sugli attributi del frutto (stessa struttura degli attributi placca). --->
-                                                            <div v-if="fi.values && fi.values.length" :id="'fruit-attribute-container-' + (fi.parentAttributeId ? fi.parentAttributeId + '-' : '') + fi.attributeId" :key="fi.parentAttributeId ? fi.parentAttributeId + '-' + fi.attributeId : fi.attributeId">
+                                                            <div v-if="fi.values && fi.values.length" :id="'fruit-attribute-container-' + fi.id" :key="fi.id">
                                                                 <label class="mb-1" :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem' }">{{ fi.attributeName }}</label>
                                                                 <select
                                                                     class="form-control form-control-sm select-item me-3 mb-2"
-                                                                    :data-attribute-id="fi.attributeId"
+                                                                    :data-fruit-item-id="fi.id"
                                                                     :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem', width: 'calc(100% - ' + (1.5 * (fi.level || 0)) + 'rem)' }"
-                                                                    @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.attributeId, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
-                                                                    <!--- handleFruitProductItemSelect: come handleProductItemSelect ma specifico per attributi frutto. Riceve: fruit.id, valore selezionato, attributeId, oggetto valore completo. --->
+                                                                    @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.id, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
+                                                                    <!--- handleFruitProductItemSelect: come handleProductItemSelect ma specifico per attributi frutto. Riceve: fruit.id, valore selezionato, itemId (fi.id), oggetto valore completo. --->
                                                                     <option
                                                                         v-for="val in fi.values"
                                                                         :value="val.productItemId"

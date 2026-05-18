@@ -1222,7 +1222,7 @@ AP.plate.modal = ( function() {
                                             } );
                                         } else {
                                             fruitItems.push( {
-                                                id: "",
+                                                id: NM.util.uuid(),
                                                 attributeId: item.attribute.id,
                                                 attributeName: item.attribute.name,
                                                 level: 0,
@@ -1271,7 +1271,7 @@ AP.plate.modal = ( function() {
                                     const match = fi.values.find( ( v ) => { return v.productItemId == qipi.productItem.id; } );
                                     if ( match ) {
                                         match.selected = true;
-                                        await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.attributeId, true );
+                                        await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.id, true );
                                         break;
                                     }
                                 }
@@ -1286,7 +1286,7 @@ AP.plate.modal = ( function() {
                                 const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
                                 if ( !hasSelection ) {
                                     fi.values[0].selected = true;
-                                    await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.attributeId );
+                                    await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.id );
                                 }
                             }
                         }
@@ -1340,12 +1340,12 @@ AP.plate.modal = ( function() {
                  * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} [originId=""] - Identificativo dell'item origine per il caricamento dei figli.
-                 * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {string} itemId - Identificativo univoco dell'item attributo (fi.id).
                  * @param {boolean} [skipAutoSelect=false] - Se true, non auto-seleziona il primo
                  *   valore dei figli dopo il caricamento. Utile quando si ripristinano selezioni
                  *   salvate (il loop chiamante si occupa di selezionare i valori corretti).
                  */
-                loadFruitProductItems: async function( fruitId, originId, attributeId, skipAutoSelect ) {
+                loadFruitProductItems: async function( fruitId, originId, itemId, skipAutoSelect ) {
                     let fruit = null;
                     for ( const fr of this.detailForm.data.fruits ) {
                         if ( fr.id === fruitId ) {
@@ -1360,24 +1360,24 @@ AP.plate.modal = ( function() {
                     const productId = fruit.fruit.id;
                     originId = originId || "";
 
+                    const itemIdx = fruitItems.findIndex( ( d ) => { return d.id === itemId; } );
+                    if ( itemIdx === -1 ) {
+                        fruit.items = fruitItems.slice();
+                        return;
+                    }
+                    const itemAttr = fruitItems[itemIdx];
+                    const attributeId = itemAttr.attributeId;
+
                     if ( originId === "" ) {
-                        let actualIndex = null;
-                        for ( let i = fruitItems.length - 1; i >= 0; i-- ) {
-                            if ( fruitItems[i].attributeId == attributeId ) {
-                                actualIndex = i;
-                                fruitItems[i].values.forEach( ( v ) => {
-                                    v.selected = false;
-                                } );
-                            }
-                        }
-                        if ( actualIndex !== null ) {
-                            const idx = actualIndex + 1;
-                            while ( idx < fruitItems.length ) {
-                                if ( fruitItems[idx].level > fruitItems[actualIndex].level ) {
-                                    fruitItems.splice( idx, 1 );
-                                } else {
-                                    break;
-                                }
+                        itemAttr.values.forEach( ( v ) => {
+                            v.selected = false;
+                        } );
+                        const idx = itemIdx + 1;
+                        while ( idx < fruitItems.length ) {
+                            if ( fruitItems[idx].level > itemAttr.level ) {
+                                fruitItems.splice( idx, 1 );
+                            } else {
+                                break;
                             }
                         }
                         fruit.items = fruitItems.slice();
@@ -1391,7 +1391,7 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 let parentIndex = -1;
                                 fruitItems.forEach( ( d, idx ) => {
-                                    if ( d.attributeId == attributeId ) {
+                                    if ( d.id === itemId ) {
                                         parentIndex = idx;
                                     }
                                 } );
@@ -1424,7 +1424,7 @@ AP.plate.modal = ( function() {
                                     xhr.data.forEach( ( item ) => {
                                         if ( lastAttrId == null || lastAttrId != item.attribute.id ) {
                                             attr = {
-                                                id: "",
+                                                id: NM.util.uuid(),
                                                 attributeId: item.attribute.id,
                                                 attributeName: item.attribute.name,
                                                 parentAttributeId: attributeId,
@@ -1463,13 +1463,7 @@ AP.plate.modal = ( function() {
                     // Se skipAutoSelect è true, salta (il chiamante gestisce le selezioni).
                     if ( !skipAutoSelect ) {
                         const updatedFruitItems = fruit.items;
-                        let fruitParentIdx = -1;
-                        for ( let i = 0; i < updatedFruitItems.length; i++ ) {
-                            if ( updatedFruitItems[i].attributeId == attributeId ) {
-                                fruitParentIdx = i;
-                                break;
-                            }
-                        }
+                        const fruitParentIdx = updatedFruitItems.findIndex( ( d ) => { return d.id === itemId; } );
                         if ( fruitParentIdx !== -1 ) {
                             const fruitParentLevel = updatedFruitItems[fruitParentIdx].level;
                             for ( let i = fruitParentIdx + 1; i < updatedFruitItems.length; i++ ) {
@@ -1493,11 +1487,11 @@ AP.plate.modal = ( function() {
                  * Carica i product items figli e aggiorna l'immagine del frutto.
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} selectedId - Identificativo del product item selezionato.
-                 * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {string} itemId - Identificativo univoco dell'item attributo (fi.id).
                  * @param {Object} value - Oggetto valore selezionato.
                  */
-                handleFruitProductItemSelect: async function( fruitId, selectedId, attributeId, value ) {
-                    await this.loadFruitProductItems( fruitId, selectedId, attributeId );
+                handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
+                    await this.loadFruitProductItems( fruitId, selectedId, itemId );
                     this.renderPlateWithFruits();
                 },
 
@@ -1543,7 +1537,7 @@ AP.plate.modal = ( function() {
                                 } );
                                 if ( !childrenLoaded ) {
                                     processed.add( key );
-                                    await this.loadFruitProductItems( fruit.id, selected.productItemId, item.attributeId );
+                                    await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
                                     this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId );
                                     cascaded = true;
                                 } else {
