@@ -195,7 +195,7 @@
                                                     <!--- v-if="fruit.expanded": mostra gli attributi del frutto SOLO quando è espanso. :id dinamico per identificare il contenitore. --->
                                                         <template v-for="fi in fruit.items">
                                                         <!--- Itera sugli attributi del frutto (stessa struttura degli attributi placca). --->
-                                                            <div v-if="fi.values && fi.values.length" :id="'fruit-attribute-container-' + fi.attributeId" :key="fi.attributeId">
+                                                            <div v-if="fi.values && fi.values.length" :id="'fruit-attribute-container-' + (fi.parentAttributeId ? fi.parentAttributeId + '-' : '') + fi.attributeId" :key="fi.parentAttributeId ? fi.parentAttributeId + '-' + fi.attributeId : fi.attributeId">
                                                                 <label class="mb-1" :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem' }">{{ fi.attributeName }}</label>
                                                                 <select
                                                                     class="form-control form-control-sm select-item me-3 mb-2"

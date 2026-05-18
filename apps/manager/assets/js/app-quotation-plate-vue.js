@@ -1068,7 +1068,7 @@ AP.plate.modal = ( function() {
                                 for ( const fi of fruit.items ) {
                                     const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
                                     if ( selected && selected.productItemId ) {
-                                        this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected );
+                                        this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId );
                                     }
                                 }
                             }
@@ -1484,7 +1484,7 @@ AP.plate.modal = ( function() {
                                 if ( !childrenLoaded ) {
                                     processed.add( key );
                                     await this.loadFruitProductItems( fruit.id, selected.productItemId, item.attributeId );
-                                    this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected );
+                                    this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId );
                                     cascaded = true;
                                 } else {
                                     processed.add( key );
@@ -1494,16 +1494,17 @@ AP.plate.modal = ( function() {
                     } while ( cascaded );
                 },
 
-                updateFruitAttributeOverlay: function( fruitId, attributeId, value ) {
+                updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId ) {
                     if ( !value || !attributeId ) { return; }
                     const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
                     if ( !fruitEl.length ) { return; }
-                    fruitEl.find( "> .fruit-overlay-" + attributeId ).remove();
+                    const overlayKey = parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId;
+                    fruitEl.find( "> .fruit-overlay-" + overlayKey ).remove();
                     const orientationId = this.detailForm.data.product.orientation.id;
                     const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
                     if ( imageUri ) {
                         const zIndex = ( value.orderby || 0 ) + 1040;
-                        fruitEl.append( `<div class="fruit-overlay-${attributeId}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
+                        fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
                 },
 
