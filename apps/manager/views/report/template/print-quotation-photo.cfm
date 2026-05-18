@@ -1,4 +1,5 @@
 ﻿<cfoutput>
+	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -21,7 +22,7 @@
 								<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 							</td>
 							<td style="border: 0; text-align: right; padding-right: 60px;">
-								<h2>Stampa Foto: Offerta N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2>#printLabel('photoPrint', langId)#: #printLabel('offer', langId)# N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 							</td>
 						</tr>
 					</tbody>
@@ -63,7 +64,7 @@
 									<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 9cm !important;">
 										<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 										<cfif !isNull(oggetto.getPosition())>
-											<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">Posizione: #oggetto.getPosition().getCode()#</div>
+											<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
 										</cfif>
 										<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 											<cfset itemsCount = ArrayLen( oggetto.getItems() )>
@@ -75,11 +76,11 @@
 												<cfset zoneQuantity = stanza.getQuantity()>
 												<cfset parentZoneQuantity = !isNull(stanza.getOrigin()) ? stanza.getOrigin().getQuantity() : 1>
 												<cfset oggettoQuantity = oggetto.getQuantity() * zoneQuantity * parentZoneQuantity>
-												<span style="font-size: 8pt; text-transform: lowecase">Qty: #oggettoQuantity#</span>
+												<span style="font-size: 8pt; text-transform: lowecase">#printLabel('qty', langId)#: #oggettoQuantity#</span>
 											</cfif>
 											<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 												<br><br>
-												Lista Frutti:
+												#printLabel('fruitList', langId)#:
 												<cfif NOT isNull(oggetto.getFruits())>
 													<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 													<ul style="padding: 0 0 0 24px;">
