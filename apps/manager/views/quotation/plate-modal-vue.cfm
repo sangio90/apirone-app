@@ -460,7 +460,7 @@
                                     <!--- data-bs-dismiss="modal": chiude il modale Bootstrap 5 senza JavaScript Vue. btn-default: stile Bootstrap pulsante neutro. --->
                                     <button type="button" class="btn btn-primary btn-sm me-2 float-end" @click="clearFilters" v-if="visibleLowerClearButton">Pulisci Configurazione</button>
                                     <!--- clearFilters: stesso comportamento del pulsante "Pulisci configurazione" superiore. v-if="visibleLowerClearButton": variante inferiore dello stesso pulsante logico. --->
-                                    <img src="/assets/main/img/ajax-loading.svg" width="20" height="20" v-if="saving" class="mt-1 float-end me-3">
+                                    <img src="/assets/main/img/ajax-loading.svg" width="20" height="20" v-if="smallLoading" class="mt-1 float-end me-3">
                                     <!--- Indicatore di salvataggio, visibile solo durante la richiesta AJAX. --->
                                 </div>
                             </div>

@@ -289,7 +289,7 @@ AP.plate.modal = ( function() {
                 positionSuggestLoading: false, /** Flag di caricamento per la ricerca posizioni. */
                 productItemsImages: {}, /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
                 activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
-                saving: false, /** Flag di caricamento durante il salvataggio. */
+                smallLoading: false, /** Flag di caricamento. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
@@ -1070,34 +1070,39 @@ AP.plate.modal = ( function() {
                  * (aggiunta, rimozione, cambio attributo) o della placca.
                  */
                 renderPlateWithFruits: function() {
+                    this.smallLoading = true;
                     this.$nextTick( function() {
-                        const gm = getGridModule();
-                        if ( !gm ) {
-                            return;
-                        }
-
-                        $( ".plate-designer" ).empty();
-                        configPlate();
-                        for ( const fruit of this.detailForm.data.fruits ) {
-                            const obj = mapFruitForPlate( fruit );
-                            if ( fruit.positionIds && fruit.positionIds.length ) {
-                                pub.fruitsController.addFruitToPositions( obj, fruit.positionIds );
-                            } else {
-                                pub.fruitsController.addFruitToPlate( obj );
+                        try {
+                            const gm = getGridModule();
+                            if ( !gm ) {
+                                return;
                             }
-                        }
-                        this.reapplyProductItemImages();
-                        for ( const fruit of this.detailForm.data.fruits ) {
-                            this.addFruitHover( fruit.id );
-                            this.changeFruitImage( fruit.id );
-                            if ( fruit.items ) {
-                                for ( const fi of fruit.items ) {
-                                    const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
-                                    if ( selected && selected.productItemId ) {
-                                        this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId );
+
+                            $( ".plate-designer" ).empty();
+                            configPlate();
+                            for ( const fruit of this.detailForm.data.fruits ) {
+                                const obj = mapFruitForPlate( fruit );
+                                if ( fruit.positionIds && fruit.positionIds.length ) {
+                                    pub.fruitsController.addFruitToPositions( obj, fruit.positionIds );
+                                } else {
+                                    pub.fruitsController.addFruitToPlate( obj );
+                                }
+                            }
+                            this.reapplyProductItemImages();
+                            for ( const fruit of this.detailForm.data.fruits ) {
+                                this.addFruitHover( fruit.id );
+                                this.changeFruitImage( fruit.id );
+                                if ( fruit.items ) {
+                                    for ( const fi of fruit.items ) {
+                                        const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
+                                        if ( selected && selected.productItemId ) {
+                                            this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId );
+                                        }
                                     }
                                 }
                             }
+                        } finally {
+                            this.smallLoading = false;
                         }
                     }.bind( this ) );
                 },
@@ -1532,37 +1537,42 @@ AP.plate.modal = ( function() {
                  * o dal flusso manuale handleFruitProductItemSelect -> loadFruitProductItems).
                  */
                 processFruitCascade: async function() {
-                    const processed = new Set();
-                    let cascaded;
-                    do {
-                        cascaded = false;
-                        for ( const fruit of this.detailForm.data.fruits ) {
-                            if ( !fruit.items ) {
-                                continue;
-                            }
-                            for ( const item of fruit.items ) {
-                                const key = fruit.id + "-" + item.attributeId;
-                                if ( processed.has( key ) ) {
+                    this.smallLoading = true;
+                    try {
+                        const processed = new Set();
+                        let cascaded;
+                        do {
+                            cascaded = false;
+                            for ( const fruit of this.detailForm.data.fruits ) {
+                                if ( !fruit.items ) {
                                     continue;
                                 }
-                                const selected = item.values && item.values.find( ( v ) => { return v.selected; } );
-                                if ( !selected || !selected.productItemId ) {
-                                    continue;
-                                }
-                                const childrenLoaded = fruit.items.some( ( ci ) => {
-                                    return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
-                                } );
-                                if ( !childrenLoaded ) {
-                                    processed.add( key );
-                                    await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
-                                    this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId );
-                                    cascaded = true;
-                                } else {
-                                    processed.add( key );
+                                for ( const item of fruit.items ) {
+                                    const key = fruit.id + "-" + item.attributeId;
+                                    if ( processed.has( key ) ) {
+                                        continue;
+                                    }
+                                    const selected = item.values && item.values.find( ( v ) => { return v.selected; } );
+                                    if ( !selected || !selected.productItemId ) {
+                                        continue;
+                                    }
+                                    const childrenLoaded = fruit.items.some( ( ci ) => {
+                                        return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
+                                    } );
+                                    if ( !childrenLoaded ) {
+                                        processed.add( key );
+                                        await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
+                                        this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId );
+                                        cascaded = true;
+                                    } else {
+                                        processed.add( key );
+                                    }
                                 }
                             }
-                        }
-                    } while ( cascaded );
+                        } while ( cascaded );
+                    } finally {
+                        this.smallLoading = false;
+                    }
                 },
 
                 /**
@@ -1793,7 +1803,7 @@ AP.plate.modal = ( function() {
                         positions[fruit.id] = fruit.cellIds;
                     } );
 
-                    this.saving = true;
+                    this.smallLoading = true;
 
                     let preview = $( "#plate-background" )[0];
                     if ( this.detailForm.data.id && this.detailForm.data.customImage ) {
@@ -1838,13 +1848,13 @@ AP.plate.modal = ( function() {
                         data: JSON.stringify( parsedData ),
                         callback: {
                             done: ( xhr ) => {
-                                this.saving = false;
+                                this.smallLoading = false;
                                 AP.loading.hide();
                                 AP.widget.notify( "success", "Placca salvata correttamente." );
                                 this.showPostSaveModal( parsedData.quotationId );
                             },
                             fail: () => {
-                                this.saving = false;
+                                this.smallLoading = false;
                                 AP.loading.hide();
                             },
                         },
