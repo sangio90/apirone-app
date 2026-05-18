@@ -176,7 +176,7 @@
                                             <div class="text-end"><a href="##" @click.prevent="toggleFruits" class="hand">{{ toggleFruitsLabel }}</a></div>
                                             <!--- toggleFruits: espande o contrae TUTTI i frutti contemporaneamente. toggleFruitsLabel: proprietà computata Vue, restituisce "Espandi tutti" o "Comprimi tutti". --->
                                             <div id="quotation-plate-fruits-product-items" style="max-width: 100%">
-                                                <div v-for="fruit in detailForm.data.fruits" :key="fruit.id" class="quotation-fruit-row" :data-fruit-id="fruit.id">
+                                                <div v-for="fruit in detailForm.data.fruits" :key="fruit._key" class="quotation-fruit-row" :data-fruit-id="fruit.id">
                                                 <!--- v-for: itera sui frutti configurati. Ogni oggetto fruit ha: id (univoco), fruit (anagrafica con name/code), items (attributi configurabili), expanded (stato espansione). :data-fruit-id: attributo data-* per identificazione DOM e hover effects. --->
                                                     <div class="quotation-fruit-row-header d-flex align-items-center justify-content-between mb-2" @click="toggleFruit(fruit)" style="cursor: pointer;">
                                                     <!--- Intestazione del frutto cliccabile. toggleFruit(fruit): espande/contrae il singolo frutto. d-flex: layout flex orizzontale con nome a sinistra e cestino a destra. --->

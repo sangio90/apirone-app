@@ -139,6 +139,7 @@ AP.plate.modal = ( function() {
         const fruit = { ...data };
         fruit.fruitId = data.fruit.id;
         fruit.id = data.id || NM.util.uuid();
+        fruit._key = NM.util.uuid();
         fruit.positionIds = data.positionIds || [];
         fruit.items = [];
         fruit.expanded = true;
