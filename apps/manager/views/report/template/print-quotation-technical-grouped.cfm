@@ -1,4 +1,5 @@
 ﻿<cfoutput>
+	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -21,7 +22,7 @@
 								<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 							</td>
 							<td style="border: 0; text-align: right; padding-right: 60px;">
-								<h2>Stampa Tecnica: Offerta N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2>#printLabel('technicalPrint', langId)#: #printLabel('offer', langId)# N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 							</td>
 						</tr>
 					</tbody>
@@ -46,12 +47,12 @@
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
 								<cfif args.params.images>
-									<td style="width: 6cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; text-align: left; padding-left: 0.1in"><strong>Articolo</strong></td>
+									<td style="width: 6cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; text-align: left; padding-left: 0.1in"><strong>#printLabel('article', langId)#</strong></td>
 									<td style="width: 5cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0;"></td>
 									<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
 								<cfelse>
 									<td style="width: 0.1cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
-									<td style="width: 10.90cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-left: 0.1in;"><strong>Articolo</strong></td>
+									<td style="width: 10.90cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-left: 0.1in;"><strong>#printLabel('article', langId)#</strong></td>
 									<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
 								</cfif>
 							</tr>
@@ -81,13 +82,13 @@
 										</cfif>
 									</cfif>
 									<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">
-										Qty: #quantity#
+										#printLabel('qty', langId)#: #quantity#
 									</div>
 								</td>
 								<td style="vertical-align: top; padding-top: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; padding-left: 5pt; width: 9cm !important;">
 									<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 										<div style="font-size: 8pt; line-height: 15px;">
-											<Lista Frutti:
+											#printLabel('fruitList', langId)#:
 											<cfif NOT isNull(oggetto.getFruits())>
 												<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 												<ul style="padding: 0 0 0 24px;">
@@ -124,7 +125,7 @@
 									</cfif>
 									<cfif structCount(zones) gt 0>
 										<div style="font-size: 8pt; line-height: 15px">
-											Posizioni: 
+											#printLabel('positions', langId)#:
 											<cfloop collection="#zones#" item="zoneName">
 												<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
 													#zoneName#: 

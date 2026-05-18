@@ -1,4 +1,5 @@
 ﻿<cfoutput>
+	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -21,22 +22,22 @@
 								#getPrintFullHeader()#
 							</td>
 							<td style="border: 0; width: 9cm; padding-top: .4in;">
-								<h2 style="text-align: right; margin-right: .1in;">Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2 style="text-align: right; margin-right: .1in;">#printLabel('quotation', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 								<table style="width: 100%; border: 0;">
 									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('date', langId)#</td>
 										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#DateFormat( args.data.quotation.getQuotationDate(), "dd/mm/yyyy" )#</td>
 									</tr>
 									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Validità offerta</td>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('offerValidity', langId)#</td>
 										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#DateFormat( args.data.quotation.getValidityDate(), "dd/mm/yyyy" )#</td>
 									</tr>
 									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Tipo Pagamento</td>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('paymentMethod', langId)#</td>
 										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#args.data.quotation.getPaymentMethodName()#</td>
 									</tr>
 									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Commerciale di Riferimento</td>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('salesAgent', langId)#</td>
 										<cfif !isNull(args.data.quotation.getSalesAgent())>
 											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#args.data.quotation.getSalesAgent().getAccount().getName()#</td>
 										<cfelse>
@@ -60,51 +61,73 @@
 					<table class="cstmtable" style="margin-top: .1in; width: 100%;">
 						<tr>
 							<td style="width: 50%;"></td>
-							<td style="width: 50%; padding-left: 0.05in;"><strong>Indirizzo Spedizione</strong></td>
+							<cfif !isNull(args.data.quotation.getShippingProfile())>
+								<td style="width: 50%; padding-left: 0.05in;"><strong>#printLabel('shippingAddress', langId)#</strong></td>
+							<cfelse>
+								<td style="width: 50%;"></td>
+							</cfif>
 						</tr>
 						<tr>
 							<td>
-								<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Ragione Sociale: </td>
-										<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getCustomer().getCompany()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Telefono: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getPhone()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Email: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Partita IVA: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getVatNumber()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-										<td style="border: 0">
-											#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
-											#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
-										</td>
-									</tr>
-								</table>
+								<cfif !isNull(args.data.quotation.getCustomer())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('company', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getCustomer().getCompany()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('phone', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getPhone()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('email', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('vatNumber', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getVatNumber()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">#printLabel('address', langId)#: </td>
+											<td style="border: 0">
+												#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
+												#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
+											</td>
+										</tr>
+									</table>
+								<cfelseif !isNull(args.data.quotation.getLead())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('lead', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getLead().getName()#</td>
+										</tr>
+									</table>
+								<cfelseif !isNull(args.data.quotation.getOpportunity())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('opportunity', langId)#: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getOpportunity().getName()#</td>
+										</tr>
+									</table>
+								</cfif>
 							</td>
 							<td>
-								<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Nome: </td>
-										<td style="border: 0; width: 75%">#args.data.quotation.getShippingProfile().getCompany()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-										<td style="border: 0">
-											#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
-											#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()# 
-											#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
-										</td>
-									</tr>
-								</table>
+								<cfif !isNull(args.data.quotation.getShippingProfile())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('shippingName', langId)#: </td>
+											<td style="border: 0; width: 75%">#args.data.quotation.getShippingProfile().getCompany()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">#printLabel('address', langId)#: </td>
+											<td style="border: 0">
+												#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
+												#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
+												#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
+											</td>
+										</tr>
+									</table>
+								</cfif>
 							</td>
 						</tr>
 					</table>
@@ -131,10 +154,10 @@
 							<cfset oggetto = stanza.zoneItems[zoneItem]>
 							<table style="border-collapse: collapse; width: 100%;">
 								<tr>
-									<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">Articolo</td>
-									<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Qty.</td>
-									<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Prezzo</td>
-									<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">Totale</td>
+									<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('article', langId)#</td>
+									<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
+									<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('price', langId)#</td>
+									<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('total', langId)#</td>
 								</tr>
 								<tr>
 									<td style="margin: 0 !important; padding: 3px; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
@@ -156,7 +179,7 @@
 												<td>
 													<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 													<cfif !isNull(oggetto.getPosition())>
-														<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">Posizione: #oggetto.getPosition().getCode()#</div>
+														<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
 													</cfif>
 													<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 														<cfset itemsCount = ArrayLen( oggetto.getItems() )>
@@ -174,7 +197,7 @@
 												<td style="vertical-align: bottom; padding: 3pt;">
 													<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 														<div style="font-size: 8pt; line-height: 15px; margin-top: 0.1in;">
-															<b>Lista Frutti: </b>
+															<b>#printLabel('fruitList', langId)#: </b>
 															<cfif NOT isNull(oggetto.getFruits())>
 																<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 																<ul style="padding: 0 0 0 14px;">
@@ -250,10 +273,10 @@
 						<cfset quantity = servizio.getQuantity()>
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
-								<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">Servizio</td>
-								<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Qty.</td>
-								<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">Prezzo</td>
-								<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">Totale</td>
+								<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('service', langId)#</td>
+								<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
+								<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('price', langId)#</td>
+								<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('total', langId)#</td>
 							</tr>
 							<tr>
 								<td style="padding: 2mm 2mm 4mm 2mm; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
@@ -283,7 +306,7 @@
 				<div style="width: 100%; text-align: right; position: relative;">
 					<table style="width: 4in; border-collapse: collapse; position: absolute; right: 0; top: .1in;">
 						<tr>
-							<td><strong>Totale merce</strong></td>
+							<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
 							<td>
 								<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
 									#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
@@ -298,7 +321,7 @@
 						</tr>
 						<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
 							<tr>
-								<td><strong>Sconti</strong></td>
+								<td><strong>#printLabel('discounts', langId)#</strong></td>
 								<td>
 									- #LSNumberFormat( 
 										args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
@@ -320,24 +343,24 @@
 							<cfif #!isNull( args.data.quotation.getVatCode())#>
 								<td>#args.data.quotation.getVatCode().getName()#</td>
 							<cfelse>
-								<td>Iva</td>
+								<td>#printLabel('vat', langId)#</td>
 							</cfif>
 							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], "9,999.99", "it_IT" )# €</td>
 						</tr>
 						<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
 							<tr>
-								<td>Spedizione</td>
+								<td>#printLabel('shipping', langId)#</td>
 								<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
 							</tr>
 						</cfif>
 						<tr>
-							<td><strong>Totale fattura</strong></td>
+							<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
 							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
 						</tr>
 					</table>
 				</div>
 
-				#getFinalForm()#
+				#getFinalForm(langId)#
 			</cfoutput>
 		</div>
     </cfdocument>

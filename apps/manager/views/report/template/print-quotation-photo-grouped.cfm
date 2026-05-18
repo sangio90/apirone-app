@@ -1,4 +1,5 @@
 ﻿<cfoutput>
+	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -21,7 +22,7 @@
 								<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
 							</td>
 							<td style="border: 0; text-align: right; padding-right: 60px;">
-								<h2>Stampa Foto: Offerta N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2>#printLabel('photoPrint', langId)#: #printLabel('offer', langId)# N° #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
 							</td>
 						</tr>
 					</tbody>
@@ -69,11 +70,11 @@
 										</cfif>
 									</cfif>
 									<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">
-										Qty: #quantity#
+										#printLabel('qty', langId)#: #quantity#
 									</div>
 									<cfif structCount(zones) gt 0>
 										<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">
-											Posizioni: 
+											#printLabel('positions', langId)#:
 											<cfloop collection="#zones#" item="zoneName">
 												<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
 													#zoneName#: 

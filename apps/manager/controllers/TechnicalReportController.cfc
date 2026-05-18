@@ -33,14 +33,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		if ( IsNull( quotation.getCustomer() ) ) {
-			Throw(
-				message = "
-				Preventivo con cliente non valido"
-			);
-			return;
-		}
-
 		switch(printParams.report){
 			case 'zone':
 				quoteObj = printZone( quoteObj, printParams );
@@ -75,7 +67,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			'paese' = ''
 		};
 
-		if (!isNull(quotation.getCustomer().getShippingProfiles()) && quotation.getCustomer().getShippingProfiles().len() > 0) {
+		if (!isNull(quotation.getCustomer()) && !isNull(quotation.getCustomer().getShippingProfiles()) && quotation.getCustomer().getShippingProfiles().len() > 0) {
 			customerShippingProfile = quotation.getCustomer().getShippingProfiles()[1];
 		}
 
