@@ -203,14 +203,6 @@ AP.plate.modal = ( function() {
 
         pub.fruitsController.plate.drawGridWithin( $( ".plate-designer" ) );
 
-        const fruits = window.vm.detailForm.data.fruits;
-        if ( fruits?.length ) {
-            for ( const fruit of fruits ) {
-                const obj = mapFruitForPlate( fruit );
-                pub.fruitsController.addFruitToPlate( obj );
-            }
-        }
-
         window.vm.isPlateDefined = true;
     }
 
@@ -650,7 +642,7 @@ AP.plate.modal = ( function() {
                                     if ( orientationValue ) {
                                         this.changeOrientation();
                                     } else {
-                                        configPlate();
+                                        this.renderPlateWithFruits();
                                     }
                                 } );
                             },
@@ -682,8 +674,7 @@ AP.plate.modal = ( function() {
                                 this.plate.image = xhr.data.image;
                                 this.detailForm.data.product.orientation = xhr.data.orientation;
                                 this.$nextTick( () => {
-                                    configPlate();
-                                    this.reapplyProductItemImages();
+                                    this.renderPlateWithFruits();
                                 } );
                             },
                         },
@@ -808,26 +799,10 @@ AP.plate.modal = ( function() {
                         this.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
                     } );
                     this.$nextTick( () => {
-                        this.applySelectedProductItemImage();
+                        this.renderPlateWithFruits();
                     } );
                 },
 
-                /**
-                 * Applica l'immagine del product item selezionato al designer della placca.
-                 * Scorre gli attributi in ordine inverso e trova il primo valore selezionato.
-                 */
-                applySelectedProductItemImage: function() {
-                    const items = this.detailForm.data.product.items;
-                    for ( let i = items.length - 1; i >= 0; i-- ) {
-                        if ( items[i].values && items[i].values.length ) {
-                            const selected = items[i].values.find( ( v ) => { return v.selected; } );
-                            if ( selected && selected.productItemId ) {
-                                this.changeImage( selected );
-                                break;
-                            }
-                        }
-                    }
-                },
 
                 /**
                  * Carica i product items figli per un dato attributo e origine.
@@ -1023,9 +998,7 @@ AP.plate.modal = ( function() {
                  */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
                     await this.loadProductItems( selectedId, attributeId );
-                    if ( value ) {
-                        this.changeImage( value );
-                    }
+                    this.renderPlateWithFruits();
                 },
 
                 // --- Fruits ---
@@ -1038,28 +1011,69 @@ AP.plate.modal = ( function() {
                 onSelectFruit: async function( selectedFruit ) {
                     const newFruit = createFruit( { position: 1, fruit: selectedFruit } );
                     this.detailForm.data.fruits.push( newFruit );
-                    await this.$nextTick();
-                    if ( pub.fruitsController ) {
-                        pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
-                    }
-                    this.addFruitHover( newFruit.id );
                     await this.addProductItemsToFruit( newFruit.id );
-                    this.changeFruitImage( newFruit.id );
+                    this.renderPlateWithFruits();
                 },
 
                 /**
                  * Aggiunge gli effetti hover al DOM per un frutto nella lista e nella griglia.
                  * All'entrata del mouse colora lo sfondo; all'uscita ripristina il colore originale.
+                 * Usa .off() prima di .on() per evitare accumulo di handler in caso di
+                 * chiamate multiple (es. da renderPlateWithFruits).
                  * @param {string} fruitId - Identificativo del frutto.
                  */
                 addFruitHover: function( fruitId ) {
-                    $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" ).on( "mouseenter", function() {
-                        $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "rgba(162, 253, 161, 0.44)" );
-                        $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "#a3fda170" );
-                    } ).on( "mouseleave", function() {
-                        $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
-                        $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "" );
-                    } );
+                    $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" )
+                        .off( "mouseenter mouseleave" )
+                        .on( "mouseenter", () => {
+                            $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "rgba(162, 253, 161, 0.44)" );
+                            $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "#a3fda170" );
+                        } )
+                        .on( "mouseleave", () => {
+                            $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
+                            $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "" );
+                        } );
+                },
+
+                /**
+                 * Ricostruisce da zero l'intero designer della placca:
+                 * svuota il contenitore grafico, richiama configPlate() per ridisegnare
+                 * griglia e frutti, poi riapplica tutte le sovrapposizioni
+                 * (immagini attributi placca, immagini frutti, overlay attributi frutto).
+                 * Va chiamato dopo ogni modifica ai dati dei frutti
+                 * (aggiunta, rimozione, cambio attributo) o della placca.
+                 */
+                renderPlateWithFruits: function() {
+                    this.$nextTick( function() {
+                        const gm = getGridModule();
+                        if ( !gm ) {
+                            return;
+                        }
+
+                        $( ".plate-designer" ).empty();
+                        configPlate();
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            const obj = mapFruitForPlate( fruit );
+                            if ( fruit.positionIds && fruit.positionIds.length ) {
+                                pub.fruitsController.addFruitToPositions( obj, fruit.positionIds );
+                            } else {
+                                pub.fruitsController.addFruitToPlate( obj );
+                            }
+                        }
+                        this.reapplyProductItemImages();
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            this.addFruitHover( fruit.id );
+                            this.changeFruitImage( fruit.id );
+                            if ( fruit.items ) {
+                                for ( const fi of fruit.items ) {
+                                    const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
+                                    if ( selected && selected.productItemId ) {
+                                        this.updateFruitAttributeOverlay( fi.attributeId, selected );
+                                    }
+                                }
+                            }
+                        }
+                    }.bind( this ) );
                 },
 
                 /**
@@ -1072,9 +1086,7 @@ AP.plate.modal = ( function() {
                     if ( idx > -1 ) {
                         this.detailForm.data.fruits.splice( idx, 1 );
                     }
-                    if ( pub.fruitsController ) {
-                        pub.fruitsController.removeFruit( fruit.id );
-                    }
+                    this.renderPlateWithFruits();
                 },
 
                 /**
@@ -1122,17 +1134,6 @@ AP.plate.modal = ( function() {
                                     fruits.push( newFruit );
                                     this.detailForm.data.fruits.push( newFruit );
 
-                                    if ( pub.fruitsController ) {
-                                        if ( thisFruit.positions && thisFruit.positions.length ) {
-                                            const posIds = thisFruit.positions.map( ( p ) => { return p.position; } );
-                                            pub.fruitsController.addFruitToPositions( mapFruitForPlate( newFruit ), posIds );
-                                        } else {
-                                            pub.fruitsController.addFruitToPlate( mapFruitForPlate( newFruit ) );
-                                        }
-                                    }
-
-                                    this.addFruitHover( newFruit.id );
-
                                     thisFruit?.items?.forEach( ( item ) => {
                                         if ( item.productItem && item.productItem.attributeValue && item.productItem.attributeValue.allowNote ) {
                                             fruitQIPIs.push( {
@@ -1151,8 +1152,8 @@ AP.plate.modal = ( function() {
 
                     for ( const fruit of fruits ) {
                         await this.addProductItemsToFruit( fruit.id );
-                        this.changeFruitImage( fruit.id );
                     }
+                    this.renderPlateWithFruits();
                 },
 
                 /**
@@ -1457,8 +1458,7 @@ AP.plate.modal = ( function() {
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, attributeId, value ) {
                     await this.loadFruitProductItems( fruitId, selectedId, attributeId );
-                    this.changeFruitImage( fruitId );
-                    this.updateFruitAttributeOverlay( attributeId, value );
+                    this.renderPlateWithFruits();
                 },
 
                 /**
@@ -1517,7 +1517,7 @@ AP.plate.modal = ( function() {
                     const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
                     if ( imageUri ) {
                         const zIndex = ( value.orderby || 0 ) + 1040;
-                        container.append( '<div id="' + attributeId + '" style="z-index:' + zIndex + '; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url(\'' + imageUri + '\')"></div>' );
+                        container.append( `<div id="${attributeId}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}')"></div>` );
                     }
                 },
 
@@ -1876,7 +1876,7 @@ AP.plate.modal = ( function() {
                     this.models = [];
                     this.finishes = [];
                     this.isPlateDefined = false;
-                    $( ".plate-designer" ).empty();
+                    this.renderPlateWithFruits();
                     AP.deleteUserPref( "plate.modelId" );
                     AP.deleteUserPref( "plate.finishId" );
                 },
@@ -1892,7 +1892,7 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.fruits = [];
                     this.finishes = [];
                     this.isPlateDefined = false;
-                    $( ".plate-designer" ).empty();
+                    this.renderPlateWithFruits();
                     AP.deleteUserPref( "plate.finishId" );
                 },
 
