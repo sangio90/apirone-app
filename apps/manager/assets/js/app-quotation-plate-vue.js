@@ -372,7 +372,7 @@ AP.plate.modal = ( function() {
             },
 
             methods: {
-                // --- Lifecycle ---
+                // MARK: Lifecycle
                 /**
                  * Reimposta il form di dettaglio ai valori predefiniti.
                  * Sostituisce tutti i dati del form con una nuova istanza pulita,
@@ -385,7 +385,7 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.product.items = [];
                 },
 
-                // --- Custom Image ---
+                // MARK: Custom Image
                 /**
                  * Attiva o disattiva la modalità immagine personalizzata per la placca.
                  * Quando attivata, carica l'immagine di sfondo esistente e scambia
@@ -436,7 +436,7 @@ AP.plate.modal = ( function() {
                     fileApp().open( value );
                 },
 
-                // --- Lines / Models / Finishes ---
+                // MARK: Lines / Models / Finishes
                 /**
                  * Carica l'elenco delle linee prodotto per la categoria 22.
                  * Effettua una richiesta AJAX e aggiorna la lista lines.
@@ -499,7 +499,7 @@ AP.plate.modal = ( function() {
                     AP.setUserPref( "plate.modelId", modelId );
                 },
 
-                // --- Zones ---
+                // MARK: Zones
                 /**
                  * Carica l'elenco completo delle zone di quotazione.
                  * Filtra le zone separando quelle principali (senza origine) dalle sottozone.
@@ -554,7 +554,7 @@ AP.plate.modal = ( function() {
                     }
                 },
 
-                // --- Product loading ---
+                // MARK: Product loading
                 /**
                  * Popola i campi del prodotto nel form di dettaglio a partire dai dati ricevuti.
                  * Imposta ID, finitura, modello, linea e immagine del prodotto.
@@ -610,7 +610,7 @@ AP.plate.modal = ( function() {
                     await this.loadPlate();
                 },
 
-                // --- Plate / Frame ---
+                // MARK: Plate / Frame
                 /**
                  * Carica i dati del telaio e configura la placca.
                  * Cerca il telaio corrispondente al codice modello, effettua una richiesta AJAX
@@ -712,7 +712,7 @@ AP.plate.modal = ( function() {
                     }
                 },
 
-                // --- Product Items ---
+                // MARK: Product Items
                 /**
                  * Carica per la prima volta i product items del prodotto selezionato.
                  * Organizza gli items per attributo raggruppandone i valori.
@@ -1022,7 +1022,7 @@ AP.plate.modal = ( function() {
                     this.renderPlateWithFruits();
                 },
 
-                // --- Fruits ---
+                // MARK: Fruits
                 /**
                  * Gestisce la selezione di un frutto dall'elenco dei suggerimenti.
                  * Crea un nuovo frutto, lo aggiunge al form, lo disegna nella placca
@@ -1576,7 +1576,7 @@ AP.plate.modal = ( function() {
                     }
                 },
 
-                // --- Fruit Suggest ---
+                // MARK: Fruit Suggest
                 /**
                  * Gestisce l'input di ricerca nel suggeritore frutti.
                  * Se il termine ha almeno 3 caratteri, effettua una richiesta AJAX
@@ -1616,7 +1616,7 @@ AP.plate.modal = ( function() {
                     this.fruitSuggestions = [];
                 },
 
-                // --- Position Suggest ---
+                // MARK: Position Suggest
                 /**
                  * Gestisce l'input di ricerca nel suggeritore posizioni.
                  * Se il termine ha almeno 2 caratteri ed è selezionata una zona,
@@ -1669,7 +1669,7 @@ AP.plate.modal = ( function() {
                     }
                 },
 
-                // --- Pricing ---
+                // MARK: Pricing
                 /**
                  * Calcola e aggiorna il prezzo della placca tramite richiesta al server.
                  * Se il metodo di prezzo è "Fisso", mostra un avviso e non procede.
@@ -1733,8 +1733,6 @@ AP.plate.modal = ( function() {
                     }
                 },
 
-                // --- Save ---
-
                 /**
                  * Formatta un importo numerico nel formato valuta italiano:
                  * punto come separatore delle migliaia, virgola per i decimali,
@@ -1748,6 +1746,8 @@ AP.plate.modal = ( function() {
                     if ( isNaN( num ) ) { return String( amount ); }
                     return num.toLocaleString( "it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 } );
                 },
+
+                // MARK: Save
                 /**
                  * Salva la placca sul server.
                  * Verifica la presenza di almeno un frutto e, in caso di custom image,
@@ -1876,7 +1876,7 @@ AP.plate.modal = ( function() {
                     }, 1000 );
                 },
 
-                // --- Helpers ---
+                // MARK: Helpers
                 /**
                  * Prepara e restituisce i dati dell'item per l'invio al server.
                  * Copia i dati del form e mappa i frutti con le proprietà essenziali.
