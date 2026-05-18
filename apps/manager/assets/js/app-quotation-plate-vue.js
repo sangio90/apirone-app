@@ -108,7 +108,9 @@ AP.plate.modal = ( function() {
      */
     function mapFruitForPlate( data ) {
         const gm = getGridModule();
-        if ( !gm ) { return null; }
+        if ( !gm ) {
+            return null;
+        }
         const fruitWidth = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].width * ( data.fruit.positionCount || 1 );
         const fruitHeight = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].height;
         return {
@@ -151,7 +153,9 @@ AP.plate.modal = ( function() {
      */
     function configPlate() {
         const gm = getGridModule();
-        if ( !gm ) { return; }
+        if ( !gm ) {
+            return;
+        }
 
         const plate = window.vm.plate;
 
@@ -401,7 +405,9 @@ AP.plate.modal = ( function() {
                  * @param {string} quotationItemId - Identificativo del quotation item.
                  */
                 loadBackgroundCustomImage: async function( quotationItemId ) {
-                    if ( !quotationItemId ) { return; }
+                    if ( !quotationItemId ) {
+                        return;
+                    }
                     await ajax( {
                         method: "GET",
                         url: BASE + "/quotation-items/" + quotationItemId + "/images",
@@ -453,7 +459,9 @@ AP.plate.modal = ( function() {
                  */
                 loadModels: async function() {
                     const lineId = this.detailForm.data.product.line.id;
-                    if ( !lineId ) { return; }
+                    if ( !lineId ) {
+                        return;
+                    }
                     await ajax( {
                         method: "GET",
                         url: BASE + "/quotations/models/" + lineId,
@@ -474,7 +482,9 @@ AP.plate.modal = ( function() {
                 loadFinishes: async function() {
                     const modelId = this.detailForm.data.product.model.id;
                     const lineId = this.detailForm.data.product.line.id;
-                    if ( !modelId || modelId === "" ) { return; }
+                    if ( !modelId || modelId === "" ) {
+                        return;
+                    }
                     await ajax( {
                         method: "GET",
                         url: BASE + "/quotations/finishes/22/" + lineId,
@@ -616,7 +626,7 @@ AP.plate.modal = ( function() {
                     } );
 
                     if ( !frame ) {
-                        AP.widget.notify( "error", "Modello [" + modelCode + "] non trovato. Impossibile continuare." );
+                        AP.widget.notify( "error", `Modello [${modelCode}] non trovato. Impossibile continuare.` );
                         return;
                     }
 
@@ -661,7 +671,9 @@ AP.plate.modal = ( function() {
                     const frameId = this.detailForm.data.product.frame.id;
                     const productId = this.detailForm.data.product.id;
 
-                    if ( !orientationId || !frameId ) { return; }
+                    if ( !orientationId || !frameId ) {
+                        return;
+                    }
 
                     await ajax( {
                         method: "GET",
@@ -716,7 +728,7 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 if ( xhr.count > 0 ) {
                                     const items = [];
-                                    xhr.data.forEach( ( item ) => {
+                                    for ( const item of xhr.data ) {
                                         const existing = items.find( ( d ) => {
                                             return d.attributeId === item.attribute.id;
                                         } );
@@ -753,7 +765,7 @@ AP.plate.modal = ( function() {
                                                 } ],
                                             } );
                                         }
-                                    } );
+                                    }
                                     this.detailForm.data.product.items = items;
                                 }
                             },
@@ -791,7 +803,9 @@ AP.plate.modal = ( function() {
                  * @param {Array} data - Elenco dei quotation item product items salvati.
                  */
                 restoreProductItemSelections: function( data ) {
-                    if ( !data || !data.length ) { return; }
+                    if ( !data || !data.length ) {
+                        return;
+                    }
                     data.sort( ( a, b ) => {
                         return a.productItem.orderby - b.productItem.orderby;
                     } );
@@ -823,7 +837,9 @@ AP.plate.modal = ( function() {
                         for ( let i = items.length - 1; i >= 0; i-- ) {
                             if ( items[i].attributeId == attributeId ) {
                                 actualIndex = i;
-                                items[i].values.forEach( ( v ) => { v.selected = false; } );
+                                items[i].values.forEach( ( v ) => {
+                                    v.selected = false;
+                                } );
                             }
                         }
                         if ( actualIndex !== null ) {
@@ -847,7 +863,9 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 let parentIndex = -1;
                                 items.forEach( ( d, idx ) => {
-                                    if ( d.attributeId == attributeId ) { parentIndex = idx; }
+                                    if ( d.attributeId == attributeId ) {
+                                        parentIndex = idx;
+                                    }
                                 } );
 
                                 // Se l'attributo non è più presente in items (es. race condition
@@ -952,10 +970,12 @@ AP.plate.modal = ( function() {
                  * @param {Object} item - Oggetto valore del product item con productItemId e images.
                  */
                 changeImage: function( item ) {
-                    if ( !item || !item.productItemId ) { return; }
+                    if ( !item || !item.productItemId ) {
+                        return;
+                    }
                     let uri = "";
                     const orientationId = this.detailForm.data.product.orientation.id;
-                    if ( item.images && item.images.length ) {
+                    if ( item.images?.length ) {
                         const targetOrientation = orientationId === "HOR" ? "horizontal" : "vertical";
                         for ( const image of item.images ) {
                             if ( image.type?.id == targetOrientation ) {
@@ -965,14 +985,14 @@ AP.plate.modal = ( function() {
                         }
                     }
                     if ( uri ) {
-                        const existing = $( "#productItem-image-" + item.productItemId );
+                        const existing = $( `#productItem-image-${item.productItemId}` );
                         if ( existing.length ) {
-                            existing.css( "background-image", "url('" + uri + "')" );
+                            existing.css( "background-image", `url('${uri}')` );
                         } else {
                             $( "<div>" )
-                                .attr( "id", "productItem-image-" + item.productItemId )
+                                .attr( "id", `productItem-image-${item.productItemId}` )
                                 .css( {
-                                    "background-image": "url('" + uri + "')",
+                                    "background-image": `url('${uri}')`,
                                     "background-size": "cover",
                                     "background-position": "center",
                                     position: "absolute",
@@ -985,7 +1005,7 @@ AP.plate.modal = ( function() {
                                 .insertBefore( "#plate-layers" );
                         }
                     } else {
-                        $( "#productItem-image-" + item.productItemId ).remove();
+                        $( `#productItem-image-${item.productItemId}` ).remove();
                     }
                 },
 
@@ -1023,15 +1043,15 @@ AP.plate.modal = ( function() {
                  * @param {string} fruitId - Identificativo del frutto.
                  */
                 addFruitHover: function( fruitId ) {
-                    $( ".quotation-fruit-row[data-fruit-id=" + fruitId + "]" )
+                    $( `.quotation-fruit-row[data-fruit-id="${fruitId}"]` )
                         .off( "mouseenter mouseleave" )
                         .on( "mouseenter", () => {
-                            $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "rgba(162, 253, 161, 0.44)" );
-                            $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "#a3fda170" );
+                            $( `#quotation-plate-fruits #${fruitId}` ).css( "background-color", "rgba(162, 253, 161, 0.44)" );
+                            $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "#a3fda170" );
                         } )
                         .on( "mouseleave", () => {
-                            $( "#quotation-plate-fruits #" + fruitId ).css( "background-color", "" );
-                            $( "div[data-fruit-id=\"" + fruitId + "\"]" ).css( "background-color", "" );
+                            $( `#quotation-plate-fruits #${fruitId}` ).css( "background-color", "" );
+                            $( `div[data-fruit-id="${fruitId}"]` ).css( "background-color", "" );
                         } );
                 },
 
@@ -1117,7 +1137,9 @@ AP.plate.modal = ( function() {
                  */
                 loadFruits: async function() {
                     const id = this.detailForm.data.id;
-                    if ( !id ) { return; }
+                    if ( !id ) {
+                        return;
+                    }
                     const fruitQIPIs = [];
                     const fruits = [];
 
@@ -1171,7 +1193,10 @@ AP.plate.modal = ( function() {
                             break;
                         }
                     }
-                    if ( !thisFruit ) { return; }
+
+                    if ( !thisFruit ) {
+                        return;
+                    }
 
                     const productId = thisFruit.fruit.id;
 
@@ -1241,7 +1266,7 @@ AP.plate.modal = ( function() {
                                         xhr.data.sort( ( a, b ) => { return a.productItem.orderby - b.productItem.orderby; } );
                                         this.$nextTick( () => {
                                             xhr.data.forEach( ( qipi ) => {
-                                                const sel = $( "#quotation-fruit-row-items_" + fruitId + " select[data-attribute-id='" + qipi.productItem.attribute.id + "']" );
+                                                const sel = $( `#quotation-fruit-row-items_${fruitId} select[data-attribute-id='${qipi.productItem.attribute.id}']` );
                                                 if ( sel.length ) {
                                                     sel.val( qipi.productItem.id );
                                                     sel.trigger( "change" );
@@ -1265,9 +1290,13 @@ AP.plate.modal = ( function() {
                  */
                 changeFruitImage: function( fruitId ) {
                     const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
-                    if ( !fruit ) { return; }
+                    if ( !fruit ) {
+                        return;
+                    }
                     const img = $( "#quotation-plate-fruits #" + fruitId + " img" );
-                    if ( !img.length ) { return; }
+                    if ( !img.length ) {
+                        return;
+                    }
                     const rootImage = fruit.fruit?.horizontalImage?.uri;
                     if ( rootImage ) {
                         img.attr( "src", rootImage ).show();
@@ -1308,7 +1337,9 @@ AP.plate.modal = ( function() {
                             break;
                         }
                     }
-                    if ( !fruit ) { return; }
+                    if ( !fruit ) {
+                        return;
+                    }
                     const fruitItems = fruit.items;
                     const productId = fruit.fruit.id;
                     originId = originId || "";
@@ -1318,7 +1349,9 @@ AP.plate.modal = ( function() {
                         for ( let i = fruitItems.length - 1; i >= 0; i-- ) {
                             if ( fruitItems[i].attributeId == attributeId ) {
                                 actualIndex = i;
-                                fruitItems[i].values.forEach( ( v ) => { v.selected = false; } );
+                                fruitItems[i].values.forEach( ( v ) => {
+                                    v.selected = false;
+                                } );
                             }
                         }
                         if ( actualIndex !== null ) {
@@ -1342,7 +1375,9 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 let parentIndex = -1;
                                 fruitItems.forEach( ( d, idx ) => {
-                                    if ( d.attributeId == attributeId ) { parentIndex = idx; }
+                                    if ( d.attributeId == attributeId ) {
+                                        parentIndex = idx;
+                                    }
                                 } );
 
                                 if ( parentIndex === -1 ) {
@@ -1472,12 +1507,18 @@ AP.plate.modal = ( function() {
                     do {
                         cascaded = false;
                         for ( const fruit of this.detailForm.data.fruits ) {
-                            if ( !fruit.items ) { continue; }
+                            if ( !fruit.items ) {
+                                continue;
+                            }
                             for ( const item of fruit.items ) {
                                 const key = fruit.id + "-" + item.attributeId;
-                                if ( processed.has( key ) ) { continue; }
+                                if ( processed.has( key ) ) {
+                                    continue;
+                                }
                                 const selected = item.values && item.values.find( ( v ) => { return v.selected; } );
-                                if ( !selected || !selected.productItemId ) { continue; }
+                                if ( !selected || !selected.productItemId ) {
+                                    continue;
+                                }
                                 const childrenLoaded = fruit.items.some( ( ci ) => {
                                     return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
                                 } );
@@ -1494,10 +1535,23 @@ AP.plate.modal = ( function() {
                     } while ( cascaded );
                 },
 
+                /**
+                 * Aggiorna l'overlay dell'attributo di un frutto sulla griglia della placca.
+                 * Rimuove l'overlay esistente e ne crea uno nuovo con l'immagine corretta
+                 * in base all'orientamento (orizzontale/verticale).
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {string} attributeId - Identificativo dell'attributo.
+                 * @param {Object} value - Oggetto valore del product item con immagini e z-index.
+                 * @param {string} [parentAttributeId] - Identificativo opzionale dell'attributo padre.
+                 */
                 updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId ) {
-                    if ( !value || !attributeId ) { return; }
+                    if ( !value || !attributeId ) {
+                        return;
+                    }
                     const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
-                    if ( !fruitEl.length ) { return; }
+                    if ( !fruitEl.length ) {
+                        return;
+                    }
                     const overlayKey = parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId;
                     fruitEl.find( "> .fruit-overlay-" + overlayKey ).remove();
                     const orientationId = this.detailForm.data.product.orientation.id;
@@ -1730,27 +1784,26 @@ AP.plate.modal = ( function() {
                     }
                     parsedData.positions = fruitPositions;
 
-                    html2canvas( preview, { useCORS: true } ).then( async( canvas ) => {
-                        const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
-                        parsedData.imageBase64 = imgData;
+                    const canvas = await html2canvas( preview, { useCORS: true } );
+                    const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+                    parsedData.imageBase64 = imgData;
 
-                        await ajax( {
-                            method: "POST",
-                            url: BASE + "/quotation-items/plate",
-                            data: JSON.stringify( parsedData ),
-                            callback: {
-                                done: ( xhr ) => {
-                                    this.saving = false;
-                                    AP.loading.hide();
-                                    AP.widget.notify( "success", "Placca salvata correttamente." );
-                                    this.showPostSaveModal( parsedData.quotationId );
-                                },
-                                fail: () => {
-                                    this.saving = false;
-                                    AP.loading.hide();
-                                },
+                    await ajax( {
+                        method: "POST",
+                        url: BASE + "/quotation-items/plate",
+                        data: JSON.stringify( parsedData ),
+                        callback: {
+                            done: ( xhr ) => {
+                                this.saving = false;
+                                AP.loading.hide();
+                                AP.widget.notify( "success", "Placca salvata correttamente." );
+                                this.showPostSaveModal( parsedData.quotationId );
                             },
-                        } );
+                            fail: () => {
+                                this.saving = false;
+                                AP.loading.hide();
+                            },
+                        },
                     } );
                 },
 
@@ -1785,7 +1838,7 @@ AP.plate.modal = ( function() {
                         hoCambiatoQuantita = pd.quantity !== plateResponse.data.quotationItem.quantity;
                     }
 
-                    if ( isNew || ( !pd.id || hoCambiatoZona || hoCambiatoQuantita ) && pd.quotationZone && pd.quotationZone.name !== "Non assegnato" ) {
+                    if ( isNew || ( ( !pd.id || hoCambiatoZona || hoCambiatoQuantita ) && pd.quotationZone && pd.quotationZone.name !== "Non assegnato" ) ) {
                         modal.modal( "show" );
                         return;
                     }
@@ -1920,7 +1973,9 @@ AP.plate.modal = ( function() {
         let zoneData = AP.quotation.detail.config().zone;
         if ( !zoneData || zoneData.id === "" ) {
             const nonAss = window.vm.zones.find( ( z ) => { return z.name === "Non assegnato"; } );
-            if ( nonAss ) { zoneData = nonAss; }
+            if ( nonAss ) {
+                zoneData = nonAss;
+            }
         }
         if ( zoneData ) {
             window.vm.detailForm.data.quotationZone = zoneData;
