@@ -60,51 +60,59 @@
 					<table class="cstmtable" style="margin-top: .1in; width: 100%;">
 						<tr>
 							<td style="width: 50%;"></td>
-							<td style="width: 50%; padding-left: 0.05in;"><strong>Indirizzo Spedizione</strong></td>
+							<cfif !isNull(args.data.quotation.getShippingProfile())>
+								<td style="width: 50%; padding-left: 0.05in;"><strong>Indirizzo Spedizione</strong></td>
+							<cfelse>
+								<td style="width: 50%;"></td>
+							</cfif>
 						</tr>
 						<tr>
 							<td>
-								<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Ragione Sociale: </td>
-										<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getCustomer().getCompany()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Telefono: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getPhone()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Email: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Partita IVA: </td>
-										<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getVatNumber()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-										<td style="border: 0">
-											#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
-											#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
-										</td>
-									</tr>
-								</table>
+								<cfif !isNull(args.data.quotation.getCustomer())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Ragione Sociale: </td>
+											<td style="border: 0; padding-left: 0.05in; width: 65%;">#args.data.quotation.getCustomer().getCompany()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Telefono: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getPhone()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Email: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Partita IVA: </td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getVatNumber()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
+											<td style="border: 0">
+												#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
+												#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
+											</td>
+										</tr>
+									</table>
+								</cfif>
 							</td>
 							<td>
-								<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
-									<tr style="border: 0">
-										<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Nome: </td>
-										<td style="border: 0; width: 75%">#args.data.quotation.getShippingProfile().getCompany()#</td>
-									</tr>
-									<tr style="border: 0">
-										<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
-										<td style="border: 0">
-											#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
-											#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
-											#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
-										</td>
-									</tr>
-								</table>
+								<cfif !isNull(args.data.quotation.getShippingProfile())>
+									<table style="width: 100%; padding: 0; border: 0; border-collapse: collapse;">
+										<tr style="border: 0">
+											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">Nome: </td>
+											<td style="border: 0; width: 75%">#args.data.quotation.getShippingProfile().getCompany()#</td>
+										</tr>
+										<tr style="border: 0">
+											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">Indirizzo: </td>
+											<td style="border: 0">
+												#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
+												#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
+												#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
+											</td>
+										</tr>
+									</table>
+								</cfif>
 							</td>
 						</tr>
 					</table>
