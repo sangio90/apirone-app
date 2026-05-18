@@ -1266,13 +1266,9 @@ AP.plate.modal = ( function() {
                         this._cascadingFruit = true;
                         savedSelections.sort( ( a, b ) => { return a.productItem.orderby - b.productItem.orderby; } );
                         for ( const qipi of savedSelections ) {
-                            debugger; // [2] iterazione saved selection
-                            console.log( "qipi:", qipi.productItem.attribute.id, qipi.productItem.id );
                             for ( const fi of thisFruit.items ) {
                                 if ( fi.attributeId == qipi.productItem.attribute.id ) {
-                                    console.log( "  fi match:", fi.attributeId, fi.attributeName, fi.level );
                                     const match = fi.values.find( ( v ) => { return v.productItemId == qipi.productItem.id; } );
-                                    console.log( "  match:", match );
                                     if ( match ) {
                                         match.selected = true;
                                         await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.attributeId, true );
