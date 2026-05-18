@@ -165,6 +165,15 @@
                                                                 <!--- Visualizzazione del nome dell'opzione con fallback a cascata: 1. attributeValue.rawValue.name (preferito), 2. attributeValue.name, 3. stringa vuota. --->
                                                             </option>
                                                         </select>
+                                                        <template v-if="checkIfSelectedAllowsNote(item)">
+                                                            <label class="mb-1" :style="{ marginLeft: (1.5 * (item.level + 1)) + 'rem', fontSize: '11px' }">NOTE</label>
+                                                            <input
+                                                                class="form-control form-control-sm me-3 mb-2"
+                                                                :value="getValueNote(item)"
+                                                                @input="onValueNoteInput($event, item)"
+                                                                :style="{ marginLeft: (1.5 * (item.level + 1)) + 'rem', width: 'calc(100% - ' + (1.5 * (item.level + 1)) + 'rem)' }"
+                                                            >
+                                                        </template>
                                                     </div>
                                                 </template>
                                             </div>
@@ -211,6 +220,15 @@
                                                                         {{ val.attributeValue && val.attributeValue.rawValue ? val.attributeValue.rawValue.name : (val.attributeValue && val.attributeValue.name ? val.attributeValue.name : '') }}
                                                                     </option>
                                                                 </select>
+                                                                <template v-if="checkIfSelectedAllowsNote(fi)">
+                                                                    <label class="mb-1" :style="{ marginLeft: (1.5 * ((fi.level || 0) + 1)) + 'rem', fontSize: '11px' }">NOTE</label>
+                                                                    <input
+                                                                        class="form-control form-control-sm me-3 mb-2"
+                                                                        :value="getValueNote(fi, fruit.id)"
+                                                                        @input="onValueNoteInput($event, fi)"
+                                                                        :style="{ marginLeft: (1.5 * ((fi.level || 0) + 1)) + 'rem', width: 'calc(100% - ' + (1.5 * ((fi.level || 0) + 1)) + 'rem)' }"
+                                                                    >
+                                                                </template>
                                                             </div>
                                                         </template>
                                                     </div>

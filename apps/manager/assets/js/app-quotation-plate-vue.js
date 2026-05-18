@@ -1602,6 +1602,66 @@ AP.plate.modal = ( function() {
                     }
                 },
 
+                /**
+                 * Verifica se il valore attualmente selezionato di un attributo
+                 * consente l'inserimento di una nota testuale (allowNote = true).
+                 * @param {Object} item - Attributo con array values.
+                 * @returns {boolean} True se il valore selezionato ha allowNote attivo.
+                 */
+                checkIfSelectedAllowsNote: function( item ) {
+                    const selected = item.values?.find( function( v ) { return v.selected; } );
+                    return !!selected?.attributeValue?.allowNote;
+                },
+
+                /**
+                 * Restituisce la nota associata al valore selezionato di un attributo.
+                 * Cerca prima sulla value (impostata dall'input), poi nei dati salvati.
+                 * @param {Object} item - Attributo con array values.
+                 * @param {string|number} [fruitId] - ID del frutto (solo per attributi frutto).
+                 * @returns {string} Nota o stringa vuota.
+                 */
+                getValueNote: function( item, fruitId ) {
+                    const selected = item.values?.find( function( v ) { return v.selected; } );
+                    if ( !selected ) { return ""; }
+                    if ( selected.note != null ) { return selected.note; }
+                    const productItemId = selected.productItemId;
+                    const attrValueId = selected.attributeValue?.id;
+                    if ( !productItemId || !attrValueId ) { return ""; }
+                    if ( fruitId != null ) {
+                        const saved = ( this.detailForm.data.fruitQuotationItemProductItems || [] ).find( function( qipi ) {
+                            return qipi.product_item_id == productItemId
+                                && qipi.attribute_value_id == attrValueId
+                                && qipi.quotation_item_fruit_id == fruitId;
+                        } );
+                        if ( saved?.note != null ) {
+                            this.$set( selected, "note", saved.note );
+                            return saved.note;
+                        }
+                    } else {
+                        const saved = ( this.detailForm.data.plateQuotationItemProductItems || [] ).find( function( qipi ) {
+                            return qipi.productItem?.id == productItemId
+                                && qipi.productItem?.attributeValue?.id == attrValueId;
+                        } );
+                        if ( saved?.note != null ) {
+                            this.$set( selected, "note", saved.note );
+                            return saved.note;
+                        }
+                    }
+                    return "";
+                },
+
+                /**
+                 * Aggiorna la nota del valore selezionato di un attributo.
+                 * @param {Event} event - Evento input.
+                 * @param {Object} item - Attributo con array values.
+                 */
+                onValueNoteInput: function( event, item ) {
+                    const selected = item.values?.find( function( v ) { return v.selected; } );
+                    if ( selected ) {
+                        this.$set( selected, "note", event.target.value );
+                    }
+                },
+
                 // MARK: Fruit Suggest
                 /**
                  * Gestisce l'input di ricerca nel suggeritore frutti.
@@ -1769,7 +1829,7 @@ AP.plate.modal = ( function() {
                 formatMoney: function( amount ) {
                     if ( amount === null || amount === undefined || amount === "" ) { return ""; }
                     const num = Number( amount );
-                    if ( isNaN( num ) ) { return String( amount ); }
+                    if ( Number.isNaN( num ) ) { return String( amount ); }
                     return num.toLocaleString( "it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 } );
                 },
 
