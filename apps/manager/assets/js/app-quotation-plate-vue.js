@@ -1396,22 +1396,6 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                 * Restituisce la prima immagine disponibile tra gli ID dei product items forniti.
-                 * Scorre l'elenco e controlla la mappa delle immagini precaricata.
-                 * @param {Array<string>} productItemIds - Elenco degli ID dei product items.
-                 * @returns {string|null} URI della prima immagine trovata o null.
-                 */
-                getFirstFruitImage: function( productItemIds ) {
-                    for ( const prodctItemId of productItemIds ) {
-                        const img = this.productItemsImages[ prodctItemId ];
-                        if ( img && img !== "" ) {
-                            return img;
-                        }
-                    }
-                    return null;
-                },
-
-                /**
                  * Carica i product items figli per un attributo di un frutto specifico.
                  * Se originId è vuoto, deseleziona i valori dell'attributo e rimuove gli items figli.
                  * Altrimenti, carica i figli tramite AJAX e li organizza per attributo.
@@ -1572,7 +1556,6 @@ AP.plate.modal = ( function() {
                     this.$set( value, "note", null );
                     await this.$nextTick();
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
-                    this.renderPlateWithFruits();
                 },
 
                 /**
@@ -1605,7 +1588,7 @@ AP.plate.modal = ( function() {
                                 if ( !fruit.items ) {
                                     continue;
                                 }
-                                for ( const [ itemIdx, item ] of fruit.items.entries() ) {
+                                for ( const item of fruit.items ) {
                                     const key = fruit.id + "-" + item.attributeId;
                                     if ( processed.has( key ) ) {
                                         continue;
@@ -1617,23 +1600,21 @@ AP.plate.modal = ( function() {
                                     const childrenLoaded = fruit.items.some( ( ci ) => {
                                         return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
                                     } );
-                                    if ( !childrenLoaded ) {
+                                    if ( childrenLoaded ) {
+                                        processed.add( key );
+                                    } else {
                                         processed.add( key );
                                         await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
                                         await this.$nextTick();
-                                        this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId, 1040 + itemIdx );
                                         cascaded = true;
-                                    } else {
-                                        processed.add( key );
                                     }
                                 }
                             }
                         } while ( cascaded );
-                        for ( const fruit of this.detailForm.data.fruits ) {
-                            this.updateFruitCombinationOverlay( fruit.id );
-                        }
-                    } finally {
+                        this.renderPlateWithFruits();
+                    } catch ( e ) {
                         this.smallLoading = false;
+                        throw e;
                     }
                 },
 
@@ -1780,7 +1761,7 @@ AP.plate.modal = ( function() {
                 onValueNoteInput: function( event, item ) {
                     const selected = item.values?.find( function( v ) { return v.selected; } );
                     if ( selected ) {
-                        this.$set( selected, "note", event.target.value );
+                        // this.$set( selected, "note", event.target.value );
                     }
                 },
 

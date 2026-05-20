@@ -152,6 +152,7 @@
                                                         <!--- :style: indentazione dinamica basata sul livello dell'attributo (level 0 = 0rem, level 1 = 1.5rem, ecc.). Crea un effetto ad albero visivo. --->
                                                         <select
                                                             class="form-control form-control-sm select-item me-3 mb-2"
+                                                            :disabled="smallLoading"
                                                             :data-attribute-id="item.attributeId"
                                                             :style="{ marginLeft: (1.5 * item.level) + 'rem', width: 'calc(100% - ' + (1.5 * item.level) + 'rem)' }"
                                                             @change="handleProductItemSelect($event.target.value, item.attributeId, item.values.find(function(v) { return v.productItemId == $event.target.value }))">
@@ -169,9 +170,10 @@
                                                             <label class="mb-1" :style="{ marginLeft: (1.5 * (item.level + 1)) + 'rem', fontSize: '11px' }">NOTE</label>
                                                             <input
                                                                 class="form-control form-control-sm me-3 mb-2"
+                                                                :disabled="smallLoading"
                                                                 :value="getValueNote(item)"
-                                                                @input="onValueNoteInput($event, item)"
                                                                 :style="{ marginLeft: (1.5 * (item.level + 1)) + 'rem', width: 'calc(100% - ' + (1.5 * (item.level + 1)) + 'rem)' }"
+                                                                @input="onValueNoteInput($event, item)"
                                                             >
                                                         </template>
                                                     </div>
@@ -208,6 +210,7 @@
                                                                 <label class="mb-1" :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem' }">{{ fi.attributeName }}</label>
                                                                 <select
                                                                     class="form-control form-control-sm select-item me-3 mb-2"
+                                                                    :disabled="smallLoading"
                                                                     :data-fruit-item-id="fi.id"
                                                                     :style="{ marginLeft: (1.5 * (fi.level || 0)) + 'rem', width: 'calc(100% - ' + (1.5 * (fi.level || 0)) + 'rem)' }"
                                                                     @change="handleFruitProductItemSelect(fruit.id, $event.target.value, fi.id, fi.values.find(function(v) { return v.productItemId == $event.target.value }))">
@@ -225,8 +228,9 @@
                                                                     <input
                                                                         class="form-control form-control-sm me-3 mb-2"
                                                                         :value="getValueNote(fi, fruit.id)"
-                                                                        @input="onValueNoteInput($event, fi)"
                                                                         :style="{ marginLeft: (1.5 * ((fi.level || 0) + 1)) + 'rem', width: 'calc(100% - ' + (1.5 * ((fi.level || 0) + 1)) + 'rem)' }"
+                                                                        :disabled="smallLoading"
+                                                                        @input="onValueNoteInput($event, fi)"
                                                                     >
                                                                 </template>
                                                             </div>
