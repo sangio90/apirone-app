@@ -1141,10 +1141,11 @@ AP.plate.modal = ( function() {
                                 this.addFruitHover( fruit.id );
                                 this.changeFruitImage( fruit.id );
                                 if ( fruit.items ) {
-                                    for ( const fi of fruit.items ) {
+                                    for ( let fiIdx = 0; fiIdx < fruit.items.length; fiIdx++ ) {
+                                        const fi = fruit.items[ fiIdx ];
                                         const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
                                         if ( selected && selected.productItemId ) {
-                                            this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId );
+                                            this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId, 1040 + fiIdx );
                                         }
                                     }
                                 }
@@ -1598,7 +1599,7 @@ AP.plate.modal = ( function() {
                                 if ( !fruit.items ) {
                                     continue;
                                 }
-                                for ( const item of fruit.items ) {
+                                for ( const [ itemIdx, item ] of fruit.items.entries() ) {
                                     const key = fruit.id + "-" + item.attributeId;
                                     if ( processed.has( key ) ) {
                                         continue;
@@ -1613,7 +1614,7 @@ AP.plate.modal = ( function() {
                                     if ( !childrenLoaded ) {
                                         processed.add( key );
                                         await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
-                                        this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId );
+                                        this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId, 1040 + itemIdx );
                                         cascaded = true;
                                     } else {
                                         processed.add( key );
@@ -1635,10 +1636,11 @@ AP.plate.modal = ( function() {
                  * in base all'orientamento (orizzontale/verticale).
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} attributeId - Identificativo dell'attributo.
-                 * @param {Object} value - Oggetto valore del product item con immagini e z-index.
+                 * @param {Object} value - Oggetto valore del product item con immagini.
                  * @param {string} [parentAttributeId] - Identificativo opzionale dell'attributo padre.
+                 * @param {number} zIndex - Z-index calcolato in base alla posizione nell'array fruit.items.
                  */
-                updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId ) {
+                updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId, zIndex ) {
                     if ( !value || !attributeId ) {
                         return;
                     }
@@ -1651,7 +1653,6 @@ AP.plate.modal = ( function() {
                     const orientationId = this.detailForm.data.product.orientation.id;
                     const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
                     if ( imageUri ) {
-                        const zIndex = ( value.orderby || 0 ) + 1040;
                         fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
                 },
@@ -1672,17 +1673,19 @@ AP.plate.modal = ( function() {
                     const selectedIds = [];
                     let maxZIndex = 0;
                     if ( fruit.items ) {
+                        let itemIdx = 0;
                         for ( const item of fruit.items ) {
                             const selected = item.values?.find( function( v ) { return v.selected; } );
                             if ( selected?.productItemId ) {
                                 selectedIds.push( selected.productItemId );
                             }
                             if ( selected ) {
-                                const z = ( selected.orderby || 0 ) + 1040;
+                                const z = 1040 + itemIdx;
                                 if ( z > maxZIndex ) {
                                     maxZIndex = z;
                                 }
                             }
+                            itemIdx++;
                         }
                     }
                     const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
