@@ -50,13 +50,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.Combination function findByListOfProductItemIds(
+	/**
+	 * Cerca le combinazioni compatibili con una lista di productItemId.
+	 * La ricerca è parziale: una combinazione è inclusa se almeno uno dei suoi
+	 * productItemId è presente nella lista, a patto che non ci siano conflitti
+	 * (stesso attributo con valore diverso). Restituisce zero, una o più combinazioni.
+	 *
+	 * @productItemIds.hint Array di ID dei product items attualmente selezionati.
+	 * @return              Array di bean Combination (vuoto se nessuna corrispondenza).
+	 */
+	public Array function findByListOfProductItemIds(
 		required Array productItemIds,
 		){
 
-		var query = getDao().findByListOfProductItemIds( argumentCollection = arguments );
-		var bean = build( query.combination_id );
-		return bean;
+		if ( !arrayLen( arguments.productItemIds ) ) {
+			return [];
+		}
+
+		var query = getDao().findByListOfProductItemIds( arguments.productItemIds );
+		var beans = [];
+		for ( var row in query ) {
+			var bean = build( row.combination_id );
+			if ( !isNull( bean ) ) {
+				beans.append( bean );
+			}
+		}
+		return beans;
 	}
 
 	public Array function calculateCombinations( required String productId, attributeIds=[] ){

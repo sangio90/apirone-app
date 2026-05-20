@@ -9,11 +9,11 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    
+
                     <form action="/manager/quotations" class="form-horizontal" method="post" id="quotation-detail-form">
-                        
+
                         <section class="card">
-                            
+
                             <div class="card-body">
 
                                 <div class="row">
@@ -113,7 +113,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        
+
                                                         </cfloop>
 
                                                     </div>
@@ -123,17 +123,17 @@
                                             </div>
 
                                         </div>
-                                    
-                                    </div>                                                    
-                                
-                                </div>                         
-                            
-                            </div>                         
-                                
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </section>
-                    
+
                     </form>
-                
+
                 </div>
 
             </div>
@@ -149,13 +149,13 @@
                     <div class="modal-body">
 
                         <div class="row">
-                            
+
                             <div class="col-12">
 
                                 <input class="form-control" name="zona">
 
                             </div>
-                        
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -163,7 +163,7 @@
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
 
         <div class="modal hide fade" tabindex="-1" id="add-plate-modal">
             <div class="modal-dialog">
@@ -174,13 +174,13 @@
                     <div class="modal-body">
 
                         <div class="row">
-                            
+
                             <div class="col-12">
 
                                 <input class="form-control" name="zona">
 
                             </div>
-                        
+
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -191,5 +191,6 @@
         </div>
     </div>
     #view( "quotation/signage-modal" )#
-    #view( "quotation/plate-modal" )#
+    <!--- #view( "quotation/plate-modal" )# --->
+    #view( "quotation/plate-modal-vue" )#
 </cfoutput>

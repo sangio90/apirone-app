@@ -411,7 +411,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var lines = [];
 
-		pricing.setQuantity( Val( json.price.quantity ) ? json.item.quantity : 1 );
+		pricing.setQuantity( StructKeyExists( json.price, "quantity" ) && Val( json.price.quantity ) ? json.item.quantity : 1 );
 		pricing.setDiscount1( Val( json.price.discount1 ) ? json.price.discount1 : 0 );
 		pricing.setDiscount2( Val( json.price.discount2 ) ? json.price.discount2 : 0 );
 
@@ -788,12 +788,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for (var fruit in fruits) {
 				var fruitItems = []
 
-				for (fruitItem in fruit.getItems()) {
-					fruitItems.append({
-						values = [
-							{ selected = true, productItemId = fruitItem.getProductItem().getId() }
-						]
-					})
+				if ( !isNull( fruit.getItems() ) ) {
+					for (fruitItem in fruit.getItems()) {
+						fruitItems.append({
+							values = [
+								{ selected = true, productItemId = fruitItem.getProductItem().getId() }
+							]
+						})
+					}
 				}
 				json.item.fruits._data.append({
 					"fruit": {
