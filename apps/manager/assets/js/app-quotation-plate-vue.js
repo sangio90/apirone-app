@@ -1063,12 +1063,14 @@ AP.plate.modal = ( function() {
 
                 /**
                  * Gestisce la selezione di un product item da parte dell'utente.
-                 * Carica i product items figli e aggiorna l'immagine corrispondente.
+                 * Resetta la nota associata al valore precedente, carica i figli
+                 * e aggiorna l'immagine corrispondente.
                  * @param {string} selectedId - Identificativo del product item selezionato.
                  * @param {string} attributeId - Identificativo dell'attributo.
                  * @param {Object} value - Oggetto valore selezionato per l'aggiornamento dell'immagine.
                  */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
+                    this.$set( value, "note", null );
                     await this.loadProductItems( selectedId, attributeId );
                     this.renderPlateWithFruits();
                 },
@@ -1552,13 +1554,15 @@ AP.plate.modal = ( function() {
 
                 /**
                  * Gestisce la selezione di un product item per un frutto.
-                 * Carica i product items figli e aggiorna l'immagine del frutto.
+                 * Resetta la nota associata al valore precedente, carica i figli
+                 * e aggiorna l'immagine del frutto.
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} selectedId - Identificativo del product item selezionato.
                  * @param {string} itemId - Identificativo univoco dell'item attributo (fi.id).
                  * @param {Object} value - Oggetto valore selezionato.
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
+                    this.$set( value, "note", null );
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
                     this.renderPlateWithFruits();
                 },
@@ -1810,7 +1814,6 @@ AP.plate.modal = ( function() {
                  * @returns {Promise<boolean>} Promise che restituisce false se il metodo è fisso.
                  */
                 updatePricing: async function() {
-                    // debugger
                     if ( this.pricing.data.method.id === "F" ) {
                         AP.widget.notify( "warning", "Hai selezionato Prezzo Fisso." );
                         return false;
