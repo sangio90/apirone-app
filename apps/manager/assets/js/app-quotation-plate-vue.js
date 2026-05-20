@@ -1148,6 +1148,7 @@ AP.plate.modal = ( function() {
                                         }
                                     }
                                 }
+                                this.updateFruitCombinationOverlay( fruit.id );
                             }
                         } finally {
                             this.smallLoading = false;
@@ -1620,6 +1621,9 @@ AP.plate.modal = ( function() {
                                 }
                             }
                         } while ( cascaded );
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            this.updateFruitCombinationOverlay( fruit.id );
+                        }
                     } finally {
                         this.smallLoading = false;
                     }
@@ -1650,6 +1654,61 @@ AP.plate.modal = ( function() {
                         const zIndex = ( value.orderby || 0 ) + 1040;
                         fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
+                },
+
+                /**
+                 * Aggiorna l'overlay di combinazione per un frutto.
+                 * Raccoglie tutti i productItemId selezionati tra gli attributi del frutto,
+                 * li invia al server per ottenere le immagini delle combinazioni compatibili
+                 * (ricerca parziale con controllo conflitti) e mostra ciascuna immagine
+                 * come overlay sopra tutti gli overlay degli attributi, con lo stesso z-index.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 */
+                updateFruitCombinationOverlay: function( fruitId ) {
+                    const fruit = this.detailForm.data.fruits.find( function( f ) { return f.id === fruitId; } );
+                    if ( !fruit ) {
+                        return;
+                    }
+                    const selectedIds = [];
+                    let maxZIndex = 0;
+                    if ( fruit.items ) {
+                        for ( const item of fruit.items ) {
+                            const selected = item.values?.find( function( v ) { return v.selected; } );
+                            if ( selected?.productItemId ) {
+                                selectedIds.push( selected.productItemId );
+                            }
+                            if ( selected ) {
+                                const z = ( selected.orderby || 0 ) + 1040;
+                                if ( z > maxZIndex ) {
+                                    maxZIndex = z;
+                                }
+                            }
+                        }
+                    }
+                    const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
+                    if ( !fruitEl.length ) {
+                        return;
+                    }
+                    fruitEl.find( "div[class^='fruit-overlay-combination']" ).remove();
+                    if ( selectedIds.length === 0 ) {
+                        return;
+                    }
+                    const combinationZIndex = maxZIndex + 100;
+                    const orientationId = this.detailForm.data.product.orientation.id;
+                    ajax( {
+                        method: "POST",
+                        url: BASE + "/combinations/findByListOfProductItemIds",
+                        data: JSON.stringify( { productItemIds: selectedIds, orientation: orientationId } ),
+                        callback: {
+                            done: function( xhr ) {
+                                if ( xhr.status === "SUCCESS" && xhr.data?.images?.length ) {
+                                    for ( let idx = 0; idx < xhr.data.images.length; idx++ ) {
+                                        fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${combinationZIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${xhr.data.images[ idx ]}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
+                                    }
+                                }
+                            },
+                        },
+                    } );
                 },
 
                 /**

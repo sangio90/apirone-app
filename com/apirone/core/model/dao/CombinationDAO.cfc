@@ -55,22 +55,57 @@
 	<cffunction name="findByListOfProductItemIds" access="public">
 		<cfargument name="productItemIds" type="array" required="true">
 
-		<cfset var N = arrayLen(arguments.productItemIds)>
 		<cfset var idsList = arrayToList(arguments.productItemIds)>
 		<cfset var q = "">
 
 		<cfquery name="q" datasource="apirone">
-			SELECT cpi.combination_id
-			FROM combination_product_items cpi
-			GROUP BY cpi.combination_id
-			HAVING
-			COUNT(*) = <cfqueryparam value="#N#" cfsqltype="cf_sql_integer">
-			AND COUNT(CASE
-			WHEN cpi.product_item_id IN (
-			<cfqueryparam value="#idsList#" list="true" cfsqltype="cf_sql_integer">
+			WITH
+			-- Coppie (attribute_id, product_item_id) risolte dagli ID
+			-- ricevuti nella richiesta corrente.
+			-- Servono per il controllo dei conflitti: se una combinazione ha un
+			-- valore diverso per lo stesso attributo, viene esclusa.
+			selected_attrs AS (
+			    SELECT arv.attribute_id, pi.product_item_id
+			    FROM product_items pi
+			    INNER JOIN attributes_raw_values arv ON arv.attribute_raw_value_id = pi.attribute_raw_value_id
+			    WHERE pi.product_item_id IN (
+			        <cfqueryparam value="#idsList#" list="true" cfsqltype="cf_sql_integer">
+			    )
+			),
+			-- Coppie (combination_id, attribute_id, product_item_id) per TUTTE le
+			-- combinazioni esistenti. Viene usata sia per trovare i conflitti sia per
+			-- costruire le candidate.
+			combination_attrs AS (
+			    SELECT cpi.combination_id, arv.attribute_id, pi.product_item_id
+			    FROM combination_product_items cpi
+			    INNER JOIN product_items pi ON pi.product_item_id = cpi.product_item_id
+			    INNER JOIN attributes_raw_values arv ON arv.attribute_raw_value_id = pi.attribute_raw_value_id
+			),
+			-- Combinazioni candidate: hanno almeno un product_item_id tra quelli
+			-- selezionati. Il DISTINCT evita duplicati se la combinazione matcha
+			-- più di un item.
+			candidates AS (
+			    SELECT DISTINCT combination_id
+			    FROM combination_product_items
+			    WHERE product_item_id IN (
+			        <cfqueryparam value="#idsList#" list="true" cfsqltype="cf_sql_integer">
+			    )
+			),
+			-- Combinazioni in conflitto: tra le candidate, quelle che hanno almeno
+			-- un attributo con un valore DIVERSO da quello selezionato dall'utente.
+			-- Esempio: combinazione ha Incisione="SI" ma l'utente ha scelto Incisione="NO".
+			conflicts AS (
+			    SELECT ca.combination_id
+			    FROM combination_attrs ca
+			    INNER JOIN selected_attrs sa
+			        ON sa.attribute_id = ca.attribute_id
+			        AND sa.product_item_id != ca.product_item_id
+			    WHERE ca.combination_id IN (SELECT combination_id FROM candidates)
 			)
-			THEN 1
-			END) = <cfqueryparam value="#N#" cfsqltype="cf_sql_integer">
+			-- Restituisce solo le candidate che NON hanno conflitti
+			SELECT combination_id::varchar
+			FROM candidates
+			WHERE combination_id NOT IN (SELECT combination_id FROM conflicts)
 		</cfquery>
 
 		<cfreturn q>
