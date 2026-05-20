@@ -1071,7 +1071,7 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Oggetto valore selezionato per l'aggiornamento dell'immagine.
                  */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
-                    this.$set( value, "note", null );
+                    // this.$set( value, "note", null );
                     await this.$nextTick();
                     await this.loadProductItems( selectedId, attributeId );
                     this.renderPlateWithFruits();
@@ -1552,7 +1552,7 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Oggetto valore selezionato.
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
-                    this.$set( value, "note", null );
+                    // this.$set( value, "note", null );
                     await this.$nextTick();
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
                 },
@@ -1736,7 +1736,7 @@ AP.plate.modal = ( function() {
                                 && qipi.quotation_item_fruit_id == fruitId;
                         } );
                         if ( saved?.note != null ) {
-                            this.$set( selected, "note", saved.note );
+                            // this.$set( selected, "note", saved.note );
                             return saved.note;
                         }
                     } else {
@@ -1745,7 +1745,7 @@ AP.plate.modal = ( function() {
                                 && qipi.productItem?.attributeValue?.id == attrValueId;
                         } );
                         if ( saved?.note != null ) {
-                            this.$set( selected, "note", saved.note );
+                            // this.$set( selected, "note", saved.note );
                             return saved.note;
                         }
                     }
