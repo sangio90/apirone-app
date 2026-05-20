@@ -701,11 +701,10 @@ AP.plate.modal = ( function() {
                  */
                 reapplyProductItemImages: function() {
                     const items = this.detailForm.data.product.items;
-                    for ( let i = 0; i < items.length; i++ ) {
-                        const attr = items[i];
-                        if ( attr.values && attr.values.length ) {
+                    for ( const attr of items ) {
+                        if ( attr?.values?.length ) {
                             const selected = attr.values.find( ( v ) => { return v.selected; } );
-                            if ( selected && selected.productItemId ) {
+                            if ( selected?.productItemId ) {
                                 this.changeImage( selected );
                             }
                         }
@@ -813,7 +812,7 @@ AP.plate.modal = ( function() {
                  * @param {Array} data - Elenco dei quotation item product items salvati.
                  */
                 restoreProductItemSelections: async function( data ) {
-                    if ( !data || !data.length ) {
+                    if ( !data?.length ) {
                         return;
                     }
 
@@ -1251,9 +1250,9 @@ AP.plate.modal = ( function() {
                 addProductItemsToFruit: async function( fruitId ) {
                     const fruits = this.detailForm.data.fruits;
                     let thisFruit = null;
-                    for ( let i = 0; i < fruits.length; i++ ) {
-                        if ( fruits[i].id === fruitId ) {
-                            thisFruit = fruits[i];
+                    for ( const fruit of fruits ) {
+                        if ( fruit.id === fruitId ) {
+                            thisFruit = fruit;
                             break;
                         }
                     }
