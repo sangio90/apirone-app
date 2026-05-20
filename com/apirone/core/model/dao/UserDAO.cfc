@@ -28,6 +28,7 @@
 		<cfargument name="statusId" type="String">
 		<cfargument name="accountId" type="String">
 		<cfargument name="roleTypeId" type="String">
+		<cfargument name="hasUtenteVerticale" type="Boolean">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -63,6 +64,14 @@
 
 				<cfif !IsNull( arguments.accountId )>
 					AND account_id = <cfqueryparam cfsqltype="Other" value="#arguments.accountId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.hasUtenteVerticale ) AND arguments.hasUtenteVerticale>
+					AND EXISTS (
+						SELECT 1 FROM membership.accounts
+						WHERE accounts.account_id = users.account_id
+						AND accounts.id_utente_verticale IS NOT NULL
+					)
 				</cfif>
 
 			ORDER BY

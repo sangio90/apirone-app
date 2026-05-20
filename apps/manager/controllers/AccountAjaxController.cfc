@@ -47,6 +47,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		account.setPwd( json?.pwd );
 		account.setStatus( status.setId( json.status.id ) );
 		account.setIdUtenteVerticale( json?.idUtenteVerticale );
+		account.setIdAgenteVerticale( json?.idAgenteVerticale );
 
 		if ( !len( json.id ) ) {
 			messageId = "account.created";

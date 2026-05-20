@@ -55,6 +55,7 @@
 		<cfargument name="langId" type="String">
 		---->
 		<cfargument name="statusId" type="String">
+		<cfargument name="hasAgenteVerticale" type="Boolean">
 
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
@@ -84,6 +85,10 @@
 
 				<cfif !IsNull( arguments.statusId )>
 					AND status_id ILIKE <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.hasAgenteVerticale ) AND arguments.hasAgenteVerticale>
+					AND id_agente_verticale IS NOT NULL
 				</cfif>
 
 				<!----
@@ -120,7 +125,8 @@
 				email,
 				status_id,
 				account,
-				id_utente_verticale
+				id_utente_verticale,
+				id_agente_verticale
 			)
 			VALUES (
 				pgp_sym_encrypt(
@@ -129,7 +135,8 @@
 				)::varchar,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdAgenteVerticale()#">
 			) RETURNING account_id::varchar
 		</cfquery>
 
@@ -149,7 +156,8 @@
 					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> 
 				)::varchar,
 				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
-				id_utente_verticale = <cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">
+				id_utente_verticale = <cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">,
+				id_agente_verticale = <cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdAgenteVerticale()#">
 			WHERE
 				account_id = <cfqueryparam cfsqltype="Other" value="#arguments.account.getId()#">
 		</cfquery>

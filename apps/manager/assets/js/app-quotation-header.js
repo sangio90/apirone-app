@@ -497,7 +497,7 @@ AP.quotation.header = ( function() {
 
 		NM.util.ajax( {
 			method: "GET",
-			url: "/manager/ajax/accounts",
+			url: "/manager/ajax/accounts?hasAgenteVerticale=true",
 			callback: {
 				done: function( xhr ) {
 					xhr.data.unshift( { id: "", name: "-- seleziona" } );

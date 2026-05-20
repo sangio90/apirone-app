@@ -243,6 +243,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setCreatedAt( record.created_at );
 			account.setUserCount( record.user_count );
 			account.setIdUtenteVerticale( record.id_utente_verticale );
+			account.setIdAgenteVerticale( record.id_agente_verticale );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
 		}

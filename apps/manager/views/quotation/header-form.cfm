@@ -333,6 +333,8 @@
 			--->
 			<div class="tab-pane fade" id="nav-assignment" role="tabpanel">
 
+				<div class="row mb-3"><div class="offset-sm-3 col-sm-9"><p class="text-muted fst-italic small mb-0">Sono visibili solo gli account per i quali è stato compilato l'ID utente Verticale.</p></div></div>
+
 				<div class="form-group row mb-3">
 					<label class="col-sm-3 control-label text-sm-end pt-2">Commerciale</label>
 					<div class="col-sm-9">
@@ -354,6 +356,8 @@
 						</select>
 					</div>
 				</div>
+
+				<div class="row mb-3 mt-4"><div class="offset-sm-3 col-sm-9"><p class="text-muted fst-italic small mb-0">Sono visibili solo gli account per i quali è stato compilato l'ID agente Verticale.</p></div></div>
 
 				<div class="form-group row mb-3">
 					<label class="col-sm-3 control-label text-sm-end pt-2">Agenti</label>

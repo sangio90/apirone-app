@@ -605,68 +605,23 @@
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var success = true/>
 
-		<cfquery name="agents" datasource="verticale">
-			SELECT AGECOD
-			FROM AZAPI_AGENTI
-			WHERE
-				TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAGE#" cfsqltype="varchar">
-		</cfquery>
-
-		<cfset var agentCode = 0 />
-		<cfif agents.recordCount>
-			<cfset agentCode = val(agents.AGECOD[1]) />
-		</cfif>
-
-		<cfset var agentCode2 = 0 />
-		<cfif !isNull(arguments.data.MMCODAG2) && Len(arguments.data.MMCODAG2)>
-			<cfquery name="agents2" datasource="verticale">
-				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG2#" cfsqltype="varchar">
-			</cfquery>
-			<cfif agents2.recordCount>
-				<cfset agentCode2 = val(agents2.AGECOD[1]) />
-			</cfif>
-		</cfif>
-
-		<cfset var agentCode3 = 0 />
-		<cfif !isNull(arguments.data.MMCODAG3) && Len(arguments.data.MMCODAG3)>
-			<cfquery name="agents3" datasource="verticale">
-				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG3#" cfsqltype="varchar">
-			</cfquery>
-			<cfif agents3.recordCount>
-				<cfset agentCode3 = val(agents3.AGECOD[1]) />
-			</cfif>
-		</cfif>
-
-		<cfset var agentCode4 = 0 />
-		<cfif !isNull(arguments.data.MMCODAG4) && Len(arguments.data.MMCODAG4)>
-			<cfquery name="agents4" datasource="verticale">
-				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG4#" cfsqltype="varchar">
-			</cfquery>
-			<cfif agents4.recordCount>
-				<cfset agentCode4 = val(agents4.AGECOD[1]) />
-			</cfif>
-		</cfif>
-
-		<cfset var agentCode5 = 0 />
-		<cfif !isNull(arguments.data.MMCODAG5) && Len(arguments.data.MMCODAG5)>
-			<cfquery name="agents5" datasource="verticale">
-				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG5#" cfsqltype="varchar">
-			</cfquery>
-			<cfif agents5.recordCount>
-				<cfset agentCode5 = val(agents5.AGECOD[1]) />
-			</cfif>
-		</cfif>
+		<cfset var agentCode  = (!isNull(arguments.data.MMCODAGE) && IsNumeric(arguments.data.MMCODAGE)) ? val(arguments.data.MMCODAGE) : 0 />
+		<cfset var agentCode2 = (!isNull(arguments.data.MMCODAG2) && IsNumeric(arguments.data.MMCODAG2)) ? val(arguments.data.MMCODAG2) : 0 />
+		<cfset var agentCode3 = (!isNull(arguments.data.MMCODAG3) && IsNumeric(arguments.data.MMCODAG3)) ? val(arguments.data.MMCODAG3) : 0 />
+		<cfset var agentCode4 = (!isNull(arguments.data.MMCODAG4) && IsNumeric(arguments.data.MMCODAG4)) ? val(arguments.data.MMCODAG4) : 0 />
+		<cfset var agentCode5 = (!isNull(arguments.data.MMCODAG5) && IsNumeric(arguments.data.MMCODAG5)) ? val(arguments.data.MMCODAG5) : 0 />
 
 		<cfquery datasource="verticaleExport">
 			INSERT INTO ORDINI_APIR (
 				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
 				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
-				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
+				DEPRODOD, DEPROMER, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
 				MMCODAG5, MMCODART, MMCODCOL, MMCODPAG,
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
-				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC
+				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
+				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -693,6 +648,7 @@
 				<cfqueryparam value="#left(arguments.data.DEPRODOD,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEPROMER,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MM_STATO,1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFLINGUA,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#agentCode#" cfsqltype="integer">,
 				<cfqueryparam value="#agentCode2#" cfsqltype="integer">,
 				<cfqueryparam value="#agentCode3#" cfsqltype="integer">,
@@ -718,7 +674,12 @@
 				<cfqueryparam value="#left(arguments.data.MMSERIAL,12)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMVALUNI ?: 0#" cfsqltype="decimal" scale="6">,
 				<cfqueryparam value="#arguments.data.MMUTECOM#" cfsqltype="integer">,
-				<cfqueryparam value="#arguments.data.MMUTETEC#" cfsqltype="integer">
+				<cfqueryparam value="#arguments.data.MMUTETEC#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMPERPRO ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR2 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR3 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR4 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">
 			)
 		</cfquery>
 
