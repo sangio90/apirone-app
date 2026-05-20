@@ -267,7 +267,7 @@
                                                     <input
                                                         type="text"
                                                         id="plate-fruit-suggest"
-                                                        class="fruit-suggest-widget-input"
+                                                        class="fruit-suggest-widget-input form-control"
                                                         placeholder="Aggiungi un frutto..."
                                                         v-model="fruitSearchTerm"
                                                         @input="onFruitSearchInput"
