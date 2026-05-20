@@ -1662,7 +1662,7 @@ AP.plate.modal = ( function() {
                  * Raccoglie tutti i productItemId selezionati tra gli attributi del frutto,
                  * li invia al server per ottenere le immagini delle combinazioni compatibili
                  * (ricerca parziale con controllo conflitti) e mostra ciascuna immagine
-                 * come overlay sopra tutti gli overlay degli attributi, con lo stesso z-index.
+                 * come overlay allo stesso z-index del suo attributo con indice più alto.
                  * @param {string} fruitId - Identificativo del frutto.
                  */
                 updateFruitCombinationOverlay: function( fruitId ) {
@@ -1671,19 +1671,14 @@ AP.plate.modal = ( function() {
                         return;
                     }
                     const selectedIds = [];
-                    let maxZIndex = 0;
+                    const productItemIndex = {};
                     if ( fruit.items ) {
                         let itemIdx = 0;
                         for ( const item of fruit.items ) {
                             const selected = item.values?.find( function( v ) { return v.selected; } );
                             if ( selected?.productItemId ) {
                                 selectedIds.push( selected.productItemId );
-                            }
-                            if ( selected ) {
-                                const z = 1040 + itemIdx;
-                                if ( z > maxZIndex ) {
-                                    maxZIndex = z;
-                                }
+                                productItemIndex[ selected.productItemId ] = itemIdx;
                             }
                             itemIdx++;
                         }
@@ -1696,7 +1691,6 @@ AP.plate.modal = ( function() {
                     if ( selectedIds.length === 0 ) {
                         return;
                     }
-                    const combinationZIndex = maxZIndex + 100;
                     const orientationId = this.detailForm.data.product.orientation.id;
                     ajax( {
                         method: "POST",
@@ -1704,9 +1698,18 @@ AP.plate.modal = ( function() {
                         data: JSON.stringify( { productItemIds: selectedIds, orientation: orientationId } ),
                         callback: {
                             done: function( xhr ) {
-                                if ( xhr.status === "SUCCESS" && xhr.data?.images?.length ) {
-                                    for ( let idx = 0; idx < xhr.data.images.length; idx++ ) {
-                                        fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${combinationZIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${xhr.data.images[ idx ]}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
+                                if ( xhr.status === "SUCCESS" && xhr.data?.combinations?.length ) {
+                                    for ( let idx = 0; idx < xhr.data.combinations.length; idx++ ) {
+                                        const combo = xhr.data.combinations[ idx ];
+                                        let maxIdx = 0;
+                                        for ( const pid of combo.productItemIds ) {
+                                            const fi = productItemIndex[ pid ];
+                                            if ( fi !== undefined && fi > maxIdx ) {
+                                                maxIdx = fi;
+                                            }
+                                        }
+                                        const zIndex = 1040 + maxIdx;
+                                        fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${combo.image}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                                     }
                                 }
                             },

@@ -22,17 +22,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		// Determina il tipo di immagine in base all'orientamento del prodotto
 		var typeId = rc.orientation == "VER" ? "vertical" : "horizontal";
 
-		var images = [];
+		var combinations = [];
 
 		for ( var row in rows ) {
 			var params = { combinationId = row.getId(), typeId = typeId };
 			var combinationImage = super.fire( "file.list", params );
 			if ( len( combinationImage ) ) {
-				images.append( combinationImage[ 1 ].getUri() );
+				var productItemIds = [];
+				for ( var cpi in row.getProductItems() ) {
+					productItemIds.append( cpi.getProductItem().getId() );
+				}
+				combinations.append( {
+					"image": combinationImage[ 1 ].getUri(),
+					"productItemIds": productItemIds
+				} );
 			}
 		}
 
-		result.setData( { "images": images } );
+		result.setData( { "combinations": combinations } );
 		event.setValue( "result", result );
 	}
 }
