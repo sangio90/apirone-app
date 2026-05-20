@@ -798,6 +798,7 @@ AP.plate.modal = ( function() {
                                 const hasSelection = pi.values.some( ( v ) => { return v.selected; } );
                                 if ( !hasSelection ) {
                                     pi.values[0].selected = true;
+                                    await this.$nextTick();
                                     await this.loadProductItems( pi.values[0].productItemId, pi.attributeId );
                                 }
                             }
@@ -1003,6 +1004,7 @@ AP.plate.modal = ( function() {
                                     const hasSelection = child.values.some( ( v ) => { return v.selected; } );
                                     if ( !hasSelection ) {
                                         child.values[0].selected = true;
+                                        await this.$nextTick();
                                         await this.loadProductItems( child.values[0].productItemId, child.attributeId );
                                     }
                                 }
@@ -1071,6 +1073,7 @@ AP.plate.modal = ( function() {
                  */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
                     this.$set( value, "note", null );
+                    await this.$nextTick();
                     await this.loadProductItems( selectedId, attributeId );
                     this.renderPlateWithFruits();
                 },
@@ -1332,6 +1335,7 @@ AP.plate.modal = ( function() {
                                     const match = fi.values.find( ( v ) => { return v.productItemId == qipi.productItem.id; } );
                                     if ( match ) {
                                         match.selected = true;
+                                        await this.$nextTick();
                                         await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.id, true );
                                         break;
                                     }
@@ -1347,6 +1351,7 @@ AP.plate.modal = ( function() {
                                 const hasSelection = fi.values.some( ( v ) => { return v.selected; } );
                                 if ( !hasSelection ) {
                                     fi.values[0].selected = true;
+                                    await this.$nextTick();
                                     await this.loadFruitProductItems( fruitId, fi.values[0].productItemId, fi.id );
                                 }
                             }
@@ -1565,6 +1570,7 @@ AP.plate.modal = ( function() {
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
                     this.$set( value, "note", null );
+                    await this.$nextTick();
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
                     this.renderPlateWithFruits();
                 },
@@ -1614,6 +1620,7 @@ AP.plate.modal = ( function() {
                                     if ( !childrenLoaded ) {
                                         processed.add( key );
                                         await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
+                                        await this.$nextTick();
                                         this.updateFruitAttributeOverlay( fruit.id, item.attributeId, selected, item.parentAttributeId, 1040 + itemIdx );
                                         cascaded = true;
                                     } else {
