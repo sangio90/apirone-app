@@ -86,6 +86,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsFiles.add( "app-quotation-signage" );
 		prc.jsFiles.add( "app-quotation-accessory" );
 		prc.jsFiles.add( "app-quotation-article" );
+		prc.jsFiles.add( "app-quotation-documents" );
 		prc.jsFiles.add( "app-file" );
 
 		prc.cssFiles.add( "quotation" );

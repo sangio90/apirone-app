@@ -51,6 +51,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="countryService" inject="CountryService";
 	property name="fileService" inject="FileService";
 	property name="ProductHashService" inject="ProductHashService";
+	property name="accountService" inject="AccountService";
 
 	property name="cacheScope" type="String" default="Quotation.bean";
 
@@ -915,6 +916,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
 			"MMCODAGE" = (!isNull(quotation.getSalesAgent())) ? quotation.getSalesAgent().getAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
+			"MMCODAG2" = (!isNull(quotation.getAgente2()) && Len(quotation.getAgente2())) ? getAccountService().get(quotation.getAgente2()).getEmail() : null,
+			"MMCODAG3" = (!isNull(quotation.getAgente3()) && Len(quotation.getAgente3())) ? getAccountService().get(quotation.getAgente3()).getEmail() : null,
+			"MMCODAG4" = (!isNull(quotation.getAgente4()) && Len(quotation.getAgente4())) ? getAccountService().get(quotation.getAgente4()).getEmail() : null,
+			"MMCODAG5" = (!isNull(quotation.getAgente5()) && Len(quotation.getAgente5())) ? getAccountService().get(quotation.getAgente5()).getEmail() : null,
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),

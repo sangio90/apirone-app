@@ -18,6 +18,7 @@
                     <i class="fas fa-check-circle"></i>
                     Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                 </button>
+				#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open" )#
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
 			</div>
@@ -184,6 +185,7 @@
     #view( "quotation/zones-modal" )#
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
+    #view( "quotation/documents-modal" )#
 
     #view( "quotation/totals" )#
 

@@ -482,6 +482,12 @@
 		post( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
 		delete( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
 
+		post( "/ajax/quotations/:quotationId/documents/reorder" ).to( "QuotationDocumentAjaxController.reorder" ).end();
+		post( "/ajax/quotations/:quotationId/documents/delete" ).to( "QuotationDocumentAjaxController.deleteDoc" ).end();
+		get( "/ajax/quotations/:quotationId/documents/:id/download" ).to( "QuotationDocumentAjaxController.download" ).end();
+		get( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.list" ).end();
+		post( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.upload" ).end();
+
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();

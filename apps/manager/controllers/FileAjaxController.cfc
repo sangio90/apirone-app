@@ -1,3 +1,4 @@
+
 component extends="com.apirone.core.controller.AbsController" {
 
 	function list( event, rc, prc ){
@@ -94,7 +95,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			entity.setKey( "attributeValue.id" );
 			var kindId = "attributeValue";
 		}
-		
+
 		if ( rc.by == "quotation-items" ) {
 			//cerco la quotationItem. se la trovo, imposto customImage a true. Questa cosa è resa necessaria perchè il componente FE app-file, non sa niente del contesto dove viene usato e
 			//quando carichi un'immagine ricarica. Siccome noi, potremmo non aver ancora flaggato customImage quando salviamo l'immagine, ci troveremmo ad avere un prodotto con un'immagine custom ma
@@ -107,7 +108,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			entity.setKey( "quotationItem.id" );
 			var kindId = "quotationItem";
 		}
-		
+
 		if ( rc.by == "quotation-zones" ) {
 			entity.setKey( "quotationZone.id" );
 			var kindId = "quotationZone";

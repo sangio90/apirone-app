@@ -613,9 +613,48 @@
 		</cfquery>
 
 		<cfset var agentCode = 0 />
-
 		<cfif agents.recordCount>
 			<cfset agentCode = val(agents.AGECOD[1]) />
+		</cfif>
+
+		<cfset var agentCode2 = 0 />
+		<cfif !isNull(arguments.data.MMCODAG2) && Len(arguments.data.MMCODAG2)>
+			<cfquery name="agents2" datasource="verticale">
+				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG2#" cfsqltype="varchar">
+			</cfquery>
+			<cfif agents2.recordCount>
+				<cfset agentCode2 = val(agents2.AGECOD[1]) />
+			</cfif>
+		</cfif>
+
+		<cfset var agentCode3 = 0 />
+		<cfif !isNull(arguments.data.MMCODAG3) && Len(arguments.data.MMCODAG3)>
+			<cfquery name="agents3" datasource="verticale">
+				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG3#" cfsqltype="varchar">
+			</cfquery>
+			<cfif agents3.recordCount>
+				<cfset agentCode3 = val(agents3.AGECOD[1]) />
+			</cfif>
+		</cfif>
+
+		<cfset var agentCode4 = 0 />
+		<cfif !isNull(arguments.data.MMCODAG4) && Len(arguments.data.MMCODAG4)>
+			<cfquery name="agents4" datasource="verticale">
+				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG4#" cfsqltype="varchar">
+			</cfquery>
+			<cfif agents4.recordCount>
+				<cfset agentCode4 = val(agents4.AGECOD[1]) />
+			</cfif>
+		</cfif>
+
+		<cfset var agentCode5 = 0 />
+		<cfif !isNull(arguments.data.MMCODAG5) && Len(arguments.data.MMCODAG5)>
+			<cfquery name="agents5" datasource="verticale">
+				SELECT AGECOD FROM AZAPI_AGENTI WHERE TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAG5#" cfsqltype="varchar">
+			</cfquery>
+			<cfif agents5.recordCount>
+				<cfset agentCode5 = val(agents5.AGECOD[1]) />
+			</cfif>
 		</cfif>
 
 		<cfquery datasource="verticaleExport">
@@ -623,7 +662,8 @@
 				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
 				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
-				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
+				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
+				MMCODAG5, MMCODART, MMCODCOL, MMCODPAG,
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC
@@ -654,6 +694,10 @@
 				<cfqueryparam value="#left(arguments.data.DEPROMER,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MM_STATO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#agentCode#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode2#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode3#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode4#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode5#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.MMCODART,15)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MMCODCOL,6)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMCODPAG ?: 0#" cfsqltype="integer">,

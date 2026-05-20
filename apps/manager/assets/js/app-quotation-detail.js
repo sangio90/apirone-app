@@ -7,6 +7,7 @@ Object.assign(AP.quotation.fields, {
 	zoneModalRoot: $("#zone-modal-root"),
 	printModalRoot: $("#print-modal-root"),
 	statusModalRoot: $("#qt-status-modal-root"),
+	documentsModalRoot: $("#qt-documents-modal-root"),
 	totalItemBox: $("#quotation-totals-item"),
 
 	addPlateBtn: $("#qt-add-plate"),
@@ -772,6 +773,10 @@ AP.quotation.detail = (function () {
 
 			statusApp().edit();
 
+		},
+
+		openDocumentsModal: function () {
+			AP.quotation.documents.open();
 		},
 
 		updateAllPrices: function () {
