@@ -939,6 +939,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
+			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),
@@ -1088,6 +1089,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !IsNull( record.commission3 ) ) bean.setCommission3( record.commission3 );
 			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
 			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
+			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

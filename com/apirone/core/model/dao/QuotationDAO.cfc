@@ -70,7 +70,8 @@
 				quotations.commission2,
 				quotations.commission3,
 				quotations.commission4,
-				quotations.commission5
+				quotations.commission5,
+				quotations.referente_amministrativo
 			FROM quotations
 				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
@@ -168,7 +169,8 @@
 				commission2,
 				commission3,
 				commission4,
-				commission5
+				commission5,
+				referente_amministrativo
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -269,7 +271,8 @@
 					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
 				<cfelse>
 					NULL
-				</cfif>
+				</cfif>,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -460,7 +463,9 @@
 						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
 					<cfelse>
 						NULL
-					</cfif>
+					</cfif>,
+
+				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
@@ -614,7 +619,7 @@
 		<cfquery datasource="verticaleExport">
 			INSERT INTO ORDINI_APIR (
 				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
-				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
+				CFPROVIN, CFREFAMM, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
 				DEPRODOD, DEPROMER, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
 				MMCODAG5, MMCODART, MMCODCOL, MMCODPAG,
@@ -632,6 +637,7 @@
 				<cfqueryparam value="#left(arguments.data.CFMOROSO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFPARIVA,11)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFPROVIN,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFREFAMM,70)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFSTAISO,3)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFTELEFO,18)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.CPROWNUM ?: 0#" cfsqltype="integer">,

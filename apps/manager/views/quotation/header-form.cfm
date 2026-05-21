@@ -132,6 +132,14 @@
 						</div>
 					</div>
 
+					<div class="row d-flex align-items-center mb-3">
+						<label class="text-end col-3">Referente amministrativo</label>
+						<div class="col-9">
+							<input type="text" class="form-control" maxlength="70"
+								data-bind="value: detailForm.data.referenteAmministrativo">
+						</div>
+					</div>
+
 				</div>
 
 			</div>
