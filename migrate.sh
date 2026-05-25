@@ -11,11 +11,25 @@ set -euo pipefail
 #   DB_HOST DB_PORT DB_NAME DB_USER DB_PASSWORD
 # ---------------------------------------------------------------------------
 
-DB_HOST="${DB_HOST:-localhost}"
-DB_PORT="${DB_PORT:-15432}"
-DB_NAME="${DB_NAME:-apironedb}"
-DB_USER="${DB_USER:-apiruser}"
-export PGPASSWORD="${DB_PASSWORD:-apirpassword}"
+ENV_FILE="$(cd "$(dirname "$0")" && pwd)/.env"
+
+_env_get() {
+    grep -m1 "^$1=" "$ENV_FILE" 2>/dev/null | cut -d'=' -f2-
+}
+
+if [ -f "$ENV_FILE" ]; then
+    DB_HOST="${DB_HOST:-$(_env_get db.host)}"
+    DB_PORT="${DB_PORT:-$(_env_get db.port)}"
+    DB_NAME="${DB_NAME:-$(_env_get db.name)}"
+    DB_USER="${DB_USER:-$(_env_get db.username)}"
+    export PGPASSWORD="${DB_PASSWORD:-$(_env_get db.pwd)}"
+else
+    DB_HOST="${DB_HOST:-localhost}"
+    DB_PORT="${DB_PORT:-11111}"
+    DB_NAME="${DB_NAME:-apironedb}"
+    DB_USER="${DB_USER:-apiruser}"
+    export PGPASSWORD="${DB_PASSWORD:-apirpassword}"
+fi
 
 DDL_DIR="$(cd "$(dirname "$0")" && pwd)/resources/db/ddl"
 SETUP_SQL="$(cd "$(dirname "$0")" && pwd)/resources/db/create_migrations_table.sql"
