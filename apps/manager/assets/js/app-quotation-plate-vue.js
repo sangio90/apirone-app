@@ -678,6 +678,13 @@ AP.plate.modal = ( function() {
 
                     this.smallLoading = true;
 
+                    // La griglia cambia completamente con l'orientamento: le vecchie
+                    // posizioni dei frutti non sono più valide. Si azzerano in modo
+                    // che renderPlateWithFruits li collochi automaticamente
+                    for ( const fruit of this.detailForm.data.fruits ) {
+                        fruit.positionIds = [];
+                    }
+
                     await ajax( {
                         method: "GET",
                         url: BASE + "/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
