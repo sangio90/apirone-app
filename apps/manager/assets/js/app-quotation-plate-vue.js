@@ -676,6 +676,8 @@ AP.plate.modal = ( function() {
                         return;
                     }
 
+                    this.smallLoading = true;
+
                     await ajax( {
                         method: "GET",
                         url: BASE + "/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
@@ -1374,7 +1376,10 @@ AP.plate.modal = ( function() {
                     if ( !img.length ) {
                         return;
                     }
-                    const rootImage = fruit.fruit?.horizontalImage?.uri;
+                    const orientationId = this.detailForm.data.product.orientation.id;
+                    const rootImage = orientationId === "VER"
+                        ? fruit.fruit?.verticalImage?.uri
+                        : fruit.fruit?.horizontalImage?.uri;
                     if ( rootImage ) {
                         img.attr( "src", rootImage ).show();
                         return;

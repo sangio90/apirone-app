@@ -257,6 +257,7 @@
                                                 <select id="plate-orientation"
                                                     required
                                                     class="form-control"
+                                                    :disabled="smallLoading"
                                                     v-model="detailForm.data.product.orientation.id"
                                                     @change="changeOrientation">
                                                     <!--- detailForm.data.product.orientation.id: ID dell'orientamento selezionato (es. O/H = orizzontale, VERT = verticale). changeOrientation: ricarica il designer con il nuovo orientamento. required: l'orientamento è obbligatorio. --->
