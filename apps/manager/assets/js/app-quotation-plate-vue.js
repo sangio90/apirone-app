@@ -884,6 +884,7 @@ AP.plate.modal = ( function() {
                                 actualIndex = i;
                                 items[i].values.forEach( ( v ) => {
                                     v.selected = false;
+                                    v.note = null;
                                 } );
                             }
                         }
@@ -1071,8 +1072,6 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Oggetto valore selezionato per l'aggiornamento dell'immagine.
                  */
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
-                    // this.$set( value, "note", null );
-                    await this.$nextTick();
                     await this.loadProductItems( selectedId, attributeId );
                     this.renderPlateWithFruits();
                 },
@@ -1121,7 +1120,7 @@ AP.plate.modal = ( function() {
                  */
                 renderPlateWithFruits: function() {
                     this.smallLoading = true;
-                    this.$nextTick( function() {
+                    this.$nextTick( async function() {
                         try {
                             const gm = getGridModule();
                             if ( !gm ) {
@@ -1151,7 +1150,7 @@ AP.plate.modal = ( function() {
                                         }
                                     }
                                 }
-                                this.updateFruitCombinationOverlay( fruit.id );
+                                await this.updateFruitCombinationOverlay( fruit.id );
                             }
                         } finally {
                             this.smallLoading = false;
@@ -1431,6 +1430,7 @@ AP.plate.modal = ( function() {
                     if ( originId === "" ) {
                         itemAttr.values.forEach( ( v ) => {
                             v.selected = false;
+                            v.note = null;
                         } );
                         const idx = itemIdx + 1;
                         while ( idx < fruitItems.length ) {
@@ -1552,8 +1552,6 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Oggetto valore selezionato.
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
-                    // this.$set( value, "note", null );
-                    await this.$nextTick();
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
                 },
 
@@ -1679,28 +1677,34 @@ AP.plate.modal = ( function() {
                         return;
                     }
                     const orientationId = this.detailForm.data.product.orientation.id;
-                    ajax( {
-                        method: "POST",
-                        url: BASE + "/combinations/findByListOfProductItemIds",
-                        data: JSON.stringify( { productItemIds: selectedIds, orientation: orientationId } ),
-                        callback: {
-                            done: function( xhr ) {
-                                if ( xhr.status === "SUCCESS" && xhr.data?.combinations?.length ) {
-                                    for ( let idx = 0; idx < xhr.data.combinations.length; idx++ ) {
-                                        const combo = xhr.data.combinations[ idx ];
-                                        let maxIdx = 0;
-                                        for ( const pid of combo.productItemIds ) {
-                                            const fi = productItemIndex[ pid ];
-                                            if ( fi !== undefined && fi > maxIdx ) {
-                                                maxIdx = fi;
+                    return new Promise( function( resolve ) {
+                        ajax( {
+                            method: "POST",
+                            url: BASE + "/combinations/findByListOfProductItemIds",
+                            data: JSON.stringify( { productItemIds: selectedIds, orientation: orientationId } ),
+                            callback: {
+                                done: function( xhr ) {
+                                    if ( xhr.status === "SUCCESS" && xhr.data?.combinations?.length ) {
+                                        for ( let idx = 0; idx < xhr.data.combinations.length; idx++ ) {
+                                            const combo = xhr.data.combinations[ idx ];
+                                            let maxIdx = 0;
+                                            for ( const pid of combo.productItemIds ) {
+                                                const fi = productItemIndex[ pid ];
+                                                if ( fi !== undefined && fi > maxIdx ) {
+                                                    maxIdx = fi;
+                                                }
                                             }
+                                            const zIndex = 1040 + maxIdx;
+                                            fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${combo.image}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                                         }
-                                        const zIndex = 1040 + maxIdx;
-                                        fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${combo.image}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                                     }
-                                }
+                                    resolve();
+                                },
+                                fail: function() {
+                                    resolve();
+                                },
                             },
-                        },
+                        } );
                     } );
                 },
 
@@ -1760,7 +1764,13 @@ AP.plate.modal = ( function() {
                 onValueNoteInput: function( event, item ) {
                     const selected = item.values?.find( function( v ) { return v.selected; } );
                     if ( selected ) {
-                        // this.$set( selected, "note", event.target.value );
+                        this._cascadingFruit = true;
+                        this.$set( selected, "note", event.target.value );
+                        this.$nextTick( () => {
+                            this.$nextTick( () => {
+                                this._cascadingFruit = false;
+                            } );
+                        } );
                     }
                 },
 
