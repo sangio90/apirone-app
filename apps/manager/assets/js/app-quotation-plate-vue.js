@@ -1391,12 +1391,14 @@ AP.plate.modal = ( function() {
                         img.attr( "src", rootImage ).show();
                         return;
                     }
-                    // Se il frutto non ha l'immagine e almeno un attributo selezionato ce l'ha,
-                    // nasconde l'immagine generica. Altrimenti mostra il
-                    // placeholder generico per non lasciare la cella vuota.
+                    // Se il frutto non ha l'immagine e almeno un attributo selezionato
+                    // ha un'immagine per l'orientamento corrente, nasconde il placeholder.
                     const hasOverlayImage = fruit.items?.some( ( fi ) => {
                         const sel = fi.values?.find( ( v ) => { return v.selected; } );
-                        return sel && ( sel.horizontalImage?.uri || sel.verticalImage?.uri || sel.images?.length );
+                        if ( !sel ) {
+                            return false;
+                        }
+                        return orientationId === "VER" ? sel.verticalImage?.uri : sel.horizontalImage?.uri;
                     } );
                     if ( hasOverlayImage ) {
                         img.hide();
