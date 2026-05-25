@@ -25,9 +25,53 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function checkRecover( event, rc, prc ){
-		var user = prc.user;
+		var email = trim( rc.email ?: "" );
+		if ( Len( email ) ) {
+			super.fire( "auth.sendRecoveryEmail", [ email ] );
+		}
+		setMessage( "Se l'indirizzo è registrato, riceverai le istruzioni via email.", "success" );
+		relocate( uri = "/manager/login", postProcessExempt = false, addToken = false );
+	}
 
-		Location( "/manager/login/recover/check", false );
+	function resetPassword( event, rc, prc ){
+		var token = trim( rc.token ?: "" );
+		if ( !Len( token ) ) {
+			relocate( uri = "/manager/login", postProcessExempt = false, addToken = false );
+			return;
+		}
+		var account = super.fire( "account.findByResetToken", [ token ] );
+		if ( isNull( account ) ) {
+			setMessage( "Il link non è valido o è scaduto.", "danger" );
+			relocate( uri = "/manager/login", postProcessExempt = false, addToken = false );
+			return;
+		}
+		rc.token = token;
+		event.setView( "main/reset-password" ).setLayout( "login" );
+	}
+
+	function checkResetPassword( event, rc, prc ){
+		var token = trim( rc.token ?: "" );
+		var pwd   = trim( rc.pwd  ?: "" );
+		var pwd2  = trim( rc.pwd2 ?: "" );
+
+		if ( !Len( token ) || !Len( pwd ) || pwd != pwd2 ) {
+			setMessage( "Verifica i dati inseriti.", "danger" );
+			relocate( uri = "/manager/login/reset-password?token=#token#", postProcessExempt = false, addToken = false );
+			return;
+		}
+
+		var account = super.fire( "account.findByResetToken", [ token ] );
+		if ( isNull( account ) ) {
+			setMessage( "Il link non è valido o è scaduto.", "danger" );
+			relocate( uri = "/manager/login", postProcessExempt = false, addToken = false );
+			return;
+		}
+
+		super.fire( "account.updatePassword", { accountId = account.getId(), newPwd = pwd } );
+		super.fire( "account.clearResetToken", [ account.getId() ] );
+
+		setMessage( "Password aggiornata. Effettua il login.", "success" );
+		relocate( uri = "/manager/login", postProcessExempt = false, addToken = false );
 	}
 
 	function checkLogin( event, rc, prc ){

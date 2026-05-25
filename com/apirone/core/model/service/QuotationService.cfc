@@ -51,6 +51,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="countryService" inject="CountryService";
 	property name="fileService" inject="FileService";
 	property name="ProductHashService" inject="ProductHashService";
+	property name="accountService" inject="AccountService";
 
 	property name="cacheScope" type="String" default="Quotation.bean";
 
@@ -914,7 +915,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMDATEVA" = quotation.getValidityDate(),
 			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
 			"MMNUMLIS" = 1,
-			"MMCODAGE" = (!isNull(quotation.getSalesAgent())) ? quotation.getSalesAgent().getAccount().getEmail() : null, //trovata tabella AZAPI_AGENTI campo id AGECOD, campo mail AGEMAI
+			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
+			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,
+			"MMCODAG2" = (!isNull(quotation.getAgente2()) && Len(quotation.getAgente2())) ? getAccountService().get(quotation.getAgente2()).getIdAgenteVerticale() : null,
+			"MMCODAG3" = (!isNull(quotation.getAgente3()) && Len(quotation.getAgente3())) ? getAccountService().get(quotation.getAgente3()).getIdAgenteVerticale() : null,
+			"MMCODAG4" = (!isNull(quotation.getAgente4()) && Len(quotation.getAgente4())) ? getAccountService().get(quotation.getAgente4()).getIdAgenteVerticale() : null,
+			"MMCODAG5" = (!isNull(quotation.getAgente5()) && Len(quotation.getAgente5())) ? getAccountService().get(quotation.getAgente5()).getIdAgenteVerticale() : null,
+			"MMPERPRO" = !isNull(quotation.getCommission1()) ? quotation.getCommission1() : 0,
+			"MMPERPR2" = !isNull(quotation.getCommission2()) ? quotation.getCommission2() : 0,
+			"MMPERPR3" = !isNull(quotation.getCommission3()) ? quotation.getCommission3() : 0,
+			"MMPERPR4" = !isNull(quotation.getCommission4()) ? quotation.getCommission4() : 0,
+			"MMPERPR5" = !isNull(quotation.getCommission5()) ? quotation.getCommission5() : 0,
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
 			"CF_IDCLI" = customer.getId(),
@@ -928,6 +939,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFTELEFO" = customer.getPhone(),
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
+			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),
@@ -1067,11 +1079,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
 
 			bean.setNessunAgente( record.nessun_agente );
-			bean.setAgente1( record.agente1 );
-			bean.setAgente2( record.agente2 );
-			bean.setAgente3( record.agente3 );
-			bean.setAgente4( record.agente4 );
-			bean.setAgente5( record.agente5 );
+			if ( !IsNull( record.agente1 ) && Len( record.agente1 ) ) bean.setAgente1( record.agente1.toString() );
+			if ( !IsNull( record.agente2 ) && Len( record.agente2 ) ) bean.setAgente2( record.agente2.toString() );
+			if ( !IsNull( record.agente3 ) && Len( record.agente3 ) ) bean.setAgente3( record.agente3.toString() );
+			if ( !IsNull( record.agente4 ) && Len( record.agente4 ) ) bean.setAgente4( record.agente4.toString() );
+			if ( !IsNull( record.agente5 ) && Len( record.agente5 ) ) bean.setAgente5( record.agente5.toString() );
+			if ( !IsNull( record.commission1 ) ) bean.setCommission1( record.commission1 );
+			if ( !IsNull( record.commission2 ) ) bean.setCommission2( record.commission2 );
+			if ( !IsNull( record.commission3 ) ) bean.setCommission3( record.commission3 );
+			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
+			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
+			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

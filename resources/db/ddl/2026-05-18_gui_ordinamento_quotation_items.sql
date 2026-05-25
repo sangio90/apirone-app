@@ -1,0 +1,1 @@
+ALTER TABLE quotation_items ADD COLUMN ordinamento INTEGER NOT NULL DEFAULT 0;

@@ -23,6 +23,7 @@
         "special",
         "image",
         "note",
+        "ordinamento",
     ],
     profiles = {
         editPlate = {

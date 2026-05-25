@@ -65,7 +65,13 @@
 				quotations.agente2,
 				quotations.agente3,
 				quotations.agente4,
-				quotations.agente5
+				quotations.agente5,
+				quotations.commission1,
+				quotations.commission2,
+				quotations.commission3,
+				quotations.commission4,
+				quotations.commission5,
+				quotations.referente_amministrativo
 			FROM quotations
 				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
@@ -158,7 +164,13 @@
 				agente2,
 				agente3,
 				agente4,
-				agente5
+				agente5,
+				commission1,
+				commission2,
+				commission3,
+				commission4,
+				commission5,
+				referente_amministrativo
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -210,11 +222,57 @@
 				</cfif>,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getOwner().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getNessunAgente()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
+				<cfif !IsNull( arguments.quotation.getAgente1() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente1()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente2() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente2()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente3() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente3()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente4() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente4()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getAgente5() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission1() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission1()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission2() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission2()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission3() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission3()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission4() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission4()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfif !IsNull( arguments.quotation.getCommission5() )>
+					<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -370,7 +428,45 @@
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getAgente5()#">::uuid
 					<cfelse>
 						NULL
-					</cfif>
+					</cfif>,
+
+				commission1 =
+					<cfif !IsNull( arguments.quotation.getCommission1() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission1()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission2 =
+					<cfif !IsNull( arguments.quotation.getCommission2() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission2()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission3 =
+					<cfif !IsNull( arguments.quotation.getCommission3() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission3()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission4 =
+					<cfif !IsNull( arguments.quotation.getCommission4() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission4()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				commission5 =
+					<cfif !IsNull( arguments.quotation.getCommission5() )>
+						<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.quotation.getCommission5()#">
+					<cfelse>
+						NULL
+					</cfif>,
+
+				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
+
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
 		</cfquery>
@@ -514,28 +610,23 @@
 		<cfargument name="data" type="Struct" required="true">
 		<cfset var success = true/>
 
-		<cfquery name="agents" datasource="verticale">
-			SELECT AGECOD
-			FROM AZAPI_AGENTI
-			WHERE
-				TRIM(AGEMAI) = <cfqueryparam value="#arguments.data.MMCODAGE#" cfsqltype="varchar">
-		</cfquery>
-
-		<cfset var agentCode = 0 />
-
-		<cfif agents.recordCount>
-			<cfset agentCode = val(agents.AGECOD[1]) />
-		</cfif>
+		<cfset var agentCode  = (!isNull(arguments.data.MMCODAGE) && IsNumeric(arguments.data.MMCODAGE)) ? val(arguments.data.MMCODAGE) : 0 />
+		<cfset var agentCode2 = (!isNull(arguments.data.MMCODAG2) && IsNumeric(arguments.data.MMCODAG2)) ? val(arguments.data.MMCODAG2) : 0 />
+		<cfset var agentCode3 = (!isNull(arguments.data.MMCODAG3) && IsNumeric(arguments.data.MMCODAG3)) ? val(arguments.data.MMCODAG3) : 0 />
+		<cfset var agentCode4 = (!isNull(arguments.data.MMCODAG4) && IsNumeric(arguments.data.MMCODAG4)) ? val(arguments.data.MMCODAG4) : 0 />
+		<cfset var agentCode5 = (!isNull(arguments.data.MMCODAG5) && IsNumeric(arguments.data.MMCODAG5)) ? val(arguments.data.MMCODAG5) : 0 />
 
 		<cfquery datasource="verticaleExport">
 			INSERT INTO ORDINI_APIR (
 				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
-				CFPROVIN, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
+				CFPROVIN, CFREFAMM, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
-				DEPRODOD, DEPROMER, MM_STATO, MMCODAGE, MMCODART, MMCODCOL, MMCODPAG,
+				DEPRODOD, DEPROMER, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
+				MMCODAG5, MMCODART, MMCODCOL, MMCODPAG,
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
-				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC
+				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
+				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -546,6 +637,7 @@
 				<cfqueryparam value="#left(arguments.data.CFMOROSO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFPARIVA,11)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFPROVIN,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFREFAMM,70)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFSTAISO,3)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFTELEFO,18)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.CPROWNUM ?: 0#" cfsqltype="integer">,
@@ -562,7 +654,12 @@
 				<cfqueryparam value="#left(arguments.data.DEPRODOD,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEPROMER,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MM_STATO,1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFLINGUA,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#agentCode#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode2#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode3#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode4#" cfsqltype="integer">,
+				<cfqueryparam value="#agentCode5#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.MMCODART,15)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MMCODCOL,6)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMCODPAG ?: 0#" cfsqltype="integer">,
@@ -583,7 +680,12 @@
 				<cfqueryparam value="#left(arguments.data.MMSERIAL,12)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMVALUNI ?: 0#" cfsqltype="decimal" scale="6">,
 				<cfqueryparam value="#arguments.data.MMUTECOM#" cfsqltype="integer">,
-				<cfqueryparam value="#arguments.data.MMUTETEC#" cfsqltype="integer">
+				<cfqueryparam value="#arguments.data.MMUTETEC#" cfsqltype="integer">,
+				<cfqueryparam value="#arguments.data.MMPERPRO ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR2 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR3 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR4 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">
 			)
 		</cfquery>
 

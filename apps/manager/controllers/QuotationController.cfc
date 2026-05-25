@@ -87,6 +87,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsFiles.add( "app-quotation-signage" );
 		prc.jsFiles.add( "app-quotation-accessory" );
 		prc.jsFiles.add( "app-quotation-article" );
+		prc.jsFiles.add( "app-quotation-documents" );
 		prc.jsFiles.add( "app-file" );
 
 		prc.cssFiles.add( "quotation" );
@@ -112,8 +113,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		page[ "currencies" ]     = memy.convertList( super.fire( "currency.list" ) );
 		page[ "frames" ]         = memy.convertList( super.fire( "frame.list" ), "minimal" );
 		page[ "vatCodes" ]       = memy.convertList( super.fire( "vatCode.list" ) );
-		page[ "techUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="TEC" } ) );
-		page[ "saleUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="COM" } ) );
+		page[ "techUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="TEC", hasUtenteVerticale=true } ) );
+		page[ "saleUsers" ]      = memy.convertList( super.fire( "user.list", { roleTypeId="COM", hasUtenteVerticale=true } ) );
 
 		return { "page" = page }
 

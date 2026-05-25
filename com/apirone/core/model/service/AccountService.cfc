@@ -199,6 +199,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return Hash( token, "SHA-512" );
 	}
 
+	public void function storeResetToken( required String accountId, required String hashedToken, required String expiresAt ){
+		getDao().storeResetToken( arguments.accountId, arguments.hashedToken, arguments.expiresAt );
+	}
+
+	public com.apirone.core.model.bean.Account function findByResetToken( required String rawToken ){
+		var hashedToken = Hash( arguments.rawToken, "SHA-512" );
+		var record      = getDao().findByResetToken( hashedToken );
+		if ( record.recordCount ) {
+			return get( record.account_id );
+		}
+		return NullValue();
+	}
+
+	public void function clearResetToken( required String accountId ){
+		getDao().clearResetToken( arguments.accountId );
+	}
+
 	public Void function removeCache( required String id ){
 
 		getCacheManager().remove( getCacheScope(), id );
@@ -226,6 +243,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			account.setCreatedAt( record.created_at );
 			account.setUserCount( record.user_count );
 			account.setIdUtenteVerticale( record.id_utente_verticale );
+			account.setIdAgenteVerticale( record.id_agente_verticale );
 
 			account.setStatus( getStatusService().get( record.status_id ) );
 		}

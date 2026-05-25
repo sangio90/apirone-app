@@ -7,28 +7,6 @@
 	},
 	{
 		href: "#",
-		icon: "far fa-building",
-		title: "Placche",
-		items: [
-			{
-				href: "/manager/plate/designer",
-				icon: "fas fa-cogs",
-				title: "Designer",
-			},
-			{
-				href: "/manager/plate/map",
-				icon: "fas fa-cogs",
-				title: "Mappa",
-			},
-			{
-				href: "/manager/selects",
-				icon: "fas fa-cogs",
-				title: "Select collegati",
-			}
-		]
-	},
-	{
-		href: "#",
 		icon: "fas fa-comment-dollar",
 		title: "Preventivi",
 		items: [

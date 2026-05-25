@@ -14,7 +14,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
-		params[ "orderBy" ] = [ { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
+		params[ "orderBy" ] = [ { "field" = "quotationItem.ordinamento", "dir" = "asc" }, { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
 		var rows = super.fire( "QuotationItem.search", params );
@@ -883,7 +883,17 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	}
 
-	private String function getTypeIdBySlug( 
+	function reorder( event, rc, prc ){
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+
+		super.fire( "QuotationItem.reorder", { ids = json.ids } );
+
+		result.setData( {} );
+		event.setValue( "result", result );
+	}
+
+	private String function getTypeIdBySlug(
 			required String slug
 		){
 

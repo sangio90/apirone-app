@@ -7,6 +7,7 @@ Object.assign(AP.quotation.fields, {
 	zoneModalRoot: $("#zone-modal-root"),
 	printModalRoot: $("#print-modal-root"),
 	statusModalRoot: $("#qt-status-modal-root"),
+	documentsModalRoot: $("#qt-documents-modal-root"),
 	totalItemBox: $("#quotation-totals-item"),
 
 	addPlateBtn: $("#qt-add-plate"),
@@ -66,6 +67,48 @@ AP.quotation.detail = (function () {
 	function pricingApp() {
 		return AP.quotation.totalPricing;
 	}
+
+	var initSortable = function () {
+		if (!AP.page.canEdit) return;
+
+		["qt-items-plate", "qt-items-signage", "qt-items-accessory"].forEach(function (id) {
+			var $el = $("#" + id);
+			if (!$el.length) return;
+
+			if ($el.hasClass("ui-sortable")) {
+				$el.sortable("destroy");
+			}
+
+			$el.sortable({
+				items: "> .quotation-item",
+				handle: ".qt-item-drag-handle",
+				cursor: "grabbing",
+				opacity: 0.75,
+				tolerance: "pointer",
+				forcePlaceholderSize: true,
+				placeholder: "quotation-item m-1 col-md-3 qt-sort-placeholder",
+				start: function (e, ui) {
+					ui.placeholder.height(ui.item.outerHeight());
+				},
+				stop: function () {
+					var ids = $el.find(".quotation-item").map(function () {
+						return $(this).data("id");
+					}).get().filter(Boolean);
+
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/quotation-items/reorder",
+						data: JSON.stringify({ ids: ids }),
+						callback: {
+							done: function (xhr) {
+								if (xhr.status === "INVALID") { NM.form.showMessages(xhr.data); }
+							}
+						}
+					});
+				}
+			});
+		});
+	};
 
 	var setQuotationItems = function (items) {
 		var typeId = viewModel.get("typeId");
@@ -590,6 +633,7 @@ AP.quotation.detail = (function () {
 						})
 
 						setQuotationItems(xhr.data);
+						setTimeout(initSortable, 150);
 					}
 				}
 			});
@@ -729,6 +773,10 @@ AP.quotation.detail = (function () {
 
 			statusApp().edit();
 
+		},
+
+		openDocumentsModal: function () {
+			AP.quotation.documents.open();
 		},
 
 		updateAllPrices: function () {

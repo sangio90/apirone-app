@@ -1,7 +1,7 @@
 ﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/x-kendo-template" id="quotation-item-preview-tmpl">
-    <div class="quotation-item m-1 col-md-3" data-uid="#: uid #">
+    <div class="quotation-item m-1 col-md-3" data-uid="#: uid #" data-id="#: id #">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-8 justify-content-start" style="margin-top: -15px; min-height: 2rem;">
@@ -31,15 +31,18 @@
                         <div class="ms-1 pb-2" style="color: rgb(199, 113, 0);" data-bind="visible: special" title="Speciale">
                             <i class="fas fa-star"></i>
                         </div>
+                        <div class="ms-2 d-flex align-items-center qt-item-drag-handle" data-bind="visible: canEdit" title="Riordina" style="cursor: grab; color: rgb(170,170,170)">
+                            <i class="fas fa-grip-vertical"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 d-flex justify-content-center">
                     <div class="qt-item-image-container">
                         <div data-bind="visible: canEdit">
-                            <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image">
+                            <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image" draggable="false">
                         </div>
                         <div data-bind="visible: canSee">
-                            <img data-bind="attr: { src: getImageSrc }" class="qt-item-image" style="cursor: default">
+                            <img data-bind="attr: { src: getImageSrc }" class="qt-item-image" style="cursor: default" draggable="false">
                         </div>
                     </div>
                 </div>

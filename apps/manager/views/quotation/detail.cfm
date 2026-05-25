@@ -18,6 +18,7 @@
                     <i class="fas fa-check-circle"></i>
                     Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                 </button>
+				#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open" )#
 				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
 				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
 			</div>
@@ -122,19 +123,19 @@
                                     <div class="tab-content" id="nav-tabContent">
                                         <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
+                                                <div id="qt-items-plate" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-signage" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsSignage" class="row">
+                                                <div id="qt-items-signage" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsSignage" class="row">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="nav-accessory" role="tabpanel">
                                             <div>
-                                                <div data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsAccessory" class="row">
+                                                <div id="qt-items-accessory" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsAccessory" class="row">
                                                 </div>
                                             </div>
                                         </div>
@@ -185,6 +186,7 @@
     #view( "quotation/zones-modal" )#
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
+    #view( "quotation/documents-modal" )#
 
     #view( "quotation/totals" )#
 

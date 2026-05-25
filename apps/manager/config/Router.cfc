@@ -234,6 +234,8 @@
 		post( "/login/check" ).toHandler( "AuthController.checkLogin" );
 		post( "/login/recover/check" ).toHandler( "AuthController.checkRecover" );
 		get( "/login/recover" ).toHandler( "AuthController.recover" );
+		post( "/login/reset-password/check" ).toHandler( "AuthController.checkResetPassword" );
+		get( "/login/reset-password" ).toHandler( "AuthController.resetPassword" );
 		get( "/login/pincode" ).toHandler( "AuthController.pincode" );
 		get( "/login" ).toHandler( "AuthController.login" );
 		get( "/logout" ).toHandler( "AuthController.logout" );
@@ -480,6 +482,12 @@
 		post( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.save" ).end();
 		delete( "/ajax/quotations/:quotationId/statuses" ).to( "QuotationStatusHistoryAjaxController.delete" ).end();
 
+		post( "/ajax/quotations/:quotationId/documents/reorder" ).to( "QuotationDocumentAjaxController.reorder" ).end();
+		post( "/ajax/quotations/:quotationId/documents/delete" ).to( "QuotationDocumentAjaxController.deleteDoc" ).end();
+		get( "/ajax/quotations/:quotationId/documents/:id/download" ).to( "QuotationDocumentAjaxController.download" ).end();
+		get( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.list" ).end();
+		post( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.upload" ).end();
+
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
@@ -529,6 +537,7 @@
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		get( "/ajax/quotation-items/fruits/:id/product-items" ).to( "QuotationItemAjaxController.fruitProductItems" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
+		post( "/ajax/quotation-items/reorder" ).to( "QuotationItemAjaxController.reorder" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 
