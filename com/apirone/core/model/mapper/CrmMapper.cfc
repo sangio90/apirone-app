@@ -100,7 +100,9 @@
 		bean.setVatNumber( "" );
 		bean.setEmail( "" );
 		bean.setPhone( "" );
-		bean.setCountry(  country ?: "" );
+		if ( !IsNull( country ) ) {
+			bean.setCountry( country );
+		}
 		bean.setState( data.provincia ?: "" );
 		bean.setCity( data.citta ?: "" );
 		bean.setPostalCode( data.cap ?: "" );
