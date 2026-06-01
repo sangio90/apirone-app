@@ -202,13 +202,6 @@
                                                                         ></div>
                                                                     </div>
 
-                                                                    #button(
-                                                                        label="Simula prezzo",
-                                                                        bind  = "click:simulatePrice",
-                                                                        size  = "sm",
-                                                                        class = "mt-4"
-                                                                    )#
-
                                                                     <div id="product-simulate-loading"></div>
                                                                 </div>
 
@@ -244,16 +237,23 @@
                                                                         </div>
                                                                     </div>
 
-                                                                    <div class="col-12 mt-4 text-end">
+                                                                    <div class="col-12 my-4">
                                                                         <button class="btn btn-primary btn-sm mt-2" data-bind="click:saveMargins">
                                                                             Salva
                                                                         </button>
                                                                     </div>
+
+                                                                    <hr style="width: 98%; margin: auto;">
                                                                 </cfif>
                                                             </div>
                                                             <div>
                                                                 <cfif prc.product.getPrices().len() GT 0>
                                                                     <h3>Prezzi</h3>
+                                                                    #button(
+                                                                        label="Simula prezzo",
+                                                                        bind  = "click:simulatePrice",
+                                                                        size  = "sm"
+                                                                    )#
                                                                     <div data-bind="source: product.prices" data-template="price-row-tmpl">
                                                                     </div>
                                                                 </cfif>
