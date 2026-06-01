@@ -612,4 +612,24 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/**
+	 * Salva le interlinee per riga su un SignageConfigItem.
+	 * L'array lineHeights viene serializzato come JSON dal frontend e deserializzato qui.
+	 */
+	function saveLineHeights( event, rc, prc ){
+		var result = super.getResult();
+		var item   = super.fire( "signageConfigItem.get", [ rc.id ] );
+
+		if ( structKeyExists( rc, "lineHeights" ) && len( rc.lineHeights ) ) {
+			item.setLineHeights( deserializeJSON( rc.lineHeights ) );
+		} else {
+			item.setLineHeights( [] );
+		}
+
+		super.fire( "signageConfigItem.update", [ item ] );
+
+		result.setData( { "message" = "Interlinea aggiornata" } );
+		event.setValue( "result", result );
+	}
+
 }

@@ -6,6 +6,7 @@
 		"heightInPixel",
 		"size",
 		"rowCount",
-		"charCount"
+		"charCount",
+		"lineHeights"
 	]
 }

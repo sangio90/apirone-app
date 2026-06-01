@@ -97,6 +97,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				"id" = "null",
 				"name" = "Seleziona font/altezza",
 				"height" = null,
+				// rowCount e lineHeights servono al frontend per popolare gli input
+				// delle interlinee: rowCount indica quante righe mostrare,
+				// lineHeights contiene i valori configurati per ciascuna riga.
+				"rowCount" = 0
 			} );
 			for ( var signageConfig in signageConfigs ) {
 				var obj = memy.convert( signageConfig, "list" );
@@ -108,11 +112,15 @@ component extends="com.apirone.core.controller.AbsController" {
 						continue;
 					}
 
-					fontSizeOptions.add( {
-						"id"     = signageConfigItem.getId(),
-						"name"   = name & " - " & signageConfigItem.getSize().getName() & "mm",
-						"height" = signageConfigItem.getSize().getName(),
-					} );
+				// rowCount serve al frontend per sapere quante righe di input mostrare.
+				// lineHeights è l'array posizionale dei valori configurati (es. [15, null, 20]).
+				fontSizeOptions.add( {
+					"id"     = signageConfigItem.getId(),
+					"name"   = name & " - " & signageConfigItem.getSize().getName() & "mm",
+					"height" = signageConfigItem.getSize().getName(),
+					"rowCount" = signageConfigItem.getRowCount(),
+					"lineHeights" = signageConfigItem.getLineHeights()
+				} );
 				}
 
 			}

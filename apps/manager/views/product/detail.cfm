@@ -182,7 +182,7 @@
                                                                             id="product-simulate-letters-quantity" value="0" type="number" min="0" style="width: 100px">
                                                                     </cfif>
                                                                 </div>
-                                                                <div class="col-3">
+                                                                <div class="col-9">
                                                                     <cfif prc.product.getCategory().getType().getId() == "SEG">
                                                                         <label class="my-1">Font Family / Altezza:</label>
                                                                         <select type="text" class="form-control" style="width: 400px;" name="simulationSignageConfigItem"
@@ -193,53 +193,63 @@
                                                                         >
                                                                         </select>
                                                                     </cfif>
+
+                                                                    <div class="col-12">
+                                                                        <label class="my-1">Interlinee</label>
+                                                                        <div
+                                                                            data-template="product-line-height-row-tmpl"
+                                                                            data-bind="source: currentLineHeights"
+                                                                        ></div>
+                                                                    </div>
+
                                                                     #button(
                                                                         label="Simula prezzo",
                                                                         bind  = "click:simulatePrice",
                                                                         size  = "sm",
                                                                         class = "mt-4"
-
                                                                     )#
 
                                                                     <div id="product-simulate-loading"></div>
                                                                 </div>
-																<cfif prc.product.getCategory().getType().getId() == "SEG">
-																	<div class="row mt-4">
-																		<div class="col-2">
-																			<label class="my-1">Larghezza targa</label>
-																			<div class="d-flex">
-																			<input class="form-control text-end" id="plate_width" data-bind="value: product.plateWidth" />
-																			<div class="ms-1 mt-2">px</div>
-																			</div>
-																		</div>
-																		<div class="col-2">
-																			<label class="my-1">Altezza targa</label>
-																			<div class="d-flex">
-																			<input class="form-control text-end" id="plate_height" data-bind="value: product.plateHeight" />
-																			<div class="ms-1 mt-2">px</div>
-																			</div>
-																		</div>
-																		<div class="col-2">
-																			<label class="my-1">Margine alto</label>
-																			<div class="d-flex">
-																			<input class="form-control text-end" id="margin_top" data-bind="value: product.marginTop" />
-																			<div class="ms-1 mt-2">px</div>
-																			</div>
-																		</div>
-																		<div class="col-2">
-																			<label class="my-1">Margine sinistra</label>
-																			<div class="d-flex">
-																			<input class="form-control text-end" id="margin_left" data-bind="value: product.marginLeft" />
-																			<div class="ms-1 mt-2">px</div>
-																			</div>
-																		</div>
-																		<div class="col-3 mt-4">
-																			<button class="btn btn-secondary btn-sm mt-2" data-bind="click:saveMargins">
-																				Salva Configurazione Margini
-																			</button>
-																		</div>
-																	</div>
-																</cfif>
+
+                                                                <cfif prc.product.getCategory().getType().getId() == "SEG">
+                                                                    <div class="row mt-4">
+                                                                        <div class="col-2">
+                                                                            <label class="my-1">Larghezza targa</label>
+                                                                            <div class="d-flex">
+                                                                            <input class="form-control text-end" id="plate_width" data-bind="value: product.plateWidth" />
+                                                                            <div class="ms-1 mt-2">px</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-2">
+                                                                            <label class="my-1">Altezza targa</label>
+                                                                            <div class="d-flex">
+                                                                            <input class="form-control text-end" id="plate_height" data-bind="value: product.plateHeight" />
+                                                                            <div class="ms-1 mt-2">px</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-2">
+                                                                            <label class="my-1">Margine alto</label>
+                                                                            <div class="d-flex">
+                                                                            <input class="form-control text-end" id="margin_top" data-bind="value: product.marginTop" />
+                                                                            <div class="ms-1 mt-2">px</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-2">
+                                                                            <label class="my-1">Margine sinistra</label>
+                                                                            <div class="d-flex">
+                                                                            <input class="form-control text-end" id="margin_left" data-bind="value: product.marginLeft" />
+                                                                            <div class="ms-1 mt-2">px</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-12 mt-4 text-end">
+                                                                        <button class="btn btn-primary btn-sm mt-2" data-bind="click:saveMargins">
+                                                                            Salva
+                                                                        </button>
+                                                                    </div>
+                                                                </cfif>
                                                             </div>
                                                             <div>
                                                                 <cfif prc.product.getPrices().len() GT 0>
@@ -265,7 +275,6 @@
                                         --->
 
                                         <div class="tab-pane p-2 fade" id="product-detail" role="tabpanel" aria-labelledby="product-detail-tab">
-                                            
                                             <div class="row" data-bind="role: this" data-role-list="ADM/TCD/CMA">
 
                                                 <div class="col-md-12 mb-3 col-lg-6">
@@ -467,6 +476,22 @@
 
     #template("jstemplate/attribute/attribute-suggest-list-row-tmpl")#
     #template("jstemplate/price/price-row-tmpl")#
+
+    <script type="text/x-kendo-template" id="product-line-height-row-tmpl">
+        <div class="d-flex align-items-center mb-1">
+            <span class="me-2" style="width: 100px">Riga ##: index ##:</span>
+            <input
+                type="number"
+                step="0.1"
+                min="0"
+                class="form-control text-end"
+                style="width: 100px"
+                data-bind="value: value"
+                data-value-update="keyup"
+            />
+            <span class="ms-1">px</span>
+        </div>
+    </script>
 
     #view( "attribute/detail-modal" )#
     #view( "component/list-modal" )#

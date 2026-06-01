@@ -57,7 +57,8 @@
 				height_in_pixel,
 				row_count,
 				char_count,
-				font_family_size_id
+				font_family_size_id,
+				line_heights
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSignageConfigId()#">,
@@ -67,6 +68,12 @@
 				<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">,
 				<cfif !IsNull( arguments.signageConfigItem.getSize() )>
 					<cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<!--- Interlinee per riga: array JSON di numeri (null = default 1.5) --->
+				<cfif arguments.signageConfigItem.getLineHeights().len()>
+					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
 				<cfelse>
 					NULL
 				</cfif>
@@ -87,7 +94,13 @@
 				height_in_pixel = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getHeightInPixel()#">,
 				row_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getRowCount()#">,
 				char_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">,
-				font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">
+				font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">,
+				<!--- Interlinee per riga: array JSON di numeri --->
+				line_heights = <cfif arguments.signageConfigItem.getLineHeights().len()>
+					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
+				<cfelse>
+					NULL
+				</cfif>
 			WHERE
 				signage_config_item_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getId()#">
 		</cfquery>

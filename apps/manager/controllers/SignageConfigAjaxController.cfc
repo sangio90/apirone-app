@@ -75,6 +75,11 @@ component extends="com.apirone.core.controller.AbsController" {
 				bean.setCharCount( item.charCount );
 				bean.setRowCount( item.rowCount );
 
+				// Se il frontend ha inviato le interlinee, le salva in SignageConfigItem
+				if ( item.keyExists( "lineHeights" ) && isArray( item.lineHeights ) ) {
+					bean.setLineHeights( item.lineHeights );
+				}
+
 				sizes.add( bean );
 			}
 

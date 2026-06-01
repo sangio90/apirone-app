@@ -124,15 +124,18 @@
                             <div class="col-4 mb-3" data-bind="visible:detailForm.data.signageConfig.font.id">
                                 <i class="fas fa-question text-md mx-2" style="cursor: pointer" data-bind="events: { click: togglePictogramHelper }"></i>
                                 <span>Anteprima</span>
-								<div data-bind="visible:detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled">
-									<span style="color: red">Attenzione! Il prodotto ha margini non corretti per la configurazione di segnaletica. Aggiorna i margini del prodotto o scegli un altro prodotto per visualizzare l'anteprima.</span>
-								</div>
+                                <div data-bind="visible:detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled">
+                                    <span style="color: red">Attenzione! Il prodotto ha margini non corretti per la configurazione di segnaletica. Aggiorna i margini del prodotto o scegli un altro prodotto per visualizzare l'anteprima.</span>
+                                </div>
+                                <div data-bind="visible: lineHeightsWarning">
+                                    <span style="color: red">Attenzione: per questa combinazione non sono state specificate le interlinee</span>
+                                </div>
                                 <div id="quotation-signage-preview-background"
                                     class="col-3 d-flex justify-content-center align-items-center"
                                     data-bind="visible:detailForm.data.signageConfig.font.id"
                                     style="position: relative"
                                     >
-									<img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" />
+                                    <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" />
                                     <div id="signage-preview-container"
                                         class="d-flex flex-column justify-content-center"
                                         style="position: absolute; top: 0; left: 0;"
@@ -178,6 +181,7 @@
 
             </div>
         </section>
+
         <div class="modal fade" tabindex="-1" id="pictogram-helper-modal" data-bs-backdrop="true">
             <div class="modal-dialog pictogram-helper-modal">
                 <div class="modal-content" style="width: 300px;">

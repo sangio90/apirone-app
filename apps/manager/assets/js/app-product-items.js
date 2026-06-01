@@ -137,6 +137,9 @@ AP.product.items = ( function() {
         currentImageEntity: undefined,
         currentUploadUrl: undefined,
         simulationSignageConfigItem: null,
+        // Array di oggetti { index, value } per le interlinee del font/font-size correntemente selezionato.
+        // Popolato da updateCurrentLineHeights() prima di kendo.bind() e aggiornato al cambio select.
+        currentLineHeights: [],
         product: AP.page.product,
         statuses: AP.page.statuses,
         fontSizeOptions: AP.page.fontSizeOptions,
@@ -246,18 +249,18 @@ AP.product.items = ( function() {
             var quantity = $( "#product-simulate-quantity" ).val();
             var lettersQuantity = 0;
 
-            var url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate"
-            var data = { itemIds: ids, quantity: quantity, currencyId: "EUR" }
+            var url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate";
+            var data = { itemIds: ids, quantity: quantity, currencyId: "EUR" };
 
-            if (AP.page.product.category.type.id == "SEG") {
+            if ( AP.page.product.category.type.id == "SEG" ) {
                 lettersQuantity = $( "#product-simulate-letters-quantity" ).val();
-                if ((viewModel.get("simulationSignageConfigItem") == null || viewModel.get("simulationSignageConfigItem") == "null")) {
+                if ( ( viewModel.get( "simulationSignageConfigItem" ) == null || viewModel.get( "simulationSignageConfigItem" ) == "null" ) ) {
                     AP.widget.notify( "warning", "Seleziona Font Family / Altezza per la simulazione del prezzo di una segnaletica." );
                     $( "#product-simulate-loading" ).html( "" );
                     return false;
                 }
-                url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate-signage"
-                data.simulationSignageConfigItemId = viewModel.get("simulationSignageConfigItem");
+                url = "/manager/ajax/products/" + AP.page.productId + "/price/simulate-signage";
+                data.simulationSignageConfigItemId = viewModel.get( "simulationSignageConfigItem" );
                 data.lettersQuantity = lettersQuantity;
             }
 
@@ -280,30 +283,75 @@ AP.product.items = ( function() {
 
         },
 
-		saveMargins: function (event ) {
-			var margin_top = viewModel.get('product.marginTop');
-			var margin_left = viewModel.get('product.marginLeft');
-			var plate_width = viewModel.get('product.plateWidth');
-			var plate_height = viewModel.get('product.plateHeight');
+        saveMargins: function( event ) {
+            const margin_top = viewModel.get( "product.marginTop" );
+            const margin_left = viewModel.get( "product.marginLeft" );
+            const plate_width = viewModel.get( "product.plateWidth" );
+            const plate_height = viewModel.get( "product.plateHeight" );
 
-			var url = "/manager/ajax/products/" + AP.page.productId + "/save-margins"
+            // Raccoglie tutte le promise AJAX (margini + interlinee) in un array
+            // per attendere il completamento di tutte prima di ricaricare la pagina.
+            const promises = [];
 
-			NM.util.ajax( {
-				method: "POST",
-				url: url,
-				data: {
-					marginTop: margin_top,
-					marginLeft: margin_left,
-					plateWidth: plate_width,
-					plateHeight: plate_height
-				},
-				callback: {
-					done: function( xhr ) {
-						$( "#product-simulate-loading" ).html( "" );
-					},
-				},
-			} );
-		},
+            promises.push( NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/products/" + AP.page.productId + "/save-margins",
+                data: {
+                    marginTop: margin_top,
+                    marginLeft: margin_left,
+                    plateWidth: plate_width,
+                    plateHeight: plate_height
+                }
+            } ) );
+
+            // Salva anche le interlinee per tutti i font/font-size modificati.
+            // flushCurrentLineHeights() scrive i valori correnti di currentLineHeights
+            // nell'oggetto fontSizeOptions corrispondente, in modo che il salvataggio
+            // raccolga tutte le modifiche effettuate.
+            viewModel.flushCurrentLineHeights();
+            const options = viewModel.get( "fontSizeOptions" ) || [];
+            for ( const element of options ) {
+                const opt = element;
+                // Salta il placeholder "Seleziona font/altezza"
+                if ( opt.id === "null" || !opt.id ) {
+                    continue;
+                }
+                const lh = opt.lineHeights;
+                if ( !lh?.length ) {
+                    continue;
+                }
+                // Validazione: se almeno una riga è compilata, devono esserlo tutte
+                let hasValue = false;
+                let allFilled = true;
+                for ( var m = 0; m < lh.length; m++ ) {
+                    if ( lh[ m ] !== null && lh[ m ] !== undefined && lh[ m ] !== "" ) {
+                        hasValue = true;
+                    } else {
+                        allFilled = false;
+                    }
+                }
+                if ( hasValue && !allFilled ) {
+                    AP.widget.notify( "error", "Per il font \"" + ( opt.name || opt.id ) + "\" non sono state compilate tutte le interlinee. Compilare tutte le righe." );
+                    return false;
+                }
+                // Se nessuna riga ha un valore, salta il salvataggio (array vuoto)
+                if ( !hasValue ) {
+                    continue;
+                }
+                promises.push( NM.util.ajax( {
+                    method: "POST",
+                    url: "/manager/ajax/products/save-line-heights/" + opt.id,
+                    data: {
+                        lineHeights: JSON.stringify( lh )
+                    }
+                } ) );
+            }
+
+            // Attende il completamento di tutte le chiamate AJAX
+            $.when.apply( $, promises ).done( function() {
+                $( "#product-simulate-loading" ).html( "" );
+            } );
+        },
 
         save: function( event ) {
 
@@ -779,8 +827,78 @@ AP.product.items = ( function() {
         } );
         */
 
+        // Inizializza currentLineHeights prima di kendo.bind() per popolare il ListView.
+        // Cerca il primo font/font-size disponibile con rowCount > 0 e lo seleziona.
+        const fontSizeOpts = viewModel.get( "fontSizeOptions" ) || [];
+        let initialId = "null";
+        for ( const element of fontSizeOpts ) {
+            if ( element.id !== "null" && element.rowCount > 0 ) {
+                initialId = element.id;
+                break;
+            }
+        }
+
+        // Scrive i valori correnti di currentLineHeights nell'array lineHeights del
+        // fontSizeOptions corrispondente. Chiamata prima di cambiare font/font-size
+        // per non perdere le modifiche effettuate dall'utente sul font precedente.
+        viewModel.flushCurrentLineHeights = function() {
+            const selectedId = viewModel.get( "currentSelectionSignageConfigItemId" );
+            if ( !selectedId || selectedId === "null" ) {
+                return;
+            }
+            const options = viewModel.get( "fontSizeOptions" ) || [];
+            for ( const element of options ) {
+                if ( element.id == selectedId ) {
+                    const current = viewModel.get( "currentLineHeights" ) || [];
+                    const primitives = [];
+                    for ( const element of current ) {
+                        const v = element.value;
+                        primitives.push( v !== undefined && v !== null ? Number( v ) : null );
+                    }
+                    element.lineHeights = primitives;
+                    break;
+                }
+            }
+        };
+
+        // Carica le interlinee per il font/font-size selezionato e popola currentLineHeights.
+        // Converte l'array di primitivi (dal server) in oggetti { index, value } per il
+        // binding Kendo MVVM. Se l'array dal server è più corto di maxRows, lo riempie
+        // con voci vuote fino a raggiungere maxRows.
+        viewModel.updateCurrentLineHeights = function( selectedId ) {
+            const options = viewModel.get( "fontSizeOptions" ) || [];
+            let match = null;
+            for ( const element of options ) {
+                if ( element.id == selectedId ) {
+                    match = element;
+                    break;
+                }
+            }
+            const raw = ( match?.lineHeights ) ? match.lineHeights : [];
+            const maxRows = match ? ( match.rowCount || 0 ) : 0;
+            const mapped = $.map( raw, function( v, i ) {
+                return { index: i + 1, value: v !== undefined && v !== null ? Number( v ) : null };
+            } );
+            while ( mapped.length < maxRows ) {
+                mapped.push( { index: mapped.length + 1, value: null } );
+            }
+            viewModel.set( "currentSelectionSignageConfigItemId", selectedId );
+            viewModel.set( "currentLineHeights", mapped );
+        };
+
+        viewModel.set( "simulationSignageConfigItem", initialId );
+        viewModel.updateCurrentLineHeights( initialId );
+
         kendo.bind( fields.rootDetail, viewModel );
-        viewModel.set("simulationSignageConfigItem", "null");
+
+        // Al cambio del font/font-size selezionato: salva le interlinee correnti
+        // nel font precedente (flushCurrentLineHeights) e carica quelle del nuovo font.
+        viewModel.bind( "change", function( e ) {
+            if ( e.field === "simulationSignageConfigItem" ) {
+                viewModel.flushCurrentLineHeights();
+                viewModel.updateCurrentLineHeights( viewModel.get( "simulationSignageConfigItem" ) );
+            }
+        } );
 
         fields.detailForm.validate( {
             onfocusout: function( element ) {

@@ -94,15 +94,18 @@ AP.signage.modal = ( function() {
         backgroundImage: {},
         fontFamilyName: "",
         maxRows: 0,
+        // Mostra un warning nell'anteprima quando il SignageConfigItem selezionato
+        // non ha interlinee definite. Viene aggiornato in parsedLineContent().
+        lineHeightsWarning: false,
         modelConfig: {
             height: null,
             width: null
         },
         cloneMode: false,
 
-		zones: [],
-		subzones: [],
-		allZones: [],
+        zones: [],
+        subzones: [],
+        allZones: [],
         quotationZone: {
             "id": ""
         },
@@ -112,16 +115,16 @@ AP.signage.modal = ( function() {
         showCustomImage: false,
         showImage: true,
 
-        //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
+        // aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
-            const value = event.target.checked
-            viewModel.set('showCustomImage', value)
-            viewModel.set('showImage', !value)
+            const value = event.target.checked;
+            viewModel.set( "showCustomImage", value );
+            viewModel.set( "showImage", !value );
 
-            return
+            return;
         },
 
-        //metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
+        // metodo che compone la struttura dati da passare al componente app-file, punto centralizzato di gestione del caricamento immagini
         openImagesList: function( event ) {
 
             var element = $( event.currentTarget );
@@ -135,8 +138,8 @@ AP.signage.modal = ( function() {
             var type = element.data( "type" );
             var value = {
                 type: type,
-                id: viewModel.get('detailForm.data.quotationItem.id'),
-                name: viewModel.get('detailForm.data.quotationItem.id'),
+                id: viewModel.get( "detailForm.data.quotationItem.id" ),
+                name: viewModel.get( "detailForm.data.quotationItem.id" ),
             };
 
             fileApp().open( value );
@@ -145,23 +148,23 @@ AP.signage.modal = ( function() {
         },
 
         changeZone: function() {
-            const allZones = viewModel.get('allZones')
-            viewModel.set('quotationSubzone', { "id": "" })
-            viewModel.get('quotationSubzone')
-            viewModel.set('subzones', [])
-            if (viewModel.get('quotationZone.name') != '-- Tutte le zone') {
-                let children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('quotationZone.id')))
-                children.unshift({
+            const allZones = viewModel.get( "allZones" );
+            viewModel.set( "quotationSubzone", { "id": "" } );
+            viewModel.get( "quotationSubzone" );
+            viewModel.set( "subzones", [] );
+            if ( viewModel.get( "quotationZone.name" ) != "-- Tutte le zone" ) {
+                const children = allZones.filter( z => z.origin && ( z.origin.id == viewModel.get( "quotationZone.id" ) ) );
+                children.unshift( {
                     "id": "",
                     "name": "\u00A0\u00A0- "
-                })
-                viewModel.set('subzones', children)
+                } );
+                viewModel.set( "subzones", children );
             }
             return;
         },
 
         isSubzoneEnabled: function() {
-            return viewModel.get('quotationZone') && viewModel.get('quotationZone.name') != '-- Tutte le zone';
+            return viewModel.get( "quotationZone" ) && viewModel.get( "quotationZone.name" ) != "-- Tutte le zone";
         },
 
         pictogramNames: [
@@ -272,7 +275,7 @@ AP.signage.modal = ( function() {
         parseLines: async function( e ) {
             viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
             if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
-                if (viewModel.get('detailForm.data.quotationItem.id') != '') {
+                if ( viewModel.get( "detailForm.data.quotationItem.id" ) != "" ) {
                     bootbox.confirm( {
                         title: "Cancellazione righe",
                         message: "Cambiando la dimensione del font cambierà la quantità di righe che puoi inserire nella segnaletica. Le righe in eccesso verranno eliminate, Vuoi procedere?",
@@ -339,7 +342,7 @@ AP.signage.modal = ( function() {
                                 row.set( "index", i + 1 );
                             } );
                         }
-                    })
+                    } );
                 }
             }
 
@@ -370,9 +373,37 @@ AP.signage.modal = ( function() {
             ) {
                 signageConfigItem.size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
             }
+
+            // Verifica se il SignageConfigItem corrente ha interlinee definite.
+            // Se non ne ha, mostra un warning nell'anteprima.
+            let lineHeightsDefined = false;
+            if ( signageConfigItem?.lineHeights ) {
+                lineHeightsDefined = signageConfigItem.lineHeights.some( function( v ) { return v !== null && v !== undefined; } );
+            }
+            viewModel.set( "lineHeightsWarning", !lineHeightsDefined );
             const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
 
-            const fontFamilyName = viewModel.get('fontFamilyName') != '' ? viewModel.get('fontFamilyName') : 'Arial'
+            // Calcola l'interlinea per la riga corrente dalla posizione
+            // nell'array lineHeights del SignageConfigItem.
+            // null = non configurato (usa 1.5 unitless), numero = px.
+            let rowLineHeight = null;
+            if ( signageConfigItem?.lineHeights ) {
+                const rows = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+                if ( rows ) {
+                    const rowData = rows.data().find( function( r ) { return r.id === id; } );
+                    if ( rowData ) {
+                        const rowIdx = rows.data().indexOf( rowData );
+                        if ( rowIdx >= 0 && rowIdx < signageConfigItem.lineHeights.length ) {
+                            const lh = signageConfigItem.lineHeights[ rowIdx ];
+                            if ( lh !== null && lh !== undefined ) {
+                                rowLineHeight = lh;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const fontFamilyName = viewModel.get( "fontFamilyName" ) == "" ? "Arial" : viewModel.get( "fontFamilyName" );
 
             // costruisco la regex solo con i nomi interni dei pictogram (senza <>), escapati
             const innerNames = pictogramNames.map( n => n.replace( /[<>]/g, "" ) );
@@ -406,10 +437,13 @@ AP.signage.modal = ( function() {
                 parts.push( this.escapeHtml( valore.substring( lastIndex ) ) );
             }
 
+            // Applica font, dimensione e interlinea al preview.
             contentSpanPreview.css( {
                 "font-family": fontFamilyName,
                 "font-size": heightPx + "px",
-                "line-height": heightPx + "px",
+                // Se l'interlinea è specificata in px, la usa direttamente.
+                // Altrimenti applica il valore unitless 1.5 (moltiplicatore CSS).
+                "line-height": rowLineHeight === null ? "1.5" : rowLineHeight + "px",
             } );
 
             contentSpanPreview.html( parts.join( "" ) );
@@ -608,7 +642,7 @@ AP.signage.modal = ( function() {
         },
 
         loadLines: async function( event ) {
-            if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) != '') {
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) != "" ) {
                 await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/lines/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ),
@@ -626,9 +660,9 @@ AP.signage.modal = ( function() {
 
         loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
-                let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-                if (viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" )) {
-                    url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" )
+                let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" );
+                if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" ) ) {
+                    url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" );
                 }
                 await NM.util.ajax( {
                     method: "GET",
@@ -663,7 +697,7 @@ AP.signage.modal = ( function() {
         },
 
         loadSignageConfigs: async function( event ) {
-            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) && viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "") {
+            if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) && viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                 const xhr = await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/signage-configs?categoryId="
@@ -673,8 +707,8 @@ AP.signage.modal = ( function() {
                         + "&modelId="
                         + viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ),
                     callback: {
-                        done: function (xhr) {
-                            //NOOP
+                        done: function( xhr ) {
+                            // NOOP
                         }
                     }
                 } );
@@ -705,8 +739,8 @@ AP.signage.modal = ( function() {
                             "&finishId=" +
                             viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
                         callback: {
-                            done: function (xhr) {
-                                //NOOP
+                            done: function( xhr ) {
+                                // NOOP
                             }
                         }
                     } );
@@ -723,19 +757,19 @@ AP.signage.modal = ( function() {
                     } else {
                         viewModel.set( "backgroundImage.url", "" );
                     }
-                    if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage')) {
+                    if ( viewModel.get( "detailForm.data.quotationItem" ) && viewModel.get( "detailForm.data.quotationItem.id" ) && viewModel.get( "detailForm.data.quotationItem.customImage" ) ) {
                         await NM.util.ajax( {
                             method: "GET",
-                            url: "/manager/ajax/quotation-items/" + viewModel.get('detailForm.data.quotationItem.id') + "/images" ,
+                            url: "/manager/ajax/quotation-items/" + viewModel.get( "detailForm.data.quotationItem.id" ) + "/images",
                             callback: {
                                 done: function( xhr ) {
-                                    if (xhr.data && xhr.data.length > 0 && xhr.data[0].uri) {
+                                    if ( xhr.data && xhr.data.length > 0 && xhr.data[0].uri ) {
                                         viewModel.set( "backgroundCustomImage", xhr.data[0] );
                                         viewModel.set( "backgroundCustomImage.url", xhr.data[0].uri );
                                     }
                                 }
                             }
-                        })
+                        } );
                     }
                 }
             }
@@ -767,24 +801,24 @@ AP.signage.modal = ( function() {
                     }
                 } );
 
-                if ( viewModel.get( "detailForm.data.quotationItem.id" ) == "" && viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id") == '' ) {
+                if ( viewModel.get( "detailForm.data.quotationItem.id" ) == "" && viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) == "" ) {
                     viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
                     this.parseLines();
                 }
             }
 
             if (
-                viewModel.get('detailForm.data.quotationItem') &&
-                viewModel.get('detailForm.data.quotationItem.signageConfigItem') &&
-                viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId')
+                viewModel.get( "detailForm.data.quotationItem" ) &&
+                viewModel.get( "detailForm.data.quotationItem.signageConfigItem" ) &&
+                viewModel.get( "detailForm.data.quotationItem.signageConfigItem.signageConfigId" )
             ) {
                 await NM.util.ajax( {
                     method: "GET",
-                    url: "/manager/ajax/font-families/get-by-signage-config-id?signageConfigId=" + viewModel.get('detailForm.data.quotationItem.signageConfigItem.signageConfigId'),
+                    url: "/manager/ajax/font-families/get-by-signage-config-id?signageConfigId=" + viewModel.get( "detailForm.data.quotationItem.signageConfigItem.signageConfigId" ),
                     callback: {
                         done: function( xhr ) {
-                            if (xhr.data) {
-                                viewModel.set('fontFamilyName', xhr.data.name)
+                            if ( xhr.data ) {
+                                viewModel.set( "fontFamilyName", xhr.data.name );
                             }
                         }
                     }
@@ -799,16 +833,16 @@ AP.signage.modal = ( function() {
             const quotationItemId = viewModel.get( "detailForm.data.quotationItem.id" );
             const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
 
-			let marginLeft = viewModel.get('detailForm.data.quotationItem.product.marginLeft') || 0
-			let marginTop = viewModel.get('detailForm.data.quotationItem.product.marginTop') || 0
-			let plateWidth = viewModel.get('detailForm.data.quotationItem.product.plateWidth') || 0
-			let plateHeight = viewModel.get('detailForm.data.quotationItem.product.plateHeight') || 0
+            const marginLeft = viewModel.get( "detailForm.data.quotationItem.product.marginLeft" ) || 0;
+            const marginTop = viewModel.get( "detailForm.data.quotationItem.product.marginTop" ) || 0;
+            const plateWidth = viewModel.get( "detailForm.data.quotationItem.product.plateWidth" ) || 0;
+            const plateHeight = viewModel.get( "detailForm.data.quotationItem.product.plateHeight" ) || 0;
 
-			viewModel.set('detailForm.data.quotationItem.product.marginLeft', marginLeft +'px')
-			viewModel.set('detailForm.data.quotationItem.product.marginTop', marginTop +'px')
-			viewModel.set('detailForm.data.quotationItem.product.plateWidth', plateWidth +'px')
-			viewModel.set('detailForm.data.quotationItem.product.plateHeight', plateHeight +'px')
-			viewModel.set('detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled', marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0)
+            viewModel.set( "detailForm.data.quotationItem.product.marginLeft", marginLeft +"px" );
+            viewModel.set( "detailForm.data.quotationItem.product.marginTop", marginTop +"px" );
+            viewModel.set( "detailForm.data.quotationItem.product.plateWidth", plateWidth +"px" );
+            viewModel.set( "detailForm.data.quotationItem.product.plateHeight", plateHeight +"px" );
+            viewModel.set( "detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled", marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0 );
 
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
@@ -895,26 +929,26 @@ AP.signage.modal = ( function() {
                 const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
                 const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
                 const attributeArray = productItems.data();
-                const getAllDescendantIndices = (startIndex, array) => {
+                const getAllDescendantIndices = ( startIndex, array ) => {
                     const foundIndices = [];
                     // Partiamo dall'ID dell'elemento iniziale
-                    const queue = [array[startIndex].attribute_id];
+                    const queue = [ array[startIndex].attribute_id ];
 
                     let i = 0;
-                    while (i < queue.length) {
+                    while ( i < queue.length ) {
                         const currentParentId = queue[i];
 
                         // Cerchiamo nell'array tutti i figli di questo ID
-                        array.forEach((item, index) => {
-                            if (item.parent_attribute_id === currentParentId) {
+                        array.forEach( ( item, index ) => {
+                            if ( item.parent_attribute_id === currentParentId ) {
                                 // Se non abbiamo già aggiunto questo indice (evita loop infiniti)
-                                if (!foundIndices.includes(index)) {
-                                    foundIndices.push(index);
+                                if ( !foundIndices.includes( index ) ) {
+                                    foundIndices.push( index );
                                     // Aggiungiamo l'ID del figlio alla coda per cercare i SUOI figli nel prossimo giro
-                                    queue.push(item.attribute_id);
+                                    queue.push( item.attribute_id );
                                 }
                             }
-                        });
+                        } );
                         i++;
                     }
                     return foundIndices;
@@ -1032,15 +1066,15 @@ AP.signage.modal = ( function() {
                                         if ( attributeArray[idx - 1].values.filter( v => v.selected == false && v.product_item_id == d.parent_item_id ).length > 0 ) {
                                             elementsToRemove.push( idx );
                                             // aggiunto perche senza cercare i discendenti di secondo o piu livello, rimanevano dei residui dell'albero delle vecchie impostazioni
-                                            let descendantIndexes = getAllDescendantIndices(idx, attributeArray)
-                                            descendantIndexes.forEach( function(d) {
-                                                elementsToRemove.push(d)
-                                            } )
+                                            const descendantIndexes = getAllDescendantIndices( idx, attributeArray );
+                                            descendantIndexes.forEach( function( d ) {
+                                                elementsToRemove.push( d );
+                                            } );
                                         }
                                     }
                                 } );
 
-                                elementsToRemove = elementsToRemove.sort((a, b) => b - a)
+                                elementsToRemove = elementsToRemove.sort( ( a, b ) => b - a );
                                 elementsToRemove.forEach( function( idx ) {
                                     productItems.remove( productItems.at( idx ) );
                                 } );
@@ -1106,70 +1140,70 @@ AP.signage.modal = ( function() {
                 }
 
                 subContainer.append( select );
-                if (selectedOption && selectedOption.attributeValue.allowNote) {
+                if ( selectedOption && selectedOption.attributeValue.allowNote ) {
                     const labelNote = $( "<label>" );
                     labelNote.addClass( "mb-1" );
                     labelNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
                     labelNote.text( "NOTE" );
                     subContainer.append( labelNote );
 
-                    let note = ''
-                    if (viewModel.get('detailForm.data.quotationItem.items')) {
-                        //cerco se il campo è censito, questo in pratica verifica se sono in edit o in new, perche in new non ho ancora questa struttura
-                        campoPresenteNeiQuotationItemProductItems = viewModel.get('detailForm.data.quotationItem.items').find(i => i.productItem.attributeValue.rawValue.id == selectedOption.attributeValue.rawValue.id)
-                        //se presente e con note (perche non tutti i campi hanno le note) e con nota valorizzata
-                        if (campoPresenteNeiQuotationItemProductItems && campoPresenteNeiQuotationItemProductItems.note && campoPresenteNeiQuotationItemProductItems.note != '') {
-                            //cerco nella struttura note dei product items che ho creato nel viewmodel. Se trovo qualcosa non lo sovvrascrivo, vuol dire che ho già caricato i dati e sto solo modificando il valore
-                            const result = viewModel.detailForm.productItemsNotes.find(n =>
+                    let note = "";
+                    if ( viewModel.get( "detailForm.data.quotationItem.items" ) ) {
+                        // cerco se il campo è censito, questo in pratica verifica se sono in edit o in new, perche in new non ho ancora questa struttura
+                        campoPresenteNeiQuotationItemProductItems = viewModel.get( "detailForm.data.quotationItem.items" ).find( i => i.productItem.attributeValue.rawValue.id == selectedOption.attributeValue.rawValue.id );
+                        // se presente e con note (perche non tutti i campi hanno le note) e con nota valorizzata
+                        if ( campoPresenteNeiQuotationItemProductItems && campoPresenteNeiQuotationItemProductItems.note && campoPresenteNeiQuotationItemProductItems.note != "" ) {
+                            // cerco nella struttura note dei product items che ho creato nel viewmodel. Se trovo qualcosa non lo sovvrascrivo, vuol dire che ho già caricato i dati e sto solo modificando il valore
+                            const result = viewModel.detailForm.productItemsNotes.find( n =>
                                 n.product_item_id === selectedOption.product_item_id &&
                                 n.attribute_raw_value_id === selectedOption.attributeValue.id
                             );
-                            //altrimenti setto per la prima volta la nota nella struttura del viewmodel con i dati provenienti dal backend
-                            if (!result) {
-                                viewModel.detailForm.productItemsNotes.push({
+                            // altrimenti setto per la prima volta la nota nella struttura del viewmodel con i dati provenienti dal backend
+                            if ( !result ) {
+                                viewModel.detailForm.productItemsNotes.push( {
                                     product_item_id: selectedOption.product_item_id,
                                     attribute_raw_value_id: selectedOption.attributeValue.id,
                                     note: campoPresenteNeiQuotationItemProductItems.note
-                                });
-                                note = campoPresenteNeiQuotationItemProductItems.note
+                                } );
+                                note = campoPresenteNeiQuotationItemProductItems.note;
                             } else {
-                                note = result.note
+                                note = result.note;
                             }
                         }
                     } else {
-                        //non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm,
+                        // non sono in edit o comunque ho modificato l'albero, non posso piu partire dai dati del detailForm,
                         // cerco se ho qualcosa in product items note. Se si, setto le note
-                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
+                        const existing = viewModel.detailForm.productItemsNotes.find( n =>
                             n.product_item_id === selectedOption.product_item_id &&
                             n.attribute_raw_value_id === selectedOption.attributeValue.id
                         );
-                        if (existing) {
+                        if ( existing ) {
                             note = existing.note;
                         }
                     }
-                    //definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
+                    // definisco il tag html e imposto onchange una funzione che cerca in product items notes dentro il viewmodel se trova un elemento per product item id e attribute value id
                     const inputNote = $( "<input>" ).addClass( "form-control me-3 mb-2" )
-                    .on("input", function () {
-                        let existing = viewModel.detailForm.productItemsNotes.find(n =>
-                            n.product_item_id === selectedOption.product_item_id &&
+                        .on( "input", function() {
+                            const existing = viewModel.detailForm.productItemsNotes.find( n =>
+                                n.product_item_id === selectedOption.product_item_id &&
                             n.attribute_raw_value_id === selectedOption.attributeValue.id
-                        );
+                            );
 
-                        //se la trovo, imposto il valore della chiave note di quel elemento con il valore immesso nella input
-                        if (existing) {
-                            existing.note = this.value;
-                        } else {
-                            //altrimenti creo un nuovo elemento
-                            viewModel.detailForm.productItemsNotes.push({
-                                product_item_id: selectedOption.product_item_id,
-                                attribute_raw_value_id: selectedOption.attributeValue.id,
-                                note: this.value
-                            });
-                        }
-                        note = this.value
-                    });
+                            // se la trovo, imposto il valore della chiave note di quel elemento con il valore immesso nella input
+                            if ( existing ) {
+                                existing.note = this.value;
+                            } else {
+                            // altrimenti creo un nuovo elemento
+                                viewModel.detailForm.productItemsNotes.push( {
+                                    product_item_id: selectedOption.product_item_id,
+                                    attribute_raw_value_id: selectedOption.attributeValue.id,
+                                    note: this.value
+                                } );
+                            }
+                            note = this.value;
+                        } );
                     inputNote.attr( "data-attribute-id", item.attribute_id );
-                    inputNote.val(note)
+                    inputNote.val( note );
                     if ( item.level > 0 ) {
                         inputNote.css( "margin-left", ( 1.5 * item.level ) + "rem" );
                         inputNote.css( "width", `calc(100% - ${1.5 * item.level}rem)` );
@@ -1189,17 +1223,17 @@ AP.signage.modal = ( function() {
             AP.loading.show();
             var quotationId = AP.page.quotation.id;
 
-            //quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a
+            // quando salvo, se sono in modalità custom image, devo scegliere il canvas dell'immagine custom da passare a
             let preview = $( "#quotation-signage-preview-background" )[0];
-            if (viewModel.get('detailForm.data.quotationItem') && viewModel.get('detailForm.data.quotationItem.id') && viewModel.get('detailForm.data.quotationItem.customImage') && viewModel.get('detailForm.data.quotationItem.customImage') == true) {
-                //se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
-               if (!viewModel.get('backgroundCustomImage.url')) {
+            if ( viewModel.get( "detailForm.data.quotationItem" ) && viewModel.get( "detailForm.data.quotationItem.id" ) && viewModel.get( "detailForm.data.quotationItem.customImage" ) && viewModel.get( "detailForm.data.quotationItem.customImage" ) == true ) {
+                // se non ho un immagine selezionata, ma sono in modalità custom image, vengo bloccato
+                if ( !viewModel.get( "backgroundCustomImage.url" ) ) {
                     AP.widget.notify( "error", "Hai scelto custom image, devi selezionare un'immagine prima di salvare." );
-                    AP.loading.hide()
+                    AP.loading.hide();
                     return false;
-               }
+                }
 
-               preview = $( "#quotation-signage-preview-custom-background" )[0];
+                preview = $( "#quotation-signage-preview-custom-background" )[0];
             }
             const parsedData = viewModel.get( "detailForm.data" );
             const signageRows = parsedData.quotationItem.signageRows.data();
@@ -1215,90 +1249,90 @@ AP.signage.modal = ( function() {
             }
             parsedData.quotationId = quotationId;
             parsedData.type = "signage";
-            parsedData.quotationItem.quotationZone = (viewModel.get('quotationSubzone.id') && viewModel.get('quotationSubzone.id') != '') ? viewModel.get('quotationSubzone') : viewModel.get('quotationZone')
-            if (viewModel.get('cloneMode')) {
-                parsedData.quotationItem.id = ""
+            parsedData.quotationItem.quotationZone = ( viewModel.get( "quotationSubzone.id" ) && viewModel.get( "quotationSubzone.id" ) != "" ) ? viewModel.get( "quotationSubzone" ) : viewModel.get( "quotationZone" );
+            if ( viewModel.get( "cloneMode" ) ) {
+                parsedData.quotationItem.id = "";
             }
 
-            //durante la save faccio passare le note dei product items e setto i valori nella struttura dati che passo al backend per il salvataggio
-            const productItemsNotes = viewModel.detailForm.productItemsNotes
-            parsedData.quotationItem.product.items._data.forEach(function (row) {
-                const selectedOption = row.values.find(r => r.selected == true)
-                if (selectedOption) {
-                    const note = productItemsNotes.find(n =>
+            // durante la save faccio passare le note dei product items e setto i valori nella struttura dati che passo al backend per il salvataggio
+            const productItemsNotes = viewModel.detailForm.productItemsNotes;
+            parsedData.quotationItem.product.items._data.forEach( function( row ) {
+                const selectedOption = row.values.find( r => r.selected == true );
+                if ( selectedOption ) {
+                    const note = productItemsNotes.find( n =>
                         n.product_item_id === selectedOption.product_item_id &&
                         n.attribute_raw_value_id === selectedOption.attributeValue.id
                     );
-                    if (note) {
-                        row.note = note.note
+                    if ( note ) {
+                        row.note = note.note;
                     }
                 }
-            })
-            const imgElement = await snapdom.toPng(preview);
+            } );
+            const imgElement = await snapdom.toPng( preview );
 
             const dataUrl = imgElement.src;
-            const imgData = dataUrl.replace(/^data:image\/png;base64,/, "");
+            const imgData = dataUrl.replace( /^data:image\/png;base64,/, "" );
 
             parsedData.imageBase64 = imgData;
             parsedData.quotationItem.price = pricingApp().getData().data;
 
             AP.loading.show();
 
-            NM.util.ajax({
+            NM.util.ajax( {
                 method: "POST",
                 url: "/manager/ajax/quotation-items/signage",
-                data: JSON.stringify(parsedData),
+                data: JSON.stringify( parsedData ),
                 callback: {
-                    done: function(xhr) {
-                        $("#signage-modal").hide();
-						AP.loading.hide()
-                        AP.widget.notify("success", "Segnaletica salvata nel preventivo.");
-                        viewModel.set("detailForm", defaultDetailForm);
+                    done: function( xhr ) {
+                        $( "#signage-modal" ).hide();
+                        AP.loading.hide();
+                        AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
+                        viewModel.set( "detailForm", defaultDetailForm );
 
-                        const modal = $( "#posizione-in-pianta-modal")
+                        const modal = $( "#posizione-in-pianta-modal" );
                         function handlerSi() {
-                            //TODO aggiungere id zona
+                            // TODO aggiungere id zona
                             window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + parsedData.quotationItem.quotationZone.id;
                         }
                         function handlerNo() {
                             window.location.reload();
                         }
-                        modal.find("#btn-si").off("click").on("click", handlerSi);
-                        modal.find("#btn-no").off("click").on("click", handlerNo);
+                        modal.find( "#btn-si" ).off( "click" ).on( "click", handlerSi );
+                        modal.find( "#btn-no" ).off( "click" ).on( "click", handlerNo );
 
-						let hoCambiatoZona = false
-						let hoCambiatoQuantita = false
-						let hoAumentatoQuantita = false
-						let hoDiminuitoQuantita = false
+                        let hoCambiatoZona = false;
+                        let hoCambiatoQuantita = false;
+                        let hoAumentatoQuantita = false;
+                        let hoDiminuitoQuantita = false;
 
-						const isNew = typeof signageResponse === 'undefined'
-						if (!isNew) {
-							hoCambiatoZona = parsedData?.quotationItem?.quotationZone?.name != signageResponse?.data?.quotationItem?.quotationZone?.name
-							hoCambiatoQuantita = parsedData?.quotationItem?.quantity != signageResponse?.data?.quotationItem?.quantity
-							hoAumentatoQuantita = parsedData?.quotationItem?.quantity > signageResponse?.data?.quotationItem?.quantity
-							hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < signageResponse?.data?.quotationItem?.quantity
-						}
+                        const isNew = typeof signageResponse === "undefined";
+                        if ( !isNew ) {
+                            hoCambiatoZona = parsedData?.quotationItem?.quotationZone?.name != signageResponse?.data?.quotationItem?.quotationZone?.name;
+                            hoCambiatoQuantita = parsedData?.quotationItem?.quantity != signageResponse?.data?.quotationItem?.quantity;
+                            hoAumentatoQuantita = parsedData?.quotationItem?.quantity > signageResponse?.data?.quotationItem?.quantity;
+                            hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < signageResponse?.data?.quotationItem?.quantity;
+                        }
 
                         if (
-							isNew ||
-                            (!parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
-                            parsedData.quotationItem.quotationZone?.name !== 'Non assegnato'
+                            isNew ||
+                            ( !parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita ) &&
+                            parsedData.quotationItem.quotationZone?.name !== "Non assegnato"
                         ) {
-                            //TODO ci sono tanti casi da gestire:
-                            //e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
-                            //aumento quantita, devo aggiungere marker(easy)
-                            //riduco quantita, devo rimuovere marker(hard)
-                            modal.modal("show")
-                            return
+                            // TODO ci sono tanti casi da gestire:
+                            // e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
+                            // aumento quantita, devo aggiungere marker(easy)
+                            // riduco quantita, devo rimuovere marker(hard)
+                            modal.modal( "show" );
+                            return;
                         }
                         setTimeout( function() {
-                                AP.loading.hide();
-                                window.location.reload();
-                            }
-                            , 1000 );
+                            AP.loading.hide();
+                            window.location.reload();
+                        }
+                        , 1000 );
                     },
                 }
-            });
+            } );
 
             return false;
         },
@@ -1326,13 +1360,13 @@ AP.signage.modal = ( function() {
         },
 
         handleSelectChanges: function() {
-            $( "#signangeProductCategory" ).on( "change", function(e) {
-                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { 'id':'' });
-                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
-                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.items", []);
+            $( "#signangeProductCategory" ).on( "change", function( e ) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { "id":"" } );
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
+                viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.lineId" );
                 AP.deleteUserPref( "signage.modelId" );
                 AP.deleteUserPref( "signage.finishId" );
@@ -1340,39 +1374,39 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageLine" ).on( "change", function(e) {
-                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
-                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.items", []);
+            $( "#signageLine" ).on( "change", function( e ) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
+                viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.modelId" );
                 AP.deleteUserPref( "signage.finishId" );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageModel" ).on( "change", function(e) {
-                viewModel.set( "detailForm.data.quotationItem.product.finish", { 'id':'' });
-                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.items", []);
+            $( "#signageModel" ).on( "change", function( e ) {
+                viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
+                viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.finishId" );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageFinish" ).on( "change", function(e) {
-                viewModel.set( "detailForm.data.signageConfig.font", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.items", []);
+            $( "#signageFinish" ).on( "change", function( e ) {
+                viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.fontId" );
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageFont" ).on( "change", function(e) {
-                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { 'id':'' });
-                viewModel.set( "detailForm.data.quotationItem.product.items", []);
+            $( "#signageFont" ).on( "change", function( e ) {
+                viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
+                viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
@@ -1386,67 +1420,67 @@ AP.signage.modal = ( function() {
 
         pricingApp().init( "signage", undefined );
 
-        let categoriesResponse = await NM.util.ajax( {
+        const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    //NOOP
+                    // NOOP
                 }
             },
         } );
 
-		if ( categoriesResponse.data.length > 0 ) {
-            categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
-			viewModel.get( "categories" ).data( categoriesResponse.data );
-            viewModel.set('detailForm.data.signageConfig.catalogBundle.category', categoriesResponse.data[0])
-		}
+        if ( categoriesResponse.data.length > 0 ) {
+            categoriesResponse.data = categoriesResponse.data.filter( c => c.id == 20 );
+            viewModel.get( "categories" ).data( categoriesResponse.data );
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", categoriesResponse.data[0] );
+        }
 
-        AP.setUserPref( "signage.categoryId", 20 )
+        AP.setUserPref( "signage.categoryId", 20 );
 
-		NM.util.openModal( AP.signage.fields.modalRoot );
+        NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
         viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
-        viewModel.handleSelectChanges()
+        viewModel.handleSelectChanges();
 
-        const signageCategoryId = AP.getUserPref( "signage.categoryId" )
-        const signageLineId = AP.getUserPref( "signage.lineId" )
-        const signageModelId = AP.getUserPref( "signage.modelId" )
-        const signageFinishId = AP.getUserPref( "signage.finishId" )
-        const signageFontId = AP.getUserPref( "signage.fontId" )
-        const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" )
+        const signageCategoryId = AP.getUserPref( "signage.categoryId" );
+        const signageLineId = AP.getUserPref( "signage.lineId" );
+        const signageModelId = AP.getUserPref( "signage.modelId" );
+        const signageFinishId = AP.getUserPref( "signage.finishId" );
+        const signageFontId = AP.getUserPref( "signage.fontId" );
+        const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" );
 
-        if (signageCategoryId) {
-            let category = viewModel.categories.data().find(c => c.id == signageCategoryId)
-            if (category) {
+        if ( signageCategoryId ) {
+            const category = viewModel.categories.data().find( c => c.id == signageCategoryId );
+            if ( category ) {
                 await viewModel.loadLines();
                 if ( signageLineId ) {
-                    let line = viewModel.lines.data().find(l => l.id == signageLineId)
-                    if (line) {
+                    let line = viewModel.lines.data().find( l => l.id == signageLineId );
+                    if ( line ) {
                         line = { id: line.id, name: line.name };
                         viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", line );
                         await viewModel.loadModels();
                         if ( signageModelId ) {
-                            let model = viewModel.models.data().find(m => m.id == signageModelId)
-                            if (model) {
+                            let model = viewModel.models.data().find( m => m.id == signageModelId );
+                            if ( model ) {
                                 model = { id: model.id, name: model.name };
                                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", model );
                                 await viewModel.loadFinishes();
                                 if ( signageFinishId ) {
-                                    let finish = viewModel.finishes.data().find(f => f.id = signageFinishId)
-                                    if (finish) {
+                                    let finish = viewModel.finishes.data().find( f => f.id = signageFinishId );
+                                    if ( finish ) {
                                         finish = { id: finish.id, name: finish.name };
                                         viewModel.set( "detailForm.data.quotationItem.product.finish", finish );
                                         await viewModel.loadSignageConfigs();
                                         if ( signageFontId ) {
-                                            let font = viewModel.fonts.data().find(f => f.id = signageFontId)
-                                            if (font) {
+                                            let font = viewModel.fonts.data().find( f => f.id = signageFontId );
+                                            if ( font ) {
                                                 font = { id: font.id, name: font.name };
-                                                viewModel.set( "detailForm.data.signageConfig.font", font)
+                                                viewModel.set( "detailForm.data.signageConfig.font", font );
                                                 await viewModel.loadFontSizes();
                                                 if ( signageSignageConfigId ) {
-                                                    const signageSignageConfigItem = viewModel.getSignageConfig().items.find(s => s.id == signageSignageConfigId)
-                                                    if (signageSignageConfigItem) {
+                                                    const signageSignageConfigItem = viewModel.getSignageConfig().items.find( s => s.id == signageSignageConfigId );
+                                                    if ( signageSignageConfigItem ) {
                                                         viewModel.set( "detailForm.data.quotationItem.signageConfigItem", signageSignageConfigItem );
                                                         viewModel.parseLines();
                                                     }
@@ -1462,40 +1496,40 @@ AP.signage.modal = ( function() {
             }
         }
 
-		initPositionSuggest();
+        initPositionSuggest();
 
-        const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin && z.id != '')
+        const allZones = AP.quotation.detail.config().zones;
+        const parentZones = allZones.filter( z => !z.origin && z.id != "" );
 
-        viewModel.set('allZones', allZones)
-        viewModel.set('zones', parentZones)
-        let zone = AP.quotation.detail.config().zone
-        if (zone.id == '') {
-            zone = allZones.find(z => z.name == 'Non assegnato')
+        viewModel.set( "allZones", allZones );
+        viewModel.set( "zones", parentZones );
+        let zone = AP.quotation.detail.config().zone;
+        if ( zone.id == "" ) {
+            zone = allZones.find( z => z.name == "Non assegnato" );
         }
-        if (zone.origin) {
-            viewModel.set('quotationZone', zone.origin)
-            viewModel.set('quotationSubzone', zone)
-            const children = allZones.filter(z => z.origin && (z.origin.id == zone.origin.id))
-            children.unshift({
+        if ( zone.origin ) {
+            viewModel.set( "quotationZone", zone.origin );
+            viewModel.set( "quotationSubzone", zone );
+            const children = allZones.filter( z => z.origin && ( z.origin.id == zone.origin.id ) );
+            children.unshift( {
                 "id": "",
                 "name": "\u00A0\u00A0- "
-            })
-            viewModel.set('subzones', children)
+            } );
+            viewModel.set( "subzones", children );
         } else {
-            viewModel.set('quotationZone', zone)
-            viewModel.set('detailForm.data.quotationItem.quotationZone', zone)
-            const children = allZones.filter(z => z.origin && (z.origin.id == zone.id))
-            children.unshift({
+            viewModel.set( "quotationZone", zone );
+            viewModel.set( "detailForm.data.quotationItem.quotationZone", zone );
+            const children = allZones.filter( z => z.origin && ( z.origin.id == zone.id ) );
+            children.unshift( {
                 "id": "",
                 "name": "\u00A0\u00A0- "
-            })
-            viewModel.set('subzones', children)
-            viewModel.set('quotationSubzone', { "id": "" })
+            } );
+            viewModel.set( "subzones", children );
+            viewModel.set( "quotationSubzone", { "id": "" } );
         }
 
-        viewModel.set('showCustomImage', false)
-        viewModel.set('showImage', true)
+        viewModel.set( "showCustomImage", false );
+        viewModel.set( "showImage", true );
     };
 
     var initPositionSuggest = function() {
@@ -1576,134 +1610,134 @@ AP.signage.modal = ( function() {
             url: "/manager/ajax/quotations/categories?typeId=SEG",
             callback: {
                 done: function( xhr ) {
-                    //NOOP
+                    // NOOP
                 },
             },
         } );
 
-        categoriesResponse.data = categoriesResponse.data.filter(c => c.id == 20)
-		viewModel.get( "categories" ).data( categoriesResponse.data );
-		NM.util.openModal( AP.signage.fields.modalRoot );
+        categoriesResponse.data = categoriesResponse.data.filter( c => c.id == 20 );
+        viewModel.get( "categories" ).data( categoriesResponse.data );
+        NM.util.openModal( AP.signage.fields.modalRoot );
 
         signageResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotation-items/signage/" + id,
             callback: {
                 done: async function( xhr ) {
-					// NOOP
+                    // NOOP
                 },
             },
         } );
-		var data = signageResponse.data;
+        var data = signageResponse.data;
 
-		viewModel.set( "detailForm.title", "Modifica segnaletica" );
+        viewModel.set( "detailForm.title", "Modifica segnaletica" );
 
-		var signageRowsArray = data.quotationItem.signageRows;
+        var signageRowsArray = data.quotationItem.signageRows;
 
-		if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
-			data.quotationItem.signageRows = new kendo.data.DataSource( {
-				data: signageRowsArray.slice(),
-				schema: {
-					model: {
-						id: "id"
-					}
-				}
-			} );
-		} else {
-			data.quotationItem.signageRows = new kendo.data.DataSource( {
-				data: [],
-				schema: { model: { id: "id" } }
-			} );
-		}
-
-		data.quotationItem.signageRows.read();
-		viewModel.set( "detailForm.data", data );
-        viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
-        viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
-        viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
-
-		var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
-
-		if ( ds && ds.data().length ) {
-			ds.data().forEach( function( row, i ) {
-				row.set( "index", i + 1 );
-			} );
-		}
-
-		await viewModel.loadLines();
-		await viewModel.loadModels();
-		await viewModel.loadFinishes();
-		await viewModel.loadSignageConfigs();
-		await viewModel.loadFontSizes();
-		await viewModel.parseLines();
-		await ds.data().forEach( row => {
-			viewModel.updateCharCounter( {
-				currentTarget: document.getElementById( row.uid + "_contentInput" )
-			} );
-		} );
-		NM.util.openModal( AP.signage.fields.modalRoot );
-		viewModel.setSelectedTextAlignIcon();
-
-		pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
-		initPositionSuggest();
-
-        const allZones = AP.quotation.detail.config().zones
-        const parentZones = allZones.filter(z => !z.origin && z.id != '')
-
-        viewModel.set('allZones', allZones)
-        viewModel.set('zones', parentZones)
-
-        if (viewModel.get('detailForm.data.quotationItem.quotationZone.origin')) {
-            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone.origin'))
-            viewModel.set('quotationSubzone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
-            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.origin.id')))
-            children.unshift({
-                "id": "",
-                "name": "\u00A0\u00A0- "
-            })
-            viewModel.set('subzones', children)
+        if ( data.quotationItem && Array.isArray( signageRowsArray ) ) {
+            data.quotationItem.signageRows = new kendo.data.DataSource( {
+                data: signageRowsArray.slice(),
+                schema: {
+                    model: {
+                        id: "id"
+                    }
+                }
+            } );
         } else {
-            viewModel.set('quotationZone', viewModel.get('detailForm.data.quotationItem.quotationZone'))
-            const children = allZones.filter(z => z.origin && (z.origin.id == viewModel.get('detailForm.data.quotationItem.quotationZone.id')))
-            children.unshift({
-                "id": "",
-                "name": "\u00A0\u00A0- "
-            })
-            viewModel.set('subzones', children)
-            viewModel.set('quotationSubzone', { "id": "" })
+            data.quotationItem.signageRows = new kendo.data.DataSource( {
+                data: [],
+                schema: { model: { id: "id" } }
+            } );
         }
 
-        if (clone) {
-            viewModel.set('cloneMode', true)
-            viewModel.set('detailForm.title', "Clona Segnaletica")
-            $('#save-button').css("display", "none")
-            $('#clone-button').css("display", "block")
-        } else {
-            viewModel.set('cloneMode', false)
-            $('#save-button').css("display", "block")
-            $('#clone-button').css("display", "none")
+        data.quotationItem.signageRows.read();
+        viewModel.set( "detailForm.data", data );
+        viewModel.set( "detailForm.data.quotationItem.customImage", viewModel.get( "detailForm.data.quotationItem.customImage" ) == "true" );
+        viewModel.set( "detailForm.data.quotationItem.special", viewModel.get( "detailForm.data.quotationItem.special" ) == "true" );
+        viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { "id": "", "code": "" } );
+
+        var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+
+        if ( ds && ds.data().length ) {
+            ds.data().forEach( function( row, i ) {
+                row.set( "index", i + 1 );
+            } );
         }
 
-        //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
-        //altrimenti farò il contrario
-        viewModel.set('showCustomImage', viewModel.get('detailForm.data.quotationItem.customImage'))
-        viewModel.set('showImage', !viewModel.get('detailForm.data.quotationItem.customImage'))
+        await viewModel.loadLines();
+        await viewModel.loadModels();
+        await viewModel.loadFinishes();
+        await viewModel.loadSignageConfigs();
+        await viewModel.loadFontSizes();
+        await viewModel.parseLines();
+        await ds.data().forEach( row => {
+            viewModel.updateCharCounter( {
+                currentTarget: document.getElementById( row.uid + "_contentInput" )
+            } );
+        } );
+        NM.util.openModal( AP.signage.fields.modalRoot );
+        viewModel.setSelectedTextAlignIcon();
 
-        viewModel.handleSelectChanges()
+        pricingApp().init( "signage", { data: signageResponse.data.quotationItem.price } );
+        initPositionSuggest();
+
+        const allZones = AP.quotation.detail.config().zones;
+        const parentZones = allZones.filter( z => !z.origin && z.id != "" );
+
+        viewModel.set( "allZones", allZones );
+        viewModel.set( "zones", parentZones );
+
+        if ( viewModel.get( "detailForm.data.quotationItem.quotationZone.origin" ) ) {
+            viewModel.set( "quotationZone", viewModel.get( "detailForm.data.quotationItem.quotationZone.origin" ) );
+            viewModel.set( "quotationSubzone", viewModel.get( "detailForm.data.quotationItem.quotationZone" ) );
+            const children = allZones.filter( z => z.origin && ( z.origin.id == viewModel.get( "detailForm.data.quotationItem.quotationZone.origin.id" ) ) );
+            children.unshift( {
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            } );
+            viewModel.set( "subzones", children );
+        } else {
+            viewModel.set( "quotationZone", viewModel.get( "detailForm.data.quotationItem.quotationZone" ) );
+            const children = allZones.filter( z => z.origin && ( z.origin.id == viewModel.get( "detailForm.data.quotationItem.quotationZone.id" ) ) );
+            children.unshift( {
+                "id": "",
+                "name": "\u00A0\u00A0- "
+            } );
+            viewModel.set( "subzones", children );
+            viewModel.set( "quotationSubzone", { "id": "" } );
+        }
+
+        if ( clone ) {
+            viewModel.set( "cloneMode", true );
+            viewModel.set( "detailForm.title", "Clona Segnaletica" );
+            $( "#save-button" ).css( "display", "none" );
+            $( "#clone-button" ).css( "display", "block" );
+        } else {
+            viewModel.set( "cloneMode", false );
+            $( "#save-button" ).css( "display", "block" );
+            $( "#clone-button" ).css( "display", "none" );
+        }
+
+        // in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
+        // altrimenti farò il contrario
+        viewModel.set( "showCustomImage", viewModel.get( "detailForm.data.quotationItem.customImage" ) );
+        viewModel.set( "showImage", !viewModel.get( "detailForm.data.quotationItem.customImage" ) );
+
+        viewModel.handleSelectChanges();
 
         AP.loading.hide();
 
-		let marginLeft = viewModel.get('detailForm.data.quotationItem.product.marginLeft') || 0
-		let marginTop = viewModel.get('detailForm.data.quotationItem.product.marginTop') || 0
-		let plateWidth = viewModel.get('detailForm.data.quotationItem.product.plateWidth') || 0
-		let plateHeight = viewModel.get('detailForm.data.quotationItem.product.plateHeight') || 0
+        const marginLeft = viewModel.get( "detailForm.data.quotationItem.product.marginLeft" ) || 0;
+        const marginTop = viewModel.get( "detailForm.data.quotationItem.product.marginTop" ) || 0;
+        const plateWidth = viewModel.get( "detailForm.data.quotationItem.product.plateWidth" ) || 0;
+        const plateHeight = viewModel.get( "detailForm.data.quotationItem.product.plateHeight" ) || 0;
 
-		viewModel.set('detailForm.data.quotationItem.product.marginLeft', marginLeft +'px')
-		viewModel.set('detailForm.data.quotationItem.product.marginTop', marginTop +'px')
-		viewModel.set('detailForm.data.quotationItem.product.plateWidth', plateWidth +'px')
-		viewModel.set('detailForm.data.quotationItem.product.plateHeight', plateHeight +'px')
-		viewModel.set('detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled', marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0)
-	};
+        viewModel.set( "detailForm.data.quotationItem.product.marginLeft", marginLeft +"px" );
+        viewModel.set( "detailForm.data.quotationItem.product.marginTop", marginTop +"px" );
+        viewModel.set( "detailForm.data.quotationItem.product.plateWidth", plateWidth +"px" );
+        viewModel.set( "detailForm.data.quotationItem.product.plateHeight", plateHeight +"px" );
+        viewModel.set( "detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled", marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0 );
+    };
 
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
