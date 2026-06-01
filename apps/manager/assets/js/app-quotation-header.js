@@ -510,6 +510,17 @@ AP.quotation.header = ( function() {
 
 		viewModel.bind("change", function(e) {
 
+			if (e.field === "detailForm.data.customer") {
+				var customer = viewModel.get("detailForm.data.customer");
+				var lingua = customer && typeof customer === "object" ? customer.lingua : null;
+				if (lingua) {
+					var lang = AP.page.languages.find(function(l) { return l.id === lingua; });
+					if (lang) {
+						viewModel.set("detailForm.data.lang", lang);
+					}
+				}
+			}
+
 			if (e.field === "detailForm.data.nessunAgente") {
 				if (viewModel.get("detailForm.data.nessunAgente") == true) {
 					clearAgentiFrom(1);
