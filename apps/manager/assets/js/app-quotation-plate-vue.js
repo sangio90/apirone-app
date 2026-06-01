@@ -1699,6 +1699,14 @@ AP.plate.modal = ( function() {
                             callback: {
                                 done: function( xhr ) {
                                     if ( xhr.status === "SUCCESS" && xhr.data?.combinations?.length ) {
+                                        // Se c'è almeno una combinazione, nasconde l'immagine del frutto (ma solo se è
+                                        // l'immagine del frutto generico)
+                                        const hasRootImage = orientationId === "VER"
+                                            ? fruit.fruit?.verticalImage?.uri
+                                            : fruit.fruit?.horizontalImage?.uri;
+                                        if ( !hasRootImage ) {
+                                            fruitEl.find( "img" ).hide();
+                                        }
                                         for ( let idx = 0; idx < xhr.data.combinations.length; idx++ ) {
                                             const combo = xhr.data.combinations[ idx ];
                                             let maxIdx = 0;
