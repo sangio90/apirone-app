@@ -31,7 +31,7 @@ component extends="AbsRestApi" accessors="true" {
 	 */
 	public CrmApiService function init(){
 		super.init(
-			baseUrl        = "http://api.test-crm.apirone.cc/api",
+			baseUrl        = "https://api.test-crm.apirone.it/api",
 			authToken      = getAuthToken(),
 			defaultHeaders = { "Accept" = "application/json" }
 		);
@@ -49,7 +49,7 @@ component extends="AbsRestApi" accessors="true" {
 	 * Cerca clienti nel CRM
 	 */
 	public any function searchCustomers(required string str, numeric limit=10, numeric offset=0) {
-		var params = { 
+		var params = {
 			"name" = str,
 			"limit" = limit,
 			"offset" = offset
@@ -69,7 +69,7 @@ component extends="AbsRestApi" accessors="true" {
 	 * Cerca clienti nel CRM
 	 */
 	public any function searchLeads(required string str, numeric limit=10, numeric offset=0) {
-		var params = { 
+		var params = {
 			"name" = str,
 			"limit" = limit,
 			"offset" = offset
@@ -89,7 +89,7 @@ component extends="AbsRestApi" accessors="true" {
 	 * Cerca clienti nel CRM
 	 */
 	public any function searchOpportunities(required string str, numeric limit=10, numeric offset=0) {
-		var params = { 
+		var params = {
 			"name" = str,
 			"limit" = limit,
 			"offset" = offset
