@@ -10,11 +10,11 @@
 	public com.apirone.core.model.bean.Customer function mapCustomer( required struct data ){
 		var customer = super.bean("Customer");
 		var accountCustom = data.custom;
-		
+
 		customer.setId( data.id );
 		customer.setName( data.name ?: "" );
 		customer.setDescription( data.description ?: "" );
-		
+
 		var country = null;
 
 		if (Len(accountCustom)) {
@@ -23,6 +23,7 @@
 			customer.setSDI( accountCustom.sdi_c ?: "" );
 			customer.setPhone( accountCustom.phone_cell_c ?: "" );
 			country = accountCustom.assignablecountry_c;
+			customer.setLingua( accountCustom.lingua_c ?: "" );
 		}
 
 		customer.setPhone( data.phone_office ?: data.phone_alternate ?: "" );
@@ -30,14 +31,14 @@
 		customer.setPostalCode( data.billing_address_postalcode ?: "" );
 		customer.setCity( data.billing_address_city ?: "" );
 		customer.setState( data.billing_address_state ?: "" );
-		
-		if ( !IsNull( country ) ) {
+
+		if ( !IsNull( country ) && Len( Trim(country) ) ) {
 			country = getCountryService().get( Trim(country) );
 			customer.setCountry( country );
 		}
 
 		var accountAddresses = data.indirizzi_spedizione;
-		
+
 		if (Len( accountAddresses ) ) {
 
 			var addressesList = [];
@@ -83,7 +84,7 @@
 
 		/*
   			7 keys:
-			id, name, via, citta, provincia, cap, paese 
+			id, name, via, citta, provincia, cap, paese
 		*/
 
 		var country = getCountryService().get( Trim( data.paese ) );
@@ -94,17 +95,17 @@
 
 		bean.setId( data.id );
 		bean.setCompany( data.name );  //"name" is shorthand
-		bean.setFirstName( "" ); 
-		bean.setLastName( "" ); 
-		bean.setVatNumber( "" ); 
-		bean.setEmail( "" ); 
-		bean.setPhone( "" ); 
-		bean.setCountry(  country ); 
+		bean.setFirstName( "" );
+		bean.setLastName( "" );
+		bean.setVatNumber( "" );
+		bean.setEmail( "" );
+		bean.setPhone( "" );
+		bean.setCountry(  country ?: "" );
 		bean.setState( data.provincia ?: "" );
-		bean.setCity( data.citta ?: "" ); 
-		bean.setPostalCode( data.cap ?: "" ); 
-		bean.setStreet( data.via ?: "" ); 
-		//bean.setType( getLookupService().get( "profileType", "S" ) ); 
+		bean.setCity( data.citta ?: "" );
+		bean.setPostalCode( data.cap ?: "" );
+		bean.setStreet( data.via ?: "" );
+		//bean.setType( getLookupService().get( "profileType", "S" ) );
 
 		return bean;
 	}

@@ -13,7 +13,8 @@
 		"state",
 		"country",
 		"SDI",
-		"shippingProfiles"
+		"shippingProfiles",
+		"lingua"
 	],
 	profiles = {}
 }
