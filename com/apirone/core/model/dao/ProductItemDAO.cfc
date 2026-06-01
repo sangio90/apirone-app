@@ -105,7 +105,7 @@
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="productId" type="String">
-		<cfargument name="productItemId" type="String">	
+		<cfargument name="productItemId" type="String">
 
 		<cfif IsNull( arguments.productItemId ) AND IsNull( arguments.productId ) AND IsNull( arguments.attributeId )>
 			<cfthrow type="apirone.error.NoArgumentsPassed" message="At least one parameter is required to delete">
@@ -131,7 +131,7 @@
 						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
 					)
 				</cfif>
-			RETURNING 
+			RETURNING
 				product_item_id
 		</cfquery>
 
@@ -149,4 +149,30 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i ProductItem collegati a una lista di productId.
+		Utilizzato da ProductItemService.listByProductIds() per pre-caricare item in blocco.
+	--->
+	<cffunction name="findByProductIds" returntype="Query" access="public">
+		<cfargument name="productIds" type="Array" required="true">
+
+		<!--- Converte l'array di ID in lista per la clausola IN --->
+		<cfset var idsList = ArrayToList(arguments.productIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_id::varchar,
+				*
+			FROM product_items
+			WHERE product_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+			ORDER BY
+				orderby ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

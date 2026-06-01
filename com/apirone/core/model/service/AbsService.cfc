@@ -236,4 +236,23 @@ component output="false" accessors="true" {
 		return server[ "wireBox-apirone" ];
 	}
 
+	/**
+	 * Costruisce un array di bean a partire da un query result e una funzione di build.
+	 * Utilizzato nei metodi batch (getMany, search ottimizzato) per iterare righe di
+	 * query e costruire bean senza chiamate individuali al DB.
+	 *
+	 * @records Risultato della query con le righe da elaborare
+	 * @buildFn Funzione che riceve una riga (Struct) e restituisce il bean compilato
+	 * @return Array di bean
+	 */
+	private Array function $buildFromRecords( required Query records, required Function buildFn ){
+		var rows = [];
+
+		for ( var record in arguments.records ) {
+			ArrayAppend( rows, arguments.buildFn( record ) );
+		}
+
+		return rows;
+	}
+
 }

@@ -54,15 +54,15 @@
 			<cfif !IsNull( arguments.typeId )>
 				AND type_id = <cfqueryparam value="#arguments.typeId#" cfsqltype="Varchar">
 			</cfif>
-			
+
 			<cfif !IsNull( arguments.quotationItemId )>
 				AND quotation_item_id = <cfqueryparam value="#arguments.quotationItemId#" cfsqltype="Varchar">::uuid
 			</cfif>
-			
+
 			<cfif !IsNull( arguments.quotationZoneId )>
 				AND quotation_zone_id = <cfqueryparam value="#arguments.quotationZoneId#" cfsqltype="Varchar">::uuid
 			</cfif>
-			
+
 			<cfif !IsNull( arguments.quotationStatusHistoryId )>
 				AND quotation_status_history_id = <cfqueryparam value="#arguments.quotationStatusHistoryId#" cfsqltype="Integer">
 			</cfif>
@@ -161,7 +161,7 @@
 
 	<cffunction returntype="Boolean" name="delete">
 		<cfargument name="fileId" type="String" required="true">
-		
+
 		<cfquery name="local.q" datasource="apirone" result="result">
 			UPDATE files
 			SET deleted_at = CURRENT_TIMESTAMP(0)
@@ -170,6 +170,31 @@
 
 		<cfreturn true>
 
+	</cffunction>
+
+	<!---
+		Recupera in batch tutti i file collegati a una lista di valori entità.
+		Utilizzato da FileService.listByEntityIds() per pre-caricare file in blocco.
+		La colonna su cui filtrare è risolta dinamicamente tramite getDBField(entityKey).
+	--->
+	<cffunction name="findByEntityIds" returntype="Query" access="public">
+		<cfargument name="entityKey" type="String" required="true">
+		<cfargument name="entityValues" type="Array" required="true">
+
+		<!--- Risolve dinamicamente la colonna DB tramite getDBField(entityKey) --->
+		<cfset var field   = super.getDBField(arguments.entityKey)>
+		<cfset var idsList = ArrayToList(arguments.entityValues)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT file_id::varchar, *
+			FROM files
+			WHERE deleted_at IS NULL
+			AND #field.name#::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 
 </cfcomponent>

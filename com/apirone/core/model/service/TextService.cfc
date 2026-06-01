@@ -144,51 +144,71 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( Len( record.attribute_id ) ) {
 			entity.setKey( "attribute.id" );
 			entity.setValue( record.attribute_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.raw_value_id ) ) {
 			entity.setKey( "rawValue.id" );
 			entity.setValue( record.raw_value_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.finish_id ) ) {
 			entity.setKey( "finish.id" );
 			entity.setValue( record.finish_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.model_id ) ) {
 			entity.setKey( "model.id" );
 			entity.setValue( record.model_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.product_category_id ) ) {
 			entity.setKey( "productCategory.id" );
 			entity.setValue( record.product_category_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.product_id ) ) {
 			entity.setKey( "product.id" );
 			entity.setValue( record.product_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.line_id ) ) {
 			entity.setKey( "line.id" );
 			entity.setValue( record.line_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.font_id ) ) {
 			entity.setKey( "font.id" );
 			entity.setValue( record.font_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.country_id ) ) {
 			entity.setKey( "country.id" );
 			entity.setValue( record.country_id.toString() );
+
+			return entity;
 		}
 
 		if ( Len( record.article_id ) ) {
 			entity.setKey( "article.id" );
 			entity.setValue( record.article_id.toString() );
+
+			return entity;
 		}
 
 		/*
@@ -222,6 +242,65 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Recupera in batch tutti i testi collegati a una lista di entity.
+	 * Restituisce uno Struct chiave = entityValue, valore = Array di bean Text.
+	 *
+	 * @entityKey Chiave entità (es. "product.id", "finish.id")
+	 * @entityValues Array di valori entità
+	 * @return Struct mappato per entityValue -> Array di Text
+	 */
+	public Struct function listByEntityIds(
+		required String entityKey,
+		required Array entityValues
+	){
+		var records = getDao().findByEntityIds(
+			entityKey    = arguments.entityKey,
+			entityValues = arguments.entityValues
+		);
+		var map = {};
+
+		// Raggruppa i risultati della query per entityValue
+		for ( var record in records ) {
+			var entityValue = record[ getEntityValueColumn( arguments.entityKey ) ];
+			if ( !StructKeyExists( map, entityValue ) ) {
+				map[ entityValue ] = [];
+			}
+			var bean = buildFromResultRow( record );
+			ArrayAppend( map[ entityValue ], bean );
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean Text a partire da una riga del query, senza chiamata DB aggiuntiva.
+	 * Utilizzato da listByEntityIds() per assemblare i bean in batch.
+	 */
+	private com.apirone.core.model.bean.Text function buildFromResultRow( required Struct record ){
+		var bean = super.bean( "Text" );
+
+		// Campi diretti dal record
+		bean.setId( record.text_id );
+		bean.setName( record.text );
+
+		// Entity collegate, caricate singolarmente
+		bean.setLang( getLangService().get( record.lang_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setEntity( getEntity( record ) );
+		bean.setKind( getLookupService().get( "textKind", record.text_kind_id ) );
+
+		return bean;
+	}
+
+	/**
+	 * Restituisce il nome della colonna DB corrispondente alla entityKey.
+	 */
+	private String function getEntityValueColumn( required String entityKey ){
+		var field = super.getDBField( arguments.entityKey );
+		return field.name;
 	}
 
 }

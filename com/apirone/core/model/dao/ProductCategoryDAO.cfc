@@ -144,5 +144,26 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
+	<!---
+		Recupera in batch più ProductCategory dato un array di ID.
+		Utilizzato da ProductCategoryService.getMany() per pre-caricare categorie in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<!--- Converte l'array di ID in lista per la clausola IN --->
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM product_categories
+			WHERE product_category_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>
-	

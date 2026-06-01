@@ -119,4 +119,26 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i prezzi collegati a una lista di productId.
+		Utilizzato da PriceService.listByProductIds() per pre-caricare prezzi in blocco.
+	--->
+	<cffunction name="findByProductIds" returntype="Query" access="public">
+		<cfargument name="productIds" type="Array" required="true">
+
+		<!--- Converte l'array di ID in lista per la clausola IN --->
+		<cfset var idsList = ArrayToList(arguments.productIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE product_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

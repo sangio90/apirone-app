@@ -173,7 +173,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var prices = list( productId = product.getId(), typeId = arguments.typeId );
 
 			if ( prices.len() ) {
-				
+
 				for ( var price in prices ) {
 					var bean   = super.bean( "Price" );
 					var entity = super.bean( "Entity" );
@@ -319,6 +319,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getLogger().error( "No entity linked to this price. Price Id: [#record.price_id#]" );
 
-	}	
+	}
+
+	/**
+	 * Recupera in batch tutti i prezzi collegati a una lista di productId.
+	 * Restituisce uno Struct chiave = productId, valore = Array di bean Price.
+	 * Sostituisce chiamate ripetute a list() per ogni prodotto.
+	 *
+	 * @productIds Array di productId
+	 * @return Struct mappato per productId -> Array di Price
+	 */
+	public Struct function listByProductIds( required Array productIds ){
+		var records = getDao().findByProductIds( productIds = arguments.productIds );
+		var map     = {};
+
+		// Raggruppa i risultati della query per productId
+		for ( var record in records ) {
+			var productId = record.product_id;
+			if ( !StructKeyExists( map, productId ) ) {
+				map[ productId ] = [];
+			}
+			var bean = buildFromResultRow( record );
+			ArrayAppend( map[ productId ], bean );
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean Price a partire da una riga del query, senza chiamata DB aggiuntiva.
+	 * Utilizzato da listByProductIds() per assemblare i bean in batch.
+	 */
+	private com.apirone.core.model.bean.Price function buildFromResultRow( required Struct record ){
+		var bean = super.bean( "Price" );
+
+		// Campi diretti dal record
+		bean.setId( record.price_id );
+		bean.setAmount( record.amount );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate: caricate singolarmente (lookup leggeri)
+		bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
+		bean.setType( getPriceTypeService().get( record.price_type_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setEntity( getEntity( record ) );
+
+		return bean;
+	}
 
 }

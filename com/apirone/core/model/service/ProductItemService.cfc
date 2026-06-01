@@ -390,4 +390,74 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
+	/**
+	 * Recupera in batch tutti i ProductItem collegati a una lista di productId.
+	 * Restituisce uno Struct chiave = productId, valore = Array di bean ProductItem.
+	 * Sostituisce chiamate ripetute a list() per ogni prodotto.
+	 *
+	 * @productIds Array di productId
+	 * @return Struct mappato per productId -> Array di ProductItem
+	 */
+	public Struct function listByProductIds( required Array productIds ){
+		var records = getDao().findByProductIds( productIds = arguments.productIds );
+		var map     = {};
+
+		// Raggruppa i risultati della query per productId
+		for ( var record in records ) {
+			var productId = record.product_id;
+			if ( !StructKeyExists( map, productId ) ) {
+				map[ productId ] = [];
+			}
+			var bean = buildFromResultRow( record );
+			ArrayAppend( map[ productId ], bean );
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean ProductItem a partire da una riga del query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	private com.apirone.core.model.bean.ProductItem function buildFromResultRow( required Struct record ){
+		var bean = super.bean( "ProductItem" );
+
+		// Campi diretti dal record
+		bean.setId( record.product_item_id );
+		bean.setProductId( record.product_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setImportant( record.important );
+		bean.setOrderBy( record.orderby );
+
+		// Entity ricorsiva: se presente, carica l'origine (chiamata singola per item)
+		bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
+
+		// Entity collegate caricate singolarmente
+		bean.setStatus( getStatusService().get( record.status_id ) );
+
+		var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
+		bean.setAttributeValue( attributeValue );
+		bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
+		bean.setComponentCount( 0 );
+
+		bean.setChildren( [] );
+
+		// Sub-entity caricate con chiamate individuali al DB
+		bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
+
+		var images = getFileService().list( productItemId = record.product_item_id );
+
+		if ( Len( images ) ) {
+			bean.setImages( images );
+		} else {
+			// Fallback: cerca immagini per attributeValueId
+			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
+			if ( Len( images ) ) {
+				bean.setImages( images );
+			}
+		}
+
+		return bean;
+	}
+
 }

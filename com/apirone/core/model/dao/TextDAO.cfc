@@ -201,11 +201,42 @@
 						<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 					</cfif>
 				--->
-
 			WHERE
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.text.getId()>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i testi collegati a una lista di valori entità.
+		Utilizzato da TextService.listByEntityIds() per pre-caricare testi in blocco.
+		La colonna su cui filtrare è risolta dinamicamente tramite getDBField(entityKey).
+	--->
+	<cffunction name="findByEntityIds" returntype="Query" access="public">
+		<cfargument name="entityKey" type="String" required="true">
+		<cfargument name="entityValues" type="Array" required="true">
+
+		<!--- Risolve dinamicamente la colonna DB tramite getDBField(entityKey) --->
+		<cfset var field   = super.getDBField(arguments.entityKey)>
+		<cfset var idsList = ArrayToList(arguments.entityValues)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				text_id,
+				product_id::varchar,
+				finish_id::varchar,
+				attribute_id::varchar,
+				font_id::varchar,
+				country_id::varchar,
+				*
+			FROM texts
+			WHERE #field.name#::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

@@ -46,11 +46,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		arguments["orderBy"] = super.createOrderBy( arguments.orderBy );
 
 		var records = getDao().find( argumentCollection = arguments );
-		
+
 		records.each( function( record ){
 			rows.add( get( fileId = record.file_id ) );
 		} );
-		
+
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
@@ -223,6 +223,81 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 
 		return mapping[ mime ] ?: null;
+	}
+
+	/**
+	 * Recupera in batch tutti i file collegati a una lista di entity.
+	 * Restituisce uno Struct chiave = entityValue, valore = Array di bean File.
+	 * Sostituisce chiamate ripetute a list() per ogni entity.
+	 *
+	 * @entityKey Chiave entità (es. "product.id", "quotationItem.id")
+	 * @entityValues Array di valori entità
+	 * @return Struct mappato per entityValue -> Array di File
+	 */
+	public Struct function listByEntityIds(
+		required String entityKey,
+		required Array entityValues
+	){
+		var records = getDao().findByEntityIds(
+			entityKey    = arguments.entityKey,
+			entityValues = arguments.entityValues
+		);
+		var map = {};
+
+		// Raggruppa i risultati della query per entityValue
+		for ( var record in records ) {
+			var entityValue = record[ getEntityValueColumn( arguments.entityKey ) ];
+			if ( !StructKeyExists( map, entityValue ) ) {
+				map[ entityValue ] = [];
+			}
+			var bean = buildFromResultRow( record );
+			ArrayAppend( map[ entityValue ], bean );
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean File a partire da una riga del query, senza chiamata DB aggiuntiva.
+	 * Utilizzato da listByEntityIds() per assemblare i bean in batch.
+	 */
+	private com.apirone.core.model.bean.File function buildFromResultRow( required Struct record ){
+		var obj = super.bean( "File" );
+
+		// Campi diretti dal record
+		obj.setId( record.file_id.toString() );
+		obj.setName( record.name );
+
+		// Entity collegate: caricate singolarmente (lookup leggeri)
+		obj.setType( getFileTypeService().get( record.type_id ) );
+
+		var kind = getLookupService().get( "fileKind", record.kind_id );
+
+		if ( IsNull( kind ) ) {
+			Throw(
+				type    = "apirone.error.file.kindNotFound",
+				message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
+			);
+		}
+
+		obj.setKind( kind );
+		obj.setSize( record.size );
+		obj.setWidth( record.width );
+		obj.setHeight( record.height );
+		obj.setAlt( record.alt );
+		obj.setDescription( record.description );
+		obj.setExtension( record.extension );
+		obj.setDirectory( record.directory );
+
+		return obj;
+	}
+
+	/**
+	 * Restituisce il nome della colonna DB corrispondente alla entityKey.
+	 */
+	private String function getEntityValueColumn( required String entityKey ){
+		var field = super.getDBField( arguments.entityKey );
+		return field.name;
 	}
 
 }
