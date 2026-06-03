@@ -32,6 +32,7 @@ AP.line.detail = ( function() {
             id: "",
             code: "",
             name: "",
+            hscode: "",
             selectedCategories: [],
             category: {
                 id: "",
