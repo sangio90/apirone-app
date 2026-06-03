@@ -115,6 +115,7 @@ AP.quotation.header = ( function() {
 			commission4: null,
 			commission5: null,
 			referenteAmministrativo: "",
+			referenteSpedizione: "",
         },
         title: "Modifica preventivo",
         totals: {

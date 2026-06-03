@@ -25,7 +25,8 @@
 		"commission3",
 		"commission4",
 		"commission5",
-		"referenteAmministrativo"
+		"referenteAmministrativo",
+		"referenteSpedizione"
 	],
 	profiles = {
 		detail = {
@@ -66,7 +67,8 @@
 				"commission3",
 				"commission4",
 				"commission5",
-				"referenteAmministrativo"
+				"referenteAmministrativo",
+		"referenteSpedizione"
 			]
 		}
 	}

@@ -281,6 +281,13 @@
 							</div>
 						</div>
 
+						<div class="form-group row mb-3">
+							<label class="col-3 control-label text-sm-end pt-2">Referente spedizione</label>
+							<div class="col-9">
+								<input type="text" class="form-control" data-bind="value: detailForm.data.referenteSpedizione">
+							</div>
+						</div>
+
 					</div>
 
 				</div>

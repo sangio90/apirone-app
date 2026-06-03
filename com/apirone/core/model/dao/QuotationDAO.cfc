@@ -71,7 +71,8 @@
 				quotations.commission3,
 				quotations.commission4,
 				quotations.commission5,
-				quotations.referente_amministrativo
+				quotations.referente_amministrativo,
+				quotations.referente_spedizione
 			FROM quotations
 				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
 			WHERE 1=1
@@ -170,7 +171,8 @@
 				commission3,
 				commission4,
 				commission5,
-				referente_amministrativo
+				referente_amministrativo,
+				referente_spedizione
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -272,7 +274,8 @@
 				<cfelse>
 					NULL
 				</cfif>,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -465,7 +468,8 @@
 						NULL
 					</cfif>,
 
-				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">
+				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
+				referente_spedizione = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
@@ -626,7 +630,8 @@
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
-				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5
+				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
+				MMRIFSPE
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -685,7 +690,8 @@
 				<cfqueryparam value="#arguments.data.MMPERPR2 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#arguments.data.MMPERPR3 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#arguments.data.MMPERPR4 ?: 0#" cfsqltype="decimal" scale="2">,
-				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">
+				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">,
+				<cfqueryparam value="#left(arguments.data.MMRIFSPE,40)#" cfsqltype="varchar">
 			)
 		</cfquery>
 
