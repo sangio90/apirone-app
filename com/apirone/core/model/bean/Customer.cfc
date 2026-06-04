@@ -16,6 +16,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="contactPersonName" type="String";
 	property name="contactPersonEmail" type="String";
 	property name="lingua" type="String";
+	property name="accountType" type="String";
 
 	public Customer function init(){
 

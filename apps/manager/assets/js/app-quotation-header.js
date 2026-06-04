@@ -116,6 +116,7 @@ AP.quotation.header = ( function() {
 			commission5: null,
 			referenteAmministrativo: "",
 			referenteSpedizione: "",
+			customerType: "",
         },
         title: "Modifica preventivo",
         totals: {
@@ -520,6 +521,8 @@ AP.quotation.header = ( function() {
 						viewModel.set("detailForm.data.lang", lang);
 					}
 				}
+				var accountType = customer && typeof customer === "object" ? customer.accountType : null;
+				viewModel.set("detailForm.data.customerType", accountType || "");
 			}
 
 			if (e.field === "detailForm.data.nessunAgente") {

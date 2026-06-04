@@ -199,6 +199,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !isNull(json.commission5) && isNumeric(json.commission5) ) quotation.setCommission5( json.commission5 );
 		if ( !isNull(json.referenteAmministrativo) ) quotation.setReferenteAmministrativo( json.referenteAmministrativo );
 		if ( !isNull(json.referenteSpedizione) ) quotation.setReferenteSpedizione( json.referenteSpedizione );
+		if ( !isNull(json.customerType) ) quotation.setCustomerType( json.customerType );
 
 		if ( !Len( json.id ) ) {
 

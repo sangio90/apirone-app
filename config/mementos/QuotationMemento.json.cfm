@@ -26,7 +26,8 @@
 		"commission4",
 		"commission5",
 		"referenteAmministrativo",
-		"referenteSpedizione"
+		"referenteSpedizione",
+		"customerType"
 	],
 	profiles = {
 		detail = {
@@ -68,7 +69,8 @@
 				"commission4",
 				"commission5",
 				"referenteAmministrativo",
-		"referenteSpedizione"
+			"referenteSpedizione",
+			"customerType"
 			]
 		}
 	}

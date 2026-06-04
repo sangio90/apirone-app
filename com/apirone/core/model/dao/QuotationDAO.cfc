@@ -172,7 +172,8 @@
 				commission4,
 				commission5,
 				referente_amministrativo,
-				referente_spedizione
+				referente_spedizione,
+				customer_type
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -275,7 +276,8 @@
 					NULL
 				</cfif>,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -469,7 +471,8 @@
 					</cfif>,
 
 				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
-				referente_spedizione = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">
+				referente_spedizione = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">,
+				customer_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
@@ -631,7 +634,7 @@
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
-				MMRIFSPE
+				MMRIFSPE, CFTIPCLF
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -691,7 +694,8 @@
 				<cfqueryparam value="#arguments.data.MMPERPR3 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#arguments.data.MMPERPR4 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">,
-				<cfqueryparam value="#left(arguments.data.MMRIFSPE,40)#" cfsqltype="varchar">
+				<cfqueryparam value="#left(arguments.data.MMRIFSPE,40)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFTIPCLF,50)#" cfsqltype="varchar">
 			)
 		</cfquery>
 
