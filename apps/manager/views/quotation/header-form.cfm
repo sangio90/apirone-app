@@ -64,7 +64,7 @@
 						<div class="col-9">
 							<input type="text" name="customer" class="form-control" id="qt-customer"
 								data-bind="source: crmCustomers, value: detailForm.data.customer"
-								data-text-field="name"
+								data-text-field="displayLabel"
 								data-role="autocomplete"
 								data-value-primitive="false"
 								data-minlength="4"

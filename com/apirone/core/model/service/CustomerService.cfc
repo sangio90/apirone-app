@@ -23,7 +23,7 @@
 		if ( !IsNull( crmData ) && !IsNull( crmData.data ) ) {
 			crmData  = crmData.data;
 			customer = getCrmMapper().mapCustomer( crmData );
-			
+
 			cm.put( getCacheScope(), customerId, customer );
 		}
 

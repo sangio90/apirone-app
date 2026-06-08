@@ -21,13 +21,22 @@ AP.quotation.header = ( function() {
     var pub = {};
     var fields = AP.quotation.fields;
 
+    function buildCustomerDisplay(c) {
+        var company = c.company || "";
+        var rs      = c.ragioneSociale || "";
+        var name    = c.name || "";
+        var label   = (company && rs && company !== rs) ? company + " (" + rs + ")" : (rs || company);
+        return label ? label + (name ? " / " + name : "") : name;
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
             name: "",
             customer: {
                 id: "",
-                name: ""
+                name: "",
+                ragioneSociale: ""
             },
             shippingProfile: {
                 id: "",
@@ -164,8 +173,12 @@ AP.quotation.header = ( function() {
                 }
             },
             schema: {
-                data: function( xhr ) {
-                    return xhr.data;
+                data: function( xhr ) { return xhr.data; },
+                parse: function( xhr ) {
+                    ( xhr.data || [] ).forEach( function( item ) {
+                        item.displayLabel = buildCustomerDisplay( item );
+                    } );
+                    return xhr;
                 }
             }
         } ),
@@ -523,6 +536,10 @@ AP.quotation.header = ( function() {
 				}
 				var accountType = customer && typeof customer === "object" ? customer.accountType : null;
 				viewModel.set("detailForm.data.customerType", accountType || "");
+				if (customer && typeof customer === "object" && customer.id) {
+					var ac = $( "#qt-customer" ).data( "kendoAutoComplete" );
+					if (ac) ac.value( buildCustomerDisplay( customer ) );
+				}
 			}
 
 			if (e.field === "detailForm.data.nessunAgente") {

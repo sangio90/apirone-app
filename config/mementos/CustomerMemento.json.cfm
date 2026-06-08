@@ -3,6 +3,7 @@
 		"id",
 		"shortId",
 		"name",
+		"ragioneSociale",
 		"company",
 		"description",
 		"phone",
