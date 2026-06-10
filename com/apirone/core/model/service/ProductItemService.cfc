@@ -416,10 +416,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * Costruisce un bean ProductItem a partire da una riga del query, senza chiamata DB aggiuntiva
+	 * Costruisce un bean ProductItem a partire da una riga della query, senza chiamata DB aggiuntiva
 	 * per il record principale.
 	 */
-	private com.apirone.core.model.bean.ProductItem function buildFromResultRow( required Struct record ){
+	private com.apirone.core.model.bean.ProductItem function buildFromResultRow( required any record ){
 		var bean = super.bean( "ProductItem" );
 
 		// Campi diretti dal record

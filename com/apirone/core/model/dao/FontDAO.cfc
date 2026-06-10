@@ -41,6 +41,11 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				font_id::varchar,
+				code,
+				directory,
+				height_width_ratio,
+				font_family_id,
+				created_at,
 				COUNT(font_id) OVER() AS total
 			FROM
 				fonts

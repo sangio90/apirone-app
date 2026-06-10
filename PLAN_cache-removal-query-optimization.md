@@ -53,11 +53,11 @@ T1 entities are worked on first (no dependencies), then T2, then T3 (depends on 
 
 ---
 
-## Phase 1: Foundation — Batch Infrastructure
+## Phase 1: Foundation — Batch Infrastructure &nbsp;&nbsp;`✅ DONE`
 
 > **Goal:** Add shared batch-query methods to `AbsDAO` and `AbsService` that all entities can reuse. No existing behavior is changed.
 
-### 1.1 AbsDAO — `readByIds(idArray)`
+### 1.1 AbsDAO — `readByIds(idArray)` &nbsp;&nbsp;`✅ DONE`
 
 **File:** `com/apirone/core/model/dao/AbsDAO.cfc`
 
@@ -91,7 +91,7 @@ public Query function readByIds(
 </cffunction>
 ```
 
-### 1.2 AbsService — `getMany(idArray)` and batch helpers
+### 1.2 AbsService — `getMany(idArray)` and batch helpers &nbsp;&nbsp;`✅ DONE`
 
 **File:** `com/apirone/core/model/service/AbsService.cfc`
 
@@ -102,7 +102,7 @@ Add:
 
 For the `buildFromQuery` approach: add a lightweight version of `build()` that takes a query row instead of doing a new DB read. This is straightforward for T1 entities (few sub-queries) and becomes complex for T3. The T3 approach uses preloaded maps (see Phase 4).
 
-### 1.3 Sub-service batch list methods (Phase 4 pre-requisite)
+### 1.3 Sub-service batch list methods (Phase 4 pre-requisite) &nbsp;&nbsp;`✅ DONE`
 
 These methods enable batch preloading for T3 entities. They can be added early since they don't change existing behavior:
 
@@ -134,7 +134,7 @@ These methods enable batch preloading for T3 entities. They can be added early s
 
 ---
 
-## Phase 2: T1 — Light Entities (≤3 DB queries in build)
+## Phase 2: T1 — Light Entities (≤3 DB queries in build) &nbsp;&nbsp;`✅ DONE` (20/20 done)
 
 > **Each entity below is fully independent.** Complete and test one at a time.
 
@@ -213,7 +213,7 @@ Lines 48 and 78 have `getCasceScope()` (missing `h`). This is a latent bug — t
 
 ---
 
-## Phase 3: T2 — Medium Entities (4–15 DB queries in build)
+## Phase 3: T2 — Medium Entities (4–15 DB queries in build) &nbsp;&nbsp;`❌ TO DO`
 
 > **Each entity is independent** (except where noted). Complete and test one at a time.
 
@@ -328,7 +328,7 @@ These services have dead code (`getCacheKey()` throws `"Use cache manager and sc
 
 ---
 
-## Phase 4: T3 — Heavy Entities (16–80+ DB queries in build)
+## Phase 4: T3 — Heavy Entities (16–80+ DB queries in build) &nbsp;&nbsp;`❌ TO DO`
 
 > **These are the performance-critical entities.** They cascade deeply into sub-entity chains.
 
@@ -544,7 +544,7 @@ Already listed in T2 but the `findByListOfProductItemIds()` method uses complex 
 
 ---
 
-## Phase 5: CacheManager Disarm & Removal
+## Phase 5: CacheManager Disarm & Removal &nbsp;&nbsp;`❌ TO DO`
 
 ### 5.1 Remove CacheManager from WireBox
 
@@ -608,7 +608,7 @@ These should all be removed in Phases 2–4. Phase 5 is a final sweep to catch a
 
 ---
 
-## Phase 6: Bug Fixes & Cleanup
+## Phase 6: Bug Fixes & Cleanup &nbsp;&nbsp;`❌ TO DO`
 
 ### 6.1 i18nService — `getCasceScope()` typo
 
@@ -748,7 +748,7 @@ Phase 6 (Bug fixes & cleanup)
 Phase 7 (Deprecated method removal)
 ```
 
-### Phase 7: Deprecated Method Removal (TBD)
+### Phase 7: Deprecated Method Removal (TBD) &nbsp;&nbsp;`❌ TO DO`
 
 > **Note:** This phase is a placeholder. When the time comes, a proper research pass will identify:
 >

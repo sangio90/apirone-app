@@ -3,23 +3,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="RolePermissionDAO";
 	property name="lookupService" inject="LookupService";
 	property name="permissionService" inject="PermissionService";
-	property name="roleService" inject="RoleService";
-
-	property name="cacheScope" type="String" default="RolePermission.bean";
 
 	public com.apirone.core.model.bean.RolePermission function get( required String rolePermissionId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.rolePermissionId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.rolePermissionId );
-		cm.put( getCacheScope(), arguments.rolePermissionId, bean );
-
-		return bean;
+		return build( arguments.rolePermissionId );
 	}
 
 	public Array function list(){
@@ -36,10 +22,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( rolePermissionid = record.role_permission_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -51,9 +38,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.RolePermission rolePermission ){
 		var newId = getDao().insert( arguments.rolePermission );
-
-		getRoleService().removeCache( getRoleService().get( rolePermission.getRoleId() ) );
-
 
 		return newId;
 	}
@@ -68,8 +52,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.rolePermissionId );
 				outcome.setData( { "deletedCount" = result } )
-				//super.getCacheManager().remove( getCacheScope(), arguments.rolePermissionId );
-				removeCache( get( arguments.rolePermissionId ) );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -81,30 +63,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public Void function removeCache( required com.apirone.core.model.bean.RolePermission rolePermission ){
-
-		getRoleService().removeCache( getRoleService().get( rolePermission.getRoleId() ) );
-		super.getCacheManager().remove( getCacheScope(), arguments.rolePermission.getId() );
-
-	}
-
 
 	private com.apirone.core.model.bean.RolePermission function build( required String rolePermissionId ){
 		var record = getDao().read( arguments.rolePermissionId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "RolePermission" );
-
-			bean.setId( record.role_permission_id );
-			bean.setPermission( getPermissionService().get( record.permission_id ) );
-			bean.setRoleId( record.role_id );
-			//bean.setActive( true );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean RolePermission a partire da una riga della query.
+	 * La sub-entity Permission è caricata con chiamata individuale.
+	 */
+	private com.apirone.core.model.bean.RolePermission function buildFromFindRow( required any record ){
+		var bean = super.bean( "RolePermission" );
+
+		// Campi diretti dal record
+		bean.setId( record.role_permission_id );
+		bean.setRoleId( record.role_id );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegata (Permission è caricato singolarmente)
+		bean.setPermission( getPermissionService().get( record.permission_id ) );
+		//bean.setActive( true );
+
+		return bean;
 	}
 
 }

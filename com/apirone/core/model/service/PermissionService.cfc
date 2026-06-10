@@ -3,21 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="PermissionDAO";
 	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="Permission.bean";
-
 	public com.apirone.core.model.bean.Permission function get( required String permissionId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.permissionId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.permissionId );
-		cm.put( getCacheScope(), arguments.permissionId, bean );
-
-		return bean;
+		return build( arguments.permissionId );
 	}
 
 	public Array function list(
@@ -26,15 +13,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String entityId,
 		required Array orderBy  = [ { field = "permission.id", desc = "asc" } ]
 	){
-		
+
 		var rows   = [];
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( permissionId = record.permission_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		return rows;
@@ -44,18 +32,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.permissionId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Permission" );
-
-			bean.setId( record.permission_id );
-			bean.setName( record.permission );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setEntity( getLookupService().get( "entity", record.entity_id ) );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Permission a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.Permission function buildFromFindRow( required any record ){
+		var bean = super.bean( "Permission" );
+
+		// Campi diretti dal record
+		bean.setId( record.permission_id );
+		bean.setName( record.permission );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegata
+		bean.setEntity( getLookupService().get( "entity", record.entity_id ) );
+
+		return bean;
 	}
 
 }

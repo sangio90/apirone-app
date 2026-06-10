@@ -23,6 +23,10 @@
 			SELECT
 				quotation_item_position_id::varchar,
 				quotation_item_id::varchar,
+				coordinate_x,
+				coordinate_y,
+				visible,
+				angle,
 				COUNT(quotation_item_position_id) OVER() AS total
 			FROM
 				quotation_item_positions

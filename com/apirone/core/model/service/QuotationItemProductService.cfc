@@ -4,20 +4,9 @@
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="ProductService" inject="ProductService";
 	property name="QuotationItemProductService" inject="QuotationItemProductService";
-	property name="cacheScope" type="String" default="QuotationItemProduct.bean";
 
 	public com.apirone.core.model.bean.QuotationItemProduct function get( required String productId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.productId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.productId );
-		cm.put( getCacheScope(), arguments.productId, bean );
-
-		return bean;
+		return build( arguments.productId );
 	}
 
 	public Array function list(){
@@ -35,10 +24,12 @@
 
 		var rows    = [];
 		var result  = super.getResult();
+
+		// // Il find() restituisce già le FK: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( productId = record.quotation_item_product_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -53,13 +44,10 @@
 		var obj     = get( arguments.productId );
 
 		outcome.setData( { productId = arguments.productId } );
-		getDao().delete( arguments.productId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.productId );
-				cm.remove( getCacheScope(), arguments.productId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -79,7 +67,6 @@
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemProduct product ){
 		getDao().update( arguments.product );
-		super.getCacheManager().remove( getCacheScope(), arguments.product.getId() );
 
 		return arguments.product.getId();
 	}
@@ -87,18 +74,30 @@
 	private com.apirone.core.model.bean.QuotationItemProduct function build( required String productId ){
 		var record = getDao().read( arguments.productId );
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationItemProduct" );
-			bean.setId( record.quotation_item_product_id );
-			bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
-			bean.setProduct( getProductService().get( record.product_id ) );
-
-			bean.setOrigin(
-				IsNull( record.origin_id ) ? NullValue() : getQuotationItemProductService().get( record.origin_id )
-			);
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean QuotationItemProduct a partire da una riga della query.
+	 * Le sub-entity (QuotationItem, Product, origin) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.QuotationItemProduct function buildFromFindRow( required any record ){
+		var bean = super.bean( "QuotationItemProduct" );
+
+		// Campi diretti dal record
+		bean.setId( record.quotation_item_product_id );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setQuotationItem( getQuotationItemService().get( record.quotation_item_id ) );
+		bean.setProduct( getProductService().get( record.product_id ) );
+
+		bean.setOrigin(
+			IsNull( record.origin_id ) ? NullValue() : getQuotationItemProductService().get( record.origin_id )
+		);
+
+		return bean;
 	}
 
 }

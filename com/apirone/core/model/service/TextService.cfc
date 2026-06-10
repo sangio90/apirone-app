@@ -255,7 +255,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function listByEntityIds(
 		required String entityKey,
 		required Array entityValues
-	){
+	) {
 		var records = getDao().findByEntityIds(
 			entityKey    = arguments.entityKey,
 			entityValues = arguments.entityValues
@@ -276,10 +276,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * Costruisce un bean Text a partire da una riga del query, senza chiamata DB aggiuntiva.
+	 * Costruisce un bean Text a partire da una riga della query, senza chiamata DB aggiuntiva.
 	 * Utilizzato da listByEntityIds() per assemblare i bean in batch.
 	 */
-	private com.apirone.core.model.bean.Text function buildFromResultRow( required Struct record ){
+	private com.apirone.core.model.bean.Text function buildFromResultRow( required any record ){
 		var bean = super.bean( "Text" );
 
 		// Campi diretti dal record

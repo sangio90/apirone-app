@@ -3,21 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="SearchDAO";
 	property name="productService" inject="ProductService";
 
-	property name="cacheScope" type="String" default="SearchTerm.bean";
-
 	public com.apirone.core.model.bean.SearchTerm function get( required String searchTermId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.searchTermId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.searchTermId );
-		cm.put( getCacheScope(), arguments.searchTermId, bean );
-
-		return bean;
+		return build( arguments.searchTermId );
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -31,10 +18,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( searchTermId = record.search_term_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -52,17 +40,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.searchTermId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "SearchTerm" );
-
-			bean.setId( record.search_term_id );
-			bean.setTerm( record.search_term );
-			bean.setCreatedAt( record.created_at );
-			bean.setProduct( getProductService().get( record.product_id ) );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean SearchTerm a partire da una riga della query.
+	 * La sub-entity Product è caricata con chiamata individuale.
+	 */
+	private com.apirone.core.model.bean.SearchTerm function buildFromFindRow( required any record ){
+		var bean = super.bean( "SearchTerm" );
+
+		// Campi diretti dal record
+		bean.setId( record.search_term_id );
+		bean.setTerm( record.search_term );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegata (Product è caricato singolarmente)
+		bean.setProduct( getProductService().get( record.product_id ) );
+
+		return bean;
 	}
 
 }

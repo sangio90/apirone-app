@@ -347,10 +347,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * Costruisce un bean Price a partire da una riga del query, senza chiamata DB aggiuntiva.
+	 * Costruisce un bean Price a partire da una riga della query, senza chiamata DB aggiuntiva.
 	 * Utilizzato da listByProductIds() per assemblare i bean in batch.
 	 */
-	private com.apirone.core.model.bean.Price function buildFromResultRow( required Struct record ){
+	private com.apirone.core.model.bean.Price function buildFromResultRow( required any record ){
 		var bean = super.bean( "Price" );
 
 		// Campi diretti dal record

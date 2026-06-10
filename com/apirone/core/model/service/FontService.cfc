@@ -5,21 +5,8 @@
 	property name="fontFamilyService" inject="FontFamilyService";
 	property name="textService" inject="TextService";
 
-	property name="cacheScope" type="String" default="Font.bean";
-
 	public com.apirone.core.model.bean.Font function get( required String fontId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.fontId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.fontId );
-		cm.put( getCacheScope(), arguments.fontId, bean );
-
-		return bean;
+		return build( arguments.fontId );
 	}
 
 	public Array function list(){
@@ -38,10 +25,11 @@
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "font" );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( fontId = record.font_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -119,8 +107,6 @@
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.font.getId() );
-
 		return arguments.font.getId();
 	}
 
@@ -141,8 +127,6 @@
 					message = "Font [#arguments.fontId#] deleted",
 					payload = { "id" = arguments.fontId }
 				);
-
-				super.getCacheManager().remove( getCacheScope(), arguments.fontId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -163,23 +147,34 @@
 		var record = getDao().read( arguments.fontId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Font" );
-
-			bean.setId( record.font_id );
-			bean.setCode( record.code );
-			bean.setDirectory( record.directory );
-			bean.setHeightWidthRatio( record.height_width_ratio );
-			bean.setFontFamily( 
-				!IsNull( record.font_family_id ) ? getFontFamilyService().get( record.font_family_id ) : super.bean( "FontFamily" )
-			)
-
-			bean.setTexts( getTextService().list( fontId = record.font_id ) );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Font a partire da una riga della query.
+	 * Le sub-entity (FontFamily, Text) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Font function buildFromFindRow( required any record ){
+		var bean = super.bean( "Font" );
+
+		// Campi diretti dal record
+		bean.setId( record.font_id );
+		bean.setCode( record.code );
+		bean.setDirectory( record.directory );
+		bean.setHeightWidthRatio( record.height_width_ratio );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setFontFamily(
+			!IsNull( record.font_family_id ) ? getFontFamilyService().get( record.font_family_id ) : super.bean( "FontFamily" )
+		)
+
+		bean.setTexts( getTextService().list( fontId = record.font_id ) );
+		bean.setCreatedAt( record.created_at );
+
+		return bean;
 	}
 
 }

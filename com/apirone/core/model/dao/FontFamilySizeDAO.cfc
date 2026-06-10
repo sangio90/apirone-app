@@ -24,8 +24,11 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				font_family_size_id,
-				COUNT(font_family_size_id) OVER() AS total
+				font_family_sizes.font_family_size_id,
+				font_family_sizes.font_family_size,
+				font_family_sizes.font_family_id,
+				font_family_sizes.enabled_pictograms,
+				COUNT(font_family_sizes.font_family_size_id) OVER() AS total
 			FROM
 				font_family_sizes
 					INNER JOIN font_families USING (font_family_id)

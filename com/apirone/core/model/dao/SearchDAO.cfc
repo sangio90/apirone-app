@@ -23,6 +23,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				search_term_id,
+				search_term,
+				created_at,
+				product_id::varchar,
 				COUNT(search_term_id) OVER() AS total
 			FROM
 				utils.search_terms

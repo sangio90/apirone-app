@@ -19,6 +19,11 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_item_price_line_id,
+				amount,
+				cost,
+				quotation_item_price_id,
+				name,
+				created_at,
 				COUNT(quotation_item_price_line_id) OVER() AS total
 			FROM 
 				quotation_item_price_lines
@@ -71,7 +76,7 @@
 	<cffunction name="update" returntype="Numeric">
 		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE quotation_items_price_lines
+			UPDATE quotation_item_price_lines
 			SET
 				name = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPriceLine.getName()#">,
 				amount = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPriceLine.getAmount()#">,

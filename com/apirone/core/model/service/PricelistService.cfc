@@ -1,21 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="PricelistDAO";
-	property name="cacheScope" type="String" default="Pricelist.bean";
 
 	public com.apirone.core.model.bean.Pricelist function get( required String pricelistId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.pricelistId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.pricelistId );
-		cm.put( getCacheScope(), arguments.pricelistId, bean );
-
-		return bean;
+		return build( arguments.pricelistId );
 	}
 
 	public Array function list(){
@@ -31,10 +19,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Unica query per tutti i record, senza chiamate individuali a get()
 		var records = getDao().read( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( pricelistId = record.pricelist_id ) );
+			rows.add( buildFromQueryRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -47,13 +36,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.pricelistId );
 
 		if ( record.RecordCount ) {
-			var obj = super.bean( "Pricelist" );
-			obj.setId( record.pricelist_id.toString() );
-			obj.setName( record.pricelist );
-			return obj;
+			return buildFromQueryRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Pricelist a partire da una riga della query, senza chiamata DB aggiuntiva.
+	 * Utilizzato sia da build() (record singolo) che da read() (iterazione batch).
+	 */
+	private com.apirone.core.model.bean.Pricelist function buildFromQueryRow( required any record ){
+		var obj = super.bean( "Pricelist" );
+
+		// Campi diretti dal record (il pricelist non ha sub-entity)
+		obj.setId( record.pricelist_id.toString() );
+		obj.setName( record.pricelist );
+
+		return obj;
 	}
 
 }

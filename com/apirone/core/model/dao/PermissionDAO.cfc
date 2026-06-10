@@ -26,6 +26,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				permission_id,
+				permission,
+				created_at,
+				entity_id,
 				COUNT(permission_id) OVER() AS total
 			FROM
 				membership.permissions
@@ -37,8 +40,8 @@
 				</cfif>
 				
 				<cfif !IsNull( arguments.permissionId )>
-					permissions.permission_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.permissionId#">
-				</cfif>
+				AND permissions.permission_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.permissionId#">
+			</cfif>
 				
 				<cfif !IsNull( arguments.str )>
 					AND
@@ -65,16 +68,14 @@
 	<cffunction name="insert" returntype="String" output="false">
 		<cfargument name="permission" type="com.apirone.core.model.bean.Permission" required="true">
 
-		<cfset var categories = super.getCategoriesAsArray( line.getCategories() )>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO membership.permissions (
 				permission_id,
-				permisssion
+				permission
 			)
 			VALUES (
-				<cfqueryparam cfsqltype="varchar" value="#arguments.permisssion.getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.permisssion.getName()#">
+				<cfqueryparam cfsqltype="varchar" value="#arguments.permission.getId()#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.permission.getName()#">
 			) RETURNING permission_id
 		</cfquery>
 

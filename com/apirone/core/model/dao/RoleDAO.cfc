@@ -24,6 +24,11 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				role_id,
+				role,
+				created_at,
+				role_type_id,
+				quotation_max_discount,
+				quotation_max_amount,
 				COUNT(role_id) OVER() AS total
 			FROM
 				membership.roles

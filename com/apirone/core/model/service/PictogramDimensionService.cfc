@@ -3,21 +3,8 @@
 	property name="dao" inject="pictogramDimensionDAO";
 	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="PictogramDimension.bean";
-
 	public com.apirone.core.model.bean.PictogramDimension function get( required String pictogramDimensionId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.pictogramDimensionId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.pictogramDimensionId );
-		cm.put( getCacheScope(), arguments.pictogramDimensionId, bean );
-
-		return bean;
+		return build( arguments.pictogramDimensionId );
 	}
 
 	public Array function list(){
@@ -36,10 +23,11 @@
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( pictogramDimensionId = record.pictogram_dimension_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -57,8 +45,6 @@
 
 	public String function update( required com.apirone.core.model.bean.PictogramDimension pictogramDimension ){
 		var id = getDao().update( arguments.pictogramDimension );
-
-		super.getCacheManager().remove( getCacheScope(), arguments.pictogramDimension.getId() );
 
 		return id;
 	}
@@ -80,8 +66,6 @@
 					message = "Pictogram [#arguments.pictogramDimensionId#] deleted",
 					payload = { "id" = arguments.pictogramDimensionId }
 				);
-
-				super.getCacheManager().remove( getCacheScope(), arguments.pictogramDimensionId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -102,20 +86,26 @@
 		var record = getDao().read( arguments.pictogramDimensionId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "PictogramDimension" );
-
-			bean.setId( record.pictogram_dimension_id );
-			
-			bean.setWidth( record.width );
-			bean.setheight( record.height );
-			
-			bean.setPictogramId( record.pictogram_id );
-			bean.setFontFamilySizeId( record.font_family_size_id );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean PictogramDimension a partire da una riga della query, senza chiamata DB aggiuntiva.
+	 */
+	private com.apirone.core.model.bean.pictogramDimension function buildFromFindRow( required any record ){
+		var bean = super.bean( "PictogramDimension" );
+
+		// Campi diretti dal record (PictogramDimension non ha sub-entity)
+		bean.setId( record.pictogram_dimension_id );
+		bean.setWidth( record.width );
+		bean.setheight( record.height );
+		bean.setPictogramId( record.pictogram_id );
+		bean.setFontFamilySizeId( record.font_family_size_id );
+
+		return bean;
 	}
 
 }

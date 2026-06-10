@@ -3,21 +3,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="ProfileDAO";
 	property name="GeoService" inject="GeoService";
 	property name="LookupService" inject="LookupService";
-	property name="cacheScope" type="String" default="Profile.bean";
 
 	public com.apirone.core.model.bean.Profile function get( required String profileId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.profileId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.profileId );
-		cm.put( getCacheScope(), arguments.profileId, bean );
-
-		return bean;
+		return build( arguments.profileId );
 	}
 
 	public Array function list(){
@@ -37,10 +25,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( profileId = record.profile_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -53,17 +42,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Outcome function delete( required String profileId ){
 		var outcome = super.bean( "Outcome" );
 		var obj = get( arguments.profileId );
-		
+
 		outcome.setData( { profileId = arguments.profileId } );
-		getDao().delete( arguments.profileId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.profileId );
-
-				cm.remove( getCacheScope(), arguments.profileId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -85,8 +69,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.Profile profile ){
 		getDao().update( arguments.profile );
 
-		super.getCacheManager().remove( getCacheScope(), arguments.profile.getId() );
-
 		return arguments.profile.getId();
 	}
 
@@ -99,42 +81,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	var record = getDao().read( arguments.profileId );
 
 		if (record.recordCount) {
-			switch ( record.type ) {
-				case "B":
-					var bean = super.bean( "BillingProfile" );
-					break;
-				case "S":
-					var bean = super.bean( "ShippingProfile" );
-					break;
-				case "G": //TODO: ha senso?
-					var bean = super.bean( "Profile" );
-					break;
-				default:
-					throw ( "Unknown profile type [#record.type#]" );
-			}
-			
-			bean.setId( record.profile_id );
-			bean.setType( getLookupService().get( "profileType", record.type ) );
-			bean.setFirstName( record.first_name );
-			bean.setLastName( record.last_name );
-			bean.setCompany( record.company );
-			bean.setVatNumber( record.vat_number );
-			bean.setEmail( record.email );
-			bean.setPhone( record.phone );
-			bean.setState( record.state );
-			bean.setCity( record.city );
-			bean.setPostalCode( record.postal_code );
-			bean.setStreet( record.street );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setCountry(
-				getGeoService().getCountry( record.country_id )
-			);
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
     	return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Profile a partire da una riga della query.
+	 * Il tipo di bean istanziato (BillingProfile, ShippingProfile, Profile) dipende dal valore di record.type.
+	 */
+	private com.apirone.core.model.bean.Profile function buildFromFindRow(required any record) {
+		// Istanzia il bean corretto in base al tipo
+		switch ( record.type ) {
+			case "B":
+				var bean = super.bean( "BillingProfile" );
+				break;
+			case "S":
+				var bean = super.bean( "ShippingProfile" );
+				break;
+			case "G": //TODO: ha senso?
+				var bean = super.bean( "Profile" );
+				break;
+			default:
+				throw ( "Unknown profile type [#record.type#]" );
+		}
+
+		// Campi diretti dal record
+		bean.setId( record.profile_id );
+		bean.setFirstName( record.first_name );
+		bean.setLastName( record.last_name );
+		bean.setCompany( record.company );
+		bean.setVatNumber( record.vat_number );
+		bean.setEmail( record.email );
+		bean.setPhone( record.phone );
+		bean.setState( record.state );
+		bean.setCity( record.city );
+		bean.setPostalCode( record.postal_code );
+		bean.setStreet( record.street );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setType( getLookupService().get( "profileType", record.type ) );
+		bean.setCountry(
+			getGeoService().getCountry( record.country_id )
+		);
+
+		return bean;
 	}
 
 }

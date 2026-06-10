@@ -24,6 +24,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				production_time_id,
+				production_time,
+				status_id,
+				created_at,
 				COUNT(production_time_id) OVER() AS total
 			FROM
 				production_times

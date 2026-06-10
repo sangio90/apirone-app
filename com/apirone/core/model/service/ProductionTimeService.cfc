@@ -3,25 +3,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="com.apirone.core.model.dao.ProductionTimeDAO";
 	property name="statusService" inject="com.apirone.core.model.service.StatusService";
 
-	property name="cacheScope" type="String" default="productionTime.bean";
-
 	public com.apirone.core.model.bean.ProductionTime function get( required String productionTimeId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.productionTimeId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var product = build( arguments.productionTimeId );
-		cm.put(
-			getCacheScope(),
-			arguments.productionTimeId,
-			product
-		);
-
-		return product;
+		return build( arguments.productionTimeId );
 	}
 
 	public Boolean function codeExists( required String code, String excludeId = "" ){
@@ -42,10 +25,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( productionTimeId = record.production_time_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -66,8 +50,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = arguments.productionTime.getId();
 
-		super.getCacheManager().remove( getCacheScope(), id );
-
 		return id;
 	}
 
@@ -82,8 +64,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.productionTimeId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.productionTimeId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -104,17 +84,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productionTimeId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ProductionTime" );
-
-			bean.setId( record.production_time_id );
-			bean.setName( record.production_time );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean ProductionTime a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.ProductionTime function buildFromFindRow( required any record ){
+		var bean = super.bean( "ProductionTime" );
+
+		// Campi diretti dal record
+		bean.setId( record.production_time_id );
+		bean.setName( record.production_time );
+
+		// Entity collegate (Status è un lookup leggero)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setCreatedAt( record.created_at );
+
+		return bean;
 	}
 
 }

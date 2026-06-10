@@ -1,20 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationZonePositionDAO";
-	property name="QuotationZoneService" inject="QuotationZoneService";
-	property name="cacheScope" type="String" default="QuotationZonePosition.bean";
 
 	public com.apirone.core.model.bean.QuotationZonePosition function get( required String quotationZonePositionId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationZonePositionId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationZonePositionId );
-		cm.put( getCacheScope(), arguments.quotationZonePositionId, bean );
-		return bean;
+		return build( arguments.quotationZonePositionId );
 	}
 
 	public Array function list(){
@@ -32,10 +21,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var rows    = [];
 		var result  = super.getResult();
+
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( quotationZonePositionId = record.quotation_zone_position_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -49,15 +40,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationZonePositionId = arguments.quotationZonePositionId } );
-		
-		var cm = getCacheManager();
-		
+
 		transaction {
 			try {
 				getDao().delete( arguments.quotationZonePositionId );
-				cm.remove( getCacheScope(), arguments.quotationZonePositionId );
 			} catch ( any error ) {
-				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.errors.CannotDeleteQuotationZone" );
@@ -73,9 +60,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public String function update( required com.apirone.core.model.bean.QuotationZonePosition zonePosition ){	
+	public String function update( required com.apirone.core.model.bean.QuotationZonePosition zonePosition ){
 		getDao().update( arguments.zonePosition );
-		super.getCacheManager().remove( getCacheScope(), arguments.zonePosition.getId() );
 
 		return arguments.zonePosition.getId();
 	}
@@ -84,18 +70,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {
 
-			var bean = super.bean( "QuotationZonePosition" );
-
-			bean.setId( record.quotation_zone_position_id );
-			bean.setCode( record.code );
-			bean.setName( record.quotation_zone_position );
-			bean.setCreatedAt( record.created_at );
-			bean.setZoneId( record.quotation_zone_id.toString() );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean QuotationZonePosition a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.QuotationZonePosition function buildFromFindRow( required any record ){
+		var bean = super.bean( "QuotationZonePosition" );
+
+		// Campi diretti dal record (QuotationZonePosition non ha sub-entity)
+		bean.setId( record.quotation_zone_position_id );
+		bean.setCode( record.code );
+		bean.setName( record.quotation_zone_position );
+		bean.setCreatedAt( record.created_at );
+		bean.setZoneId( record.quotation_zone_id.toString() );
+
+		return bean;
 	}
 
 }

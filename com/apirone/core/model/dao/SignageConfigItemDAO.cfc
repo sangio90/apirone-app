@@ -24,6 +24,14 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				signage_config_item_id,
+				signage_config_id,
+				created_at,
+				height,
+				height_in_pixel,
+				row_count,
+				char_count,
+				line_heights,
+				font_family_size_id,
 				COUNT(signage_config_item_id) OVER() AS total
 			FROM
 				signage_config_items

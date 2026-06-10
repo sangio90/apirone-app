@@ -21,6 +21,11 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				report_id::varchar,
+				report,
+				example_data,
+				example_file,
+				file_name,
+				status_id,
 				COUNT(report_id) OVER() AS total
 			FROM
 				reports

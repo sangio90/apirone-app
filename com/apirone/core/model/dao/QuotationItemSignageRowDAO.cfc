@@ -23,6 +23,10 @@
 			SELECT
 				quotation_item_signage_row_id::varchar,
 				quotation_item_id::varchar,
+				text_align,
+				content,
+				char_count,
+				orderby,
 				COUNT(quotation_item_signage_row_id) OVER() AS total
 			FROM
 				quotation_item_signage_rows

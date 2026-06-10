@@ -25,6 +25,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				role_permission_id,
+				role_id,
+				created_at,
+				permission_id,
 				COUNT(role_permission_id) OVER() AS total
 			FROM
 				membership.roles_permissions
