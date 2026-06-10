@@ -71,6 +71,20 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 
+	<!---
+		Recupera in batch più ModelConfig dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsUuid(
+			table   = "model_configs",
+			pkColumn = "model_config_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="modelId" type="String">
 		<cfargument name="productCategoryId" type="String">
@@ -81,7 +95,8 @@
 				model_config_id::varchar,
 				model_id::varchar,
 				product_category_id,
-				line_id::varchar
+				line_id::varchar,
+				COUNT(model_config_id) OVER() AS total
 			FROM
 				model_configs
 			WHERE

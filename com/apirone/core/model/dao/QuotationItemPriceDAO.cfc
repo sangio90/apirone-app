@@ -13,6 +13,20 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più QuotationItemPrice dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "quotation_item_prices",
+			pkColumn = "quotation_item_price_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="productId" type="String" required="false">

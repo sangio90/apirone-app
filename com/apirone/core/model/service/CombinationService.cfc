@@ -6,21 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="CombinationProductItemService" inject="CombinationProductItemService";
 	property name="ProductService" inject="ProductService";
 	property name="statusService" inject="StatusService";
-	property name="cacheScope" type="String" default="Combination.bean";
-
 	public com.apirone.core.model.bean.Combination function get( required String combinationId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.combinationId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.combinationId );
-		cm.put( getCacheScope(), arguments.combinationId, bean );
-
-		return bean;
+		return build( arguments.combinationId );
 	}
 
 	// TODO: use search( productId )
@@ -32,16 +19,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required Numeric offset   = 0,
 		required Array orderBy    = [ { field = "combination.id" } ]
 	){
+		var rows = [];
 
-		var rows   = [];
 		var result = super.getResult();
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( record.combination_id ) );
-		} );
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		for ( var record in records ) {
+			ids.append( record.combination_id );
+		}
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.combination_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		for ( var record in records ) {
+			rows.add( beanMap[ record.combination_id ] );
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -168,18 +172,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Outcome function delete( required String combinationId ){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.combinationId );
-
 		outcome.setData( { combinationId = arguments.combinationId } );
-		getDao().delete( arguments.combinationId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.combinationId );
-
-				cm.remove( getCacheScope(), arguments.combinationId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -199,8 +196,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.Combination combination ){
 		getDao().update( arguments.combination );
-
-		super.getCacheManager().remove( getCacheScope(), arguments.combination.getId() );
 
 		return arguments.combination.getId();
 	}
@@ -356,49 +351,59 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.combinationId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Combination" );
-
-			bean.setId( record.combination_id );
-			bean.setCreatedAt( record.created_at );
-			bean.setProductId( record.product_id );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-
-			var combinationProductItems = getCombinationProductItemService().getByCombinationId(
-				record.combination_id
-			);
-
-			var productItemsData = combinationProductItems.getData();
-
-			bean.setProductItems( productItemsData );
-
-			if (!isNull(record.combination)) {
-				bean.setName( record.combination );
-			} else {
-				var name = "";
-				productItemsData.each( function( combinationProductItem, index ){
-					name &= combinationProductItem
-						.getProductItem()
-						.getAttribute()
-						.getName();
-
-					name &= ": ";
-
-					name &= combinationProductItem
-						.getProductItem()
-						.getAttributeValue()
-						.getRawValue()
-						.getName();
-
-					name &= productItemsData.len() == index ? "" : " - ";
-				} );
-
-				bean.setName( name );
-			}
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Combination a partire da una riga del query.
+	 * Le sub-entity (Status, CombinationProductItem e relativi ProductItem) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Combination function buildFromRow( required any record ){
+		var bean = super.bean( "Combination" );
+
+		// Campi diretti dal record
+		bean.setId( record.combination_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setProductId( record.product_id );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+
+		var combinationProductItems = getCombinationProductItemService().getByCombinationId(
+			record.combination_id
+		);
+
+		var productItemsData = combinationProductItems.getData();
+		bean.setProductItems( productItemsData );
+
+		if ( !isNull( record.combination ) ) {
+			bean.setName( record.combination );
+		} else {
+			var name = "";
+			productItemsData.each( function( combinationProductItem, index ){
+				name &= combinationProductItem
+					.getProductItem()
+					.getAttribute()
+					.getName();
+
+				name &= ": ";
+
+				name &= combinationProductItem
+					.getProductItem()
+					.getAttributeValue()
+					.getRawValue()
+					.getName();
+
+				name &= productItemsData.len() == index ? "" : " - ";
+			} );
+
+			bean.setName( name );
+		}
+
+		return bean;
 	}
 
 }

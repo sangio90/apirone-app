@@ -34,6 +34,20 @@
 	</cffunction>
 	---->
 
+	<!---
+		Recupera in batch più AttributeValue dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "attributes_raw_values",
+			pkColumn = "attribute_raw_value_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">

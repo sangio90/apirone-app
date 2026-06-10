@@ -4,23 +4,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="productItemService" inject="ProductItemService";
 
-	property name="cacheScope" type="String" default="ProductItemProduct.bean";
-
 	public com.apirone.core.model.bean.ProductItemProduct function get( required String productItemProductId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.productItemProductId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
 		var bean = build( arguments.productItemProductId );
-		cm.put(
-			getCacheScope(),
-			arguments.productItemProductId,
-			bean
-		);
 
 		return bean;
 	}
@@ -193,17 +178,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		var outcome = super.bean( "Outcome" );
 
-		var obj = get( arguments.productId );
-
 		outcome.setData( { productId = arguments.productId } );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.productId );
-
-				cm.remove( getCacheScope(), obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
