@@ -751,6 +751,7 @@ AP.signage.modal = ( function() {
                         viewModel.set( "detailForm.data.quotationItem.product.marginTop", xhr2.data.marginTop );
                         viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
                     }
+                    viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
                     if ( xhr2.data.file ) {
                         viewModel.set( "backgroundImage", xhr2.data.file );
                         viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
@@ -850,10 +851,11 @@ AP.signage.modal = ( function() {
                 url: "/manager/ajax/product-items?productId=" + productId,
                 callback: {
                     done: function( xhr ) {
+                        viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                        productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
+                        attributeArray = productItems.data();
+
                         if ( xhr.data.length > 0 ) {
-                            viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
-                            productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
-                            attributeArray = productItems.data();
                             // settiamo nel viewModel tutte le select di level 0 e le popoliamo con tutte le options
                             xhr.data.forEach( item => {
                                 const existing = attributeArray.find( d => d.attribute_id === item.attribute.id );
@@ -894,13 +896,16 @@ AP.signage.modal = ( function() {
                                     viewModel.loadProductItems( d.values[0].product_item_id, d.attribute_id );
                                 } );
                             }
-                            viewModel.renderProductItems();
                         }
+
+                        viewModel.renderProductItems();
                     }
                 }
             } ).then( async function() {
-                // Se ci sono product items pre-selezionati, li carichiamo
-                if ( quotationItemId != "" ) {
+                // Se ci sono product items pre-selezionati, li carica.
+                // Ma solo se il prodotto corrente ha attributi (altrimenti caricherebbe items di un prodotto diverso)
+                const currentProductItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
+                if ( quotationItemId != "" && currentProductItems && currentProductItems.data().length > 0 ) {
                     await NM.util.ajax( {
                         method: "GET",
                         url: "/manager/ajax/quotation-items/" + quotationItemId + "/product-items",
