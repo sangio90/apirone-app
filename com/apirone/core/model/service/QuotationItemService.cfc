@@ -503,9 +503,138 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			lines.add( line );
 		}
 
+		if ( isVitiAVistaNo( json ) ) {
+			for ( var plug in computePlugRuns( json ) ) {
+				var plugProductId = ( plug.type == "tappo" )
+					? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
+					: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
+				var plugProduct = super.service( "Product" ).get( plugProductId );
+				if ( IsNull( plugProduct ) ) continue;
+				var plugPrice = calculator.calculate(
+					plugProductId, 1, json.item.quotationZone.id, [], 0, 0, quotation, quotationItem
+				);
+				var plugLine = super.bean( "QuotationItemPriceLine" );
+				plugLine.setName( plug.type == "tappo" ? "Tappo" : "Mezzo tappo" );
+				plugLine.setAmount( plugPrice.finalPrice );
+				plugLine.setCost( plugPrice.totalCost );
+				lines.add( plugLine );
+			}
+		}
+
 		pricing.setLines( lines );
 
 		return pricing;
+	}
+
+	private Boolean function isVitiAVistaNo( required Struct json ) {
+		if ( !StructKeyExists( json, "item" )
+			|| !StructKeyExists( json.item, "product" )
+			|| !StructKeyExists( json.item.product, "items" )
+			|| !StructKeyExists( json.item.product.items, "_data" ) ) {
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] early exit: missing keys" );
+			return false;
+		}
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] _data count=#ArrayLen(json.item.product.items._data)#" );
+		for ( var item in json.item.product.items._data ) {
+			var hasName = StructKeyExists( item, "attributeName" );
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] item hasName=#hasName# name=#hasName ? item.attributeName : 'n/a'#" );
+			if ( hasName && item.attributeName == "VITI A VISTA" ) {
+				for ( var val in item.values ) {
+					var sel = StructKeyExists( val, "selected" ) && val.selected;
+					var hasAV = StructKeyExists( val, "attributeValue" );
+					var hasRV = hasAV && StructKeyExists( val.attributeValue, "rawValue" );
+					var rvName = hasRV ? val.attributeValue.rawValue.name : "n/a";
+					cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] val sel=#sel# hasAV=#hasAV# hasRV=#hasRV# rawValue.name=#rvName#" );
+					if ( sel && hasAV && hasRV && rvName == "NO" ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private Array function computePlugRuns( required Struct json ) {
+		var result = [];
+		if ( !StructKeyExists( json, "positions" )
+			|| !StructKeyExists( json, "item" )
+			|| !StructKeyExists( json.item, "product" )
+			|| !StructKeyExists( json.item.product, "frame" )
+			|| !Len( json.item.product.frame.id )
+			|| !StructKeyExists( json.item.product, "orientation" )
+			|| !Len( json.item.product.orientation.id ) ) {
+			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] early exit: missing keys hasPositions=#StructKeyExists(json,'positions')# hasFrame=#StructKeyExists(json,'item') && StructKeyExists(json.item,'product') && StructKeyExists(json.item.product,'frame')#" );
+			return result;
+		}
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frameId=#json.item.product.frame.id# orientationId=#json.item.product.orientation.id#" );
+		var frame = super.service( "Frame" ).get( json.item.product.frame.id );
+		if ( IsNull( frame ) ) { cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frame is null" ); return result; }
+		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frameCode=#frame.getCode()#" );
+		var gridFile = ExpandPath( "/config/data/plates/grid_#frame.getCode()#.json.cfm" );
+		if ( !FileExists( gridFile ) ) { cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] gridFile not found: #gridFile#" ); return result; }
+		var gridConfig = DeserializeJSON( FileRead( gridFile ) );
+		var orientationId = json.item.product.orientation.id;
+		if ( !StructKeyExists( gridConfig.frame.orientations, orientationId ) ) return result;
+		var gridRows = gridConfig.frame.orientations[ orientationId ].grid;
+		var allPositions = [];
+		for ( var gridRow in gridRows ) {
+			for ( var cell in gridRow ) {
+				if ( cell.type != "0" ) {
+					allPositions.add( { id: cell.id, order: cell.order } );
+				}
+			}
+		}
+		ArraySort( allPositions, function( a, b ) {
+			if ( a.order < b.order ) return -1;
+			if ( a.order > b.order ) return 1;
+			return 0;
+		} );
+		var occupiedIds = {};
+		for ( var fId in json.positions ) {
+			for ( var pos in json.positions[ fId ] ) {
+				if ( StructKeyExists( pos, "id" ) ) {
+					occupiedIds[ pos.id ] = true;
+				}
+			}
+		}
+		var emptyPositions = [];
+		for ( var pos in allPositions ) {
+			if ( !StructKeyExists( occupiedIds, pos.id ) ) {
+				emptyPositions.add( pos );
+			}
+		}
+		var idx = 1;
+		while ( idx <= ArrayLen( emptyPositions ) ) {
+			var isDouble = idx < ArrayLen( emptyPositions )
+				&& emptyPositions[ idx + 1 ].order == emptyPositions[ idx ].order + 1;
+			if ( isDouble ) {
+				result.add( { type: "tappo", positionIds: [ emptyPositions[ idx ], emptyPositions[ idx + 1 ] ] } );
+				idx += 2;
+			} else {
+				result.add( { type: "mezzotappo", positionIds: [ emptyPositions[ idx ] ] } );
+				idx += 1;
+			}
+		}
+		return result;
+	}
+
+	public Array function buildPlugFruitBeans( required Struct data ) {
+		var json = arguments.data;
+		var result = [];
+		if ( !isVitiAVistaNo( json ) ) return result;
+		for ( var plug in computePlugRuns( json ) ) {
+			var plugProductId = ( plug.type == "tappo" )
+				? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
+				: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
+			var plugProduct = super.service( "Product" ).get( plugProductId );
+			if ( IsNull( plugProduct ) ) continue;
+			var fruitBean = super.bean( "QuotationItemFruit" );
+			fruitBean.setFruit( plugProduct );
+			fruitBean.setPositions( plug.positionIds );
+			fruitBean.setItems( [] );
+			result.add( fruitBean );
+		}
+		return result;
 	}
 
 	public com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){

@@ -1370,6 +1370,10 @@ AP.plate.modal = ( function() {
          */
         loadFruits: async function( onDone ) {
             var id = viewModel.get( "detailForm.data.id" );
+            var PLUG_IDS = [
+                "5f4ec169-c445-40a0-8c94-1dc22c21be79",
+                "452e03e4-ddf4-4042-ac87-b0f17489c4e1",
+            ];
 
             await NM.util.ajax( {
                 method: "GET",
@@ -1379,6 +1383,7 @@ AP.plate.modal = ( function() {
                         let fruitQuotationItemProductItems = []
                         for ( var i = 0; i < xhr.data.length; i++ ) {
                             var thisFruit = xhr.data[i];
+                            if ( PLUG_IDS.includes( thisFruit.fruit.id.toLowerCase() ) ) continue;
                             var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
 
                             viewModel.set( "currentFruit", newFruit );

@@ -604,6 +604,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		}
 
+		var plugBeans = super.fire( "QuotationItem.buildPlugFruitBeans", { "data" = json } );
+		for ( var plugBean in plugBeans ) {
+			beanFruits.add( plugBean );
+		}
+
 		bean.setFruits( beanFruits );
 
 		var message = 'Errore durante il salvataggio della placca.'

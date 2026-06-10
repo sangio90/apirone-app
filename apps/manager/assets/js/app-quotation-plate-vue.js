@@ -1213,6 +1213,10 @@ AP.plate.modal = ( function() {
                     }
                     const fruitQIPIs = [];
                     const fruits = [];
+                    const PLUG_IDS = [
+                        "5f4ec169-c445-40a0-8c94-1dc22c21be79",
+                        "452e03e4-ddf4-4042-ac87-b0f17489c4e1",
+                    ];
 
                     await ajax( {
                         method: "GET",
@@ -1220,6 +1224,7 @@ AP.plate.modal = ( function() {
                         callback: {
                             done: ( xhr ) => {
                                 xhr.data.forEach( ( thisFruit ) => {
+                                    if ( PLUG_IDS.includes( thisFruit.fruit.id.toLowerCase() ) ) return;
                                     const newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
                                     if ( thisFruit.positions && thisFruit.positions.length ) {
                                         newFruit.positionIds = thisFruit.positions.map( ( p ) => { return p.position; } );
