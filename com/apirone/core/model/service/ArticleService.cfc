@@ -209,7 +209,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Costruisce un bean Article a partire da una riga della query.
 	 * Le sub-entity (Texts, Price, Status) sono caricate con chiamate individuali.
 	 */
-	private com.apirone.core.model.bean.Article function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.Article function buildFromRow( required any record ){
 		var bean = super.bean( "Article" );
 
 		// Testi e nome (setName va chiamato dopo setTexts)

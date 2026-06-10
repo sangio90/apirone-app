@@ -170,7 +170,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Costruisce un bean Attribute a partire da una riga della query.
 	 * Le sub-entity (Texts, Status, Values, Categories) sono caricate con chiamate individuali.
 	 */
-	private com.apirone.core.model.bean.Attribute function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.Attribute function buildFromRow( required any record ){
 		var bean = super.bean( "Attribute" );
 
 		// Campi diretti dal record

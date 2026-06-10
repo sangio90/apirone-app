@@ -91,7 +91,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/**
 	 * Costruisce un bean ComponentOverride a partire da una riga della query.
 	 */
-	private com.apirone.core.model.bean.ComponentOverride function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.ComponentOverride function buildFromRow( required any record ){
 		var bean = super.bean( "ComponentOverride" );
 
 		// Campi diretti dal record (ComponentOverride non ha sub-entity)

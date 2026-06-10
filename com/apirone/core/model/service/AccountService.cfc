@@ -224,7 +224,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
 	 * La sub-entity Status è caricata con chiamata individuale.
 	 */
-	private com.apirone.core.model.bean.Account function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.Account function buildFromRow( required any record ){
 		var account = super.bean( "Account" );
 
 		// Campi diretti dal record

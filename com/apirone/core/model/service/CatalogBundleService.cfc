@@ -126,7 +126,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Costruisce un bean CatalogBundle a partire da una riga della query.
 	 * Le sub-entity (Line, Model, Category) sono caricate con chiamate individuali.
 	 */
-	private com.apirone.core.model.bean.CatalogBundle function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.CatalogBundle function buildFromRow( required any record ){
 		var bean = super.bean( "CatalogBundle" );
 
 		// Campi diretti dal record

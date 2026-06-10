@@ -117,7 +117,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Costruisce un bean Company a partire da una riga della query.
 	 * Le sub-entity (Location, Account, Types, Status) sono caricate con chiamate individuali.
 	 */
-	private com.apirone.core.model.bean.Company function buildFromRow( required Struct record ){
+	private com.apirone.core.model.bean.Company function buildFromRow( required any record ){
 		var company = super.bean( "Company" );
 		var types = [];
 
