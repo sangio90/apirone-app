@@ -328,7 +328,7 @@ These services have dead code (`getCacheKey()` throws `"Use cache manager and sc
 
 ---
 
-## Phase 4: T3 — Heavy Entities (16–80+ DB queries in build) &nbsp;&nbsp;`❌ TO DO`
+## Phase 4: T3 — Heavy Entities (16–80+ DB queries in build) &nbsp;&nbsp;`✅ DONE`
 
 > **These are the performance-critical entities.** They cascade deeply into sub-entity chains.
 

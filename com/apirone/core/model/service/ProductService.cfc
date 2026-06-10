@@ -14,21 +14,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 
-	property name="cacheScope" type="String" default="Product.bean";
-
 	public com.apirone.core.model.bean.Product function get( required String productId ){
-		 var cm = getCacheManager();
-
-		 var cache = cm.get( getCacheScope(), arguments.productId );
-
-		 if ( cache.status ) {
-		 	return cache.data;
-		 }
-
-		var bean = build( arguments.productId );
-		 cm.put( getCacheScope(), arguments.productId, bean );
-
-		return bean;
+		return build( arguments.productId );
 	}
 
 	public com.apirone.core.model.bean.Product function getByParams(
@@ -83,10 +70,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.product_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.product_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( productId = record.Product_id ) );
+			rows.add( beanMap[ record.product_id ] );
 		} );
 
 		result.setData( rows );
@@ -102,15 +106,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj = get( arguments.productId );
 
 		outcome.setData( { productId = arguments.productId } );
-		getDao().delete( arguments.productId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.productId );
-
-				cm.remove( getCacheScope(), arguments.productId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -137,11 +136,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( obj.getId() );
-
-				cm.remove( getCacheScope(), arguments.obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -163,19 +158,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		outcome.setData( arguments );
 
 		transaction {
-			// try {
 			getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
-			/*
-			} catch ( any error ) {
-				outcome.setError( error );
-				outcome.setStatus( "ERROR" );
-				outcome.setType( "ApirOne.CannotDeleteProduct" );
-				outcome.setMessage( "Cannot delete product by lineId [#arguments.lineId#] and categoryId [#arguments.categoryId#]" );
-			}
-				*/
 		}
-
-		getCacheManager().removeAll();
 
 		return outcome;
 	}
@@ -200,7 +184,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
-	public Struct function cloneTree( required String fromProductId, required String toProductId, required Boolean deleteCache = true ){
+	public Struct function cloneTree( required String fromProductId, required String toProductId ){
 		if ( fromProductId == toProductId ) {
 			Throw(
 				type    = "ApirOne.errors.productService.InvalidArgument",
@@ -290,10 +274,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		if( arguments.deleteCache ) {
-			getCacheManager().removeAll();
-		}
-
 		super.logEvent(
 			event   = "product.CLONED_TREE",
 			message = "End clone tree of product [#arguments.fromProductId#] to [#arguments.toProductId#]",
@@ -315,8 +295,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function updateDetail( required com.apirone.core.model.bean.Product product ){
 
 		getDao().updateDetail( arguments.product );
-
-		super.getCacheManager().remove( getCacheScope(), product.getId() );
 
 		return product.getId();
 	}
@@ -345,23 +323,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), product.getId() );
-
 		return product.getId();
-	}
-
-	public Void function removeCache( required String productId ){
-		var cm = super.getCacheManager();
-
-		cm.remove( getCacheScope(), arguments.productId );
 	}
 
 
 	/*
-    	private method
+			private method
 	*/
 
-	// normalize data  for catalogBundle
+	// normalize data for catalogBundle
 	private com.apirone.core.model.bean.Product function handleCatalogBundle(
 		required com.apirone.core.model.bean.Product product
 	){
@@ -378,61 +348,67 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return product;
 	}
 
+	/**
+	 * Costruisce un bean Product a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Product function build( required String productId ){
 		var record = getDao().read( arguments.productId );
 
 		if ( record.recordCount ) {
-			if ( IsNull( record.catalog_bundle_id ) ) {
-				var bean = super.bean( "ProductBase" );
-
-				bean.setCode( record.code );
-				bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
-				bean.setPositionCount( record.position_count );
-				bean.setLines( super.getLinesBeanByIds( record.lines ) );
-			} else {
-				var bean = super.bean( "ProductComplex" );
-
-				bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
-
-				bean.setLine( bean.getCatalogBundle().getLine() );
-				bean.setModel( bean.getCatalogBundle().getModel() );
-				bean.setCategory( bean.getCatalogBundle().getCategory() );
-				bean.setFinish( getFinishService().get( record.finish_id ) );
-			}
-
-			bean.setId( record.product_id.toString() );
-			bean.setSerial( record.serial );
-			bean.setCreatedAt( record.created_at );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setSpecial( BooleanFormat( record.special ) ); //TODO: to remove
-			bean.setMinQuantity( record.min_quantity );
-			bean.setMaxQuantity( record.max_quantity );
-			bean.setMarginTop( record.margin_top );
-			bean.setMarginLeft( record.margin_left );
-			bean.setPlateWidth( record.plate_width );
-			bean.setPlateHeight( record.plate_height );
-			bean.setTexts( getTextService().list( productId = record.product_id ) );
-
-			bean.setImportantAttributes( super.getAttributesBeanByIds( record.attributes_important ) );
-
-			bean.setPrices( getPriceService().list( productId = record.product_id ) );
-			var images = getFileService().list( productId = record.product_id );
-
-			if ( Len( images ) ) {
-				bean.setImages( images )
-			}
-
-			/*
-			var items = getProductItemService().list( productId = record.product_id );
-			if ( Len( items ) ) {
-				bean.setItems( items );
-			}
-			*/
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Product a partire da una riga del query.
+	 * Le sub-entity (Category, Status, Texts, Prices, Files, ecc.) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Product function buildFromRow( required any record ){
+		// Campi diretti dal record (distingue ProductBase da ProductComplex)
+		if ( IsNull( arguments.record.catalog_bundle_id ) ) {
+			var bean = super.bean( "ProductBase" );
+
+			bean.setCode( arguments.record.code );
+			bean.setCategory( getProductCategoryService().get( arguments.record.product_category_id ) );
+			bean.setPositionCount( arguments.record.position_count );
+			bean.setLines( super.getLinesBeanByIds( arguments.record.lines ) );
+		} else {
+			var bean = super.bean( "ProductComplex" );
+
+			bean.setCatalogBundle( getCatalogBundleService().get( arguments.record.catalog_bundle_id ) );
+
+			bean.setLine( bean.getCatalogBundle().getLine() );
+			bean.setModel( bean.getCatalogBundle().getModel() );
+			bean.setCategory( bean.getCatalogBundle().getCategory() );
+			bean.setFinish( getFinishService().get( arguments.record.finish_id ) );
+		}
+
+		// Campi comuni
+		bean.setId( arguments.record.product_id.toString() );
+		bean.setSerial( arguments.record.serial );
+		bean.setCreatedAt( arguments.record.created_at );
+		bean.setSpecial( BooleanFormat( arguments.record.special ) ); //TODO: to remove
+		bean.setMinQuantity( arguments.record.min_quantity );
+		bean.setMaxQuantity( arguments.record.max_quantity );
+		bean.setMarginTop( arguments.record.margin_top );
+		bean.setMarginLeft( arguments.record.margin_left );
+		bean.setPlateWidth( arguments.record.plate_width );
+		bean.setPlateHeight( arguments.record.plate_height );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setStatus( getStatusService().get( arguments.record.status_id ) );
+		bean.setTexts( getTextService().list( productId = arguments.record.product_id ) );
+		bean.setImportantAttributes( super.getAttributesBeanByIds( arguments.record.attributes_important ) );
+		bean.setPrices( getPriceService().list( productId = arguments.record.product_id ) );
+
+		var images = getFileService().list( productId = arguments.record.product_id );
+		if ( Len( images ) ) {
+			bean.setImages( images )
+		}
+
+		return bean;
 	}
 
 }

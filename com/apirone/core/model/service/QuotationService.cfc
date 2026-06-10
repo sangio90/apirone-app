@@ -53,20 +53,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="ProductHashService" inject="ProductHashService";
 	property name="accountService" inject="AccountService";
 
-	property name="cacheScope" type="String" default="Quotation.bean";
-
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.quotationId );
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationId );
-		cm.put( getCacheScope(), arguments.quotationId, bean );
-
-		return bean;
+		return build( arguments.quotationId );
 	}
 
 	public Number function getNextNumber(){
@@ -92,10 +80,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.quotation_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.quotation_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( quotationId = record.quotation_id ) );
+			rows.add( beanMap[ record.quotation_id ] );
 		} );
 
 		result.setData( rows );
@@ -167,17 +172,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			} catch ( any error ) {
 				transaction action="rollback";
-				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteQuotation" );
 				outcome.setMessage( "Cannot delete quotation [#arguments.quotationId#]" );
-				return outcome;
+				rethrow
 			}
-
-
-		// var cm = getCacheManager();
-		// cm.remove( getCacheScope(), arguments.quotationId );
 
 
 		return outcome;
@@ -249,7 +249,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.Quotation quotation ){
 		getDao().update( arguments.quotation );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
 
 		return arguments.quotation.getId();
 	}
@@ -1002,9 +1001,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		quotationService.update( originalQuotation );
 
-		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
-
 		return clonedQuotationId;
 	}
 
@@ -1026,16 +1022,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
 		quotationService.update( originalQuotation );
 
-		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
-
 		return clonedQuotationId;
-	}
-
-	public Void function removeCache( required String quotationId ){
-
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationId );
-
 	}
 
 	/*
@@ -1068,109 +1055,121 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
+	/**
+	 * Costruisce un bean Quotation a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Quotation function build( required String quotationId ){
 		var record = getDao().read( arguments.quotationId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Quotation" );
-
-			var calculatedAmount = 0;
-
-			bean.setId( record.quotation_id.toString() );
-			bean.setSerial( record.serial );
-			bean.setName( record.quotation );
-			bean.setQuotationNumber( record.quotation_number );
-			bean.setVersionNumber( record.version_number );
-			bean.setQuotationDate( record.quotation_date );
-			bean.setCreatedAt( record.created_at );
-			bean.setNote( record.note );
-			bean.setValidityDate( record.validity_date );
-			bean.setExported( record.exported );
-			bean.setActive( record.active );
-			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
-			bean.setOwner( getUserService().get( record.owner_id.toString() ) );
-			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
-
-			bean.setNessunAgente( record.nessun_agente );
-			if ( !IsNull( record.agente1 ) && Len( record.agente1 ) ) bean.setAgente1( record.agente1.toString() );
-			if ( !IsNull( record.agente2 ) && Len( record.agente2 ) ) bean.setAgente2( record.agente2.toString() );
-			if ( !IsNull( record.agente3 ) && Len( record.agente3 ) ) bean.setAgente3( record.agente3.toString() );
-			if ( !IsNull( record.agente4 ) && Len( record.agente4 ) ) bean.setAgente4( record.agente4.toString() );
-			if ( !IsNull( record.agente5 ) && Len( record.agente5 ) ) bean.setAgente5( record.agente5.toString() );
-			if ( !IsNull( record.commission1 ) ) bean.setCommission1( record.commission1 );
-			if ( !IsNull( record.commission2 ) ) bean.setCommission2( record.commission2 );
-			if ( !IsNull( record.commission3 ) ) bean.setCommission3( record.commission3 );
-			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
-			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
-			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
-			if ( Len( record.referente_spedizione ) ) bean.setReferenteSpedizione( record.referente_spedizione );
-			if ( Len( record.customer_type ) ) bean.setCustomerType( record.customer_type );
-
-			//by a trigger from history
-			//bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setStatusHistory( getQuotationStatusHistoryService().get( record.quotation_status_history_id ) );
-
-			if ( !IsNull( record.customer_id ) ) {
-
-				var customer = getCustomerService().get( record.customer_id );
-				bean.setCustomer( customer );
-
-				// cerco l'indirizzo di spedizione tra gli indirizzi del customer
-				if ( !IsNull( record.shipping_profile_id ) ) {
-					for( var thisAddress in customer.getShippingProfiles() ) {
-						if ( thisAddress.getId() == record.shipping_profile_id ) {
-							bean.setShippingProfile( thisAddress );
-							break;
-						}
-					}
-				}
-
-			}
-
-			/*
-			var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = record.quotation_id, statusId = record.status_id );
-
-			if ( quotationStatusHistories.len() > 0 && record.status_id == 'CCN' ) {
-				var statusFiles = getFileService().list( quotationStatusHistoryId = quotationStatusHistories[1].getId() );
-				if ( statusFiles.len() > 0 ) {
-					bean.setStatusFile( statusFiles[1] )
-				}
-			}
-			*/
-
-			if ( !IsNull( record.opportunity_id ) ) {
-				bean.setOpportunity( getOpportunityService().get( record.opportunity_id.toString() ) );
-			}
-
-			if ( !IsNull( record.lead_id ) ) {
-				bean.setLead( getLeadService().get( record.lead_id ) );
-			}
-
-			if ( !IsNull( record.vat_code_id ) ) {
-				bean.setVatCode( getVatCodeService().get( record.vat_code_id ) );
-			}
-
-			if ( !IsNull( record.sales_agent_account_id ) ) {
-				bean.setSalesAgent( getUserService().get( record.sales_agent_account_id.toString() ) );
-			}
-
-			if ( !IsNull( record.graphic_technician_account_id ) ) {
-				bean.setGraphicTechnician( getUserService().get( record.graphic_technician_account_id.toString() ) );
-			}
-
-			bean.setCalculatedAmount(
-				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
-			);
-
-			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
-			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
-			// bean.setgraphicTechnician( getAccountService().get( record.graphic_technician_account_id ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Quotation a partire da una riga del query.
+	 * Le sub-entity (Lang, Currency, Owner, PaymentMethod, StatusHistory, Customer, ecc.) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Quotation function buildFromRow( required any record ){
+		var bean = super.bean( "Quotation" );
+
+		var calculatedAmount = 0;
+
+		// Campi diretti dal record
+		bean.setId( arguments.record.quotation_id.toString() );
+		bean.setSerial( arguments.record.serial );
+		bean.setName( arguments.record.quotation );
+		bean.setQuotationNumber( arguments.record.quotation_number );
+		bean.setVersionNumber( arguments.record.version_number );
+		bean.setQuotationDate( arguments.record.quotation_date );
+		bean.setCreatedAt( arguments.record.created_at );
+		bean.setNote( arguments.record.note );
+		bean.setValidityDate( arguments.record.validity_date );
+		bean.setExported( arguments.record.exported );
+		bean.setActive( arguments.record.active );
+		bean.setLang( getLangService().get( arguments.record.lang_id ) );
+		bean.setCurrency( getCurrencyService().get( arguments.record.currency_id ) );
+		bean.setOwner( getUserService().get( arguments.record.owner_id.toString() ) );
+		bean.setPaymentMethod( getPaymentMethodService().get( arguments.record.payment_method_id ) );
+
+		bean.setNessunAgente( arguments.record.nessun_agente );
+		if ( !IsNull( arguments.record.agente1 ) && Len( arguments.record.agente1 ) ) bean.setAgente1( arguments.record.agente1.toString() );
+		if ( !IsNull( arguments.record.agente2 ) && Len( arguments.record.agente2 ) ) bean.setAgente2( arguments.record.agente2.toString() );
+		if ( !IsNull( arguments.record.agente3 ) && Len( arguments.record.agente3 ) ) bean.setAgente3( arguments.record.agente3.toString() );
+		if ( !IsNull( arguments.record.agente4 ) && Len( arguments.record.agente4 ) ) bean.setAgente4( arguments.record.agente4.toString() );
+		if ( !IsNull( arguments.record.agente5 ) && Len( arguments.record.agente5 ) ) bean.setAgente5( arguments.record.agente5.toString() );
+		if ( !IsNull( arguments.record.commission1 ) ) bean.setCommission1( arguments.record.commission1 );
+		if ( !IsNull( arguments.record.commission2 ) ) bean.setCommission2( arguments.record.commission2 );
+		if ( !IsNull( arguments.record.commission3 ) ) bean.setCommission3( arguments.record.commission3 );
+		if ( !IsNull( arguments.record.commission4 ) ) bean.setCommission4( arguments.record.commission4 );
+		if ( !IsNull( arguments.record.commission5 ) ) bean.setCommission5( arguments.record.commission5 );
+		if ( Len( arguments.record.referente_amministrativo ) ) bean.setReferenteAmministrativo( arguments.record.referente_amministrativo );
+		if ( Len( arguments.record.referente_spedizione ) ) bean.setReferenteSpedizione( arguments.record.referente_spedizione );
+		if ( Len( arguments.record.customer_type ) ) bean.setCustomerType( arguments.record.customer_type );
+
+		//by a trigger from history
+		//bean.setStatus( getStatusService().get( arguments.record.status_id ) );
+		bean.setStatusHistory( getQuotationStatusHistoryService().get( arguments.record.quotation_status_history_id ) );
+
+		if ( !IsNull( arguments.record.customer_id ) ) {
+
+			var customer = getCustomerService().get( arguments.record.customer_id );
+			bean.setCustomer( customer );
+
+			// cerco l'indirizzo di spedizione tra gli indirizzi del customer
+			if ( !IsNull( arguments.record.shipping_profile_id ) ) {
+				for( var thisAddress in customer.getShippingProfiles() ) {
+					if ( thisAddress.getId() == arguments.record.shipping_profile_id ) {
+						bean.setShippingProfile( thisAddress );
+						break;
+					}
+				}
+			}
+
+		}
+
+		/*
+		var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = arguments.record.quotation_id, statusId = arguments.record.status_id );
+
+		if ( quotationStatusHistories.len() > 0 && arguments.record.status_id == 'CCN' ) {
+			var statusFiles = getFileService().list( quotationStatusHistoryId = quotationStatusHistories[1].getId() );
+			if ( statusFiles.len() > 0 ) {
+				bean.setStatusFile( statusFiles[1] )
+			}
+		}
+		*/
+
+		if ( !IsNull( arguments.record.opportunity_id ) ) {
+			bean.setOpportunity( getOpportunityService().get( arguments.record.opportunity_id.toString() ) );
+		}
+
+		if ( !IsNull( arguments.record.lead_id ) ) {
+			bean.setLead( getLeadService().get( arguments.record.lead_id ) );
+		}
+
+		if ( !IsNull( arguments.record.vat_code_id ) ) {
+			bean.setVatCode( getVatCodeService().get( arguments.record.vat_code_id ) );
+		}
+
+		if ( !IsNull( arguments.record.sales_agent_account_id ) ) {
+			bean.setSalesAgent( getUserService().get( arguments.record.sales_agent_account_id.toString() ) );
+		}
+
+		if ( !IsNull( arguments.record.graphic_technician_account_id ) ) {
+			bean.setGraphicTechnician( getUserService().get( arguments.record.graphic_technician_account_id.toString() ) );
+		}
+
+		bean.setCalculatedAmount(
+			getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+		);
+
+		// bean.setPricelist( getPricelistService().get( arguments.record.pricelist_id ) );
+		// bean.setBillingProfile( getProfileService().get( arguments.record.billing_profile_id ) );
+		// bean.setgraphicTechnician( getAccountService().get( arguments.record.graphic_technician_account_id ) );
+
+		return bean;
 	}
 
 }

@@ -725,4 +725,35 @@
 
 		<cfreturn local.q.nextval>
 	</cffunction>
+
+	<!---
+		Recupera in batch più preventivi dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotations.quotation_id::varchar,
+				lang_id::varchar,
+				pricelist_id::varchar,
+				payment_method_id::varchar,
+				currency_id::varchar,
+				billing_profile_id::varchar,
+				shipping_profile_id::varchar,
+				sales_agent_account_id::varchar,
+				graphic_technician_account_id::varchar,
+				*
+			FROM quotations
+				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
+			WHERE quotations.quotation_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

@@ -5,25 +5,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="catalogBundleService" inject="catalogBundleService";
 	property name="signageConfigItemService" inject="signageConfigItemService";
 
-	property name="cacheScope" type="String" default="SignageConfig.bean";
-
 	public com.apirone.core.model.bean.SignageConfig function get( required String signageConfigId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.signageConfigId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.signageConfigId );
-		cm.put(
-			getCacheScope(),
-			arguments.signageConfigId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.signageConfigId );
 	}
 
 	public Array function list(){
@@ -43,10 +26,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.signage_config_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.signage_config_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( signageConfigId = record.signage_config_id ) );
+			rows.add( beanMap[ record.signage_config_id ] );
 		} );
 
 		result.setData( rows );
@@ -75,9 +75,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// TODO: optimize cache invalidation
-		getCacheManager().removeAll();
-
 		return newId;
 	}
 
@@ -94,9 +91,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// TODO: optimize cache invalidation
-		getCacheManager().removeAll();
-
 		return signageConfig.getId();
 	}
 
@@ -111,8 +105,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.signageConfigId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.signageConfigId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -129,24 +121,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean SignageConfig a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.SignageConfig function build( required String signageConfigId ){
 		var record = getDao().read( arguments.signageConfigId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "SignageConfig" );
-
-			bean.setId( record.signage_config_id );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setFont( getFontService().get( record.font_id ) );
-			bean.setCatalogBundle( getCatalogBundleService().get( record.catalog_bundle_id ) );
-			bean.setItems( getSignageConfigItemService().list( record.signage_config_id ) );
-
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean SignageConfig a partire da una riga del query.
+	 * Le sub-entity (Font, CatalogBundle, SignageConfigItems) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.SignageConfig function buildFromRow( required any record ){
+		var bean = super.bean( "SignageConfig" );
+
+		// Campi diretti dal record
+		bean.setId( arguments.record.signage_config_id );
+		bean.setCreatedAt( arguments.record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setFont( getFontService().get( arguments.record.font_id ) );
+		bean.setCatalogBundle( getCatalogBundleService().get( arguments.record.catalog_bundle_id ) );
+		bean.setItems( getSignageConfigItemService().list( arguments.record.signage_config_id ) );
+
+		return bean;
 	}
 
 }

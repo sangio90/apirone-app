@@ -163,7 +163,7 @@
 	 * Costruisce un bean Model a partire da una riga della query, senza chiamata DB aggiuntiva
 	 * per il record principale.
 	 */
-	public com.apirone.core.model.bean.Model function buildFromRow( required any record ){
+	private com.apirone.core.model.bean.Model function buildFromRow( required any record ){
 		var bean = super.bean( "Model" );
 
 		// Campi diretti dal record
