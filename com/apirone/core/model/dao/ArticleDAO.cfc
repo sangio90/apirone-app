@@ -120,5 +120,24 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
+	<!---
+		Recupera in batch più articoli dato un array di ID.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT article_id::varchar, *
+			FROM articles
+			WHERE article_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>
 

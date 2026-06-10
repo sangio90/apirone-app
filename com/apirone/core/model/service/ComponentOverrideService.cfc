@@ -1,25 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ComponentOverrideDAO";
-	property name="cacheScope" type="String" default="ComponentOverride.bean";
 
 	public com.apirone.core.model.bean.ComponentOverride function get( required String ComponentOverrideId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.ComponentOverrideId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.ComponentOverrideId );
-		cm.put(
-			getCacheScope(),
-			arguments.ComponentOverrideId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.ComponentOverrideId );
 	}
 
 	public Array function list(){
@@ -35,14 +19,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		var records = getDao().find( argumentCollection = arguments );
-
 		// TODO: should be only one override with productItemId and componentId.
 		// Add check? DB guarantees uniqueness
 
-		records.each( function( record ){
-			rows.add( get( record.component_override_id ) );
+		// Il find() restituisce gli ID: li raccogliamo e carichiamo i record in una sola query
+		var records = getDao().find( argumentCollection = arguments );
+
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.component_override_id );
 		} );
+
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( record ){
+				rows.add( buildFromRow( record ) );
+			} );
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -61,8 +54,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			try {
 				getDao().delete( arguments.ComponentOverrideId );
-
-				super.getCacheManager().remove( getCacheScope(), obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -84,8 +75,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.ComponentOverride ComponentOverride ){
 		getDao().update( arguments.ComponentOverride );
 
-		super.getCacheManager().remove( getCacheScope(), ComponentOverride.getId() );
-
 		return arguments.ComponentOverride.getId();
 	}
 
@@ -93,18 +82,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.ComponentOverrideId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ComponentOverride" );
-
-			bean.setId( record.component_override_id );
-
-			bean.setDeleted( record.deleted );
-			bean.setQuantity( record.quantity );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean ComponentOverride a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.ComponentOverride function buildFromRow( required Struct record ){
+		var bean = super.bean( "ComponentOverride" );
+
+		// Campi diretti dal record (ComponentOverride non ha sub-entity)
+		bean.setId( record.component_override_id );
+		bean.setDeleted( record.deleted );
+		bean.setQuantity( record.quantity );
+		bean.setCreatedAt( record.created_at );
+
+		return bean;
 	}
 
 }

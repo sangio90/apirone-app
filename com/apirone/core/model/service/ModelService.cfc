@@ -5,21 +5,8 @@
 	property name="textService" inject="TextService";
 	property name="lookupService" inject="lookupService";
 
-	property name="cacheScope" type="String" default="Model.bean";
-
 	public com.apirone.core.model.bean.Model function get( required String modelId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.modelId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.modelId );
-		cm.put( getCacheScope(), arguments.modelId, bean );
-
-		return bean;
+		return build( arguments.modelId );
 	}
 
 	public Array function list(){
@@ -36,10 +23,26 @@
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( modelId = record.model_id ) );
+			ids.append( record.model_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( record ){
+				beanMap[ record.model_id ] = buildFromRow( record );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.model_id ] );
 		} );
 
 		result.setData( rows );
@@ -100,8 +103,6 @@
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.model.getId() );
-
 		return arguments.model.getId();
 	}
 
@@ -130,7 +131,6 @@
 				var result = getDao().delete( arguments.modelId );
 				outcome.setData( { "deletedCount" = result } )
 
-				super.getCacheManager().remove( getCacheScope(), arguments.modelId );
 				super.logEvent( event = "MODEL.DELETED", message = "Model [#arguments.modelId#] deleted" );
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -153,23 +153,33 @@
 		var record = getDao().read( arguments.modelId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Model" );
-
-			bean.setId( record.model_id );
-			bean.setName( record.model );
-			bean.setCode( record.code );
-			bean.setFruitsCount( record.fruits_count );
-			bean.setType( getLookupService().get( "modelType", record.model_type_id ) );
-			bean.setCategories( getCategoriesBeanByIds( record.categories ) );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setTexts( getTextService().list( modelId = record.model_id ) );
-
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Model a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.Model function buildFromRow( required any record ){
+		var bean = super.bean( "Model" );
+
+		// Campi diretti dal record
+		bean.setId( record.model_id );
+		bean.setName( record.model );
+		bean.setCode( record.code );
+		bean.setFruitsCount( record.fruits_count );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setType( getLookupService().get( "modelType", record.model_type_id ) );
+		bean.setCategories( getCategoriesBeanByIds( record.categories ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setTexts( getTextService().list( modelId = record.model_id ) );
+
+		return bean;
 	}
 
 }

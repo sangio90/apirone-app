@@ -12,14 +12,14 @@
 	</cffunction>
 
 	<cffunction name="find" returntype="Query">
-		
+
         <cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
-		
+
         <cfargument name="orderby" type="String" default="product_category_type">
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT 
+			SELECT
                 product_category_type_id,
 				COUNT(product_category_type_id) OVER() AS total
 			FROM
@@ -42,4 +42,23 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM product_category_types
+			WHERE product_category_type_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

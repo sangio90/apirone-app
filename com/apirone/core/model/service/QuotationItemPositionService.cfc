@@ -67,6 +67,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.position.getId();
 	}
 
+	/**
+	 * Costruisce un bean QuotationItemPosition a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationItemPosition function build( required String positionId ){
 		var record = getDao().read( arguments.positionId );
 		if ( record.recordCount ) {

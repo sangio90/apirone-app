@@ -80,6 +80,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean ProductionTime a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.ProductionTime function build( required String productionTimeId ){
 		var record = getDao().read( arguments.productionTimeId );
 

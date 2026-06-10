@@ -71,6 +71,9 @@
 		return arguments.product.getId();
 	}
 
+	/**
+	 * Costruisce un bean QuotationItemProduct a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationItemProduct function build( required String productId ){
 		var record = getDao().read( arguments.productId );
 		if ( record.recordCount ) {

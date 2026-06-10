@@ -8,21 +8,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" inject="LookupService";
 	property name="articleService" inject="ArticleService";
 
-	property name="cacheScope" type="String" default="Price.bean";
-
 	public com.apirone.core.model.bean.Price function get( required String priceId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.priceId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.priceId );
-		cm.put( getCacheScope(), arguments.priceId, bean );
-
-		return bean;
+		return build( arguments.priceId );
 	}
 
 	public Array function list(){
@@ -35,15 +22,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String productId,
 		Numeric productItemId,
 		String statusId,
-		String articleId,
+		String articleId
 	){
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( record.price_id, false ) );
+			ids.append( record.price_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( record ){
+				beanMap[ record.price_id ] = buildFromRow( record );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.price_id ] );
 		} );
 
 		result.setData( rows );
@@ -68,14 +71,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					message = "Price [#arguments.priceId#] deleted.",
 					payload = { "id" = arguments.priceId }
 				);
-				super.getCacheManager().remove( getCacheScope(), arguments.priceId );
-				removeEntityCache( obj.getEntity() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.error.CannotDeletePrice" );
 				outcome.setMessage( "Cannot delete price [#arguments.priceId#]" );
-				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# PriceService: error delete #error.message#");
 			}
 		}
 
@@ -94,13 +94,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			try {
 				getDao().deleteByParams( arguments.price );
-
-				super.getCacheManager().remove( getCacheScope(), obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeletePrice" );
-				outcome.setMessage( "Cannot delete pricd [#obj.getId()#]" );
+				outcome.setMessage( "Cannot delete price [#obj.getId()#]" );
 			}
 		}
 
@@ -114,8 +112,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().insert( arguments.price );
 
-		removeEntityCache( price.getEntity() );
-
 		return id;
 	}
 
@@ -125,10 +121,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		getDao().update( arguments.price );
-
-		super.getCacheManager().remove( getCacheScope(), price.getId() );
-
-		removeEntityCache( price.getEntity() );
 
 		return arguments.price.getId();
 	}
@@ -159,16 +151,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		backupTable( "prices" );
 
-		// var records = getDao().find( argumentCollection = findCriteria );
-
 		var products = getProductService().list( argumentCollection = findCriteria );
 
 		for ( var product in products ) {
-			/*
-			var prices = getDao().find(
-				argumentCollection = { productId = product.getId(), typeId = arguments.typeId }
-			);
-			*/
 
 			var prices = list( productId = product.getId(), typeId = arguments.typeId );
 
@@ -178,7 +163,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					var bean   = super.bean( "Price" );
 					var entity = super.bean( "Entity" );
 
-					entity.setkey( "product.id" );
+					entity.setKey( "product.id" );
 					entity.setValue( product.getId() );
 
 					var bean = get( price.getId() );
@@ -191,9 +176,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					getDao().update( bean );
 
 					updatedRecords++;
-
-					super.getCacheManager().remove( getCacheScope(), price.getId() );
-					getProductService().removeCache( product.getId() );
 
 					super.logEvent(
 						event   = "price.UPDATED",
@@ -221,7 +203,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setType( getPriceTypeService().get( arguments.typeId ) );
 				bean.setStatus( getStatusService().get( "ACT" ) );
 
-				entity.setkey( "product.Id" );
+				entity.setKey( "product.id" );
 				entity.setValue( product.getId() );
 
 				bean.setEntity( entity );
@@ -243,8 +225,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		};
 
-		super.getCacheManager().removeAll();
-
 		return { "inserted" = insertedRecords, "updated" = updatedRecords };
 	}
 
@@ -254,50 +234,35 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private Struct function removeEntityCache( required com.apirone.core.model.bean.Entity entity ){
-
-		var result = {};
-
-		if( entity.getKey() == "product.id" ) {
-			getProductService().removeCache( entity.getValue() );
-			result = { key = "product.id", value = entity.getValue() }
-		}
-
-		if( entity.getKey() == "productItem.id" ) {
-			getProductItemService().removeCache( entity.getValue() );
-			result = { key = "productItem.id", value = entity.getValue() }
-		}
-
-		if( entity.getKey() == "article.id" ) {
-			getArticleService().removeCache( entity.getValue() );
-			result = { key = "article.id", value = entity.getValue() }
-		}
-
-		return result;
-
-	}
-
 	private com.apirone.core.model.bean.Price function build( required String priceId ){
 		var record = getDao().read( arguments.priceId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Price" );
-
-			bean.setId( record.price_id );
-
-			bean.setAmount( record.amount );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
-
-			bean.setType( getPriceTypeService().get( record.price_type_id ) );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setEntity( getEntity( record ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Price a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.Price function buildFromRow( required any record ){
+		var bean = super.bean( "Price" );
+
+		// Campi diretti dal record
+		bean.setId( record.price_id );
+		bean.setAmount( record.amount );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
+		bean.setType( getPriceTypeService().get( record.price_type_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setEntity( getEntity( record ) );
+
+		return bean;
 	}
 
 	private com.apirone.core.model.bean.Entity function getEntity( required record ){
@@ -339,32 +304,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !StructKeyExists( map, productId ) ) {
 				map[ productId ] = [];
 			}
-			var bean = buildFromResultRow( record );
+			var bean = buildFromRow( record );
 			ArrayAppend( map[ productId ], bean );
 		}
 
 		return map;
-	}
-
-	/**
-	 * Costruisce un bean Price a partire da una riga della query, senza chiamata DB aggiuntiva.
-	 * Utilizzato da listByProductIds() per assemblare i bean in batch.
-	 */
-	private com.apirone.core.model.bean.Price function buildFromResultRow( required any record ){
-		var bean = super.bean( "Price" );
-
-		// Campi diretti dal record
-		bean.setId( record.price_id );
-		bean.setAmount( record.amount );
-		bean.setCreatedAt( record.created_at );
-
-		// Entity collegate: caricate singolarmente (lookup leggeri)
-		bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
-		bean.setType( getPriceTypeService().get( record.price_type_id ) );
-		bean.setStatus( getStatusService().get( record.status_id ) );
-		bean.setEntity( getEntity( record ) );
-
-		return bean;
 	}
 
 }

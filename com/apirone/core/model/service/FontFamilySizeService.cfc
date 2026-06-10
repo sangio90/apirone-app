@@ -73,6 +73,9 @@
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean FontFamilySize a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.FontFamilySize function build( required String fontFamilySizeId ){
 		var record = getDao().read( arguments.fontFamilySizeId );
 

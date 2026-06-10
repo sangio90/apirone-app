@@ -6,21 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="accountService" inject="AccountService";
 	property name="companyTypeService" inject="CompanyTypeService";
 
-	property name="cacheScope" type="String" default="Company.bean";
-
 	public com.apirone.core.model.bean.Company function get( required String companyId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.companyId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var company = build( arguments.companyId );
-
-		cm.put( getCacheScope(), arguments.companyId, company );
-		return company;
+		return build( arguments.companyId );
 	}
 
 	public Boolean function vatExists( required String vat ){
@@ -43,10 +30,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.company_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.company_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( companyId = record.company_id ) );
+			rows.add( beanMap[ record.company_id ] );
 		} );
 
 		result.setData( rows );
@@ -85,16 +89,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getLocationService().update( location = arguments.company.getLocation() );
 
-			getCacheManager().remove( getCacheScope(), id );
-
 			return id;
 		}
 	}
 
 	public Boolean function delete( required String companyId ){
 		var result = getDao().delete( arguments.companyId );
-
-		getCacheManager().remove( getCacheScope(), arguments.companyId );
 
 		return result;
 	}
@@ -107,30 +107,40 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.companyId );
 
 		if ( record.RecordCount ) {
-			var company = super.bean( "Company" );
-
-			var types = [];
-
-			company.setId( record.company_id.toString() );
-			company.setName( record.company );
-			company.setVat( record.vat );
-			company.setContact( record.contact );
-			company.setPhone( record.phone );
-			company.setCode( record.code );
-			company.setLocation( getLocationService().list( companyId = record.company_id ).getData()[ 1 ] );
-			company.setAccount( getAccountService().get( accountId = record.account_id.toString() ) );
-
-			DeserializeJSON( record.types.getValue() ).each( function( typeId ){
-				types.push( getCompanyTypeService().get( typeId ) );
-			} );
-
-			company.setTypes( types );
-			company.setStatus( getStatusService().get( record.status_id ) );
-
-			return company;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Company a partire da una riga della query.
+	 * Le sub-entity (Location, Account, Types, Status) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Company function buildFromRow( required Struct record ){
+		var company = super.bean( "Company" );
+		var types = [];
+
+		// Campi diretti dal record
+		company.setId( arguments.record.company_id.toString() );
+		company.setName( arguments.record.company );
+		company.setVat( arguments.record.vat );
+		company.setContact( arguments.record.contact );
+		company.setPhone( arguments.record.phone );
+		company.setCode( arguments.record.code );
+
+		// Entity collegate (caricate singolarmente)
+		company.setLocation( getLocationService().list( companyId = arguments.record.company_id ).getData()[ 1 ] );
+		company.setAccount( getAccountService().get( accountId = arguments.record.account_id.toString() ) );
+
+		DeserializeJSON( arguments.record.types.getValue() ).each( function( typeId ){
+			types.push( getCompanyTypeService().get( typeId ) );
+		} );
+
+		company.setTypes( types );
+		company.setStatus( getStatusService().get( arguments.record.status_id ) );
+
+		return company;
 	}
 
 }

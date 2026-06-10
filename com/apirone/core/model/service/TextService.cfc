@@ -6,22 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" inject="LookupService";
 	// property name="textKindService" inject="TextKindService";
 
-	property name="cacheScope" type="String" default="Text.bean";
-
 	public com.apirone.core.model.bean.Text function get( required String textId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.textId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.textId );
-
-		cm.put( getCacheScope(), arguments.textId, bean );
-
-		return bean;
+		return build( arguments.textId );
 	}
 
 	public Array function list(){
@@ -50,11 +36,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( textId = record.text_id ) );
-		} );
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.text_id );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.text_id ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.text_id ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromResultRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -128,8 +133,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Numeric function update( required com.apirone.core.model.bean.Text text ){
 		var id = getDao().update( arguments.text );
-
-		getCacheManager().remove( getCacheScope(), arguments.text.getId() );
 
 		return id;
 	}
@@ -228,17 +231,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( textId = arguments.textId );
 
 		if ( record.RecordCount ) {
-			var bean = super.bean( "Text" );
-
-			bean.setId( record.text_id );
-			bean.setName( record.text );
-			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setEntity( getEntity( record ) );
-
-			bean.setKind( getLookupService().get( "textKind", record.text_kind_id ) );
-
-			return bean;
+			return buildFromResultRow( record );
 		}
 
 		return NullValue();
@@ -286,7 +279,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setId( record.text_id );
 		bean.setName( record.text );
 
-		// Entity collegate, caricate singolarmente
+		// Entity collegate (caricate singolarmente)
 		bean.setLang( getLangService().get( record.lang_id ) );
 		bean.setStatus( getStatusService().get( record.status_id ) );
 		bean.setEntity( getEntity( record ) );

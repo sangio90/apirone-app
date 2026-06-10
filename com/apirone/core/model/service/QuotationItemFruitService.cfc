@@ -1,30 +1,13 @@
 ﻿
-
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
 	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="quotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
-	property name="cacheScope" type="String" default="QuotationItemFruit.bean";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemFruitId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationItemFruitId );
-
-		cm.put(
-			getCacheScope(),
-			arguments.quotationItemFruitId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.quotationItemFruitId );
 	}
 
 	public Array function list(){
@@ -42,11 +25,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var rows    = [];
 		var result  = super.getResult();
+
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( record.quotation_item_fruit_id ) );
-		} );
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.quotation_item_fruit_id );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.quotation_item_fruit_id ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.quotation_item_fruit_id ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -59,13 +62,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemFruitId = arguments.quotationItemFruitId } );
-		getDao().delete( arguments.quotationItemFruitId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.quotationItemFruitId );
-				cm.remove( getCacheScope(), arguments.quotationItemFruitId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -77,7 +77,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public Numeric function create( required quotationItemFruit ){
+	public Numeric function create( required com.apirone.core.model.bean.QuotationItemFruit quotationItemFruit ){
 		var newId = getDao().insert( arguments.quotationItemFruit );
 
 		// 01 items
@@ -122,8 +122,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationItemFruitPositionService().create( arguments.quotationItemFruit.getId(), position.id, position.order );
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemFruit.getId() );
-
 		return arguments.quotationItemFruit.getId();
 	}
 
@@ -132,33 +130,37 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		private methods
 	*/
 
+	private com.apirone.core.model.bean.QuotationItemFruit function buildFromRow( required any record ){
+		var bean = super.bean( "QuotationItemFruit" );
+
+		// Campi diretti dal record
+		bean.setId( record.quotation_item_fruit_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setNote( record.note );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setFruit( getProductService().get( record.fruit_id ) );
+
+		var items = getQuotationItemProductItemService().list( quotationItemFruitId = record.quotation_item_fruit_id );
+
+		if ( Len( items ) ) {
+			bean.setItems( items );
+		}
+
+		var positions = getQuotationItemFruitPositionService().list( quotationItemFruitId = record.quotation_item_fruit_id );
+
+		if ( Len( positions ) ) {
+			bean.setPositions( positions );
+		}
+
+		return bean;
+	}
+
 	private com.apirone.core.model.bean.QuotationItemFruit function build( required Numeric quotationItemFruitId ){
 		var record = getDao().read( arguments.quotationItemFruitId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "quotationItemFruit" );
-
-			bean.setId( record.quotation_item_fruit_id );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setFruit( getProductService().get( record.fruit_id ) );
-
-			var items = getQuotationItemProductItemService().list( quotationItemFruitId = quotationItemFruitId );
-
-			if ( Len( items ) ) {
-				bean.setItems( items );
-			}
-
-			var positions = getQuotationItemFruitPositionService().list( quotationItemFruitId=arguments.quotationItemFruitId );
-
-			var positionsData = [];
-			if ( Len( positions ) ) {
-				bean.setPositions( positions );
-			}
-
-			bean.setNote( record.note );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();

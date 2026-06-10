@@ -1,5 +1,5 @@
 ﻿<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
-	
+
 	<cffunction name="read" returntype="Query">
 		<cfargument name="quotationPriceId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone">
@@ -12,9 +12,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM quotation_prices
+			WHERE quotation_price_id IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="integer"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationId" type="String" required="false">
-		
+
 		<cfargument name="orderBy" type="String" required="true" default="quotation_prices.quotation_price_id">
 		<cfargument name="limit" type="Numeric" required="true" default="20">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -23,7 +41,7 @@
 			SELECT
 				quotation_price_id,
 				COUNT(quotation_price_id) OVER() AS total
-			FROM 
+			FROM
 				quotation_prices
 			WHERE 1=1
 				<cfif !IsNull( arguments.quotationId )>
@@ -32,13 +50,13 @@
 
 			ORDER BY
 				#super.sanitizeSQL( arguments.orderBy )#
-			
+
 			<cfif arguments.limit GT 0>
 				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
 				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
-		
+
 		<cfreturn local.q>
 	</cffunction>
 
@@ -69,7 +87,7 @@
 
 	<cffunction name="update" returntype="String">
 		<cfargument name="quotationPrice" type="com.apirone.core.model.bean.QuotationPrice" required="true">
-		
+
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE quotation_prices
 			SET
@@ -81,7 +99,7 @@
 			WHERE
 				quotation_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationPrice.getId()#">
 		</cfquery>
-		
+
 		<cfreturn arguments.quotationPrice.getId()>
 	</cffunction>
 
@@ -94,24 +112,24 @@
 			WHERE
 				quotation_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationPriceId#">
 		</cfquery>
-		
+
 		<cfreturn true>
-	
+
 	</cffunction>
 
 	<cffunction name="deleteByQuotationId" returntype="Boolean">
 		<cfargument name="quotationId" type="String" required="true">
-		
+
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
-			FROM 
-				quotation_prices	
+			FROM
+				quotation_prices
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
 		</cfquery>
 
-		<cfreturn true>	
-	
+		<cfreturn true>
+
 	</cffunction>
 
 </cfcomponent>

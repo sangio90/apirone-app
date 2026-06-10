@@ -6,28 +6,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="roleService" inject="RoleService";
 	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="Account.bean";
-
 	public com.apirone.core.model.bean.Account function get( required String accountId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.accountId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var account = build( arguments.accountId );
-		cm.put( getCacheScope(), arguments.accountId, account );
-
-		return account;
+		return build( arguments.accountId );
 	}
 
 	public String function create( required com.apirone.core.model.bean.Account account ){
 		if ( !Len( arguments.account.getEmail() ) ) {
 			Throw(
 				type    = "apirone.accountService.EmailNotProvided",
-				message = "Account [#arguments.accountId#] not exists"
+				message = "Account [#arguments.account.getId()#] not exists"
 			);
 		};
 
@@ -48,13 +35,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( !Len( arguments.account.getEmail() ) ) {
 			Throw(
 				type    = "apirone.accountService.EmailNotProvided",
-				message = "Account [#arguments.accountId#] not exists"
+				message = "Account [#arguments.account.getId()#] not exists"
 			);
 		};
 
 		var id = getDao().update( argumentCollection = arguments );
-
-		removeCache( id );
 
 		return id;
 	}
@@ -62,18 +47,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function updateLastLoggedUserId( required String accountId, required String userId ){
 		var id = getDao().updateLastLoggedUserId( arguments.accountId, arguments.userId );
 
-		removeCache( id );
-
 		return id;
-	}
-
-	public Boolean function updatePassword(
-		required String accountId,
-		required String pwd
-	){
-		getDao().updatePassword( arguments.accountId, pwd );
-
-		return true;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String accountId ){
@@ -87,8 +61,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.accountId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.accountId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -119,13 +91,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getDao().updatePassword( arguments.accountId, pwd );
 
-		removeCache( arguments.accountId );
-
 		super.logEvent(
 			event   = "account.UPDATED",
 			message = "Password for account [#arguments.accountId#] updated",
 			payload = { "id" = arguments.accountId, "newPwd" = StringUtil.maskString( arguments.newPwd ) }
-		);		
+		);
 
 		return true;
 	}
@@ -146,13 +116,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Account function getByEmail( required String email ){
 		if ( !Len( arguments.email ) ) {
-			Throw( type = "apirone.EmailNotProvided", message = "Account [#arguments.accountId#] not exists" );
+			Throw( type = "apirone.EmailNotProvided", message = "Account email not provided" );
 		};
-		
+
 		var accounts = search( email = arguments.email ).getData();
 
 		if ( !IsNull( accounts[ 1 ] ) ) {
-			return get( accountId = accounts[ 1 ].getId() );
+			return accounts[ 1 ];
 		}
 
 		return NullValue();
@@ -169,11 +139,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments["orderBy"] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		for ( var record in records ) {
-			rows.add( get( accountId = record.account_id ) )
+			ids.append( record.account_id );
+		}
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.account_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		for ( var record in records ) {
+			rows.add( beanMap[ record.account_id ] );
 		}
 
 		result.setData( rows );
@@ -216,11 +202,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getDao().clearResetToken( arguments.accountId );
 	}
 
-	public Void function removeCache( required String id ){
-
-		getCacheManager().remove( getCacheScope(), id );
-	}
-
 
 	/**
 	 * @private
@@ -232,21 +213,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var account = NullValue();
 
 		if ( record.recordCount ) {
-			var account = super.bean( "Account" );
-
-			account.setId( record.account_id.toString() );
-			account.setEmail( record.email );
-			account.setName( record.account );
-			account.setPwd( record.pwd );
-			account.setSerial( record.serial );
-			account.setLastLoggedUserId( record.last_logged_user_id );
-			account.setCreatedAt( record.created_at );
-			account.setUserCount( record.user_count );
-			account.setIdUtenteVerticale( record.id_utente_verticale );
-			account.setIdAgenteVerticale( record.id_agente_verticale );
-
-			account.setStatus( getStatusService().get( record.status_id ) );
+			return buildFromRow( record );
 		}
+
+		return account;
+	}
+
+	/**
+	 * Costruisce un bean Account a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * La sub-entity Status è caricata con chiamata individuale.
+	 */
+	private com.apirone.core.model.bean.Account function buildFromRow( required Struct record ){
+		var account = super.bean( "Account" );
+
+		// Campi diretti dal record
+		account.setId( arguments.record.account_id.toString() );
+		account.setEmail( arguments.record.email );
+		account.setName( arguments.record.account );
+		account.setPwd( arguments.record.pwd );
+		account.setSerial( arguments.record.serial );
+		account.setLastLoggedUserId( arguments.record.last_logged_user_id );
+		account.setCreatedAt( arguments.record.created_at );
+		account.setUserCount( arguments.record.user_count );
+		account.setIdUtenteVerticale( arguments.record.id_utente_verticale );
+		account.setIdAgenteVerticale( arguments.record.id_agente_verticale );
+
+		// Entity collegata (Status è un lookup leggero)
+		account.setStatus( getStatusService().get( arguments.record.status_id ) );
 
 		return account;
 	}

@@ -16,12 +16,30 @@
 
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM raw_values
+			WHERE raw_value_id IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="integer"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="readByCode" output="false">
 		<cfargument name="code" type="String" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				raw_value_id, 
+				raw_value_id,
 				code
 			FROM
 				raw_values
@@ -36,13 +54,13 @@
 
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
-		
+
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT DISTINCT
-				code, 
+				code,
 				raw_value_id,
 				<!---- COUNT(raw_value_id) AS total ---->
 				COUNT(raw_value_id) OVER() AS total
@@ -54,23 +72,23 @@
 			WHERE 1=1
 				<cfif !IsNull( arguments.str )>
 					AND
-						( 
+						(
 						texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 						OR
 						raw_values.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
 						)
 				</cfif>
-				
+
 				<cfif !IsNull( arguments.statusId )>
 					AND raw_values.status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.statusId#">
 				</cfif>
 
-			GROUP BY 
-				code, 
+			GROUP BY
+				code,
 				raw_value_id
 			ORDER BY
-				code ASC, 
-				raw_value_id 
+				code ASC,
+				raw_value_id
 			<cfif arguments.limit GTE 0>
 				LIMIT
 					<cfqueryparam cfsqltype="integer" value="#arguments.limit#">
@@ -109,7 +127,7 @@
 		<cfargument name="value" type="com.apirone.core.model.bean.RawValue" required="true">
 
         <cfquery name="local.q" datasource="apirone">
-			UPDATE raw_values 
+			UPDATE raw_values
 			SET
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getStatus().getId()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.value.getCode()#">
@@ -122,7 +140,7 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">
-		
+
 		<cfargument name="rawValueId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">

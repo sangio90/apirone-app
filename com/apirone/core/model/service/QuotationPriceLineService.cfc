@@ -51,6 +51,9 @@
 		return newId;
 	}
 
+	/**
+	 * Costruisce un bean QuotationPriceLine a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationPriceLine function build( required Numeric quotationPriceLineId ){
 		var record = getDao().read( arguments.quotationPriceLineId );
 

@@ -3,22 +3,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="FileDAO";
 	property name="lookupService" inject="LookupService";
 	property name="fileTypeService" inject="FileTypeService";
-	property name="cacheScope" type="String" default="File.bean";
 
 	public com.apirone.core.model.bean.file function get( required String fileId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.fileId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var obj = build( arguments.fileId );
-
-		cm.put( getCacheScope(), arguments.fileId, obj );
-
-		return obj;
+		return build( arguments.fileId );
 	}
 
 	public Array function list(){
@@ -45,10 +32,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments["orderBy"] = super.createOrderBy( arguments.orderBy );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( fileId = record.file_id ) );
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids     = [];
+		records.each( function( r ){
+			ids.append( r.file_id ); // file_id già castato a varchar dal find()
+		} );
+
+		var beanMap = {};
+
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( r ){
+				beanMap[ r.file_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( r ){
+			rows.add( beanMap[ r.file_id ] );
 		} );
 
 		result.setData( rows );
@@ -64,15 +68,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	){
 		var id = getDao().update( file = arguments.file, entity = arguments.entity ).toString();
 
-		getCacheManager().remove( getCacheScope(), arguments.fileId );
-
 		return id;
 	}
 
 	public void function delete( required String fileId ){
 		getDao().delete( arguments.fileId );
-
-		getCacheManager().remove( getCacheScope(), arguments.fileId );
 	}
 
 	public String function create(
@@ -169,43 +169,57 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+	/*
+    	private method
+	*/
+
 	/**
-	 * @private
+	 * Costruisce un bean File a partire dall'ID, effettuando la lettura dal DB.
 	 */
 	private com.apirone.core.model.bean.File function build( required String fileId ){
 		var record = getDao().read( fileId = arguments.fileId );
 
 		if ( record.RecordCount ) {
-			var obj = super.bean( "File" );
-
-			obj.setId( record.file_id.toString() );
-			obj.setName( record.name );
-
-			obj.setType( getFileTypeService().get( record.type_id ) );
-
-			var kind = getLookupService().get( "fileKind", record.kind_id );
-
-			// TODO add arguments "throwOnNull" to lookup.get()
-			if ( IsNull( kind ) ) {
-				Throw(
-					type    = "apirone.error.file.kindNotFound",
-					message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
-				);
-			}
-
-			obj.setKind( kind );
-			obj.setSize( record.size );
-			obj.setWidth( record.width );
-			obj.setHeight( record.height );
-			obj.setAlt( record.alt );
-			obj.setDescription( record.description );
-			obj.setExtension( record.extension );
-			obj.setDirectory( record.directory );
-
-			return obj;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean File a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * Le sub-entity (type, kind) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.File function buildFromRow( required any record ){
+		var obj = super.bean( "File" );
+
+		// Campi diretti dal record
+		obj.setId( record.file_id.toString() );
+		obj.setName( record.name );
+
+		// Entity collegate (caricate singolarmente)
+		obj.setType( getFileTypeService().get( record.type_id ) );
+
+		var kind = getLookupService().get( "fileKind", record.kind_id );
+
+		if ( IsNull( kind ) ) {
+			Throw(
+				type    = "apirone.error.file.kindNotFound",
+				message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
+			);
+		}
+
+		obj.setKind( kind );
+		obj.setSize( record.size );
+		obj.setWidth( record.width );
+		obj.setHeight( record.height );
+		obj.setAlt( record.alt );
+		obj.setDescription( record.description );
+		obj.setExtension( record.extension );
+		obj.setDirectory( record.directory );
+
+		return obj;
 	}
 
 	public String function getExtensionFromDataUrl( required String dataUrl ) {
@@ -250,46 +264,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !StructKeyExists( map, entityValue ) ) {
 				map[ entityValue ] = [];
 			}
-			var bean = buildFromResultRow( record );
+			var bean = buildFromRow( record );
 			ArrayAppend( map[ entityValue ], bean );
 		}
 
 		return map;
-	}
-
-	/**
-	 * Costruisce un bean File a partire da una riga della query, senza chiamata DB aggiuntiva.
-	 * Utilizzato da listByEntityIds() per assemblare i bean in batch.
-	 */
-	private com.apirone.core.model.bean.File function buildFromResultRow( required any record ){
-		var obj = super.bean( "File" );
-
-		// Campi diretti dal record
-		obj.setId( record.file_id.toString() );
-		obj.setName( record.name );
-
-		// Entity collegate: caricate singolarmente (lookup leggeri)
-		obj.setType( getFileTypeService().get( record.type_id ) );
-
-		var kind = getLookupService().get( "fileKind", record.kind_id );
-
-		if ( IsNull( kind ) ) {
-			Throw(
-				type    = "apirone.error.file.kindNotFound",
-				message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
-			);
-		}
-
-		obj.setKind( kind );
-		obj.setSize( record.size );
-		obj.setWidth( record.width );
-		obj.setHeight( record.height );
-		obj.setAlt( record.alt );
-		obj.setDescription( record.description );
-		obj.setExtension( record.extension );
-		obj.setDirectory( record.directory );
-
-		return obj;
 	}
 
 	/**

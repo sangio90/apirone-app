@@ -213,7 +213,7 @@ Lines 48 and 78 have `getCasceScope()` (missing `h`). This is a latent bug — t
 
 ---
 
-## Phase 3: T2 — Medium Entities (4–15 DB queries in build) &nbsp;&nbsp;`❌ TO DO`
+## Phase 3: T2 — Medium Entities (4–15 DB queries in build) &nbsp;&nbsp;`✅ DONE`
 
 > **Each entity is independent** (except where noted). Complete and test one at a time.
 
@@ -492,7 +492,7 @@ getQuotationItemPositionService().list()           [1 + position builds]
 2. `QuotationItemService.cfc` — rewrite `search()` with full batch preloading:
    - Collect all quotationItemIds
    - Batch load: fruits, prices, quotation zones, signage rows, files, positions, product items
-   - Batch load: all quotationIds → `QuotationService.getMany(allQuotaionIds)`
+   - Batch load: all quotationIds → `QuotationService.getMany(allQuotationIds)`
    - Batch load: all productIds → `ProductService.getMany(allProductIds)` ← uses batch infrastructure
    - Batch load: all statusIds, zoneIds, configItemIds, etc.
 3. `QuotationItemService.cfc` — remove `cacheScope`, cache from `get()`, `delete()`, `update()`, `updateHash()`

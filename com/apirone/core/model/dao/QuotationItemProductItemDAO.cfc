@@ -13,6 +13,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotation_item_product_item_id::varchar,
+				quotation_item_id::varchar,
+				*
+			FROM quotation_item_product_items
+			WHERE quotation_item_product_item_id::varchar IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="varchar"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="productItemId" type="String" required="false">

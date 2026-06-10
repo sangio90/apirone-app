@@ -5,22 +5,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="modelService" inject="ModelService";
 	property name="productCategoryService" inject="ProductCategoryService";
 
-	property name="CacheScope" type="String" default="CatalogBundle.bean";
-
 	public com.apirone.core.model.bean.CatalogBundle function get( required String catalogBundleId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.catalogBundleId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.catalogBundleId );
-
-		cm.put( getCacheScope(), catalogBundleId, bean );
-
-		return bean;
+		return build( arguments.catalogBundleId );
 	}
 
 	public Array function list(){
@@ -47,8 +33,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			message = "CatalogBundle [#arguments.catalogBundle.getId()#] updated"
 		);
 
-		super.getCacheManager().remove( getCacheScope(), arguments.catalogBundle.getId() );
-
 		return arguments.catalogBundle.getId();
 	}
 
@@ -67,10 +51,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.catalog_bundle_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.catalog_bundle_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( record.catalog_bundle_id ) );
+			rows.add( beanMap[ record.catalog_bundle_id ] );
 		} );
 
 		result.setData( rows );
@@ -115,21 +116,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.catalogBundleId );
 
 		if ( record.RecordCount ) {
-			var bean = super.bean( "CatalogBundle" );
-
-			bean.setId( record.catalog_bundle_id );
-			bean.setName( record.catalog_bundle );
-			bean.setCreatedAt( record.created_at );
-			bean.setMarkupValue( record.markup_value );
-
-			bean.setLine( getLineService().get( record.line_id ) );
-			bean.setModel( getModelService().get( record.model_id ) );
-			bean.setCategory( getProductCategoryService().get( record.product_category_id ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean CatalogBundle a partire da una riga della query.
+	 * Le sub-entity (Line, Model, Category) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.CatalogBundle function buildFromRow( required Struct record ){
+		var bean = super.bean( "CatalogBundle" );
+
+		// Campi diretti dal record
+		bean.setId( arguments.record.catalog_bundle_id );
+		bean.setName( arguments.record.catalog_bundle );
+		bean.setCreatedAt( arguments.record.created_at );
+		bean.setMarkupValue( arguments.record.markup_value );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setLine( getLineService().get( arguments.record.line_id ) );
+		bean.setModel( getModelService().get( arguments.record.model_id ) );
+		bean.setCategory( getProductCategoryService().get( arguments.record.product_category_id ) );
+
+		return bean;
 	}
 
 }

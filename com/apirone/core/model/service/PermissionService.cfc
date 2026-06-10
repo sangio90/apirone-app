@@ -28,6 +28,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return rows;
 	}
 
+	/**
+	 * Costruisce un bean Permission a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Permission function build( required String permissionId ){
 		var record = getDao().read( arguments.permissionId );
 

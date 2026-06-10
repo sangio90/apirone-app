@@ -32,6 +32,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	/**
+	 * Costruisce un bean Pricelist a partire dall'ID. Delega a buildFromQueryRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Pricelist function build( required String pricelistId ){
 		var record = getDao().read( arguments.pricelistId );
 

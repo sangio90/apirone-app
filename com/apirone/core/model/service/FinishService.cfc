@@ -4,21 +4,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="ProductCategoryService" inject="ProductCategoryService";
 	property name="textService" inject="TextService";
-	property name="cacheScope" type="String" default="Finish.bean";
 
 	public com.apirone.core.model.bean.Finish function get( required String finishId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.finishId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.finishId );
-		cm.put( getCacheScope(), arguments.finishId, bean );
-
-		return bean;
+		return build( arguments.finishId );
 	}
 
 	public Array function list(){
@@ -36,10 +24,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "finish" );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( finishId = record.finish_id ) );
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids     = [];
+		records.each( function( r ){
+			ids.append( r.finish_id ); // finish_id già castato a varchar dal find()
+		} );
+
+		var beanMap = {};
+
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( r ){
+				beanMap[ r.finish_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( r ){
+			rows.add( beanMap[ r.finish_id ] );
 		} );
 
 		result.setData( rows );
@@ -88,8 +93,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.finish.getId() );
-
 		return arguments.finish.getId();
 	}
 
@@ -117,8 +120,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.finishId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.finishId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -134,27 +135,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean Finish a partire dall'ID, effettuando la lettura dal DB.
+	 */
 	private com.apirone.core.model.bean.Finish function build( required String finishId ){
 		var record = getDao().read( arguments.finishId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Finish" );
-
-			bean.setId( record.finish_id );
-			bean.setCode( record.code );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setTexts( getTextService().list( finishId = record.finish_id ) );
-
-			var categories = getCategoriesBeanByIds( record.categories )
-
-			bean.setCategories( categories );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Finish a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * Le sub-entity (status, texts, categories) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Finish function buildFromRow( required any record ){
+		var bean = super.bean( "Finish" );
+
+		// Campi diretti dal record
+		bean.setId( record.finish_id );
+		bean.setCode( record.code );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setTexts( getTextService().list( finishId = record.finish_id ) );
+
+		var categories = getCategoriesBeanByIds( record.categories )
+
+		bean.setCategories( categories );
+
+		return bean;
 	}
 
 }

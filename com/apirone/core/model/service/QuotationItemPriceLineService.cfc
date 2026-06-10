@@ -62,6 +62,9 @@
 		PRIVATE METHODS
 	*/
 
+	/**
+	 * Costruisce un bean QuotationItemPriceLine a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationItemPriceLine function build( required Numeric quotationItemPriceLineId ){
 		var record = getDao().read( arguments.quotationItemPriceLineId );
 

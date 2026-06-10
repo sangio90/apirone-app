@@ -6,28 +6,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="roleService" inject="RoleService";
 	property name="accountService" inject="AccountService";
 
-	property name="cacheScope" type="String" default="User.bean";
-
 	public com.apirone.core.model.bean.User function get( required String userId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.userId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var user = build( arguments.userId );
-		cm.put( getCacheScope(), arguments.userId, user );
-
-		return user;
+		return build( arguments.userId );
 	}
 
 	public String function create( required com.apirone.core.model.bean.User user ){
 
 		var id = getDao().insert( argumentCollection = arguments );
-
-		getAccountService().removeCache( arguments.user.getAccount().getId() );
 
 		return id;
 	}
@@ -35,8 +20,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.User user ){
 
 		var id = getDao().update( argumentCollection = arguments );
-
-		removeCache( id );
 
 		return id;
 	}
@@ -52,8 +35,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.userId );
 				outcome.setData( { "deletedCount" = result } )
-
-				removeCache( arguments.userId );
 
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -83,10 +64,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		for ( var record in records ) {
-			rows.add( get( userId = record.user_id ) )
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.user_id );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.user_id ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.user_id ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromRow( fullRecord ) );
+				}
+			}
 		}
 
 		result.setData( rows );
@@ -100,36 +100,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		private methods
 	*/
 
-	public Void function removeCache( required String id ){
+	private com.apirone.core.model.bean.User function buildFromRow( required any record ){
+		var user = super.bean( "User" );
 
-		var cm = super.getCacheManager();
+		// Campi diretti dal record
+		user.setId( record.user_id );
+		user.setName( record.user_name );
+		user.setSerial( record.serial );
+		user.setPhone( record.phone );
+		user.setCreatedAt( record.created_at );
 
-		var bean = get( arguments.id );
+		// Entity collegate (caricate singolarmente)
+		user.setAccount( getAccountService().get( record.account_id.toString() ) );
+		user.setStatus( getStatusService().get( record.status_id ) );
+		user.setRole( getRoleService().get( record.role_id ) );
+		user.setLang( getLangService().get( record.lang_id ) );
 
-		getCacheManager().remove( getCacheScope(), arguments.id );
-
-		getAccountService().removeCache( bean.getAccount().getId() )
-
+		return user;
 	}
 
 	private com.apirone.core.model.bean.User function build( required String userId ){
 		var record = getDao().read( userId = arguments.userId );
 
 		if ( record.recordCount ) {
-			var user = super.bean( "User" );
-
-			user.setId( record.user_id );
-			user.setName( record.user_name );
-			user.setSerial( record.serial );
-			user.setPhone( record.phone );
-			user.setCreatedAt( record.created_at );
-			
-			user.setAccount( getAccountService().get( record.account_id.toString() ) );
-			user.setStatus( getStatusService().get( record.status_id ) );
-			user.setRole( getRoleService().get( record.role_id ) );
-			user.setLang( getLangService().get( record.lang_id ) );
-
-			return user;
+			return buildFromRow( record );
 		}
 
 		return NullValue();

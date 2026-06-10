@@ -143,6 +143,9 @@
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean Font a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Font function build( required String fontId ){
 		var record = getDao().read( arguments.fontId );
 

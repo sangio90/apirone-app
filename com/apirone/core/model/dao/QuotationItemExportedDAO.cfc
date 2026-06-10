@@ -11,7 +11,26 @@
 
 		<cfreturn local.q>
 	</cffunction>
-	
+
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="verticaleExport">
+			SELECT
+				*
+			FROM ARTICO_APIR
+			WHERE AR_CHIAVE IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="varchar"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="readRow" returntype="Query">
 		<cfargument name="key" type="String" required="true">
 		<cfargument name="rowNumber" type="Numeric" required="true">
@@ -21,6 +40,24 @@
 				*
 			FROM DISBAS_APIR
 			WHERE DS_CHIAVE = <cfqueryparam cfsqltype="Varchar" value="#arguments.key#"> AND CPROWNUM = <cfqueryparam cfsqltype="Integer" value="#arguments.rowNumber#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch tutte le righe di un articolo esportato, dato il DS_CHIAVE.
+		Utilizzato dal Service corrispondente per caricare le righe in blocco.
+	--->
+	<cffunction name="readRowsByKey" returntype="Query">
+		<cfargument name="key" type="String" required="true">
+
+		<cfquery name="local.q" datasource="verticaleExport">
+			SELECT
+				*
+			FROM DISBAS_APIR
+			WHERE DS_CHIAVE = <cfqueryparam cfsqltype="Varchar" value="#arguments.key#">
+			ORDER BY CPROWNUM
 		</cfquery>
 
 		<cfreturn local.q>
@@ -54,7 +91,7 @@
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS 
+				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
 				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY
 			</cfif>
 		</cfquery>

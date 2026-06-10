@@ -81,6 +81,9 @@
 		return newId;
 	}
 
+	/**
+	 * Il DAO non ha un metodo read() per questo tipo di entity: get() non può ricostruire il bean dal DB.
+	 */
 	private com.apirone.core.model.bean.QuotationItemFruit function build( required Numeric quotationItemFruitPositionId ){
 		return NullValue();
 	}

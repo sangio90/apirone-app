@@ -8,7 +8,7 @@
 			SELECT *
 			FROM
 				locations
-			WHERE  
+			WHERE
 				location_id = <cfqueryparam value="#arguments.locationId#" cfsqltype="varchar">::uuid
 		</cfquery>
 
@@ -16,7 +16,25 @@
 
 	</cffunction>
 
-	
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM
+				locations
+			WHERE
+				location_id::varchar IN (<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="varchar">)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="limit" required="true" type="Numeric" default="50">
@@ -31,7 +49,7 @@
 			FROM
 				locations
 			WHERE 1=1
-	
+
 			<cfif !isNull( arguments.companyId ) >
 				AND company_id = <cfqueryparam value="#arguments.companyId#" cfsqltype="varchar">::uuid
 			</cfif>
@@ -41,9 +59,9 @@
 			</cfif>
 
 			<cfif arguments.limit GT 0>
-				LIMIT  
+				LIMIT
 					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET 
+				OFFSET
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 
@@ -74,7 +92,7 @@
 		</cfquery>
 
 		<cfreturn q.location_id.toString()>
-	
+
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
@@ -82,16 +100,16 @@
 		<cfargument name="location" type="com.apirone.core.model.bean.Location" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE locations 
-			SET address 	= <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getAddress()#">, 
+			UPDATE locations
+			SET address 	= <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getAddress()#">,
 				city_id 	= <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getCity().getId()#">::uuid,
 				postal_code = <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getPostalCode()#">
-			WHERE 
+			WHERE
 				location_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.location.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.location.getId()>
-	
+
 	</cffunction>
 
 

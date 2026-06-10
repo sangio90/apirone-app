@@ -75,6 +75,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.exportCode.getId();
 	}
 
+	/**
+	 * Costruisce un bean ExportCode a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.ExportCode function build( required Numeric exportCodeId ){
 		var record = getDao().read( arguments.exportCodeId );
 

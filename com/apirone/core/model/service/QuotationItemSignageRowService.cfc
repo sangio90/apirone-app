@@ -68,6 +68,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotationItemSignageRow.getId();
 	}
 
+	/**
+	 * Costruisce un bean QuotationItemSignageRow a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationItemSignageRow function build( required String quotationItemSignageRowId ){
 		var record = getDao().read( arguments.quotationItemSignageRowId );
 		if ( record.recordCount ) {

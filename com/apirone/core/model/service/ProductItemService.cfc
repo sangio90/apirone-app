@@ -8,21 +8,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="priceService" inject="PriceService";
 
-	property name="cacheScope" default="ProductItem.bean";
-
 	public com.apirone.core.model.bean.ProductItem function get( required productItemId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.productItemId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.productItemId );
-		cm.put( getCacheScope(), arguments.productItemId, bean );
-
-		return bean;
+		return build( arguments.productItemId );
 	}
 
 	public Array function getTree( required String productId ){
@@ -42,7 +29,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Array function list( String productId, Numeric originId ){
+	public Array function getFlatTree(
+		required String productId,
+		required Numeric originId             = NullValue(),
+		required String level                 = 1,
+		required String orderBy               = "",
+		required Boolean includeMissingValues = true
+	){
 		var result = [];
 		var rows   = [];
 
@@ -115,15 +108,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( record.product_item_id ) );
+			ids.append( record.product_item_id );
+		} );
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( record ){
+				beanMap[ record.product_item_id ] = buildFromRow( record );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.product_item_id ] );
 		} );
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
-		result.setTotal( Val( records.recordcount ) );
+		result.setTotal( Val( records.total ) );
 
 		return result;
 	}
@@ -144,9 +153,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			try {
 				getDao().delete( argumentCollection = arguments );
-
-				cm.removeByScope( "product.bean" );
-				cm.removeByScope( "productItem.bean" );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -158,8 +164,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public String function create( required com.apirone.core.model.bean.ProductItem ProductItem ){
-		var newId = getDao().insert( arguments.ProductItem );
+	public String function create( required com.apirone.core.model.bean.ProductItem productItem ){
+		var newId = getDao().insert( arguments.productItem );
 
 		return newId;
 	}
@@ -168,64 +174,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public String function update( required com.apirone.core.model.bean.ProductItem productItem ){
 		var newId = getDao().update( arguments.productItem );
 
-		// super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
-
-		removeCache( arguments.productItem.getId() );
-
 		return newId;
-	}
-
-	public Array function getFlatTree(
-		required String productId,
-		required Numeric originId             = NullValue(),
-		required String level                 = 1,
-		required String orderBy               = "",
-		required Boolean includeMissingValues = true
-	){
-		var result = [];
-		var rows   = [];
-
-		var productId = arguments.productId;
-
-		var items = list( productId = arguments.productId, originId = arguments.originId );
-
-		if ( arguments.includeMissingValues ) {
-			rows = listWithMissingValues( items );
-		} else {
-			rows = items;
-		}
-
-		var thisLevel            = arguments.level;
-		var includeMissingValues = arguments.includeMissingValues;
-
-		var n = 1;
-
-		for ( var row in rows ) {
-			var thisOrderBy = "#arguments.orderBy#.#n#";
-			var originId    = row.getId();
-
-			row.setLevel( arguments.level );
-
-			result.add( row );
-
-			var rows = getFlatTree(
-				productId,
-				originId,
-				thisLevel + 1,
-				thisOrderBy,
-				includeMissingValues
-			);
-
-			result = result.merge( rows );
-
-			n++;
-		}
-
-		return result;
-	}
-
-	public Void function removeCache( required Numeric productItemId ){
-		super.getCacheManager().remove( getCacheScope(), arguments.productItemId );
 	}
 
 
@@ -348,46 +297,51 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.productItemId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ProductItem" );
-
-			bean.setId( record.product_item_id );
-			bean.setProductId( record.product_id );
-			bean.setCreatedAt( record.created_at );
-			bean.setImportant( record.important );
-
-			bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
-
-			bean.setOrderBy( record.orderby );
-
-			bean.setStatus( getStatusService().get( record.status_id ) );
-
-			var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
-
-			bean.setAttributeValue( attributeValue );
-
-			bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-			//bean.setComponentCount( getComponentService().count( productItemId = record.product_item_id ) );
-			bean.setComponentCount( 0 )
-
-			bean.setChildren( [] );
-
-			bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
-
-			var images = getFileService().list( productItemId = record.product_item_id );
-
-			if ( Len( images ) ) {
-				bean.setImages( images )
-			} else {
-				var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
-				if ( Len( images ) ) {
-					bean.setImages( images )
-				}
-			}
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean ProductItem a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.ProductItem function buildFromRow( required any record ){
+		var bean = super.bean( "ProductItem" );
+
+		// Campi diretti dal record
+		bean.setId( record.product_item_id );
+		bean.setProductId( record.product_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setImportant( record.important );
+		bean.setOrderBy( record.orderby );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+
+		var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
+		bean.setAttributeValue( attributeValue );
+		bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
+		bean.setComponentCount( 0 );
+
+		bean.setChildren( [] );
+
+		bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
+
+		var images = getFileService().list( productItemId = record.product_item_id );
+
+		if ( Len( images ) ) {
+			bean.setImages( images );
+		} else {
+			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
+			if ( Len( images ) ) {
+				bean.setImages( images );
+			}
+		}
+
+		return bean;
 	}
 
 	/**
@@ -408,56 +362,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !StructKeyExists( map, productId ) ) {
 				map[ productId ] = [];
 			}
-			var bean = buildFromResultRow( record );
+			var bean = buildFromRow( record );
 			ArrayAppend( map[ productId ], bean );
 		}
 
 		return map;
-	}
-
-	/**
-	 * Costruisce un bean ProductItem a partire da una riga della query, senza chiamata DB aggiuntiva
-	 * per il record principale.
-	 */
-	private com.apirone.core.model.bean.ProductItem function buildFromResultRow( required any record ){
-		var bean = super.bean( "ProductItem" );
-
-		// Campi diretti dal record
-		bean.setId( record.product_item_id );
-		bean.setProductId( record.product_id );
-		bean.setCreatedAt( record.created_at );
-		bean.setImportant( record.important );
-		bean.setOrderBy( record.orderby );
-
-		// Entity ricorsiva: se presente, carica l'origine (chiamata singola per item)
-		bean.setOrigin( IsNull( record.origin_id ) ? NullValue() : get( record.origin_id ) );
-
-		// Entity collegate caricate singolarmente
-		bean.setStatus( getStatusService().get( record.status_id ) );
-
-		var attributeValue = getAttributeValueService().get( record.attribute_raw_value_id );
-		bean.setAttributeValue( attributeValue );
-		bean.setAttribute( getAttributeService().get( attributeValue.getAttributeId() ) );
-		bean.setComponentCount( 0 );
-
-		bean.setChildren( [] );
-
-		// Sub-entity caricate con chiamate individuali al DB
-		bean.setPrices( getPriceService().list( productItemId = record.product_item_id ) );
-
-		var images = getFileService().list( productItemId = record.product_item_id );
-
-		if ( Len( images ) ) {
-			bean.setImages( images );
-		} else {
-			// Fallback: cerca immagini per attributeValueId
-			var images = getFileService().list( attributeValueId = record.attribute_raw_value_id );
-			if ( Len( images ) ) {
-				bean.setImages( images );
-			}
-		}
-
-		return bean;
 	}
 
 }

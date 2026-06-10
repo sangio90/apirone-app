@@ -10,21 +10,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="textService" inject="TextService";
 
-	property name="cacheScope" type="String" default="Line.bean";
-
 	public com.apirone.core.model.bean.Line function get( required String lineId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.lineId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.lineId );
-		cm.put( getCacheScope(), arguments.lineId, bean );
-
-		return bean;
+		return build( arguments.lineId );
 	}
 
 	public Array function list(){
@@ -46,10 +33,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
+		var ids     = [];
+		records.each( function( r ){
+			ids.append( r.line_id );
+		} );
 
-		records.each( function( record ){
-			rows.add( get( lineId = record.line_id ) );
+		var beanMap = {};
+
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			allRecords.each( function( r ){
+				beanMap[ r.line_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( r ){
+			rows.add( beanMap[ r.line_id ] );
 		} );
 
 		result.setData( rows );
@@ -143,8 +146,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			maxThreads = 1
 		);
 
-		getCacheManager().removeAll();
-
 		super.logEvent(
 			event   = "line.CLONED",
 			message = "End clone line from [#arguments.fromLineId#] to [#arguments.toLineId#]",
@@ -180,8 +181,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			payload = { "id" = arguments.line.getId() }
 		);
 
-		super.getCacheManager().remove( getCacheScope(), arguments.line.getId() );
-
 		return arguments.line.getId();
 	}
 
@@ -209,8 +208,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.lineId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.lineId );
 
 				// super.logAction( type = "LINE.DELETED", message = "Line [#arguments.lineId#] deleted" );
 			} catch ( any error ) {
@@ -244,8 +241,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( lineId = arguments.lineId, categoryId = arguments.categoryId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.lineId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -262,30 +257,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean Line a partire dall'ID, effettuando la lettura dal DB.
+	 */
 	private com.apirone.core.model.bean.Line function build( required String lineId ){
 		var record = getDao().read( arguments.lineId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Line" );
-
-			bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
-
-			bean.setTexts( getTextService().list( lineId = record.line_id ) );
-
-			bean.setName( bean.getName() );
-
-			bean.setId( record.line_id );
-			bean.setCode( record.code );
-			bean.setHscode( record.hscode );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Line a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * Le sub-entity (thickness, texts, status, categories) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Line function buildFromRow( required any record ){
+		var bean = super.bean( "Line" );
+
+		// Campi diretti dal record
+		bean.setId( record.line_id );
+		bean.setCode( record.code );
+		bean.setHscode( record.hscode );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setThickness( getLookupService().get( "thickness", record.thickness_id ) );
+		bean.setTexts( getTextService().list( lineId = record.line_id ) );
+		bean.setName( bean.getName() );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setCategories( super.getCategoriesBeanByIds( record.categories ) );
+
+		return bean;
 	}
 
 }

@@ -4,25 +4,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lineService" inject="lineService";
 	property name="productCategoryService" inject="productCategoryService";
 
-	property name="cacheScope" type="String" default="ProductCategoryLine.bean";
-
 	public com.apirone.core.model.bean.ProductCategoryLine function get( required String ProductCategoryLineId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.ProductCategoryLineId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.ProductCategoryLineId );
-		cm.put(
-			getCacheScope(),
-			arguments.ProductCategoryLineId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.ProductCategoryLineId );
 	}
 
 	public Array function list(){
@@ -46,9 +29,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( productCategoryLineId = record.product_category_line_id ) );
-		} );
+		// Raccoglie gli ID restituiti dalla find per un caricamento batch
+		var ids = [];
+		for ( var record in records ) {
+			ids.add( record.product_category_line_id );
+		}
+
+		// Carica tutti i record completi in un'unica query e costruisce una mappa id -> bean
+		if ( ids.len() ) {
+			var fullRecords = getDao().readByIds( ids );
+			var beanMap = {};
+
+			for ( var fullRecord in fullRecords ) {
+				beanMap[ fullRecord.product_category_line_id ] = buildFromRow( fullRecord );
+			}
+
+			// Itera i record originali per preservare l'ordinamento della find
+			for ( var record in records ) {
+				rows.add( beanMap[ record.product_category_line_id ] );
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -66,15 +66,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var newId = getDao().insert( arguments.productCategoryLine );
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.productCategoryLine.getId() );
-
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.ProductCategoryLine productCategoryLine ){
 		getDao().update( arguments.productCategoryLine );
-
-		super.getCacheManager().remove( getCacheScope(), arguments.productCategoryLine.getId() );
 
 		return arguments.productCategoryLine.getId();
 	}
@@ -88,8 +84,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.productCategoryLineId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.productCategoryLineId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -102,24 +96,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	/*
-    	private method
-	*/
+	/**
+	 * Costruisce un bean ProductCategoryLine a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.ProductCategoryLine function buildFromRow( required any record ){
+		var bean = super.bean( "ProductCategoryLine" );
+
+		bean.setId( record.product_category_line_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setMarkup( record.markup );
+		// Entity collegate (Line e ProductCategory sono lookup leggeri)
+		bean.setLine( getLineService().get( record.line_id ) );
+		bean.setProductCategory( getProductCategoryService().get( record.product_category_id ) );
+
+		return bean;
+	}
 
 	private com.apirone.core.model.bean.ProductCategoryLine function build( required String productCategoryLineId ){
 		var record = getDao().read( arguments.productCategoryLineId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ProductCategoryLine" );
-
-			bean.setId( record.product_category_line_id );
-			bean.setCreatedAt( record.created_at );
-			bean.setMarkup( record.markup );
-
-			bean.setLine( getLineService().get( record.line_id ) );
-			bean.setProductCategory( getProductCategoryService().get( record.product_category_id ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();

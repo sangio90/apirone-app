@@ -2,19 +2,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemProductItemDAO";
 	property name="QuotationItemService" inject="QuotationItemService";
-	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductItemService" inject="ProductItemService";
-	property name="cacheScope" type="String" default="QuotationItemProductItem.bean";
 
 	public com.apirone.core.model.bean.QuotationItemProductItem function get( required String productItemId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.productItemId );
-		if ( cache.status ) {
-			return cache.data;
-		}
-		var bean = build( arguments.productItemId );
-		cm.put( getCacheScope(), arguments.productItemId, bean );
-		return bean;
+		return build( arguments.productItemId );
 	}
 
 	public Array function list(){
@@ -32,11 +23,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var rows    = [];
 		var result  = super.getResult();
+
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( productItemId = record.quotation_item_product_item_id ) );
-		} );
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.quotation_item_product_item_id );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.quotation_item_product_item_id ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.quotation_item_product_item_id ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -50,13 +61,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = get( arguments.productItemId );
 
 		outcome.setData( { productItemId = arguments.productItemId } );
-		getDao().delete( arguments.productItemId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.productItemId );
-				cm.remove( getCacheScope(), arguments.productItemId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -72,13 +80,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemFruitId = arguments.quotationItemFruitId } );
-		getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
-				cm.remove( getCacheScope(), arguments.quotationItemFruitId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -98,27 +103,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemProductItem productItem ){
 		getDao().update( arguments.productItem );
-		super.getCacheManager().remove( getCacheScope(), arguments.productItem.getId() );
 
 		return arguments.productItem.getId();
+	}
+
+	private com.apirone.core.model.bean.QuotationItemProductItem function buildFromRow( required any record ){
+		var bean = super.bean( "QuotationItemProductItem" );
+		
+		// Campi diretti dal record
+		bean.setId( record.quotation_item_product_item_id );
+		bean.setQuotationItemId( record.quotation_item_id );
+		bean.setLevel( record.level );
+		bean.setNote( record.note );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setProductItem( getProductItemService().get( record.product_item_id ) );
+
+		if ( !IsNull( record.origin_id ) ) {
+			bean.setOrigin( getProductItemService().get( record.origin_id ) );
+		}
+
+		return bean;
 	}
 
 	private com.apirone.core.model.bean.QuotationItemProductItem function build( required String productItemId ){
 		var record = getDao().read( arguments.productItemId );
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationItemProductItem" );
-			
-			bean.setId( record.quotation_item_product_item_id );
-			bean.setQuotationItemId( record.quotation_item_id );
-
-			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
-			bean.setLevel( record.level );
-			bean.setNote( record.note );
-
-			if ( !IsNull( record.origin_id ) ) {
-				bean.setOrigin( getProductItemService().get( record.origin_id ) );
-			}
-			return bean;
+			return buildFromRow( record );
 		}
 		return NullValue();
 	}

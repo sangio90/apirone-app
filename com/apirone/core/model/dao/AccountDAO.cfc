@@ -151,9 +151,9 @@
 			UPDATE membership.accounts
 			SET
 				account = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getName()#">,
-				email = pgp_sym_encrypt( 
-					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,  
-					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'> 
+				email = pgp_sym_encrypt(
+					<cfqueryparam cfsqltype="varchar" value="#arguments.account.getEmail()#">,
+					<cfqueryparam cfsqltype="varchar" value='#variables.configuration.get('encryptKey')#'>
 				)::varchar,
 				status_id = <cfqueryparam cfsqltype="varchar" value="#arguments.account.getStatus().getId()#">,
 				id_utente_verticale = <cfqueryparam cfsqltype="Integer" value="#arguments.account.getIdUtenteVerticale()#">,
@@ -260,4 +260,28 @@
 
 	</cffunction>
 
+	<!---
+		Recupera in batch più account dato un array di ID.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				pgp_sym_decrypt(
+					email::bytea,
+					<cfqueryparam cfsqltype="varchar" value="#variables.configuration.get('encryptKey')#">
+				) AS email,
+				account_id::varchar,
+				*
+			FROM membership.accounts
+			WHERE account_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

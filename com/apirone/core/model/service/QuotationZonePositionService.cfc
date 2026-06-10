@@ -66,6 +66,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zonePosition.getId();
 	}
 
+	/**
+	 * Costruisce un bean QuotationZonePosition a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationZonePosition function build( required String zoneId ){
 		var record = getDao().read( arguments.zoneId );
 		if ( record.recordCount ) {

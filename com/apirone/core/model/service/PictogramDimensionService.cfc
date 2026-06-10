@@ -82,6 +82,9 @@
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean PictogramDimension a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.pictogramDimension function build( required String pictogramDimensionId ){
 		var record = getDao().read( arguments.pictogramDimensionId );
 

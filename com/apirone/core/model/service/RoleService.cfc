@@ -44,6 +44,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		private methods
 	*/
 
+	/**
+	 * Costruisce un bean Role a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Role function build( required String roleId ){
 		var record = getDao().read( arguments.roleId );
 

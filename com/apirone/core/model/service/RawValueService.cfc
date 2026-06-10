@@ -4,22 +4,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="textService" inject="TextService";
 	property name="statusService" inject="statusService";
 
-	property name="cacheScope" type="String" default="RawValue.bean";
-
 	public com.apirone.core.model.bean.RawValue function get( required String rawValueId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.rawValueId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.rawValueId );
-
-		cm.put( getCacheScope(), arguments.rawValueId, bean );
-
-		return bean;
+		return build( arguments.rawValueId );
 	}
 
 	public Array function list(){
@@ -37,11 +23,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( rawValueId = record.raw_value_id ) );
-		} );
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.raw_value_id );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.raw_value_id ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.raw_value_id ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -89,8 +94,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), id );
-
 		return id;
 	}
 
@@ -118,8 +121,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.rawValueId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.rawValueId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -136,20 +137,26 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	private com.apirone.core.model.bean.rawValue function buildFromRow( required any record ){
+		var bean = super.bean( "rawValue" );
+
+		// Campi diretti dal record
+		bean.setId( record.raw_value_id );
+		bean.setCode( record.code );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setTexts( getTextService().list( rawValueId = record.raw_value_id ) );
+
+		return bean;
+	}
+
 	private com.apirone.core.model.bean.rawValue function build( required String rawValueId ){
 		var record = getDao().read( arguments.rawValueId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "rawValue" );
-
-			bean.setId( record.raw_value_id );
-			bean.setCode( record.code );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setTexts( getTextService().list( rawValueId = record.raw_value_id ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();

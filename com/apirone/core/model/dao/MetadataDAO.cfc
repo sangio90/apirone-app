@@ -53,6 +53,26 @@
 		<cfreturn local.q>
 	</cffunction>
 
+		<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM metadata
+			WHERE metadata_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="metadata" type="com.apirone.core.model.bean.Metadata" required="true">
 
@@ -94,7 +114,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE metadata
 			SET
-				#param.dbField# = 
+				#param.dbField# =
 					<cfif Len( value )>
 						<cfqueryparam cfsqltype="#param.dbType#" value="#value#">
 					<cfelse>
@@ -121,8 +141,8 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 
-	<!--- 
-		private methods 
+	<!---
+		private methods
 	--->
 
 	<cffunction name="getFieldsAndValues" returntype="Struct" access="private">

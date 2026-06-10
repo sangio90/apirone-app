@@ -77,6 +77,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean Profile a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.Profile function build(required String profileId) {
     	var record = getDao().read( arguments.profileId );
 

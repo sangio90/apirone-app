@@ -78,6 +78,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/**
+	 * Costruisce un bean SignageConfigItem a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.SignageConfigItem function build( required String signageConfigItemId ){
 		var record = getDao().read( arguments.signageConfigItemId );
 
