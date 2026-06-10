@@ -940,6 +940,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
 			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",
+			"MMRIFSPE" = quotation.getReferenteSpedizione() ?: "",
+			"CFTIPCLF" = (function(){
+				var crmToErp = {
+					"CAT" = "CA", "HOT" = "HO", "HO1" = "H1", "HO2" = "H2", "HO3" = "H3",
+					"HO4" = "H4", "HO5" = "H5", "BEB" = "BB", "RIS" = "RI", "AGR" = "AG",
+					"CAM" = "CM", "AGE" = "AE", "CLI" = "CL", "RES" = "RS", "UFF" = "UF",
+					"ARC" = "AR", "CEN" = "CN", "CON" = "CO", "RIV" = "RV", "IMC" = "IC",
+					"COl" = "CP", "AZI" = "AZ", "PRO" = "PR", "COS" = "CS", "ELE" = "EL",
+					"ENT" = "EN", "NEG" = "NE", "AGA" = "AA", "CCR" = "CC", "PRI" = "PI",
+					"Installatore Elettrico" = "IE", "Tour Operator" = "TO", "Other" = "OT"
+				};
+				var ct = quotation.getCustomerType() ?: "";
+				return StructKeyExists( crmToErp, ct ) ? crmToErp[ ct ] : "";
+			})(),
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),
@@ -1090,6 +1104,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
 			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
 			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
+			if ( Len( record.referente_spedizione ) ) bean.setReferenteSpedizione( record.referente_spedizione );
+			if ( Len( record.customer_type ) ) bean.setCustomerType( record.customer_type );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

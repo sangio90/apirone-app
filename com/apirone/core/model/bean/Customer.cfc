@@ -1,6 +1,7 @@
 component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	property name="company" type="String";
+	property name="ragioneSociale" type="String";
 	property name="description" type="String";
 	property name="phone" type="String";
 	property name="vatNumber" type="String";
@@ -16,6 +17,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="contactPersonName" type="String";
 	property name="contactPersonEmail" type="String";
 	property name="lingua" type="String";
+	property name="accountType" type="String";
 
 	public Customer function init(){
 

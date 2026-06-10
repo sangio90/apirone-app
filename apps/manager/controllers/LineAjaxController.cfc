@@ -221,7 +221,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		line.setId( json.id );
 		line.setCode( json.code );
 		line.setName( json.name );
-		line.setHscode( json.hscode );
+		if ( !isNull( json.hscode ) ) line.setHscode( json.hscode );
 
 		line.setStatus( status.setId( json.status.id ) );
 		line.setCategories( categories );

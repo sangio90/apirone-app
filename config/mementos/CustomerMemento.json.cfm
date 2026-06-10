@@ -3,6 +3,7 @@
 		"id",
 		"shortId",
 		"name",
+		"ragioneSociale",
 		"company",
 		"description",
 		"phone",
@@ -14,7 +15,8 @@
 		"country",
 		"SDI",
 		"shippingProfiles",
-		"lingua"
+		"lingua",
+		"accountType"
 	],
 	profiles = {}
 }

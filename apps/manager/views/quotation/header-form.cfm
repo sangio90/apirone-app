@@ -64,7 +64,7 @@
 						<div class="col-9">
 							<input type="text" name="customer" class="form-control" id="qt-customer"
 								data-bind="source: crmCustomers, value: detailForm.data.customer"
-								data-text-field="name"
+								data-text-field="displayLabel"
 								data-role="autocomplete"
 								data-value-primitive="false"
 								data-minlength="4"
@@ -278,6 +278,13 @@
 							<label class="col-3 control-label text-sm-end pt-2">Provincia</label>
 							<div class="col-9">
 								<input type="text" class="form-control" data-bind="value: detailForm.data.shippingProfile.state" disabled>
+							</div>
+						</div>
+
+						<div class="form-group row mb-3">
+							<label class="col-3 control-label text-sm-end pt-2">Referente spedizione</label>
+							<div class="col-9">
+								<input type="text" class="form-control" data-bind="value: detailForm.data.referenteSpedizione">
 							</div>
 						</div>
 

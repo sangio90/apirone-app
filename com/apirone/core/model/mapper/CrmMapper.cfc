@@ -26,6 +26,8 @@
 			customer.setLingua( accountCustom.lingua_c ?: "" );
 		}
 
+		customer.setRagioneSociale( data.ragione_sociale_c ?: customer.getCompany() ?: "" );
+
 		customer.setPhone( data.phone_office ?: data.phone_alternate ?: "" );
 		customer.setStreet( data.billing_address_street ?: "" );
 		customer.setPostalCode( data.billing_address_postalcode ?: "" );
@@ -53,6 +55,7 @@
 
 		customer.setContactPersonName(data.referente_nome ?: "");
 		customer.setContactPersonEmail(data.referente_email ?: "");
+		customer.setAccountType( data.account_type ?: "" );
 
 		return customer;
 	}
