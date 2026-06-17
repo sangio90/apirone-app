@@ -32,14 +32,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.attribute_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.attribute_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -127,6 +121,104 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return id;
+	}
+
+	/**
+	 * Recupera in batch più Attribute dato un array di ID.
+	 * Restituisce uno Struct chiave = attributeId, valore = bean Attribute.
+	 * Precarica i testi e le categorie in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di attributeId
+	 * @return Struct mappato per attributeId -> Attribute
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutti gli attributi (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "attribute.id", arguments.ids );
+
+		// Precarica le categorie in batch: raccoglie tutti i category_id
+		// dai JSONB categories di ogni attributo e li carica con getMany() ottimizzato
+		var allCatIds = [];
+		for ( var record in records ) {
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					allCatIds.append( cid );
+				}
+			}
+		}
+		var catMap = {};
+		if ( ArrayLen( allCatIds ) ) {
+			catMap = getProductCategoryService().getMany( allCatIds );
+		}
+
+		// Precarica tutti gli AttributeValue in batch tramite DAO
+		var valueMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var valueRecords = getAttributeValueService().getDao().readByAttributeIds( arguments.ids );
+			for ( var vr in valueRecords ) {
+				if ( !StructKeyExists( valueMap, vr.attribute_id ) ) {
+					valueMap[ vr.attribute_id ] = [];
+				}
+				var vBean = super.bean( "AttributeValue" );
+				vBean.setId( vr.attribute_raw_value_id );
+				vBean.setAttributeId( vr.attribute_id.toString() );
+				vBean.setCreatedAt( vr.created_at );
+				vBean.setOrderBy( vr.orderby );
+				vBean.setAllowNote( vr.allow_note ? true : false );
+				vBean.setAffectToImage( vr.affect_to_image ? true : false );
+				vBean.setComponentCount( vr.component_count );
+				vBean.setStatus( getStatusService().get( vr.status_id ) );
+				// rawValue e images: non caricati in batch (richiesti solo in contesti specifici)
+				valueMap[ vr.attribute_id ].append( vBean );
+			}
+		}
+
+		// Cache locali per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Attribute" );
+
+			// Campi diretti dal record
+			bean.setId( record.attribute_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setCode( record.code );
+
+			// Status: cached localmente (StatusService ha cache interna)
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.attribute_id ) ) {
+				bean.setTexts( textMap[ record.attribute_id ] );
+			}
+
+			// Valori: dalla mappa pre-caricata
+			if ( StructKeyExists( valueMap, record.attribute_id ) ) {
+				bean.setValues( valueMap[ record.attribute_id ] );
+			}
+
+			// Categorie: dalla mappa pre-caricata
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			var catBeans = [];
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					if ( StructKeyExists( catMap, cid ) ) {
+						catBeans.append( catMap[ cid ] );
+					}
+				}
+			}
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+
+			map[ record.attribute_id ] = bean;
+		}
+
+		return map;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String attributeId ){

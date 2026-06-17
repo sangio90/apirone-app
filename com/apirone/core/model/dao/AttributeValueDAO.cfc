@@ -48,6 +48,30 @@
 		)>
 	</cffunction>
 
+	<!---
+		Recupera in batch più AttributeValue dato un array di attributeId.
+		Utilizzato da AttributeService.getMany() per precaricare i valori in blocco.
+	--->
+	<cffunction name="readByAttributeIds" returntype="Query" access="public">
+		<cfargument name="attributeIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.attributeIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				attribute_raw_value_id,
+				attribute_id::varchar,
+				*
+			FROM attributes_raw_values
+			WHERE attribute_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+			ORDER BY orderby
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 
 		<cfargument name="str" type="String">

@@ -40,15 +40,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.line_id );
 		} );
 
-		var beanMap = {};
-
-		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( r ){
-				beanMap[ r.line_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( r ){
@@ -195,6 +188,85 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Recupera in batch più Line dato un array di ID.
+	 * Restituisce uno Struct chiave = lineId, valore = bean Line.
+	 * Precarica i testi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di lineId
+	 * @return Struct mappato per lineId -> Line
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutte le linee (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "line.id", arguments.ids );
+
+		// Raccoglie tutti i category_id dai JSONB categories di ogni linea
+		var allCatIds = [];
+		for ( var record in records ) {
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					allCatIds.append( cid );
+				}
+			}
+		}
+		var allCatMap = {};
+		if ( ArrayLen( allCatIds ) ) {
+			allCatMap = getProductCategoryService().getMany( allCatIds );
+		}
+
+		// Cache locali per thickness e status
+		var thicknesses = {};
+		var statuses    = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Line" );
+
+			// Campi diretti dal record
+			bean.setId( record.line_id );
+			bean.setCode( record.code );
+			bean.setHscode( record.hscode );
+			bean.setCreatedAt( record.created_at );
+
+			// Thickness: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( thicknesses, record.thickness_id ) ) {
+				thicknesses[ record.thickness_id ] = getLookupService().get( "thickness", record.thickness_id );
+			}
+			bean.setThickness( thicknesses[ record.thickness_id ] );
+
+			// Status: cached localmente (StatusService ha cache interna)
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.line_id ) ) {
+				bean.setTexts( textMap[ record.line_id ] );
+			}
+			bean.setName( bean.getName() );
+
+			// Categorie: dalla mappa pre-caricata
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			var catBeans = [];
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					if ( StructKeyExists( allCatMap, cid ) ) {
+						catBeans.append( allCatMap[ cid ] );
+					}
+				}
+			}
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+
+			map[ record.line_id ] = bean;
+		}
+
+		return map;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String lineId ){

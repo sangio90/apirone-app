@@ -4,6 +4,7 @@
 	property name="statusService" inject="StatusService";
 	property name="textService" inject="TextService";
 	property name="lookupService" inject="lookupService";
+	property name="ProductCategoryService" inject="ProductCategoryService";
 
 	public com.apirone.core.model.bean.Model function get( required String modelId ){
 		return build( arguments.modelId );
@@ -32,13 +33,8 @@
 			ids.append( record.model_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( record ){
-				beanMap[ record.model_id ] = buildFromRow( record );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -106,6 +102,85 @@
 		return arguments.model.getId();
 	}
 
+
+	/**
+	 * Recupera in batch più Model dato un array di ID.
+	 * Restituisce uno Struct chiave = modelId, valore = bean Model.
+	 * Precarica i testi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di modelId
+	 * @return Struct mappato per modelId -> Model
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutti i modelli (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "model.id", arguments.ids );
+
+		// Raccoglie tutti i category_id dai JSONB categories di ogni modello
+		var allCatIds = [];
+		for ( var record in records ) {
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					allCatIds.append( cid );
+				}
+			}
+		}
+		var allCatMap = {};
+		if ( ArrayLen( allCatIds ) ) {
+			allCatMap = getProductCategoryService().getMany( allCatIds );
+		}
+
+		// Cache locali per type e status
+		var types    = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Model" );
+
+			// Campi diretti dal record
+			bean.setId( record.model_id );
+			bean.setName( record.model );
+			bean.setCode( record.code );
+			bean.setFruitsCount( record.fruits_count );
+			bean.setCreatedAt( record.created_at );
+
+			// Type: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( types, record.model_type_id ) ) {
+				types[ record.model_type_id ] = getLookupService().get( "modelType", record.model_type_id );
+			}
+			bean.setType( types[ record.model_type_id ] );
+
+			// Status: cached localmente (StatusService ha cache interna)
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Categorie: dalla mappa pre-caricata
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			var catBeans = [];
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					if ( StructKeyExists( allCatMap, cid ) ) {
+						catBeans.append( allCatMap[ cid ] );
+					}
+				}
+			}
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.model_id ) ) {
+				bean.setTexts( textMap[ record.model_id ] );
+			}
+
+			map[ record.model_id ] = bean;
+		}
+
+		return map;
+	}
 
 	public Boolean function codeExists( required String code, String excludedId = "" ){
 		var record = getDao().readByCode( arguments.code );

@@ -33,14 +33,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.finish_id ); // finish_id già castato a varchar dal find()
 		} );
 
-		var beanMap = {};
-
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( r ){
-				beanMap[ r.finish_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( r ){
@@ -107,6 +101,76 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Recupera in batch più Finish dato un array di ID.
+	 * Restituisce uno Struct chiave = finishId, valore = bean Finish.
+	 * Precarica i testi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di finishId
+	 * @return Struct mappato per finishId -> Finish
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutte le finiture (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "finish.id", arguments.ids );
+
+		// Raccoglie tutti i category_id dai JSONB categories di ogni finitura
+		var allCatIds = [];
+		for ( var record in records ) {
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					allCatIds.append( cid );
+				}
+			}
+		}
+		var allCatMap = {};
+		if ( ArrayLen( allCatIds ) ) {
+			allCatMap = getProductCategoryService().getMany( allCatIds );
+		}
+
+		// Cache locali per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Finish" );
+
+			// Campi diretti dal record
+			bean.setId( record.finish_id );
+			bean.setCode( record.code );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente (StatusService ha cache interna)
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.finish_id ) ) {
+				bean.setTexts( textMap[ record.finish_id ] );
+			}
+
+			// Categorie: dalla mappa pre-caricata
+			var cats = IsNull( record.categories ) ? [] : DeserializeJSON( record.categories );
+			var catBeans = [];
+			if ( !IsNull( cats ) && ArrayLen( cats ) ) {
+				for ( var cid in cats ) {
+					if ( StructKeyExists( allCatMap, cid ) ) {
+						catBeans.append( allCatMap[ cid ] );
+					}
+				}
+			}
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+
+			map[ record.finish_id ] = bean;
+		}
+
+		return map;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String finishId ){

@@ -43,13 +43,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( record.product_category_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( record ){
-				beanMap[ record.product_category_id ] = buildFromRow( record );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -197,8 +192,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Restituisce uno Struct chiave = categoryId, valore = bean ProductCategory.
 	 * Sostituisce il pattern di AbsService.getCategoriesBeanByIds() che chiama get() per ogni ID.
 	 *
-	 * Effettua pre-caricamento locale di status, type e mode per evitare chiamate duplicate
-	 * al DB quando più categorie condividono gli stessi valori.
+	 * Precarica in batch i testi e i tipi per evitare il problema N+1.
 	 *
 	 * @ids Array di productCategoryId
 	 * @return Struct mappato per productCategoryId -> ProductCategory
@@ -208,42 +202,65 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().readByIds( ids = arguments.ids );
 		var map     = {};
 
-		// Cache locali per status, type e mode: evita chiamate duplicate al DB
-		var statuses    = {};
-		var types       = {};
-		var modes       = {};
+		// Precarica i testi in batch per tutte le categorie (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "productCategory.id", arguments.ids );
+
+		// Raccoglie gli ID unici dei tipi per precaricarli in batch
+		var typeIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.product_category_type_id ) ) {
+				typeIds.append( record.product_category_type_id );
+			}
+		}
+
+		// Precarica i ProductCategoryType in batch e costruisce una mappa
+		var typeMap = {};
+		if ( ArrayLen( typeIds ) ) {
+			var typeRecords = getProductCategoryTypeService().getDao().readByIds( typeIds );
+			for ( var tr in typeRecords ) {
+				var typeBean = super.bean( "ProductCategoryType" );
+				typeBean.setId( tr.product_category_type_id );
+				typeBean.setName( tr.product_category_type );
+				typeBean.setCreatedAt( tr.created_at );
+				typeBean.setStatus( getStatusService().get( tr.status_id ) );
+				typeMap[ tr.product_category_type_id ] = typeBean;
+			}
+		}
+
+		// Cache locali per status e mode: evita chiamate duplicate
+		var statuses = {};
+		var modes    = {};
 
 		for ( var record in records ) {
 			var bean = super.bean( "ProductCategory" );
 
-			// Testi: chiamata individuale per categoria
-			var texts = getTextService().list( productCategoryId = record.product_category_id );
-			bean.setTexts( texts );
-			bean.setName( bean.getName() );
-
 			// Campi diretti dal record
 			bean.setId( record.product_category_id );
 			bean.setCode( record.code );
+			bean.setCreatedAt( record.created_at );
 
-			// Status: cached localmente
+			// Status: cached localmente (StatusService ha cache interna)
 			if ( !StructKeyExists( statuses, record.status_id ) ) {
 				statuses[ record.status_id ] = getStatusService().get( record.status_id );
 			}
 			bean.setStatus( statuses[ record.status_id ] );
 
-			bean.setCreatedAt( record.created_at );
-
-			// Type: cached localmente
-			if ( !StructKeyExists( types, record.product_category_type_id ) ) {
-				types[ record.product_category_type_id ] = getProductCategoryTypeService().get( productCategoryTypeId = record.product_category_type_id );
+			// Type: dalla mappa pre-caricata
+			if ( StructKeyExists( typeMap, record.product_category_type_id ) ) {
+				bean.setType( typeMap[ record.product_category_type_id ] );
 			}
-			bean.setType( types[ record.product_category_type_id ] );
 
-			// Mode: cached localmente
+			// Mode: LookupService in-memory, nessuna query DB aggiuntiva
 			if ( !StructKeyExists( modes, record.mode_id ) ) {
 				modes[ record.mode_id ] = getLookupService().get( "ProductCategoryMode", record.mode_id );
 			}
 			bean.setMode( modes[ record.mode_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.product_category_id ) ) {
+				bean.setTexts( textMap[ record.product_category_id ] );
+			}
+			bean.setName( bean.getName() );
 
 			map[ record.product_category_id ] = bean;
 		}

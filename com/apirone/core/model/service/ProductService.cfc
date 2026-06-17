@@ -13,6 +13,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="ProductItemService" inject="ProductItemService";
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
+	property name="attributeService" inject="AttributeService";
 
 	public com.apirone.core.model.bean.Product function get( required String productId ){
 		return build( arguments.productId );
@@ -79,13 +80,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.product_id );
 		} );
 
-		var beanMap = {};
+		// Precarica tutte le FK entity in blocco e costruisce i bean senza chiamate DB individuali
 		if ( ArrayLen( ids ) ) {
 			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.product_id ] = buildFromRow( r );
-			} );
+			var beanMap = buildMany( allRecords );
+		} else {
+			var beanMap = {};
 		}
 
 		// Ricostruisce le righe nell'ordine del find() originale
@@ -346,6 +346,244 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return product;
+	}
+
+	/**
+	 * Costruisce in batch uno Struct mappato per product_id -> Product.
+	 * precarica tutte le FK entity (Category, Line, Attribute, Finish, CatalogBundle)
+	 * e le entity 1:N (Text, Price, File) in blocco per evitare il problema N+1.
+	 * Utilizzato esclusivamente da search() per le liste paginate.
+	 *
+	 * @records Risultato della query readByIds() con tutte le righe da elaborare
+	 * @return Struct mappato per product_id -> Product
+	 */
+	private Struct function buildMany( required Query records ){
+		var map = {};
+
+		// --- Raccoglie tutti gli ID delle FK dai record dei prodotti ---
+		var categoryIds = [];
+		var finishIds   = [];
+		var bundleIds   = [];
+		var productIds  = [];
+		var allLineIds  = [];
+		var allAttrIds  = [];
+
+		for ( var r in arguments.records ) {
+			productIds.append( r.product_id );
+
+			if ( !IsNull( r.product_category_id ) ) {
+				categoryIds.append( r.product_category_id );
+			}
+
+			if ( !IsNull( r.finish_id ) ) {
+				finishIds.append( r.finish_id );
+			}
+
+			if ( !IsNull( r.catalog_bundle_id ) ) {
+				bundleIds.append( r.catalog_bundle_id );
+			}
+
+			// Linee dal JSONB lines
+			var lines = IsNull( r.lines ) ? [] : DeserializeJSON( r.lines );
+			if ( !IsNull( lines ) && ArrayLen( lines ) ) {
+				for ( var lid in lines ) {
+					allLineIds.append( lid );
+				}
+			}
+
+			// Attributi dal JSONB attributes_important
+			var attrs = IsNull( r.attributes_important ) ? [] : DeserializeJSON( r.attributes_important );
+			if ( !IsNull( attrs ) && ArrayLen( attrs ) ) {
+				for ( var aid in attrs ) {
+					allAttrIds.append( aid );
+				}
+			}
+		}
+
+		// --- Fase 2: legge i CatalogBundle e raccoglie i loro FK ---
+		var bundleLineIds  = [];
+		var bundleModelIds = [];
+		var bundleCatIds   = [];
+		var bundleRecords  = QueryNew( "" );
+
+		if ( ArrayLen( bundleIds ) ) {
+			bundleRecords = getCatalogBundleService().getDao().readByIds( bundleIds );
+
+			for ( var br in bundleRecords ) {
+				if ( !IsNull( br.line_id ) ) {
+					bundleLineIds.append( br.line_id );
+				}
+				if ( !IsNull( br.model_id ) ) {
+					bundleModelIds.append( br.model_id );
+				}
+				if ( !IsNull( br.product_category_id ) ) {
+					bundleCatIds.append( br.product_category_id );
+				}
+			}
+		}
+
+		// --- Fase 3: unisce gli ID delle FK in unica lista per tipo ---
+		// Le linee dei bundle si aggiungono alle linee già raccolte dai prodotti
+		for ( var lid in bundleLineIds ) {
+			allLineIds.append( lid );
+		}
+		// Le categorie dei bundle si aggiungono alle categorie già raccolte
+		for ( var cid in bundleCatIds ) {
+			categoryIds.append( cid );
+		}
+
+		// --- Fase 4: precarica tutte le entity con una query batch ciascuna ---
+		var categoryMap = {};
+		if ( ArrayLen( categoryIds ) ) {
+			categoryMap = getProductCategoryService().getMany( categoryIds );
+		}
+
+		var finishMap = {};
+		if ( ArrayLen( finishIds ) ) {
+			finishMap = getFinishService().getMany( finishIds );
+		}
+
+		var lineMap = {};
+		if ( ArrayLen( allLineIds ) ) {
+			lineMap = getLineService().getMany( allLineIds );
+		}
+
+		var attributeMap = {};
+		if ( ArrayLen( allAttrIds ) ) {
+			attributeMap = getAttributeService().getMany( allAttrIds );
+		}
+
+		var modelMap = {};
+		if ( ArrayLen( bundleModelIds ) ) {
+			modelMap = getModelService().getMany( bundleModelIds );
+		}
+
+		// Costruisce i bean CatalogBundle con le mappe pre-caricate
+		var bundleMap = {};
+		for ( var br in bundleRecords ) {
+			var bundle = super.bean( "CatalogBundle" );
+
+			bundle.setId( br.catalog_bundle_id );
+			bundle.setName( br.catalog_bundle );
+			bundle.setCreatedAt( br.created_at );
+			bundle.setMarkupValue( br.markup_value );
+
+			if ( !IsNull( br.line_id ) && StructKeyExists( lineMap, br.line_id ) ) {
+				bundle.setLine( lineMap[ br.line_id ] );
+			}
+			if ( !IsNull( br.model_id ) && StructKeyExists( modelMap, br.model_id ) ) {
+				bundle.setModel( modelMap[ br.model_id ] );
+			}
+			if ( !IsNull( br.product_category_id ) && StructKeyExists( categoryMap, br.product_category_id ) ) {
+				bundle.setCategory( categoryMap[ br.product_category_id ] );
+			}
+
+			bundleMap[ br.catalog_bundle_id ] = bundle;
+		}
+
+		// Entity 1:N: carica tutti i testi/prezzi/file in blocco, raggruppati per product_id
+		var textMap  = getTextService().listByEntityIds( "product.id", productIds );
+		var priceMap = getPriceService().listByProductIds( productIds );
+		var fileMap  = getFileService().listByEntityIds( "product.id", productIds );
+
+		// --- Fase 5: costruisce i bean Product usando le mappe pre-caricate ---
+		// Cache locale per status: evita lookup ripetuti nello stesso batch
+		var statuses = {};
+
+		for ( var r in arguments.records ) {
+			if ( IsNull( r.catalog_bundle_id ) ) {
+				var bean = super.bean( "ProductBase" );
+
+				// Campi specifici ProductBase
+				bean.setCode( r.code );
+
+				if ( !IsNull( r.product_category_id ) && StructKeyExists( categoryMap, r.product_category_id ) ) {
+					bean.setCategory( categoryMap[ r.product_category_id ] );
+				}
+
+				bean.setPositionCount( r.position_count );
+
+				// Linee dal JSONB: filtra con lineMap pre-caricata
+				var lines = IsNull( r.lines ) ? [] : DeserializeJSON( r.lines );
+				var lineBeans = [];
+				if ( !IsNull( lines ) && ArrayLen( lines ) ) {
+					for ( var lid in lines ) {
+						if ( StructKeyExists( lineMap, lid ) ) {
+							lineBeans.append( lineMap[ lid ] );
+						}
+					}
+				}
+				bean.setLines( ArrayLen( lineBeans ) ? lineBeans : NullValue() );
+			} else {
+				var bean = super.bean( "ProductComplex" );
+
+				// CatalogBundle: imposta il bundle e deriva Line, Model, Category
+				if ( StructKeyExists( bundleMap, r.catalog_bundle_id ) ) {
+					var bundle = bundleMap[ r.catalog_bundle_id ];
+					bean.setCatalogBundle( bundle );
+					bean.setLine( bundle.getLine() );
+					bean.setModel( bundle.getModel() );
+					bean.setCategory( bundle.getCategory() );
+				}
+
+				// Finitura (solo ProductComplex)
+				if ( !IsNull( r.finish_id ) && StructKeyExists( finishMap, r.finish_id ) ) {
+					bean.setFinish( finishMap[ r.finish_id ] );
+				}
+			}
+
+			// Campi comuni a ProductBase e ProductComplex
+			bean.setId( r.product_id.toString() );
+			bean.setSerial( r.serial );
+			bean.setCreatedAt( r.created_at );
+			bean.setSpecial( BooleanFormat( r.special ) ); //TODO: to remove
+			bean.setMinQuantity( r.min_quantity );
+			bean.setMaxQuantity( r.max_quantity );
+			bean.setMarginTop( r.margin_top );
+			bean.setMarginLeft( r.margin_left );
+			bean.setPlateWidth( r.plate_width );
+			bean.setPlateHeight( r.plate_height );
+
+			// Status: cached localmente (StatusService ha cache interna)
+			if ( !StructKeyExists( statuses, r.status_id ) ) {
+				statuses[ r.status_id ] = getStatusService().get( r.status_id );
+			}
+			bean.setStatus( statuses[ r.status_id ] );
+
+			// Testi dalla mappa batch
+			if ( StructKeyExists( textMap, r.product_id ) ) {
+				bean.setTexts( textMap[ r.product_id ] );
+			}
+
+			// Attributi importanti dalla mappa batch
+			var attrs = IsNull( r.attributes_important ) ? [] : DeserializeJSON( r.attributes_important );
+			var attrBeans = [];
+			if ( !IsNull( attrs ) && ArrayLen( attrs ) ) {
+				for ( var aid in attrs ) {
+					if ( StructKeyExists( attributeMap, aid ) ) {
+						attrBeans.append( attributeMap[ aid ] );
+					}
+				}
+			}
+			bean.setImportantAttributes( ArrayLen( attrBeans ) ? attrBeans : NullValue() );
+
+			// Prezzi dalla mappa batch
+			if ( StructKeyExists( priceMap, r.product_id ) ) {
+				bean.setPrices( priceMap[ r.product_id ] );
+			}
+
+			// Immagini dalla mappa batch
+			if ( StructKeyExists( fileMap, r.product_id ) ) {
+				var images = fileMap[ r.product_id ];
+				if ( Len( images ) ) {
+					bean.setImages( images );
+				}
+			}
+
+			map[ r.product_id ] = bean;
+		}
+
+		return map;
 	}
 
 	/**
