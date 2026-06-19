@@ -11,6 +11,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.statuses   = super.fire( "status.list", [ "line" ] );
 		prc.finishes   = super.fire( "finish.list" );
 
+		prc.page['statuses'] = prc.statuses;
+		// memento: il nome delle finiture vive nei texts, il bean grezzo non lo espone
+		prc.page['finishes'] = memy.convertList( prc.finishes );
+
 		prc.title = "Prodotti complessi";
 
 		prc.jsFiles.add( "app-product-list" );

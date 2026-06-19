@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 	property name="frameCellService" inject="FrameCellService";
+	property name="frameBlockService" inject="FrameBlockService";
 
 	property name="cacheScope" type="String" default="Frame.bean";
 
@@ -59,12 +60,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var newId = getDao().insert( arguments.Frame );
 
 		if( ( !IsNull( arguments.frame.getCells() ) ) ) {
-			
+
 			for( var cell in arguments.frame.getCells() ) {
 				cell.setFrameId( newId );
 				getFrameCellService().create( cell );
 			}
-		
+
+		}
+
+		if( ( !IsNull( arguments.frame.getBlocks() ) ) ) {
+
+			for( var block in arguments.frame.getBlocks() ) {
+				block.setFrameId( newId );
+				getFrameBlockService().create( block );
+			}
+
 		}
 
 		return newId;
@@ -79,12 +89,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getFrameCellService().deleteByFrameId( arguments.frame.getId() );
 
 			if( ( !IsNull( arguments.frame.getCells() ) ) ) {
-				
+
 				for( var cell in arguments.frame.getCells() ) {
 					cell.setFrameId( frame.getId() );
 					getFrameCellService().create( cell );
 				}
-			
+
+			}
+
+			getFrameBlockService().deleteByFrameId( arguments.frame.getId() );
+
+			if( ( !IsNull( arguments.frame.getBlocks() ) ) ) {
+
+				for( var block in arguments.frame.getBlocks() ) {
+					block.setFrameId( frame.getId() );
+					getFrameBlockService().create( block );
+				}
+
 			}
 
 		}
@@ -92,6 +113,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		super.getCacheManager().remove( getCacheScope(), arguments.Frame.getId() );
 
 		return arguments.Frame.getId();
+	}
+
+	public Any function getByCode( required String code ){
+		var record = getDao().readByCode( arguments.code );
+
+		if ( record.recordCount ) {
+			return get( record.frame_id );
+		}
+
+		return NullValue();
 	}
 
 	public Boolean function codeExists( required String code, String excludedId = "" ){
@@ -159,6 +190,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setStatus( getStatusService().get( record.status_id ) );
 
 			bean.setCells( getFrameCellService().list( record.frame_id ) );
+			bean.setBlocks( getFrameBlockService().list( record.frame_id ) );
 
 			return bean;
 		}

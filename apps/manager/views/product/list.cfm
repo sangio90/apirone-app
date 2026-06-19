@@ -6,9 +6,9 @@
             <div class="col-6">
 				#pageTitle()#
             </div>
-			<!--- <div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
+			<div class="col-6 text-end pb-3" data-bind="role: this" data-role-list="ADM/TCD">
                 #addButton( bind="click:new", size="sm" )#
-			</div> --->
+			</div>
         </div>
 
 		<div class="row">
@@ -121,6 +121,8 @@
 				</section>
 			</div>
 		</div>
+
+		#view( "product/detail-modal" )#
 
 	</div>
 

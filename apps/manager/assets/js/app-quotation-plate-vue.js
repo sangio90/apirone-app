@@ -88,6 +88,9 @@ AP.plate.modal = ( function() {
         height: 500,
         orientation: { id: "" },
         cellOrientation: { id: "" },
+        blocks: [],
+        // override orientamento per singolo blocco: { "<order>": "HOR"|"VER" }
+        blockOrientations: {},
         grid: [
             [
                 { type: "_", id: "default-cell-1" },
@@ -171,22 +174,26 @@ AP.plate.modal = ( function() {
 
         gm.setCellDimensions( freeCellWidth, freeCellHeight );
 
+        const isBlockPlate = !!( plate.blocks && plate.blocks.length );
+
         const grid = [];
-        for ( const columns of plate.grid ) {
-            const row = [];
-            for ( const cellData of columns ) {
-                const cellType = cellData.type;
-                const cell = new gm.Cell(
-                    gm.constants.GRID_CELL_DIMENSIONS[cellType].width,
-                    gm.constants.GRID_CELL_DIMENSIONS[cellType].height,
-                    plate.cellOrientation.id,
-                    cellType,
-                    cellData.id,
-                    cellData.order
-                );
-                row.push( cell );
+        if ( !isBlockPlate ) {
+            for ( const columns of plate.grid ) {
+                const row = [];
+                for ( const cellData of columns ) {
+                    const cellType = cellData.type;
+                    const cell = new gm.Cell(
+                        gm.constants.GRID_CELL_DIMENSIONS[cellType].width,
+                        gm.constants.GRID_CELL_DIMENSIONS[cellType].height,
+                        plate.cellOrientation.id,
+                        cellType,
+                        cellData.id,
+                        cellData.order
+                    );
+                    row.push( cell );
+                }
+                grid.push( row );
             }
-            grid.push( row );
         }
 
         const plateObj = new gm.Plate( {
@@ -197,6 +204,12 @@ AP.plate.modal = ( function() {
             id: plate.id,
             code: plate.code,
             image: plate.image.uri,
+            // placche a blocchi (configurazione su DB): la griglia
+            // viene costruita da drawBlocksWithin()
+            blocks: isBlockPlate ? plate.blocks : null,
+            onRotateBlock: isBlockPlate ? function( blockOrder ) {
+                window.vm.rotateBlock( blockOrder );
+            } : null,
             grid: grid,
             isSpecial: false,
         } );
@@ -566,6 +579,33 @@ AP.plate.modal = ( function() {
                  * @param {Object|null} product.horizontalImage - Immagine orizzontale con id e uri.
                  * @param {Object|null} product.verticalImage - Immagine verticale con id e uri.
                  */
+                /**
+                 * Imposta le dimensioni del canvas della placca (sfondo + immagine).
+                 * Placche legacy: width/height dal server o default 1200x500 (con swap
+                 * gestito da Rectangle in base all'orientamento).
+                 * Placche a blocchi: il server restituisce il bounding box dei blocchi,
+                 * ma il canvas resta quello fisso legacy (1200x500, invertito se la
+                 * placca è verticale) così l'immagine mantiene la dimensione di prima;
+                 * il bounding box prevale solo se più grande del canvas.
+                 * @param {Object} data - Risposta del server (frame).
+                 */
+                applyPlateCanvasSize: function( data ) {
+                    const isBlockPlate = ( data.blocks || [] ).length > 0;
+
+                    if ( !isBlockPlate ) {
+                        this.plate.width = data?.width ?? 1200;
+                        this.plate.height = data?.height ?? 500;
+                        return;
+                    }
+
+                    const isVertical = data.orientation && data.orientation.id === "VER";
+                    const canvasWidth = isVertical ? 500 : 1200;
+                    const canvasHeight = isVertical ? 1200 : 500;
+
+                    this.plate.width = Math.max( canvasWidth, data?.width ?? 0 );
+                    this.plate.height = Math.max( canvasHeight, data?.height ?? 0 );
+                },
+
                 populateProduct: function( product ) {
                     const image = product.horizontalImage || product.verticalImage;
                     this.detailForm.data.product.id = product.id || "";
@@ -596,15 +636,28 @@ AP.plate.modal = ( function() {
                         return;
                     }
 
+                    let productFound = false;
+
                     await ajax( {
                         method: "GET",
                         url: BASE + "/quotation-items/product/by-params?categoryId=22&lineId=" + lineId + "&modelId=" + modelId + "&finishId=" + finishId,
                         callback: {
                             done: ( xhr ) => {
+                                if ( !xhr.data || !xhr.data.id ) {
+                                    AP.widget.notify( "error", "Nessun prodotto placca configurato per questa combinazione di linea, modello e finitura. Verifica l'anagrafica prodotti." );
+                                    return;
+                                }
+                                productFound = true;
                                 this.populateProduct( xhr.data );
                             },
                         },
                     } );
+
+                    if ( !productFound ) {
+                        this.detailForm.data.product.id = "";
+                        this.detailForm.data.product.items = [];
+                        return;
+                    }
 
                     await this.firstLoadProductItems();
                     await this.loadPlate();
@@ -636,18 +689,18 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/frames/" + frameId,
+                        url: BASE + "/frames/" + frameId + "?_=1" + this.blockOrientationsParam(),
                         callback: {
                             done: ( xhr ) => {
                                 this.plate.id = xhr.data.id;
                                 this.plate.code = xhr.data.code;
-                                this.plate.width = xhr.data?.width ?? 1200;
-                                this.plate.height = xhr.data?.height ?? 500;
                                 this.plate.orientation = xhr.data.orientation;
                                 this.detailForm.data.product.orientation = orientationValue || xhr.data.orientation;
                                 this.plate.cellOrientation = xhr.data.cellOrientation;
                                 this.availableOrientations = xhr.data.availableOrientations;
-                                this.plate.grid = xhr.data.grid;
+                                this.plate.blocks = xhr.data.blocks || [];
+                                this.plate.grid = xhr.data.grid || [];
+                                this.applyPlateCanvasSize( xhr.data );
                                 this.plate.image = image;
                                 this.$nextTick( () => {
                                     if ( orientationValue ) {
@@ -678,21 +731,38 @@ AP.plate.modal = ( function() {
 
                     this.smallLoading = true;
 
-                    // La griglia cambia completamente con l'orientamento: le vecchie
-                    // posizioni dei frutti non sono più valide. Si azzerano in modo
-                    // che renderPlateWithFruits li collochi automaticamente
-                    for ( const fruit of this.detailForm.data.fruits ) {
-                        fruit.positionIds = [];
+                    // Placche legacy (griglia da file): la griglia cambia
+                    // completamente con l'orientamento e le vecchie posizioni
+                    // dei frutti non sono più valide. Si azzerano in modo che
+                    // renderPlateWithFruits li collochi automaticamente.
+                    // Nelle placche a blocchi gli id slot sono interi stabili
+                    // fra HOR e VER: le posizioni restano valide e i frutti
+                    // ruotano coerentemente con la placca.
+                    if ( !( this.plate.blocks && this.plate.blocks.length ) ) {
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            fruit.positionIds = [];
+                        }
+                    } else {
+                        // allinea le posizioni con lo stato corrente del designer
+                        // (eventuali drag fatti dopo il caricamento)
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            const designerFruit = pub.fruitsController?.fruits.find( ( f ) => f.id === fruit.id );
+                            if ( designerFruit && designerFruit.cellIds.length ) {
+                                fruit.positionIds = designerFruit.cellIds.map( ( c ) => c.id );
+                            }
+                        }
                     }
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId,
+                        url: BASE + "/frames/" + frameId + "?orientationId=" + orientationId + "&productId=" + productId + this.blockOrientationsParam(),
                         callback: {
                             done: ( xhr ) => {
                                 this.plate.orientation = xhr.data.orientation;
                                 this.plate.cellOrientation = xhr.data.cellOrientation;
-                                this.plate.grid = xhr.data.grid;
+                                this.plate.blocks = xhr.data.blocks || [];
+                                this.plate.grid = xhr.data.grid || [];
+                                this.applyPlateCanvasSize( xhr.data );
                                 this.plate.image = xhr.data.image;
                                 this.detailForm.data.product.orientation = xhr.data.orientation;
                                 this.$nextTick( () => {
@@ -701,6 +771,54 @@ AP.plate.modal = ( function() {
                             },
                         },
                     } );
+                },
+
+                /**
+                 * Querystring con gli override di orientamento dei blocchi
+                 * (vuota se non ci sono override).
+                 */
+                blockOrientationsParam: function() {
+                    const overrides = this.plate.blockOrientations || {};
+                    if ( !Object.keys( overrides ).length ) {
+                        return "";
+                    }
+                    return "&blockOrientations=" + encodeURIComponent( JSON.stringify( overrides ) );
+                },
+
+                /**
+                 * Ruota il singolo blocco della placca (solo per questa riga di
+                 * preventivo): inverte l'orientamento corrente del blocco e
+                 * ricarica il layout. Gli id degli slot sono stabili, quindi i
+                 * frutti restano nelle stesse posizioni e ruotano col blocco.
+                 * @param {number} blockOrder - ordine del blocco nella placca.
+                 */
+                rotateBlock: async function( blockOrder ) {
+                    const block = ( this.plate.blocks || [] ).find( ( b ) => {
+                        return b.order == blockOrder;
+                    } );
+
+                    if ( !block ) {
+                        return;
+                    }
+
+                    const next = block.cellOrientation === "HOR" ? "VER" : "HOR";
+
+                    // orientamento "naturale" del blocco (senza override):
+                    // se l'override coincide, si rimuove invece di salvarlo
+                    const plateOrientation = this.detailForm.data.product.orientation.id || this.plate.orientation.id;
+                    const natural = block.orientationMode === "HAV" ? plateOrientation : block.orientationMode;
+
+                    const overrides = { ...( this.plate.blockOrientations || {} ) };
+                    if ( next === natural ) {
+                        delete overrides[ blockOrder ];
+                    } else {
+                        overrides[ blockOrder ] = next;
+                    }
+                    this.plate.blockOrientations = overrides;
+
+                    // changeOrientation ricarica il layout con gli override e
+                    // riposiziona i frutti per id slot
+                    await this.changeOrientation();
                 },
 
                 /**
@@ -1094,6 +1212,14 @@ AP.plate.modal = ( function() {
                  */
                 onSelectFruit: async function( selectedFruit ) {
                     const newFruit = createFruit( { position: 1, fruit: selectedFruit } );
+
+                    // se il frutto non è posizionabile non va nemmeno in lista
+                    const mapped = mapFruitForPlate( newFruit );
+                    if ( mapped && pub.fruitsController && !pub.fruitsController.canPlaceFruit( mapped ) ) {
+                        AP.widget.notify( "error", "Non c'è spazio sufficiente sulla placca per questo frutto. Sposta i frutti esistenti per liberare posizioni adiacenti." );
+                        return;
+                    }
+
                     this.detailForm.data.fruits.push( newFruit );
                     await this.addProductItemsToFruit( newFruit.id );
                     this.renderPlateWithFruits();
@@ -1129,6 +1255,31 @@ AP.plate.modal = ( function() {
                  */
                 renderPlateWithFruits: function() {
                     this.smallLoading = true;
+
+                    // Placche a blocchi: gli id slot sono stabili, quindi prima di
+                    // ridisegnare allinea le posizioni del form allo stato corrente
+                    // del designer (drag compresi); senza questo, il re-render
+                    // riporterebbe i frutti alle posizioni dell'ultimo load.
+                    // NB: positionIds va riassegnato SOLO se cambiato davvero, il
+                    // watcher deep sui frutti rilancerebbe cascata+render in loop.
+                    if ( ( this.plate.blocks || [] ).length && pub.fruitsController?.plate?.isBlockPlate?.() ) {
+                        for ( const fruit of this.detailForm.data.fruits ) {
+                            const designerFruit = pub.fruitsController.fruits.find( ( f ) => { return f.id === fruit.id; } );
+                            if ( !designerFruit || !designerFruit.cellIds.length ) {
+                                continue;
+                            }
+
+                            const next = designerFruit.cellIds.map( ( c ) => { return c.id; } );
+                            const current = fruit.positionIds || [];
+                            const changed = next.length !== current.length
+                                || next.some( ( id, i ) => { return String( id ) !== String( current[ i ] ); } );
+
+                            if ( changed ) {
+                                fruit.positionIds = next;
+                            }
+                        }
+                    }
+
                     this.$nextTick( async function() {
                         try {
                             const gm = getGridModule();
@@ -1379,6 +1530,42 @@ AP.plate.modal = ( function() {
                  * NON carica immagini di combinazione dagli attributi selezionati
                  * @param {string} fruitId - Identificativo del frutto.
                  */
+                /**
+                 * Orientamento effettivo di un frutto: nelle placche a blocchi è
+                 * quello del blocco che lo ospita (può differire da quello della
+                 * placca, es. blocco ruotato singolarmente); altrimenti quello
+                 * della placca.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @returns {string} "HOR" | "VER"
+                 */
+                fruitOrientationId: function( fruitId ) {
+                    const designerFruit = pub.fruitsController?.fruits.find( ( f ) => { return f.id === fruitId; } );
+                    if ( designerFruit && designerFruit.orientation ) {
+                        return designerFruit.orientation;
+                    }
+                    return this.detailForm.data.product.orientation.id;
+                },
+
+                /**
+                 * Stile (posizionamento + eventuale rotazione) per gli overlay
+                 * immagine di un frutto. Le immagini di frutti e attributi sono
+                 * censite in orizzontale: quando il frutto è verticale (blocco
+                 * ruotato o placca verticale) l'overlay viene ruotato via CSS,
+                 * come già avviene per l'immagine base del frutto.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {number} zIndex - z-index dell'overlay.
+                 * @returns {string} Frammento di stile inline.
+                 */
+                fruitOverlayStyle: function( fruitId, zIndex ) {
+                    if ( this.fruitOrientationId( fruitId ) !== "VER" ) {
+                        return `z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0;`;
+                    }
+                    const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
+                    const width = fruitEl.height();
+                    const height = fruitEl.width();
+                    return `z-index: ${zIndex}; width: ${width}px; height: ${height}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg);`;
+                },
+
                 changeFruitImage: function( fruitId ) {
                     const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
                     if ( !fruit ) {
@@ -1388,22 +1575,21 @@ AP.plate.modal = ( function() {
                     if ( !img.length ) {
                         return;
                     }
-                    const orientationId = this.detailForm.data.product.orientation.id;
-                    const rootImage = orientationId === "VER"
-                        ? fruit.fruit?.verticalImage?.uri
-                        : fruit.fruit?.horizontalImage?.uri;
+                    // le immagini dei frutti sono censite in orizzontale: per i
+                    // frutti verticali la rotazione la fa il CSS (drawWithin)
+                    const rootImage = fruit.fruit?.horizontalImage?.uri;
                     if ( rootImage ) {
                         img.attr( "src", rootImage ).show();
                         return;
                     }
                     // Se il frutto non ha l'immagine e almeno un attributo selezionato
-                    // ha un'immagine per l'orientamento corrente, nasconde il placeholder.
+                    // ha un'immagine, nasconde il placeholder.
                     const hasOverlayImage = fruit.items?.some( ( fi ) => {
                         const sel = fi.values?.find( ( v ) => { return v.selected; } );
                         if ( !sel ) {
                             return false;
                         }
-                        return orientationId === "VER" ? sel.verticalImage?.uri : sel.horizontalImage?.uri;
+                        return sel.horizontalImage?.uri;
                     } );
                     if ( hasOverlayImage ) {
                         img.hide();
@@ -1598,6 +1784,7 @@ AP.plate.modal = ( function() {
                     try {
                         const processed = new Set();
                         let cascaded;
+                        let didCascade = false;
                         do {
                             cascaded = false;
                             for ( const fruit of this.detailForm.data.fruits ) {
@@ -1623,11 +1810,20 @@ AP.plate.modal = ( function() {
                                         await this.loadFruitProductItems( fruit.id, selected.productItemId, item.id );
                                         await this.$nextTick();
                                         cascaded = true;
+                                        didCascade = true;
                                     }
                                 }
                             }
                         } while ( cascaded );
-                        this.renderPlateWithFruits();
+
+                        // ridisegna solo se la cascata ha caricato davvero qualcosa:
+                        // il render tocca i frutti, il watcher deep riparte e senza
+                        // questa guardia si innesca un loop cascata->render infinito
+                        if ( didCascade ) {
+                            this.renderPlateWithFruits();
+                        } else {
+                            this.smallLoading = false;
+                        }
                     } catch ( e ) {
                         this.smallLoading = false;
                         throw e;
@@ -1654,10 +1850,11 @@ AP.plate.modal = ( function() {
                     }
                     const overlayKey = parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId;
                     fruitEl.find( "> .fruit-overlay-" + overlayKey ).remove();
-                    const orientationId = this.detailForm.data.product.orientation.id;
-                    const imageUri = orientationId === "VER" ? value.verticalImage?.uri : value.horizontalImage?.uri;
+                    // immagine orizzontale + rotazione CSS per i frutti verticali
+                    const imageUri = value.horizontalImage?.uri;
                     if ( imageUri ) {
-                        fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
+                        const style = this.fruitOverlayStyle( fruitId, zIndex );
+                        fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="${style} background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
                 },
 
@@ -1695,20 +1892,20 @@ AP.plate.modal = ( function() {
                     if ( selectedIds.length === 0 ) {
                         return;
                     }
-                    const orientationId = this.detailForm.data.product.orientation.id;
+                    // le immagini di combinazione sono censite in orizzontale:
+                    // per i frutti verticali la rotazione la fa il CSS
+                    const overlayStyleFor = ( zIndex ) => { return this.fruitOverlayStyle( fruitId, zIndex ); };
                     return new Promise( function( resolve ) {
                         ajax( {
                             method: "POST",
                             url: BASE + "/combinations/findByListOfProductItemIds",
-                            data: JSON.stringify( { productItemIds: selectedIds, orientation: orientationId } ),
+                            data: JSON.stringify( { productItemIds: selectedIds, orientation: "HOR" } ),
                             callback: {
                                 done: function( xhr ) {
                                     if ( xhr.status === "SUCCESS" && xhr.data?.combinations?.length ) {
                                         // Se c'è almeno una combinazione, nasconde l'immagine del frutto (ma solo se è
                                         // l'immagine del frutto generico)
-                                        const hasRootImage = orientationId === "VER"
-                                            ? fruit.fruit?.verticalImage?.uri
-                                            : fruit.fruit?.horizontalImage?.uri;
+                                        const hasRootImage = fruit.fruit?.horizontalImage?.uri;
                                         if ( !hasRootImage ) {
                                             fruitEl.find( "img" ).hide();
                                         }
@@ -1722,7 +1919,7 @@ AP.plate.modal = ( function() {
                                                 }
                                             }
                                             const zIndex = 1040 + maxIdx;
-                                            fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="z-index: ${zIndex}; width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: url('${combo.image}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
+                                            fruitEl.append( `<div class="fruit-overlay-combination-${idx}" style="${overlayStyleFor( zIndex )} background-image: url('${combo.image}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                                         }
                                     }
                                     resolve();
@@ -1908,10 +2105,19 @@ AP.plate.modal = ( function() {
                         return false;
                     }
                     const item = this.getItemData();
+
+                    // posizioni correnti dei frutti: servono al server per la
+                    // logica dei tappi (VITI A VISTA = NO), come nel salvataggio
+                    const positions = {};
+                    pub.fruitsController?.fruits.forEach( ( fruit ) => {
+                        positions[ fruit.id ] = fruit.cellIds;
+                    } );
+
                     const payload = {
                         item: item,
                         price: this.pricing.data,
                         quotationId: AP.page.quotation.id,
+                        positions: positions,
                     };
                     AP.loading.show();
 
@@ -2110,6 +2316,7 @@ AP.plate.modal = ( function() {
                     const data = { ...this.detailForm.data };
                     data.product = { ...data.product };
                     data.product.items = { _data: data.product.items || [] };
+                    data.blockOrientations = { ...( this.plate.blockOrientations || {} ) };
                     data.fruits = {
                         _data: this.detailForm.data.fruits.map( ( f ) => {
                             return {
@@ -2167,6 +2374,7 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.fruits = [];
                     this.models = [];
                     this.finishes = [];
+                    this.plate.blockOrientations = {};
                     this.isPlateDefined = false;
                     this.renderPlateWithFruits();
                     AP.deleteUserPref( "plate.modelId" );
@@ -2183,6 +2391,7 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.product.items = [];
                     this.detailForm.data.fruits = [];
                     this.finishes = [];
+                    this.plate.blockOrientations = {};
                     this.isPlateDefined = false;
                     this.renderPlateWithFruits();
                     AP.deleteUserPref( "plate.finishId" );
@@ -2221,6 +2430,7 @@ AP.plate.modal = ( function() {
         }
         await window.vm.loadLines();
         window.vm.resetDetailForm();
+        window.vm.plate.blockOrientations = {};
 
         let zoneData = AP.quotation.detail.config().zone;
         if ( !zoneData || zoneData.id === "" ) {
@@ -2318,6 +2528,16 @@ AP.plate.modal = ( function() {
         if ( plateResponse.status === "SUCCESS" ) {
             const data = plateResponse.data;
             window.vm.populateProduct( data.quotationItem.product );
+
+            // override orientamento blocchi salvati con la riga di preventivo
+            window.vm.plate.blockOrientations = {};
+            if ( data.quotationItem.blockOrientations ) {
+                try {
+                    window.vm.plate.blockOrientations = JSON.parse( data.quotationItem.blockOrientations );
+                } catch ( e ) {
+                    console.error( "blockOrientations non valido", data.quotationItem.blockOrientations );
+                }
+            }
             window.vm.detailForm.data.id = data.quotationItem.id;
             window.vm.detailForm.data.position = data.quotationItem.position;
             window.vm.detailForm.data.note = data.quotationItem.note;

@@ -17,11 +17,27 @@ $( document ).ready( function() {
 AP.catalogBundle.list = ( function() {
     var pub = {};
 
-    var detailApp  = AP.catalogBundle.detail;
     var fields  = AP.catalogBundle.fields;
+
+    var defaultDetailForm = {
+        data: {
+            id: "",
+            markupValue: "",
+            category: { id: "" },
+            line: { id: "" },
+            model: { id: "" },
+        },
+        title: "Carica bundle",
+    };
 
     var viewModel = kendo.observable( {
         rows: NM.kendo.dataSource( { url: "/manager/ajax/catalog-bundles" } ),
+
+        detailForm: JSON.parse( JSON.stringify( defaultDetailForm ) ),
+
+        resetForm: function() {
+            viewModel.set( "detailForm", JSON.parse( JSON.stringify( defaultDetailForm ) ) );
+        },
 
         getCreatedAt: function( event ) {
             return NM.kendo.formatISODate( event.createdAt );
@@ -38,12 +54,60 @@ AP.catalogBundle.list = ( function() {
             return false;
         },
 
-        edit: function( event ) {
-            var onSave = function() {
-                viewModel.get( "rows" ).read();
-            };
+        new: function( event ) {
+            this.resetForm();
 
-            detailApp.edit( { id: event.data.id, onSave: onSave } );
+            NM.util.openModal( fields.detailRoot );
+
+            return false;
+        },
+
+        edit: function( event ) {
+            this.resetForm();
+
+            viewModel.set( "detailForm.data.id", event.data.id );
+            viewModel.set( "detailForm.data.markupValue", event.data.markupValue );
+            viewModel.set( "detailForm.data.category.id", event.data.category.id );
+            viewModel.set( "detailForm.data.line.id", event.data.line.id );
+            viewModel.set( "detailForm.data.model.id", event.data.model.id );
+            viewModel.set( "detailForm.title", "Modifica bundle < " + event.data.shortId + " >" );
+
+            NM.util.openModal( fields.detailRoot );
+
+            return false;
+        },
+
+        saveDetail: function( event ) {
+            var thisForm = fields.detailForm;
+            var status = thisForm.find( ".status" );
+
+            if ( !thisForm.valid() ) {
+                return false;
+            }
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/catalog-bundles/detail",
+                data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                callback: {
+                    done: function( xhr ) {
+                        status.html( "" );
+
+                        if ( xhr.data.payload && xhr.data.payload.hasOwnProperty( "errors" ) ) {
+                            AP.widget.notify( "error", xhr.data.message.text );
+                            return;
+                        }
+
+                        AP.widget.notify( "success", xhr.data.message.text );
+
+                        setTimeout( () => fields.detailRoot.modal( "hide" ), 500 );
+
+                        viewModel.rows.read();
+                    },
+                },
+            } );
 
             return false;
         },
@@ -63,9 +127,9 @@ AP.catalogBundle.list = ( function() {
                         status.html( "" );
 
                         if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
-                            AP.widget.notify( "error", "Non riesco a cancellare tutti i bundle" );
+                            AP.widget.notify( "error", "Non riesco ad aggiornare tutti i bundle" );
                         } else {
-                            AP.widget.notify( "success", "Salvataggio avvenuta con successo" );
+                            AP.widget.notify( "success", "Salvataggio avvenuto con successo" );
                         }
 
                         viewModel.rows.read();
@@ -79,8 +143,13 @@ AP.catalogBundle.list = ( function() {
 
     pub.init = function() {
         kendo.bind( fields.listRoot, viewModel );
+
+        fields.detailForm.validate( {
+            onfocusout: function( element ) {
+                $( element ).valid();
+            },
+        } );
     };
 
     return pub;
 } () );
-

@@ -112,7 +112,8 @@
 				ordinamento
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
-					orientation_id
+					orientation_id,
+					block_orientations
 				</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,
@@ -157,7 +158,8 @@
 				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getOrdinamento()#">
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
-					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">,
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getBlockOrientations() ?: ''#" null="#IsNull( arguments.quotationItem.getBlockOrientations() ) || !Len( arguments.quotationItem.getBlockOrientations() )#">
 				</cfif>
 
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
@@ -218,7 +220,8 @@
 					</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
-					orientation_id         = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">
+					orientation_id         = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">,
+					block_orientations     = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getBlockOrientations() ?: ''#" null="#IsNull( arguments.quotationItem.getBlockOrientations() ) || !Len( arguments.quotationItem.getBlockOrientations() )#">
 				</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" )>
 					,

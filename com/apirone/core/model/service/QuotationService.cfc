@@ -437,20 +437,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 								}
 
 								if (isImportant) {
-									if ( varCode.len() < 10 ) {
-										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										arrayAppend(productItems, {
-											"important"   = true,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									} else {
-										arrayAppend(productItems, {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
+									var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+									if ( varCode.len() + slotCode.len() > 10 ) {
+										result.success = false;
+										result.error = 'Il codice variante supera i 10 caratteri: attributo "#attribute.getCode()#" (valore "#rawValue.getCode()#") non entra nel codice variante (già #varCode.len()# su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
+										return result;
 									}
+									varCode &= slotCode;
+									arrayAppend(productItems, {
+										"important"   = true,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
 								} else {
 									arrayAppend(productItems, {
 										"important"   = false,

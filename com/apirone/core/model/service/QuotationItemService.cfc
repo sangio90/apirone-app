@@ -314,6 +314,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				frame.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
 				bean.setFrame( frame );
 
+				if ( !IsNull( record.block_orientations ) && Len( record.block_orientations ) ) {
+					bean.setBlockOrientations( record.block_orientations );
+				}
+
 			} else {
 
 				if ( Len( record.signage_config_item_id ) ) {
@@ -531,21 +535,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			|| !StructKeyExists( json.item, "product" )
 			|| !StructKeyExists( json.item.product, "items" )
 			|| !StructKeyExists( json.item.product.items, "_data" ) ) {
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] early exit: missing keys" );
 			return false;
 		}
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] _data count=#ArrayLen(json.item.product.items._data)#" );
 		for ( var item in json.item.product.items._data ) {
-			var hasName = StructKeyExists( item, "attributeName" );
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] item hasName=#hasName# name=#hasName ? item.attributeName : 'n/a'#" );
-			if ( hasName && item.attributeName == "VITI A VISTA" ) {
+			if ( StructKeyExists( item, "attributeName" ) && item.attributeName == "VITI A VISTA" ) {
 				for ( var val in item.values ) {
-					var sel = StructKeyExists( val, "selected" ) && val.selected;
-					var hasAV = StructKeyExists( val, "attributeValue" );
-					var hasRV = hasAV && StructKeyExists( val.attributeValue, "rawValue" );
-					var rvName = hasRV ? val.attributeValue.rawValue.name : "n/a";
-					cffile( action="append", file="#ExpandPath('/debug.log')#", output="[VAV] val sel=#sel# hasAV=#hasAV# hasRV=#hasRV# rawValue.name=#rvName#" );
-					if ( sel && hasAV && hasRV && rvName == "NO" ) {
+					if ( StructKeyExists( val, "selected" ) && val.selected
+						&& StructKeyExists( val, "attributeValue" )
+						&& StructKeyExists( val.attributeValue, "rawValue" )
+						&& val.attributeValue.rawValue.name == "NO" ) {
 						return true;
 					}
 				}
@@ -560,30 +558,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			|| !StructKeyExists( json, "item" )
 			|| !StructKeyExists( json.item, "product" )
 			|| !StructKeyExists( json.item.product, "frame" )
-			|| !Len( json.item.product.frame.id )
 			|| !StructKeyExists( json.item.product, "orientation" )
 			|| !Len( json.item.product.orientation.id ) ) {
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] early exit: missing keys hasPositions=#StructKeyExists(json,'positions')# hasFrame=#StructKeyExists(json,'item') && StructKeyExists(json.item,'product') && StructKeyExists(json.item.product,'frame')#" );
 			return result;
 		}
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frameId=#json.item.product.frame.id# orientationId=#json.item.product.orientation.id#" );
-		var frame = super.service( "Frame" ).get( json.item.product.frame.id );
-		if ( IsNull( frame ) ) { cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frame is null" ); return result; }
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] frameCode=#frame.getCode()#" );
-		var gridFile = ExpandPath( "/config/data/plates/grid_#frame.getCode()#.json.cfm" );
-		if ( !FileExists( gridFile ) ) { cffile( action="append", file="#ExpandPath('/debug.log')#", output="[CPR] gridFile not found: #gridFile#" ); return result; }
-		var gridConfig = DeserializeJSON( FileRead( gridFile ) );
-		var orientationId = json.item.product.orientation.id;
-		if ( !StructKeyExists( gridConfig.frame.orientations, orientationId ) ) return result;
-		var gridRows = gridConfig.frame.orientations[ orientationId ].grid;
+		// frame.code usato direttamente (path aggiornaPrezzo); frame.id come fallback (path save da client)
+		var frameCode = "";
+		var frame = "";
+		if ( StructKeyExists( json.item.product.frame, "id" ) && Len( json.item.product.frame.id ) ) {
+			frame = super.service( "Frame" ).get( json.item.product.frame.id );
+		} else if ( StructKeyExists( json.item.product.frame, "code" ) && Len( json.item.product.frame.code ) ) {
+			frame = super.service( "Frame" ).getByCode( json.item.product.frame.code );
+		}
+		if ( !IsNull( frame ) && !IsSimpleValue( frame ) ) frameCode = frame.getCode();
+		if ( !Len( frameCode ) && StructKeyExists( json.item.product.frame, "code" ) ) frameCode = json.item.product.frame.code;
+		if ( !Len( frameCode ) ) return result;
+
 		var allPositions = [];
-		for ( var gridRow in gridRows ) {
-			for ( var cell in gridRow ) {
-				if ( cell.type != "0" ) {
-					allPositions.add( { id: cell.id, order: cell.order } );
+
+		if ( !IsNull( frame ) && !IsSimpleValue( frame ) && !IsNull( frame.getBlocks() ) && ArrayLen( frame.getBlocks() ) ) {
+			// placca a blocchi: slot numerati 1..N, indipendenti dall'orientamento.
+			// Il blocco serve per non far "cavallottare" un tappo doppio fra due blocchi.
+			var slotCounter = 0;
+			var blockIndex = 0;
+			for ( var block in frame.getBlocks() ) {
+				blockIndex++;
+				for ( var i = 1; i <= block.getSlotCount(); i++ ) {
+					slotCounter++;
+					allPositions.add( { id: slotCounter, order: slotCounter - 1, block: blockIndex } );
+				}
+			}
+		} else {
+			// placca legacy su file
+			var gridFile = ExpandPath( "/config/data/plates/grid_#frameCode#.json.cfm" );
+			if ( !FileExists( gridFile ) ) return result;
+			var gridConfig = DeserializeJSON( FileRead( gridFile ) );
+			var orientationId = json.item.product.orientation.id;
+			if ( !StructKeyExists( gridConfig.frame.orientations, orientationId ) ) return result;
+			var gridRows = gridConfig.frame.orientations[ orientationId ].grid;
+			for ( var gridRow in gridRows ) {
+				for ( var cell in gridRow ) {
+					if ( cell.type != "0" ) {
+						allPositions.add( { id: cell.id, order: cell.order, block: 0 } );
+					}
 				}
 			}
 		}
+
 		ArraySort( allPositions, function( a, b ) {
 			if ( a.order < b.order ) return -1;
 			if ( a.order > b.order ) return 1;
@@ -592,9 +613,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var occupiedIds = {};
 		for ( var fId in json.positions ) {
 			for ( var pos in json.positions[ fId ] ) {
-				if ( StructKeyExists( pos, "id" ) ) {
-					occupiedIds[ pos.id ] = true;
-				}
+				// posizioni da client: {id: uuid, order: N}; da DB: {position: uuid, order: N}
+				var posId = StructKeyExists( pos, "id" ) ? pos.id : ( StructKeyExists( pos, "position" ) ? pos.position : "" );
+				if ( Len( posId ) ) occupiedIds[ posId ] = true;
 			}
 		}
 		var emptyPositions = [];
@@ -606,7 +627,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var idx = 1;
 		while ( idx <= ArrayLen( emptyPositions ) ) {
 			var isDouble = idx < ArrayLen( emptyPositions )
-				&& emptyPositions[ idx + 1 ].order == emptyPositions[ idx ].order + 1;
+				&& emptyPositions[ idx + 1 ].order == emptyPositions[ idx ].order + 1
+				&& emptyPositions[ idx + 1 ].block == emptyPositions[ idx ].block;
 			if ( isDouble ) {
 				result.add( { type: "tappo", positionIds: [ emptyPositions[ idx ], emptyPositions[ idx + 1 ] ] } );
 				idx += 2;
@@ -913,10 +935,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					]
 				});
 			}
+			var PLUG_IDS = [ "5f4ec169-c445-40a0-8c94-1dc22c21be79", "452e03e4-ddf4-4042-ac87-b0f17489c4e1" ];
+			var realFruits = [];
+			var positions = {};
 			var fruits = quotationItem.getFruits();
 			for (var fruit in fruits) {
-				var fruitItems = []
-
+				// escludi tappi esistenti: verranno ricalcolati
+				if ( PLUG_IDS.find( LCase( fruit.getFruit().getId() ) ) ) continue;
+				realFruits.append( fruit );
+				var fruitItems = [];
 				if ( !isNull( fruit.getItems() ) ) {
 					for (fruitItem in fruit.getItems()) {
 						fruitItems.append({
@@ -934,7 +961,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					"fruitId": fruit.getId(),
 					"items": { "_data": fruitItems }
 				});
+				// costruisce json.positions per computePlugRuns
+				var fruitPositions = fruit.getPositions();
+				if ( !isNull( fruitPositions ) && ArrayLen( fruitPositions ) ) {
+					var posArr = [];
+					for ( var fp in fruitPositions ) {
+						var posId = StructKeyExists( fp, "id" ) ? fp.id : ( StructKeyExists( fp, "position" ) ? fp.position : "" );
+						if ( Len( posId ) ) posArr.append( { id: posId, order: fp.order } );
+					}
+					positions[ fruit.getId() ] = posArr;
+				}
 			}
+			// fornisce frame.code e orientation a computePlugRuns
+			json.positions = positions;
+			json.item.product.frame = { "code": quotationItem.getProduct().getModel().getCode() };
+			json.item.product.orientation = { "id": quotationItem.getFrame().getOrientation().getId() };
+			// ricalcola i tappi e aggiorna la lista fruits
+			var plugBeans = buildPlugFruitBeans( json );
+			var allFruits = [];
+			allFruits.append( realFruits, true );
+			allFruits.append( plugBeans, true );
+			quotationItem.setFruits( allFruits );
 			var price = getPlatePricing(json)
 		}
 

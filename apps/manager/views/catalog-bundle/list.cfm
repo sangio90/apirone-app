@@ -6,6 +6,9 @@
             <div class="col-8">
                 #pageTitle()#
             </div>
+            <div class="col-4 text-end pb-3">
+                #addButton( bind = "click:new" )#
+            </div>
         </div>
 
         <div class="row">
@@ -82,15 +85,16 @@
                         
                         <form name="catalog-bundle-grid-form" id="catalog-bundle-grid-form" method="post">
 
-                            #grid( 
+                            #grid(
                                 id="catalog-bundle-grid",
                                 columns="[
                                     { 'field':'shortId', 'title':'ID', width: '80px'},
                                     { 'field':'createdAt', 'title':'Creato il', width: '140px' },
                                     { 'field':'category.name', 'title':'Categoria'},
                                     { 'field':'line.name', 'title':'Linea' },
-                                    { 'field':'model.name', 'title':'Finitura' },
+                                    { 'field':'model.name', 'title':'Modello' },
                                     { 'field':'Markup', 'title':'Markup %', width: '120px'  },
+                                    { 'title':'', width: '60px' },
                                 ]",
                                 rowTemplate="catalog-bundle/catalog-bundle-grid-row-tmpl"
                             )#
@@ -101,6 +105,8 @@
                 </section>
             </div>
         </div>
+
+        #view("catalog-bundle/detail-modal")#
 
     </div>
 

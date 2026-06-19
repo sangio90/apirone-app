@@ -147,6 +147,11 @@
 				icon: "fas fa-print",
 				title: "Report",
 			},
+			{
+				href: "/manager/frames",
+				icon: "fas fa-border-all",
+				title: "Configurazione placche",
+			},
 		]
 
 	},

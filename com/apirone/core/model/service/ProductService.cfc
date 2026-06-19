@@ -397,7 +397,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setLine( bean.getCatalogBundle().getLine() );
 				bean.setModel( bean.getCatalogBundle().getModel() );
 				bean.setCategory( bean.getCatalogBundle().getCategory() );
-				bean.setFinish( getFinishService().get( record.finish_id ) );
+
+				// finish_id è nullable: prodotto censito senza finitura
+				if ( !IsNull( record.finish_id ) && Len( record.finish_id ) ) {
+					bean.setFinish( getFinishService().get( record.finish_id.toString() ) );
+				}
 			}
 
 			bean.setId( record.product_id.toString() );

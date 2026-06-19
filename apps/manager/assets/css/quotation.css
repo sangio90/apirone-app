@@ -150,6 +150,18 @@ input#input-item-total[readonly] {
 	border: 1px dashed lightgray;
 }
 
+/* rotazione blocco: visibile solo al passaggio sulla placca, come i bordi */
+.plate-block-rotate {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.15s ease-in-out;
+}
+
+.plate-background:hover .plate-block-rotate {
+	opacity: 1;
+	pointer-events: auto;
+}
+
 .grid-column .position-label {
 	color: black;
 	display: none;

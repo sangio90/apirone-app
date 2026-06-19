@@ -19,6 +19,15 @@
 			getLogger().warning( "Products found: #ArrayLen( products )#. Get the first. Should be only one with this params: modelId: #rc.modelId#, lineId: #rc.lineId#, finishId: #rc.finishId#, categoryId: #rc.categoryId#" );
 		}
 
+		if ( !ArrayLen( products ) ) {
+			getLogger().warning( "No product found with params: modelId: #rc.modelId#, lineId: #rc.lineId#, finishId: #rc.finishId#, categoryId: #rc.categoryId#" );
+
+			result.setData( "" );
+
+			event.setValue( "result", result );
+			return;
+		}
+
 		var product = products[ 1 ];
 
 		result.setData( memy.convert( product, "plate" ) );

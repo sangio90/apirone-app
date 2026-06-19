@@ -527,6 +527,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 		bean.setNote( json.item.note )
 
+		// override orientamento dei singoli blocchi (placche a blocchi)
+		if ( !IsNull( json.item.blockOrientations ) && IsStruct( json.item.blockOrientations ) && !StructIsEmpty( json.item.blockOrientations ) ) {
+			bean.setBlockOrientations( SerializeJSON( json.item.blockOrientations ) );
+		} else {
+			bean.setBlockOrientations( "" );
+		}
+
 		if( Len( json.item?.position?.code ) ) {
 			var position = populatePositionBean( json.item.position );
 			bean.setPosition( position );

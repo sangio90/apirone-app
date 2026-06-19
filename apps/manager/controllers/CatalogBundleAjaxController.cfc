@@ -42,6 +42,63 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function saveDetail( event, rc, prc ){
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		var result = super.getResult();
+
+		var thisId = json.keyExists( "id" ) ? json.id : "";
+
+		// duplicato: stessa tripletta categoria/linea/modello su un altro record
+		var existingId = super.fire( "catalogBundle.findId", {
+			modelId    = json.model.id,
+			categoryId = json.category.id,
+			lineId     = json.line.id
+		} );
+
+		if ( !IsNull( existingId ) && existingId != thisId ) {
+			result.setData( {
+				"message" = {
+					"id"   = "catalogBundle.duplicated",
+					"text" = "Esiste già un bundle con questa combinazione di categoria, linea e modello."
+				},
+				"payload" = { "errors" = [ { "message" = "duplicated" } ] }
+			} );
+
+			event.setValue( "result", result );
+			return;
+		}
+
+		var bundle   = super.bean( "CatalogBundle" );
+		var line     = super.bean( "Line" );
+		var model    = super.bean( "Model" );
+		var category = super.bean( "ProductCategory" );
+
+		bundle.setLine( line.setId( json.line.id ) );
+		bundle.setModel( model.setId( json.model.id ) );
+		bundle.setCategory( category.setId( json.category.id ) );
+
+		if ( json.keyExists( "markupValue" ) && IsNumeric( json.markupValue ) ) {
+			bundle.setMarkupValue( json.markupValue );
+		}
+
+		var messageId = "";
+
+		if ( !Len( thisId ) ) {
+			messageId = "catalogBundle.created";
+			thisId    = super.fire( "catalogBundle.create", [ bundle ] );
+		} else {
+			bundle.setId( thisId );
+			messageId = "catalogBundle.updated";
+			thisId    = super.fire( "catalogBundle.update", [ bundle ] );
+		}
+
+		var message = super.completeMessage( messageId );
+
+		result.setData( { "message" = message, "payload" = { "id" = thisId } } );
+
+		event.setValue( "result", result );
+	}
+
 	function save( event, rc, prc ){
 		var result    = super.getResult();
 		var mem       = super.getMementify();

@@ -75,6 +75,7 @@
     "VatCode.bean": {},
     "Frame.bean": {},
     "FrameCell.bean": {},
+    "FrameBlock.bean": {},
     "ProductCategoryLine.bean": {},
     "Price.bean": {},
     "PriceType.bean": {},

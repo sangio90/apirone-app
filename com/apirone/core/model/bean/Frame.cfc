@@ -6,6 +6,7 @@
 	property name="cellOrientation" type="com.apirone.core.model.bean.Orientation";
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="cells" type="com.apirone.core.model.bean.FrameCell[]";
+	property name="blocks" type="com.apirone.core.model.bean.FrameBlock[]";
 
 	public Frame function init(){
 		return this;

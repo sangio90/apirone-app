@@ -95,10 +95,21 @@
 
 		<cfset var id = arguments.catalogBundle.getId()>
 
+		<!--- linea/modello/categoria vengono aggiornati solo se presenti sul bean:
+			il salvataggio massivo dei markup dalla griglia passa solo id + markupValue --->
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
 				catalog_bundles
 			SET
+				<cfif !IsNull( arguments.catalogBundle.getLine() )>
+					line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundle.getLine().getId()#">::uuid,
+				</cfif>
+				<cfif !IsNull( arguments.catalogBundle.getModel() )>
+					model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.catalogBundle.getModel().getId()#">::uuid,
+				</cfif>
+				<cfif !IsNull( arguments.catalogBundle.getCategory() )>
+					product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.catalogBundle.getCategory().getId()#">,
+				</cfif>
 				markup_value = <cfqueryparam cfsqltype="Numeric" value="#arguments.catalogBundle.getMarkupValue()#">
 			WHERE
 				catalog_bundle_id = <cfqueryparam cfsqltype="Varchar" value="#id#">::uuid

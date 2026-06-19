@@ -51,6 +51,7 @@
 		/*
 			catalog bundle
 		*/
+		post( "/ajax/catalog-bundles/detail" ).to( "CatalogBundleAjaxController.saveDetail" ).end();
 		get( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.list" ).end();
 		post( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.save" ).end();
 		delete( "/signages/catalog-bundles" ).to( "CatalogBundleAjaxController.delete" ).end();
@@ -315,7 +316,8 @@
 		delete( "/ajax/frames" ).to( "FrameAjaxController.delete" ).end();
 		post( "/ajax/frames" ).to( "FrameAjaxController.save" ).end();
 		get( "/ajax/frames" ).to( "FrameAjaxController.list" ).end();
-		get( "/frames" ).to( "FrameController.list" ).end();
+		get( "/frames-legacy" ).to( "FrameController.list" ).end();
+		get( "/frames" ).to( "FrameController.builder" ).end();
 
 
 		/*
