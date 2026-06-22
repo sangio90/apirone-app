@@ -555,7 +555,7 @@ Each affected service receives:
 2. `search()` modified to call `getMany(ids)` instead of looping `buildFromRow()`
 3. `buildFromRow()` / `build()` kept unchanged for single-record lookups
 
-### Services Fixed (45 total)
+### Services Fixed (49 total — ALL DONE)
 
 #### Already fixed in Phase 3/4 (6)
 ProductService, ProductCategoryService, FinishService, LineService, AttributeService, ModelService
@@ -569,11 +569,13 @@ ArticleService, FontService, FrameService, PictogramService, CatalogBundleServic
 #### Batch Subagent #3 — Mixed (13) &nbsp;&nbsp;`✅ DONE`
 CompanyService, AttributeValueService, FontFamilyService, FileService, FrameCellService, ProfileService, ProductCategoryLineService, UserService, QuotationItemProductItemService, PriceTypeService, MetadataTypeService, QuotationItemProductService, SignageConfigService
 
-#### New DAO methods added
-PermissionDAO, ProductionTimeDAO, ReportDAO, RolePermissionDAO, SearchDAO, SignageConfigItemDAO, FontDAO, RoleDAO, QuotationItemProductDAO — `readByIds()`
+#### Individual — T3 Heavy (5) &nbsp;&nbsp;`✅ DONE`
+QuotationService, QuotationItemService, ComponentService, ProductItemService, QuotationPriceService — tutti e 5 con getMany() batch e precaricamento FK ricorsivo.
 
-### Still TODO (5 complex services)
-QuotationService, QuotationItemService, ComponentService, ProductItemService, QuotationPriceService — these have deep FK chains, verticale dependencies, or conditional branches that need individual analysis.
+#### New DAO methods added
+**readByIds():** PermissionDAO, ProductionTimeDAO, ReportDAO, RolePermissionDAO, SearchDAO, SignageConfigItemDAO, FontDAO, RoleDAO, QuotationItemProductDAO
+
+**readBy*/findBy* (batch FK):** PriceDAO (findByProductItemIds, findByArticleIds), FrameCellDAO (readByFrameIds), RolePermissionDAO (readByRoleIds), SignageConfigItemDAO (readBySignageConfigIds), QuotationItemFruitDAO (findByQuotationItemIds), QuotationItemPositionDAO, QuotationItemPriceDAO, QuotationItemProductItemDAO, QuotationItemSignageRowDAO (readByQuotationItemIds)
 
 ---
 

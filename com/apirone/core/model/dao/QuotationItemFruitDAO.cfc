@@ -99,4 +99,27 @@
 		</cfquery>
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Restituisce gli ID (PK + FK) dei frutti collegati a più quotation_item_id.
+		Utilizzato da QuotationItemService.getMany() per raccogliere i PK da passare a getMany().
+	--->
+	<cffunction name="findByQuotationItemIds" returntype="Query" access="public">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotation_item_fruit_id,
+				quotation_item_id::varchar
+			FROM quotation_item_fruits
+			WHERE quotation_item_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

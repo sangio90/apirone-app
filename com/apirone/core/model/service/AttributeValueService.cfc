@@ -118,11 +118,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			if ( ArrayLen( uniqueRvIds ) ) {
 				var rvRecords = getRawValueService().getDao().readByIds( uniqueRvIds );
+
+				// Precarica i testi per i RawValue in batch
+				var rawValueTextMap = getTextService().listByEntityIds( "rawValue.id", uniqueRvIds );
+
 				for ( var rvr in rvRecords ) {
 					var rvBean = super.bean( "RawValue" );
 					rvBean.setId( rvr.raw_value_id );
 				rvBean.setCode( rvr.code );
 				rvBean.setCreatedAt( rvr.created_at );
+					// Testi: dalla mappa pre-caricata
+					if ( StructKeyExists( rawValueTextMap, rvr.raw_value_id ) ) {
+						rvBean.setTexts( rawValueTextMap[ rvr.raw_value_id ] );
+					}
 					// Status: precaricato sotto con cache locale condivisa
 					rawValueMap[ rvr.raw_value_id ] = rvBean;
 				}

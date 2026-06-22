@@ -75,27 +75,21 @@
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		if ( records.recordCount ) {
-			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
-			var ids = [];
-			for ( var record in records ) {
-				ids.append( record.quotation_price_id );
-			}
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.quotation_price_id );
+		} );
 
-			var loadedRecords = getDao().readByIds( ids );
-			var recordMap = {};
-			for ( var loadedRecord in loadedRecords ) {
-				recordMap[ loadedRecord.quotation_price_id ] = loadedRecord;
-			}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1 + calcolo aggregato)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
-			// Ricostruisce le righe nell'ordine del find() originale
-			for ( var record in records ) {
-				var fullRecord = recordMap[ record.quotation_price_id ];
-				if ( !IsNull( fullRecord ) ) {
-					rows.add( buildFromRow( fullRecord ) );
-				}
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			if ( StructKeyExists( beanMap, record.quotation_price_id ) ) {
+				rows.add( beanMap[ record.quotation_price_id ] );
 			}
-		}
+		} );
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -144,6 +138,67 @@
 		getDao().update( arguments.quotationPrice );
 
 		return arguments.quotationPrice.getId();
+	}
+
+	/**
+	 * Recupera in batch più QuotationPrice dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationPriceId, valore = bean QuotationPrice.
+	 * precarica i QuotationItem per quotation_id univoco (con cache per evitare duplicati)
+	 * e calcola il totalMultipliedByQuantity in batch.
+	 *
+	 * @ids Array di quotationPriceId
+	 * @return Struct mappato per quotationPriceId -> QuotationPrice
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie i quotation_id univoci
+		var quotationIds = [];
+		for ( var r in records ) {
+			if ( !ArrayContains( quotationIds, r.quotation_id ) ) {
+				quotationIds.append( r.quotation_id );
+			}
+		}
+
+		// Precarica i QuotationItem in cache per quotation_id (list() ora usa getMany() internamente)
+		var itemsCache = {};
+		for ( var qid in quotationIds ) {
+			itemsCache[ qid ] = getQuotationItemService().list( quotationId = qid );
+		}
+
+		// Costruisce i bean con l'aggregazione dai QuotationItem pre-caricati
+		for ( var r in records ) {
+			var bean = super.bean( "QuotationPrice" );
+
+			// Campi diretti dal record
+			bean.setId( r.quotation_price_id );
+			bean.setQuotationId( r.quotation_id );
+			bean.setDiscount1( r.discount1 );
+			bean.setDiscount2( r.discount2 );
+			bean.setShippingCost( r.shipment_cost );
+			bean.setFlatDiscount( r.flat_discount );
+			bean.setCreatedAt( r.created_at );
+
+			// Aggregazione totalMultipliedByQuantity dai QuotationItem
+			if ( StructKeyExists( itemsCache, r.quotation_id ) ) {
+				itemsCache[ r.quotation_id ].each( function( item ){
+					var zone         = item.getQuotationZone();
+					var zoneQuantity = zone.getQuantity();
+					if ( !IsNull( zone.getOrigin() ) ) {
+						zoneQuantity *= zone.getOrigin().getQuantity();
+					}
+					bean.setTotalMultipliedByQuantity(
+						bean.getTotalMultipliedByQuantity() +
+						( item.getPrice().getTotal() * item.getQuantity() * zoneQuantity )
+					);
+				} );
+			}
+
+			map[ r.quotation_price_id ] = bean;
+		}
+
+		return map;
 	}
 
 	private com.apirone.core.model.bean.QuotationPrice function buildFromRow( required any record ){

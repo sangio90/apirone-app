@@ -4,6 +4,7 @@
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="ProductService" inject="ProductService";
 	property name="QuotationItemProductService" inject="QuotationItemProductService";
+	property name="textService" inject="TextService";
 
 	public com.apirone.core.model.bean.QuotationItemProduct function get( required String productId ){
 		return build( arguments.productId );
@@ -121,6 +122,10 @@
 			}
 			if ( ArrayLen( uniqueProductIds ) ) {
 				var prodRecords = getProductService().getDao().readByIds( uniqueProductIds );
+
+				// Precarica i testi per i Product in batch
+				var prodTextMap = getTextService().listByEntityIds( "product.id", uniqueProductIds );
+
 				for ( var pr in prodRecords ) {
 					var prodBean = super.bean( "Product" );
 					prodBean.setId( pr.product_id.toString() );
@@ -128,6 +133,10 @@
 					prodBean.setCreatedAt( pr.created_at );
 					prodBean.setMinQuantity( pr.min_quantity );
 					prodBean.setMaxQuantity( pr.max_quantity );
+					// Testi: dalla mappa pre-caricata
+					if ( StructKeyExists( prodTextMap, pr.product_id ) ) {
+						prodBean.setTexts( prodTextMap[ pr.product_id ] );
+					}
 					prodMap[ pr.product_id.toString() ] = prodBean;
 				}
 			}

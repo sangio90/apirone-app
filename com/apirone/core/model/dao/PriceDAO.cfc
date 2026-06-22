@@ -181,4 +181,24 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch tutti i prezzi collegati a una lista di productItemId.
+		Utilizzato da ProductItemService.getMany() per evitare N+1 query.
+	--->
+	<cffunction name="findByProductItemIds" returntype="Query" access="public">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.productItemIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

@@ -89,14 +89,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.quotation_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.quotation_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -1053,6 +1047,151 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# notifyVerticale: apir_update_ordini: status: #result.status_code#");
 
+	}
+
+	/**
+	 * Recupera in batch più Quotation dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationId, valore = bean Quotation.
+	 * precarica User e QuotationStatusHistory in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationId
+	 * @return Struct mappato per quotationId -> Quotation
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti gli user_id (owner, salesAgent, graphicTechnician)
+		var allUserIds = [];
+		for ( var r in records ) {
+			if ( !IsNull( r.owner_id ) ) {
+				allUserIds.append( r.owner_id );
+			}
+			if ( !IsNull( r.sales_agent_account_id ) ) {
+				allUserIds.append( r.sales_agent_account_id );
+			}
+			if ( !IsNull( r.graphic_technician_account_id ) ) {
+				allUserIds.append( r.graphic_technician_account_id );
+			}
+		}
+
+		// Precarica gli User in batch (1 query per tutti e 3 i ruoli)
+		var userMap = {};
+		if ( ArrayLen( allUserIds ) ) {
+			userMap = getUserService().getMany( allUserIds );
+		}
+
+		// Raccoglie i quotation_status_history_id
+		var statusHistoryIds = [];
+		for ( var r in records ) {
+			if ( !IsNull( r.quotation_status_history_id ) ) {
+				statusHistoryIds.append( r.quotation_status_history_id );
+			}
+		}
+
+		// Precarica i QuotationStatusHistory in batch (1 query)
+		var statusHistoryMap = {};
+		if ( ArrayLen( statusHistoryIds ) ) {
+			statusHistoryMap = getQuotationStatusHistoryService().getMany( statusHistoryIds );
+		}
+
+		// Costruisce i bean Quotation con le mappe pre-caricate
+		for ( var r in records ) {
+			var bean = super.bean( "Quotation" );
+
+			// Campi diretti dal record
+			bean.setId( r.quotation_id.toString() );
+			bean.setSerial( r.serial );
+			bean.setName( r.quotation );
+			bean.setQuotationNumber( r.quotation_number );
+			bean.setVersionNumber( r.version_number );
+			bean.setQuotationDate( r.quotation_date );
+			bean.setCreatedAt( r.created_at );
+			bean.setNote( r.note );
+			bean.setValidityDate( r.validity_date );
+			bean.setExported( r.exported );
+			bean.setActive( r.active );
+
+			// Lang, Currency, PaymentMethod: chiamate individuali (cache interna)
+			bean.setLang( getLangService().get( r.lang_id ) );
+			bean.setCurrency( getCurrencyService().get( r.currency_id ) );
+			bean.setPaymentMethod( getPaymentMethodService().get( r.payment_method_id ) );
+
+			// Owner, SalesAgent, GraphicTechnician: dalla mappa batch
+			if ( !IsNull( r.owner_id ) && StructKeyExists( userMap, r.owner_id ) ) {
+				bean.setOwner( userMap[ r.owner_id ] );
+			} else if ( !IsNull( r.owner_id ) ) {
+				bean.setOwner( getUserService().get( r.owner_id.toString() ) );
+			}
+
+			if ( !IsNull( r.sales_agent_account_id ) && StructKeyExists( userMap, r.sales_agent_account_id ) ) {
+				bean.setSalesAgent( userMap[ r.sales_agent_account_id ] );
+			} else if ( !IsNull( r.sales_agent_account_id ) ) {
+				bean.setSalesAgent( getUserService().get( r.sales_agent_account_id.toString() ) );
+			}
+
+			if ( !IsNull( r.graphic_technician_account_id ) && StructKeyExists( userMap, r.graphic_technician_account_id ) ) {
+				bean.setGraphicTechnician( userMap[ r.graphic_technician_account_id ] );
+			} else if ( !IsNull( r.graphic_technician_account_id ) ) {
+				bean.setGraphicTechnician( getUserService().get( r.graphic_technician_account_id.toString() ) );
+			}
+
+			// StatusHistory: dalla mappa batch
+			if ( !IsNull( r.quotation_status_history_id ) && StructKeyExists( statusHistoryMap, r.quotation_status_history_id ) ) {
+				bean.setStatusHistory( statusHistoryMap[ r.quotation_status_history_id ] );
+			}
+
+			// Agenti e commissioni (campi diretti)
+			bean.setNessunAgente( r.nessun_agente );
+			if ( !IsNull( r.agente1 ) && Len( r.agente1 ) ) bean.setAgente1( r.agente1.toString() );
+			if ( !IsNull( r.agente2 ) && Len( r.agente2 ) ) bean.setAgente2( r.agente2.toString() );
+			if ( !IsNull( r.agente3 ) && Len( r.agente3 ) ) bean.setAgente3( r.agente3.toString() );
+			if ( !IsNull( r.agente4 ) && Len( r.agente4 ) ) bean.setAgente4( r.agente4.toString() );
+			if ( !IsNull( r.agente5 ) && Len( r.agente5 ) ) bean.setAgente5( r.agente5.toString() );
+			if ( !IsNull( r.commission1 ) ) bean.setCommission1( r.commission1 );
+			if ( !IsNull( r.commission2 ) ) bean.setCommission2( r.commission2 );
+			if ( !IsNull( r.commission3 ) ) bean.setCommission3( r.commission3 );
+			if ( !IsNull( r.commission4 ) ) bean.setCommission4( r.commission4 );
+			if ( !IsNull( r.commission5 ) ) bean.setCommission5( r.commission5 );
+			if ( Len( r.referente_amministrativo ) ) bean.setReferenteAmministrativo( r.referente_amministrativo );
+			if ( Len( r.referente_spedizione ) ) bean.setReferenteSpedizione( r.referente_spedizione );
+			if ( Len( r.customer_type ) ) bean.setCustomerType( r.customer_type );
+
+			// Customer: chiamata individuale (CRM API, cache interna)
+			if ( !IsNull( r.customer_id ) ) {
+				var customer = getCustomerService().get( r.customer_id );
+				bean.setCustomer( customer );
+
+				if ( !IsNull( r.shipping_profile_id ) ) {
+					for ( var thisAddress in customer.getShippingProfiles() ) {
+						if ( thisAddress.getId() == r.shipping_profile_id ) {
+							bean.setShippingProfile( thisAddress );
+							break;
+						}
+					}
+				}
+			}
+
+			// Opportunity, Lead, VatCode: chiamate individuali (CRM/verticale, cache interna)
+			if ( !IsNull( r.opportunity_id ) ) {
+				bean.setOpportunity( getOpportunityService().get( r.opportunity_id.toString() ) );
+			}
+			if ( !IsNull( r.lead_id ) ) {
+				bean.setLead( getLeadService().get( r.lead_id ) );
+			}
+			if ( !IsNull( r.vat_code_id ) ) {
+				bean.setVatCode( getVatCodeService().get( r.vat_code_id ) );
+			}
+
+			// Totale calcolato: query individuale (SUM per quotation_id)
+			bean.setCalculatedAmount(
+				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+			);
+
+			map[ r.quotation_id ] = bean;
+		}
+
+		return map;
 	}
 
 	/**

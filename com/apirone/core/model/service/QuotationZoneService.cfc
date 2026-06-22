@@ -207,18 +207,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// Precarica le Quotation in batch (via readByIds del DAO)
-		var quotationMap = {};
-		if ( ArrayLen( quotationIds ) ) {
-			var qRecords = getQuotationService().getDao().readByIds( quotationIds );
-			for ( var qr in qRecords ) {
-				var qBean = super.bean( "Quotation" );
-				qBean.setId( qr.quotation_id );
-				qBean.setName( qr.quotation );
-				qBean.setCreatedAt( qr.created_at );
-				quotationMap[ qr.quotation_id ] = qBean;
-			}
-		}
+		// Precarica le Quotation in batch con getMany() ottimizzato
+		var quotationMap = ArrayLen( quotationIds ) ? getQuotationService().getMany( quotationIds ) : {};
 
 		// Precarica le Origin Zone in batch (self-reference: ricorsione gestita via getMany)
 		var originMap = {};

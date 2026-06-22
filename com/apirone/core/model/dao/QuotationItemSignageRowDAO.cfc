@@ -93,4 +93,26 @@
 		</cfquery>
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch le righe di signage collegate a più quotation_item_id.
+		Utilizzato da QuotationItemService.getMany() per evitare N+1.
+	--->
+	<cffunction name="readByQuotationItemIds" returntype="Query" access="public">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM quotation_item_signage_rows
+			WHERE quotation_item_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+			ORDER BY orderby
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

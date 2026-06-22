@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="catalogBundleService" inject="catalogBundleService";
 	property name="signageConfigItemService" inject="signageConfigItemService";
 	property name="FontFamilySizeService" inject="FontFamilySizeService";
+	property name="textService" inject="TextService";
 
 	public com.apirone.core.model.bean.SignageConfig function get( required String signageConfigId ){
 		return build( arguments.signageConfigId );
@@ -151,6 +152,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			if ( ArrayLen( uniqueFontIds ) ) {
 				var fontRecords = getFontService().getDao().readByIds( uniqueFontIds );
+
+				// Precarica i testi per i Font in batch
+				var fontTextMap = getTextService().listByEntityIds( "font.id", uniqueFontIds );
+
 				for ( var fr in fontRecords ) {
 					var fontBean = super.bean( "Font" );
 					fontBean.setId( fr.font_id );
@@ -158,7 +163,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					fontBean.setDirectory( fr.directory );
 					fontBean.setHeightWidthRatio( fr.height_width_ratio );
 					fontBean.setCreatedAt( fr.created_at );
-					// FontFamily e Texts: non precaricati in batch (sono leggeri o già ottimizzati)
+					// Testi: dalla mappa pre-caricata
+					if ( StructKeyExists( fontTextMap, fr.font_id ) ) {
+						fontBean.setTexts( fontTextMap[ fr.font_id ] );
+					}
 					fontMap[ fr.font_id ] = fontBean;
 				}
 			}

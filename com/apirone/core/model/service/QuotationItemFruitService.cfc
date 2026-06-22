@@ -6,6 +6,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="quotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
 	property name="productItemService" inject="ProductItemService";
+	property name="CatalogBundleService" inject="CatalogBundleService";
+	property name="statusService" inject="StatusService";
+	property name="textService" inject="TextService";
+	property name="priceService" inject="PriceService";
+	property name="fileService" inject="FileService";
+	property name="finishService" inject="FinishService";
+	property name="productCategoryService" inject="ProductCategoryService";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
 		return build( arguments.quotationItemFruitId );
@@ -155,8 +162,115 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productMap = {};
 		if ( ArrayLen( fruitIds ) ) {
 			var productRecords = getProductService().getDao().readByIds( fruitIds );
+
+			// Raccoglie i catalog_bundle_id per i ProductComplex
+			var bundleIds = [];
 			for ( var pr in productRecords ) {
-				var productBean = resolveProductType( pr );
+				if ( !IsNull( pr.catalog_bundle_id ) ) {
+					bundleIds.append( pr.catalog_bundle_id );
+				}
+			}
+
+			// Precarica i CatalogBundle in batch
+			var bundleMap = {};
+			if ( ArrayLen( bundleIds ) ) {
+				bundleMap = getCatalogBundleService().getMany( bundleIds );
+			}
+
+			// Precarica i testi dei prodotti in batch
+			var productTextMap = getTextService().listByEntityIds( "product.id", fruitIds );
+
+			// Precarica i prezzi dei prodotti in batch
+			var productPriceMap = getPriceService().listByProductIds( fruitIds );
+
+			// Precarica le immagini dei prodotti in batch
+			var productFileMap = getFileService().listByEntityIds( "product.id", fruitIds );
+
+			// Raccoglie i finish_id per i ProductComplex e i product_category_id per i ProductBase
+			var finishIds           = [];
+			var productCategoryIds  = [];
+			for ( var pr in productRecords ) {
+				if ( !IsNull( pr.finish_id ) ) {
+					finishIds.append( pr.finish_id );
+				}
+				if ( !IsNull( pr.product_category_id ) ) {
+					productCategoryIds.append( pr.product_category_id );
+				}
+			}
+
+			// Precarica le Finish in batch
+			var finishMap = {};
+			if ( ArrayLen( finishIds ) ) {
+				finishMap = getFinishService().getMany( finishIds );
+			}
+
+			// Precarica le ProductCategory in batch
+			var categoryMap = {};
+			if ( ArrayLen( productCategoryIds ) ) {
+				categoryMap = getProductCategoryService().getMany( productCategoryIds );
+			}
+
+			for ( var pr in productRecords ) {
+				if ( IsNull( pr.catalog_bundle_id ) ) {
+					var productBean = super.bean( "ProductBase" );
+					productBean.setCode( pr.code );
+					productBean.setPositionCount( pr.position_count );
+					// Categoria per ProductBase
+					if ( !IsNull( pr.product_category_id ) && StructKeyExists( categoryMap, pr.product_category_id ) ) {
+						productBean.setCategory( categoryMap[ pr.product_category_id ] );
+					}
+					// Lines per ProductBase
+					if ( Len( pr.lines ) ) {
+						productBean.setLines( super.getLinesBeanByIds( pr.lines ) );
+					}
+				} else {
+					var productBean = super.bean( "ProductComplex" );
+					if ( StructKeyExists( bundleMap, pr.catalog_bundle_id ) ) {
+						productBean.setCatalogBundle( bundleMap[ pr.catalog_bundle_id ] );
+						var bundle = bundleMap[ pr.catalog_bundle_id ];
+						productBean.setLine( bundle.getLine() );
+						productBean.setModel( bundle.getModel() );
+						productBean.setCategory( bundle.getCategory() );
+					}
+					// Finish per ProductComplex
+					if ( !IsNull( pr.finish_id ) && StructKeyExists( finishMap, pr.finish_id ) ) {
+						productBean.setFinish( finishMap[ pr.finish_id ] );
+					}
+				}
+
+				// Campi comuni
+				productBean.setId( pr.product_id.toString() );
+				productBean.setCreatedAt( pr.created_at );
+				productBean.setSerial( pr.serial );
+				productBean.setSpecial( BooleanFormat( pr.special ) );
+				productBean.setMinQuantity( pr.min_quantity );
+				productBean.setMaxQuantity( pr.max_quantity );
+				productBean.setMarginTop( pr.margin_top );
+				productBean.setMarginLeft( pr.margin_left );
+				productBean.setPlateWidth( pr.plate_width );
+				productBean.setPlateHeight( pr.plate_height );
+				productBean.setStatus( getStatusService().get( pr.status_id ) );
+
+				// Testi: dalla mappa pre-caricata
+				if ( StructKeyExists( productTextMap, pr.product_id ) ) {
+					productBean.setTexts( productTextMap[ pr.product_id ] );
+				}
+
+				// Prezzi: dalla mappa pre-caricata
+				if ( StructKeyExists( productPriceMap, pr.product_id ) ) {
+					productBean.setPrices( productPriceMap[ pr.product_id ] );
+				}
+
+				// Immagini: dalla mappa pre-caricata
+				if ( StructKeyExists( productFileMap, pr.product_id ) && Len( productFileMap[ pr.product_id ] ) ) {
+					productBean.setImages( productFileMap[ pr.product_id ] );
+				}
+
+				// Attributi importanti
+				if ( Len( pr.attributes_important ) ) {
+					productBean.setImportantAttributes( super.getAttributesBeanByIds( pr.attributes_important ) );
+				}
+
 				productMap[ pr.product_id ] = productBean;
 			}
 		}
@@ -198,26 +312,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					uniquePiIds.append( pid );
 				}
 			}
-			if ( ArrayLen( uniquePiIds ) ) {
-				var piRecords = getProductItemService().getDao().readByIds( uniquePiIds );
-				var piMap = {};
-				for ( var pir in piRecords ) {
-					var piBean = super.bean( "ProductItem" );
-					piBean.setId( pir.product_item_id );
-					piBean.setProductId( pir.product_id );
-					piBean.setCreatedAt( pir.created_at );
-					piBean.setImportant( pir.important );
-					piBean.setOrderBy( pir.orderby );
-					piMap[ pir.product_item_id ] = piBean;
-				}
-				// Collega i ProductItem ai beans QuotationItemProductItem
-				for ( var fid in itemMap ) {
-					for ( var itemBean in itemMap[ fid ] ) {
-						if ( StructKeyExists( itemBean, "_productItemId" ) && StructKeyExists( piMap, itemBean._productItemId ) ) {
-							itemBean.setProductItem( piMap[ itemBean._productItemId ] );
-						}
-						StructDelete( itemBean, "_productItemId" );
+			// Precarica tutti i ProductItem (main e origin) con getMany() ottimizzato
+			var piMap = ArrayLen( uniquePiIds ) ? getProductItemService().getMany( uniquePiIds ) : {};
+
+			// Collega i ProductItem ai beans QuotationItemProductItem
+			for ( var fid in itemMap ) {
+				for ( var itemBean in itemMap[ fid ] ) {
+					if ( StructKeyExists( itemBean, "_productItemId" ) && StructKeyExists( piMap, itemBean._productItemId ) ) {
+						itemBean.setProductItem( piMap[ itemBean._productItemId ] );
 					}
+					StructDelete( itemBean, "_productItemId" );
 				}
 			}
 		}

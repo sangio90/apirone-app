@@ -158,6 +158,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var valueMap = {};
 		if ( ArrayLen( arguments.ids ) ) {
 			var valueRecords = getAttributeValueService().getDao().readByAttributeIds( arguments.ids );
+
 			for ( var vr in valueRecords ) {
 				if ( !StructKeyExists( valueMap, vr.attribute_id ) ) {
 					valueMap[ vr.attribute_id ] = [];

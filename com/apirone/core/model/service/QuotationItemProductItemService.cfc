@@ -6,6 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="attributeService" inject="AttributeService";
 	property name="attributeValueService" inject="AttributeValueService";
+	property name="rawValueService" inject="RawValueService";
+	property name="textService" inject="TextService";
 
 	public com.apirone.core.model.bean.QuotationItemProductItem function get( required String productItemId ){
 		return build( arguments.productItemId );
@@ -154,6 +156,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var allAttrIds = [];
 				if ( ArrayLen( allAttrValueIds ) ) {
 					var avRecords = getAttributeValueService().getDao().readByIds( allAttrValueIds );
+
+					// Raccoglie i raw_value_id per precaricamento batch dei RawValue
+					var allRawValueIds = [];
+					for ( var avr in avRecords ) {
+						if ( !IsNull( avr.raw_value_id ) ) {
+							allRawValueIds.append( avr.raw_value_id );
+						}
+					}
+
+					// Batch-load dei RawValue via DAO
+					var rawValueMap = {};
+					if ( ArrayLen( allRawValueIds ) ) {
+						var rvRecs = getRawValueService().getDao().readByIds( allRawValueIds );
+
+						// Precarica i testi per i RawValue in batch
+						var rawValueTextMap = getTextService().listByEntityIds( "rawValue.id", allRawValueIds );
+
+						for ( var rvr in rvRecs ) {
+							var rvBean = super.bean( "RawValue" );
+							rvBean.setId( rvr.raw_value_id );
+							rvBean.setCode( rvr.code );
+							rvBean.setCreatedAt( rvr.created_at );
+							// Testi: dalla mappa pre-caricata
+							if ( StructKeyExists( rawValueTextMap, rvr.raw_value_id ) ) {
+								rvBean.setTexts( rawValueTextMap[ rvr.raw_value_id ] );
+							}
+							rawValueMap[ rvr.raw_value_id ] = rvBean;
+						}
+					}
+
 					for ( var avr in avRecords ) {
 						var avBean = super.bean( "AttributeValue" );
 						avBean.setId( avr.attribute_raw_value_id );
@@ -161,6 +193,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						avBean.setCreatedAt( avr.created_at );
 						avBean.setOrderBy( avr.orderby );
 						avBean.setStatus( getStatusService().get( avr.status_id ) );
+						// RawValue: dalla mappa pre-caricata
+						if ( !IsNull( avr.raw_value_id ) && StructKeyExists( rawValueMap, avr.raw_value_id ) ) {
+							avBean.setRawValue( rawValueMap[ avr.raw_value_id ] );
+						}
 						attrValueMap[ avr.attribute_raw_value_id ] = avBean;
 						if ( !IsNull( avr.attribute_id ) ) {
 							allAttrIds.append( avr.attribute_id );
