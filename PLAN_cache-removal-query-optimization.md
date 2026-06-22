@@ -579,67 +579,43 @@ QuotationService, QuotationItemService, ComponentService, ProductItemService, Qu
 
 ---
 
-## Phase 5: CacheManager Disarm & Removal &nbsp;&nbsp;`❌ TO DO`
+## Phase 5: Cache Cleanup &nbsp;&nbsp;`✅ DONE`
 
-### 5.1 Remove CacheManager from WireBox
+> **Note:** Phase 5 was originally called "CacheManager Disarm & Removal" but audit revealed 17 services legitimately need caching (verticale ERP, CRM API, readonly lookups). The plan was revised to: remove dead/broken cache code, keep CacheManager infrastructure for the 17 services that require it.
 
-**File:** `config/WireBox.cfc`
+### 5.1 Remove dead/broken cache code &nbsp;&nbsp;`✅ DONE`
 
-Remove lines 98-103:
+**CostService.cfc** — Removed `get()` method (unused, called `getCacheScope()` which doesn't exist). Removed dead `cm = getCacheManager()` variable in `getByParams()`.
 
-```cfml
-map("CacheManager").to( "com.apirone.core.util.CacheManager" )...
-```
+**PaymentTypeService.cfc** — Removed broken cache code in `get()` (undefined `key` variable, missing `cacheScope`). Fixed incorrect DAO injection (`VatCodeDAO` → `PaymentTypeDAO`). Fixed incorrect bean type (`VatCode` → `PaymentType`).
 
-Remove the `CacheManager` property injection from `QueryLoader` (line 96):
+### 5.2 Sweep: leftover cacheScope in optimized services &nbsp;&nbsp;`✅ DONE`
 
-```cfml
-map("QueryLoader").to( "com.apirone.core.util.QueryLoader" )
-    .property( name = "CacheManager", ref = "CacheManager");  ← remove this line
-```
+Zero `cacheScope` properties found in already-optimized services. All removed in Phases 2-4.
 
-### 5.2 Remove `getCacheManager()` from base classes
+### 5.3 Sweep: leftover getCacheManager() in optimized services &nbsp;&nbsp;`✅ DONE`
 
-**File:** `com/apirone/core/model/service/AbsService.cfc:208-210`
-Remove the method.
+Zero `getCacheManager()` calls found in already-optimized services (except `AbsService` which is the base class for the 17 services that still need it).
 
-**File:** `com/apirone/core/controller/AbsController.cfc:384-386`
-Remove the method.
+### 5.4 Kept: CacheManager infrastructure
 
-**File:** `com/apirone/core/controller/AbsController.cfc:222`
-Remove the commented-out line.
+The following files MUST stay — they are required by 17 services (verticale, CRM API, readonly lookups):
 
-### 5.3 Remove CacheManager class file
+| File | Role |
+|------|------|
+| `com/apirone/core/util/CacheManager.cfc` | Cache implementation |
+| `config/cacheScopes.json.cfm` | Scope definitions |
+| `config/WireBox.cfc` | CacheManager + QueryLoader mapping |
+| `com/apirone/core/model/service/AbsService.cfc` | `getCacheManager()` base method |
+| `com/apirone/core/controller/AbsController.cfc` | `getCacheManager()` for controllers |
+| `com/apirone/core/util/QueryLoader.cfc` | ERP cost cache (separate concern) |
 
-**File:** `com/apirone/core/util/CacheManager.cfc`
-Can be deleted entirely (or kept for reference).
+### 5.5 Services that still depend on CacheManager (17 total)
 
-### 5.4 Remove cacheScopes config
-
-**File:** `config/cacheScopes.json.cfm`
-Can be deleted (or kept for reference).
-
-### 5.5 Update QueryLoader
-
-**File:** `com/apirone/core/util/QueryLoader.cfc`
-
-The QueryLoader caches MS SQL ERP query results (table `azapi_listin`). This is NOT the bean cache and doesn't cause stale data for customers — it caches ERP data that rarely changes. However, we need to decide:
-
-**Option A:** Keep QueryLoader caching (it loads the entire `azapi_listin` table into memory). The stale data risk is low since ERP data changes infrequently.
-
-**Option B:** Remove QueryLoader caching and re-query the ERP on every call. This could slow down cost calculations but ensures freshness.
-
-**Recommendation:** Keep QueryLoader as-is for now. It's separate from the bean cache system. If stale ERP costs become an issue later, add a TTL-based refresh.
-
-### 5.6 Remove all `cm.remove(...)` calls
-
-After all services are updated, verify there are no remaining calls to:
-
-- `getCacheManager()`
-- `cm.get(`, `cm.put(`, `cm.remove(`
-- `getCacheManager().removeAll()`
-
-These should all be removed in Phases 2–4. Phase 5 is a final sweep to catch any stragglers.
+**Verticale ERP (7):** RawProduct, VatCode, Country, Currency, Color, Variant, PaymentMethod
+**CRM API (3):** Customer, Opportunity, Lead
+**Readonly lookup (4):** Status, Lang, SystemColor
+**Other (3):** i18nService, GeoService, RawProductType (+ VariantType)
 
 ---
 

@@ -1,20 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="dao" inject="VatCodeDAO";
+	property name="dao" inject="PaymentTypeDAO";
 
 	public com.apirone.core.model.bean.PaymentType function get( required String paymentTypeId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( key );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.paymentTypeId );
-		cm.put( key, bean );
-
-		return bean;
+		return build( arguments.paymentTypeId );
 	}
 
 	public com.apirone.core.model.bean.PaymentType(){
@@ -51,7 +40,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var bean = NullValue();
 
 		if ( record.RecordCount ) {
-			var bean = super.bean( "VatCode" );
+			var bean = super.bean( "PaymentType" );
 
 			bean.setId( record.pagcod );
 			bean.setName( record.pagdes );
