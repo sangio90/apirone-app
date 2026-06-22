@@ -27,7 +27,13 @@
 		"commission5",
 		"referenteAmministrativo",
 		"referenteSpedizione",
-		"customerType"
+		"customerType",
+		"industry",
+		"rifLibero",
+		"dataEvasione",
+		"sentToClient",
+		"dataConfermaOrdine",
+		"codiceSdi"
 	],
 	profiles = {
 		detail = {
@@ -70,7 +76,13 @@
 				"commission5",
 				"referenteAmministrativo",
 			"referenteSpedizione",
-			"customerType"
+			"customerType",
+			"industry",
+			"rifLibero",
+			"dataEvasione",
+			"sentToClient",
+			"dataConfermaOrdine",
+			"codiceSdi"
 			]
 		}
 	}

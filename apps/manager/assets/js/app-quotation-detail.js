@@ -166,6 +166,7 @@ AP.quotation.detail = (function () {
 		},
 		canEdit: AP.page.canEdit,
 		canSee: AP.page.canSee,
+		canRevise: AP.page.canRevise || false,
 
 		target: null,
 		zones: new kendo.data.DataSource(),
@@ -311,6 +312,37 @@ AP.quotation.detail = (function () {
 			});
 		},
 
+		exportProvisional: function () {
+			AP.loading.show();
+			NM.util.ajax({
+				method: "GET",
+				url: "/manager/ajax/quotations-export-provisional/" + AP.page.quotation.id,
+				callback: {
+					done: function (xhr) {
+						if (xhr.status == "INVALID") {
+							NM.form.showMessages(xhr.data);
+							AP.loading.hide();
+							return;
+						}
+
+						if (xhr.data.error || xhr.data.success == false) {
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
+							AP.loading.hide();
+							return;
+						}
+
+						AP.widget.notify("success", "Ordine provvisorio esportato correttamente.");
+					},
+					always: function (xhr) {
+						if (xhr && xhr.data && (xhr.data.error || xhr.data.success == false)) {
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
+						}
+						AP.loading.hide();
+					}
+				}
+			});
+		},
+
 		changeType: function (event) {
 
 			var target = $(event.currentTarget);
@@ -444,12 +476,23 @@ AP.quotation.detail = (function () {
 		approveQuotation: function (event) {
 			event.stopPropagation();
 
+			var maxAmount = AP.page.userRole ? parseFloat(AP.page.userRole.quotationMaxAmount) : 0;
+			var pricingData = {};
+			try { pricingData = AP.quotation.totalPricing.getTotals() || {}; } catch(e) {}
+			var currentTotal = parseFloat(pricingData.total) || 0;
+			var needsEscalation = maxAmount > 0 && currentTotal > maxAmount;
+
+			var fmt = function(n) { return Number(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; };
+
 			bootbox.confirm({
-				title: "Conferma approvazione",
-				message: "Sei sicuro di voler approvare questo preventivo?",
+				size: 'large',
+				title: needsEscalation ? "Richiesta approvazione superiore" : "Conferma approvazione",
+				message: needsEscalation
+					? "Il totale del preventivo (" + fmt(currentTotal) + ") supera il tuo massimale (" + fmt(maxAmount) + "). Vuoi inviare la richiesta di approvazione a un superiore?"
+					: "Sei sicuro di voler approvare questo preventivo?",
 				buttons: {
 					confirm: {
-						label: "Si, confermo",
+						label: needsEscalation ? "Sì, invia richiesta" : "Sì, confermo",
 						className: "btn-primary",
 					},
 					cancel: {
@@ -480,6 +523,74 @@ AP.quotation.detail = (function () {
 				},
 			});
 
+			return false;
+		},
+
+		markAsSent: function (event) {
+			event.stopPropagation();
+			bootbox.confirm({
+				size: 'large',
+				title: "Invia a cliente",
+				message: "Sei sicuro di voler contrassegnare questo preventivo come inviato al cliente? Il preventivo diventerà non modificabile.",
+				buttons: {
+					confirm: { label: "Sì, invia", className: "btn-success" },
+					cancel: { label: "Annulla", className: "btn-secondary" },
+				},
+				callback: function (result) {
+					if (!result) return;
+					AP.loading.show();
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/markasSent",
+						callback: {
+							done: function (xhr) {
+								AP.loading.hide();
+								const status = xhr.status ? xhr.status.toLowerCase() : 'error';
+								AP.widget.notify(status, xhr.data.message);
+								if (status === 'success') {
+									setTimeout(() => { window.location.reload(); }, 1500);
+								}
+							}
+						}
+					});
+				},
+			});
+			return false;
+		},
+
+		createRevision: function (event) {
+			event.stopPropagation();
+			bootbox.confirm({
+				size: 'large',
+				title: "Modifica preventivo",
+				message: "Questo preventivo è già stato inviato al cliente. Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?",
+				buttons: {
+					confirm: { label: "Sì, crea revisione", className: "btn-warning" },
+					cancel: { label: "Annulla", className: "btn-secondary" },
+				},
+				callback: function (result) {
+					if (!result) return;
+					AP.loading.show();
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/createrevision",
+						callback: {
+							done: function (xhr) {
+								AP.loading.hide();
+								const status = xhr.status ? xhr.status.toLowerCase() : 'error';
+								if (status === 'success' && xhr.data.payload && xhr.data.payload.id) {
+									AP.widget.notify('success', xhr.data.message);
+									setTimeout(() => {
+										window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+									}, 1500);
+								} else {
+									AP.widget.notify('error', xhr.data.message || 'Errore durante la creazione della revisione.');
+								}
+							}
+						}
+					});
+				},
+			});
 			return false;
 		},
 

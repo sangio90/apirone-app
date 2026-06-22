@@ -155,6 +155,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newFileId;
 	}
 
+	public String function duplicateForZone( required String fileId, required String quotationZoneId ){
+		var file = get( arguments.fileId );
+		return getDao().duplicateQuotationZoneFile( file = file, quotationZoneId = arguments.quotationZoneId );
+	}
+
 	public Void function resize( required String filePath, required Numeric size ){
 		var sizePath = Replace( filePath, "_ori", size );
 

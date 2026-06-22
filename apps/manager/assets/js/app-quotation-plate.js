@@ -494,8 +494,9 @@ AP.plate.modal = ( function() {
                         if (viewModel.get('detailForm.data.fruits') && viewModel.get('detailForm.data.fruits')._data && viewModel.get('detailForm.data.fruits')._data.length) {
                             for(let f in viewModel.get('detailForm.data.fruits')._data) {
                                 const fruit = viewModel.get('detailForm.data.fruits')._data[f]
-                                if (fruit.id && fruit.items._data.length) {
-                                    const fruitItems = fruit.items._data
+                                const _fruitItemsData = fruit.items?._data ?? (Array.isArray(fruit.items) ? fruit.items : []);
+                                if (fruit.id && _fruitItemsData.length) {
+                                    const fruitItems = _fruitItemsData
                                     for (let fi in fruitItems) {
                                         fi = fruitItems[fi]
                                         if (fi.attributeId && fi.attributeId != '') {

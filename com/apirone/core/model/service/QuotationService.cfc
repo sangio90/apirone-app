@@ -500,7 +500,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 											"rawValueId"  = rawValue.getId(),
 											"attributeId" = attributeValue.getAttributeId()
 										} );
-										arrayAppend( fruitsProductItemIds[fruitsIndex], productItem.getId() );
+										arrayAppend( fruitsProductItemIds[fruitsIndex], fruitItemBean.getId() );
 										note &= attribute.getName() & ": " & rawValue.getName() & "; ";
 										if (fruitItem.note != "") {
 											note &= " Note: " & fruitItem.note & "; ";
@@ -604,7 +604,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems, boolean provisional = false ){
 		var result = {
 			'success' = false,
 			'error' = null
@@ -615,7 +615,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var quotation = quotationItems[1].getQuotation();
 
 				getDao().deleteExport( quotationNumber = quotation.getQuotationNumber() );
-				quotationDataResult = prepareExportData(quotation);
+				quotationDataResult = prepareExportData(quotation, arguments.provisional);
 				if (!isNull(quotationDataResult.error)) {
 					result.error = quotationDataResult.error;
 					return result;
@@ -893,7 +893,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return componente;
 	}
 
-	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
+	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation, boolean provisional = false ){
 		var result = {
 			"data" = {},
 			"error" = null
@@ -910,8 +910,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MM_IDRIF" = quotation.getQuotationNumber(), // i need the same code
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
-			"MMDATEVA" = quotation.getValidityDate(),
-			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
+			"MMDATEVA" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
+			"MMEVASIO" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
+			"MMRIFORD" = quotation.getRifLibero() ?: "",
 			"MMNUMLIS" = 1,
 			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
 			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,
@@ -952,10 +953,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var ct = quotation.getCustomerType() ?: "";
 				return StructKeyExists( crmToErp, ct ) ? crmToErp[ ct ] : "";
 			})(),
+			"INDUSTRY" = quotation.getIndustry() ?: "",
+			"MMORDFOR" = "",
+			"CFCODDES" = quotation.getCodiceSdi() ?: "",
+			"MMORDPRO" = arguments.provisional ? "S" : "N",
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),
-			"DECAPDES" = customer.getPostalCode(),
+			"DECAPDOC" = customer.getPostalCode(),
 			"DEDESDOD" = customer.getCompany(),
 			"DEINDDOD" = customer.getStreet(),
 			"DELOCDOD" = customer.getCity(),
@@ -964,7 +969,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 
 		if (isNull(quotation.getShippingProfile())) {
-			quotationData["DECAPDOC"] = "";
+			quotationData["DECAPDES"] = "";
 			quotationData["DEIDDMER"] = "";
 			quotationData["DEDESMER"] = "";
 			quotationData["DEINDMER"] = "";
@@ -972,7 +977,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quotationData["DEPROMER"] = "";
 			quotationData["DENAZMER"] = "";
 		} else {
-			quotationData["DECAPDOC"] = quotation.getShippingProfile().getPostalCode();
+			quotationData["DECAPDES"] = quotation.getShippingProfile().getPostalCode();
 			quotationData["DEIDDMER"] = quotation.getShippingProfile().getId();
 			quotationData["DEDESMER"] = quotation.getShippingProfile().getCompany();
 			quotationData["DEINDMER"] = quotation.getShippingProfile().getStreet();
@@ -1010,9 +1015,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
-		clonedQuotation.setActive( 0 );
+		clonedQuotation.setActive( 1 );
 		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
-		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() );
+		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
@@ -1021,11 +1026,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
 		}
 
-		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
-		quotationService.update( originalQuotation );
-
 		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
 		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
+
+		return clonedQuotationId;
+	}
+
+	public Void function markAsSent( required String quotationId ){
+		getDao().markAsSent( arguments.quotationId );
+		super.getCacheManager().remove( getCacheScope(), arguments.quotationId );
+	}
+
+	public String function createRevision( required com.apirone.core.model.bean.Quotation quotation ){
+		var originalQuotation = arguments.quotation;
+		var clonedQuotation = Duplicate( originalQuotation );
+		clonedQuotation.setId( "" );
+		clonedQuotation.setActive( 1 );
+		clonedQuotation.setSentToClient( false );
+		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
+		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
+		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+
+		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
+		for ( var quotationZone in quotationZones ) {
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId );
+		}
+
+		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
+		super.getCacheManager().remove( getCacheScope(), originalQuotation.getId() );
 
 		return clonedQuotationId;
 	}
@@ -1104,6 +1132,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
 			if ( Len( record.referente_spedizione ) ) bean.setReferenteSpedizione( record.referente_spedizione );
 			if ( Len( record.customer_type ) ) bean.setCustomerType( record.customer_type );
+			if ( Len( record.industry ) ) bean.setIndustry( record.industry );
+			if ( Len( record.rif_libero ) ) bean.setRifLibero( record.rif_libero );
+			if ( IsDate( record.data_evasione ) ) bean.setDataEvasione( record.data_evasione );
+			if ( !IsNull( record.sent_to_client ) ) bean.setSentToClient( record.sent_to_client );
+			if ( !IsNull( record.data_conferma_ordine ) && IsDate( record.data_conferma_ordine ) ) bean.setDataConfermaOrdine( record.data_conferma_ordine );
+			if ( Len( record.codice_sdi ) ) bean.setCodiceSdi( record.codice_sdi );
 
 			//by a trigger from history
 			//bean.setStatus( getStatusService().get( record.status_id ) );

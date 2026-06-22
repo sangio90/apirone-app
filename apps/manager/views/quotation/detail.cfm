@@ -1,27 +1,48 @@
 ﻿<cfoutput>
     <div id="quotation-detail-root">
         <div class="row mb-3">
-            <div class="col-4">
+            <div class="col-5">
                 <h2>#prc.title#</h2>
+                #button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left" )#
             </div>
 
-            <div class="col-8 text-end mt-3">
-				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
-				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
-                #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
-                #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				<button type="button"
-                        class="btn btn-primary btn-sm"
-                        data-role-list="ADM/CMA"
-                        data-bind="click: openStatusModal, roleEnable: this">
-
-                    <i class="fas fa-check-circle"></i>
-                    Status: #prc.quotation.getStatusHistory().getStatus().getName()#
-                </button>
-				#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open" )#
-				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
-				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
-			</div>
+            <div class="col-7 mt-1">
+                <div class="row g-2 mb-2">
+                    <div class="col-2">#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit", class="w-100" )#</div>
+                    <div class="col-2">#button( bind="click:exportProducts, enabled: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="w-100 export-button" )#</div>
+                    <div class="col-2">#button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="w-100 export-button" )#</div>
+                    <div class="col-2">#button( bind="click:exportProvisional, enabled: canEdit", size="sm", label="Esporta provvisorio", icon="file-export", class="w-100" )#</div>
+                    <div class="col-4">
+                        <cfif prc.quotation.getSentToClient() ?: false>
+                            <button type="button" class="btn btn-primary btn-sm w-100" disabled>
+                                <i class="fas fa-check-circle"></i>
+                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                            </button>
+                        <cfelse>
+                            <button type="button"
+                                    class="btn btn-primary btn-sm w-100"
+                                    data-role-list="ADM/CMA"
+                                    data-bind="click: openStatusModal, roleEnable: this">
+                                <i class="fas fa-check-circle"></i>
+                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                            </button>
+                        </cfif>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-3">#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open", class="w-100" )#</div>
+                    <div class="col-3">#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print", class="w-100" )#</div>
+                    <div class="col-3">#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map", class="w-100" )#</div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bind="click:markAsSent, visible:canEdit">
+                            <i class="fas fa-paper-plane"></i> Inviato a cliente
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm w-100" data-bind="click:createRevision, visible:canRevise">
+                            <i class="fas fa-pencil-alt"></i> Modifica preventivo
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <div class="export-button-tooltip col-6 text-end">
 				<p class="export-button-tooltip" style="color: red; display: none">

@@ -781,19 +781,22 @@ AP.accessory.modal = ( function() {
             parsedData.quotationItem.quotationZone = (viewModel.get('quotationSubzone.id') && viewModel.get('quotationSubzone.id') != '') ? viewModel.get('quotationSubzone') : viewModel.get('quotationZone')
 
             //durante la save faccio passare le note dei product items e setto i valori nella struttura dati che passo al backend per il salvataggio
-            const productItemsNotes = viewModel.detailForm.productItemsNotes
-            parsedData.quotationItem.product.items._data.forEach(function (row) {
-                const selectedOption = row.values.find(r => r.selected == true)
-                if (selectedOption) {
-                    const note = productItemsNotes.find(n =>
-                        n.product_item_id === selectedOption.product_item_id &&
-                        n.attribute_raw_value_id === selectedOption.attributeValue.id
-                    );
-                    if (note) {
-                        row.note = note.note
+            const productItemsNotes = viewModel.detailForm.productItemsNotes;
+            const productItemsData = parsedData.quotationItem.product?.items?._data;
+            if ( productItemsData ) {
+                productItemsData.forEach( function( row ) {
+                    const selectedOption = row.values.find( r => r.selected == true );
+                    if ( selectedOption ) {
+                        const note = ( productItemsNotes || [] ).find( n =>
+                            n.product_item_id === selectedOption.product_item_id &&
+                            n.attribute_raw_value_id === selectedOption.attributeValue.id
+                        );
+                        if ( note ) {
+                            row.note = note.note;
+                        }
                     }
-                }
-            })
+                } );
+            }
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
                 const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
 

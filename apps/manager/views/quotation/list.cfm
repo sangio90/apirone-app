@@ -23,8 +23,7 @@
                                         class="d-flex justify-content-end" 
                                         data-bind="events: { submit: search }">
 
-                                        <input name="strDescription" placeholder="Cerca nella descrizione" class="form-control me-2" type="text">
-                                        <input name="strNumber" placeholder="Cerca per numero" class="form-control me-2" type="text">
+                                        <input name="strSearch" placeholder="Cerca per numero, nome, referente, rif. libero" class="form-control me-2" type="text">
 
 										<select class="form-control me-2" name="statusId">
 											<option value="">-- tutti gli stati</option>
@@ -59,6 +58,7 @@
                                         { 'field':'shortId', 'title':'ID',  width: '80px' },
                                         { 'field':'quotationNumber', 'title':'##', width: '80px' },
                                         { 'field':'name', 'title':'Nome' },
+                                        { 'field':'rifLibero', 'title':'Rif. Libero' },
                                         { 'field':'referentName', 'title':'Referente' },
                                         { 'field':'owner.email', 'title':'Account', width: '10%'},
                                         { 'field':'createdAt', 'title':'Creato il', width: '10%'},

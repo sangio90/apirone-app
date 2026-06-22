@@ -435,7 +435,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.item.product;
 
-		for ( var item in product.items._data ) {
+		var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+		for ( var item in productItemsData ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
 					productItemsIds.add( value.productItemId );
@@ -690,9 +691,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.quotationItem.product;
 
-		var product = json.quotationItem.product;
 		if ( product.keyExists( "items" ) ) {
-			for ( var item in product.items._data ) {
+			var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+			for ( var item in productItemsData ) {
 				for ( var value in item.values ) {
 					if ( value.selected ) {
 						productItemsIds.add( value.product_item_id );
@@ -764,7 +765,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.quotationItem.product;
 		if ( product.keyExists( "items" ) ) {
-			for ( var item in product.items._data ) {
+			var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+			for ( var item in productItemsData ) {
 				for ( var value in item.values ) {
 					if ( value.selected ) {
 						productItemsIds.add( value.product_item_id );

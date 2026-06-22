@@ -13,6 +13,9 @@
                 <span data-bind="text: name"></span>
             </td>
             <td>
+                <span data-bind="text: rifLibero"></span>
+            </td>
+            <td>
                 <span data-bind="text: referentName"></span>
             </td>
             <td>

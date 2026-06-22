@@ -279,7 +279,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			} );
 
 			if ( json.quotationItem.product.keyExists( "items" ) ) {
-				var productItemsData = json.quotationItem.product.items._data;
+				var _items1 = json.quotationItem.product.items ?: [];
+				var productItemsData = isArray( _items1 ) ? _items1 : ( structKeyExists( _items1, "_data" ) ? _items1._data : [] );
 				productItemsData.each( function( productItemRow ){
 					var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 						return v.selected;
@@ -444,7 +445,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				)
 			} );
 
-			var productItemsData = json.quotationItem.product.items._data;
+			var _items2 = json.quotationItem.product.items ?: [];
+			var productItemsData = isArray( _items2 ) ? _items2 : ( structKeyExists( _items2, "_data" ) ? _items2._data : [] );
 			productItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 					return v.selected;
@@ -580,7 +582,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var items = [];
 
-			var fruitProductItemsData = thisFruit.items._data;
+			var _fruitItems = thisFruit.items ?: [];
+			var fruitProductItemsData = isArray( _fruitItems ) ? _fruitItems : ( structKeyExists( _fruitItems, "_data" ) ? _fruitItems._data : [] );
 
 			fruitProductItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -636,7 +639,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
 			} );
 
-			var productItemsData = json.item.product.items._data;
+			var _items3 = json.item.product.items ?: [];
+			var productItemsData = isArray( _items3 ) ? _items3 : ( structKeyExists( _items3, "_data" ) ? _items3._data : [] );
 
 			productItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){

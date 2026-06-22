@@ -455,6 +455,7 @@
 			quotations
 		*/
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
+		get( "/ajax/quotations-export-provisional/:id" ).to( "QuotationAjaxController.exportProvisional" ).end();
 		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
@@ -466,6 +467,8 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 		get( "/ajax/quotations_approve/:id" ).to( "QuotationAjaxController.approveQuotation" ).end();
+		post( "/ajax/quotations/:id/markasSent" ).to( "QuotationAjaxController.markAsSent" ).end();
+		post( "/ajax/quotations/:id/createrevision" ).to( "QuotationAjaxController.createRevision" ).end();
 
 		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();

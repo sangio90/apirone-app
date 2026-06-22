@@ -200,6 +200,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !isNull(json.referenteAmministrativo) ) quotation.setReferenteAmministrativo( json.referenteAmministrativo );
 		if ( !isNull(json.referenteSpedizione) ) quotation.setReferenteSpedizione( json.referenteSpedizione );
 		if ( !isNull(json.customerType) ) quotation.setCustomerType( json.customerType );
+		if ( !isNull(json.industry) ) quotation.setIndustry( json.industry );
+		if ( !isNull(json.rifLibero) ) quotation.setRifLibero( json.rifLibero );
+		if ( structKeyExists(json, "dataEvasione") && !isNull(json.dataEvasione) && IsDate(json.dataEvasione) ) quotation.setDataEvasione( json.dataEvasione );
+		if ( !isNull(json.codiceSdi) ) quotation.setCodiceSdi( json.codiceSdi );
 
 		if ( !Len( json.id ) ) {
 
@@ -310,6 +314,33 @@ component extends="com.apirone.core.controller.AbsController" {
 
 
 		result.setData( { "message" = message, "error" = { } } );
+		event.setValue( "result", result );
+	}
+
+	function markAsSent( event, rc, prc ) {
+		var result = super.getResult();
+		try {
+			var quotation = super.fire( 'quotation.get', [ rc.id ] );
+			quotation.setSentToClient( true );
+			super.fire( 'quotation.update', [ quotation ] );
+			result.setData( { "message" = "Preventivo contrassegnato come inviato al cliente.", "error" = {} } );
+		} catch (e) {
+			result.setData( { "message" = "Errore: " & e.Message, "error" = {} } );
+			result.setStatus( 'error' );
+		}
+		event.setValue( "result", result );
+	}
+
+	function createRevision( event, rc, prc ) {
+		var result = super.getResult();
+		try {
+			var quotation = super.fire( 'quotation.get', [ rc.id ] );
+			var newId = super.fire( 'Quotation.createRevision', { 'quotation': quotation } );
+			result.setData( { "message" = "Revisione creata.", "payload" = { "id" = newId }, "error" = {} } );
+		} catch (e) {
+			result.setData( { "message" = "Errore: " & e.Message, "error" = {} } );
+			result.setStatus( 'error' );
+		}
 		event.setValue( "result", result );
 	}
 
@@ -480,6 +511,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function exportProducts( event, rc, prc ){
+		setting requestTimeout=300;
 		var data = [];
 
 		var result = super.getResult();
@@ -492,6 +524,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function export( event, rc, prc ){
+		setting requestTimeout=300;
 		var data = [];
 
 		var result = super.getResult();
@@ -500,13 +533,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "id" ] = rc.id;
 
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
-		var result         = super.fire( "Quotation.export", [ quotationItems ] );
+		var result         = super.fire( "Quotation.export", [ quotationItems, false ] );
 
 		if (result.success) {
 			var quotation = super.fire( "Quotation.get",[ rc.id ]);
 			quotation.setExported( true );
+			quotation.setDataConfermaOrdine( Now() );
 			super.fire( "quotation.update", [ quotation ] );
 		}
+
+		event.setValue( "result", result );
+	}
+
+	function exportProvisional( event, rc, prc ){
+		setting requestTimeout=300;
+
+		var result = super.getResult();
+
+		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
+		var result         = super.fire( "Quotation.export", [ quotationItems, true ] );
 
 		event.setValue( "result", result );
 	}

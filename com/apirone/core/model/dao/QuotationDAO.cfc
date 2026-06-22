@@ -173,7 +173,13 @@
 				commission5,
 				referente_amministrativo,
 				referente_spedizione,
-				customer_type
+				customer_type,
+				industry,
+				rif_libero,
+				data_evasione,
+				sent_to_client,
+				data_conferma_ordine,
+				codice_sdi
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getQuotationNumber()#">,
@@ -277,7 +283,21 @@
 				</cfif>,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
+				<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
+					<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getSentToClient() ?: false#">,
+				<cfif !isNull(arguments.quotation.getDataConfermaOrdine()) && IsDate(arguments.quotation.getDataConfermaOrdine())>
+					<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataConfermaOrdine()#">
+				<cfelse>
+					NULL
+				</cfif>,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCodiceSdi() ?: ''#">
 			)
 			RETURNING quotation_id
 		</cfquery>
@@ -472,13 +492,39 @@
 
 				referente_amministrativo = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteAmministrativo() ?: ''#">,
 				referente_spedizione = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReferenteSpedizione() ?: ''#">,
-				customer_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">
+				customer_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">,
+				industry = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
+				rif_libero = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
+				data_evasione =
+					<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
+						<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
+					<cfelse>
+						NULL
+					</cfif>,
+				sent_to_client = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotation.getSentToClient() ?: false#">,
+				data_conferma_ordine =
+					<cfif !isNull(arguments.quotation.getDataConfermaOrdine()) && IsDate(arguments.quotation.getDataConfermaOrdine())>
+						<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataConfermaOrdine()#">
+					<cfelse>
+						NULL
+					</cfif>,
+				codice_sdi = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCodiceSdi() ?: ''#">
 
 			WHERE
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.quotation.getId()>
+	</cffunction>
+
+	<cffunction name="markAsSent" returntype="void">
+		<cfargument name="quotationId" type="String" required="true">
+
+		<cfquery datasource="apirone">
+			UPDATE quotations
+			SET sent_to_client = TRUE, updated_at = now()
+			WHERE quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+		</cfquery>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
@@ -628,13 +674,13 @@
 				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
 				CFPROVIN, CFREFAMM, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
-				DEPRODOD, DEPROMER, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
+				DEPRODOD, DEPROMER, DECAPDOC, DECAPDES, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
 				MMCODAG5, MMCODART, MMCODCOL, MMCODPAG,
 				MMSCOCF1, MMSCOCF2, MMSPETRA, MMCODVAL, MMCODVAR, MMDATDOC, MMDATEVA,
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
-				MMRIFSPE, CFTIPCLF
+				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -661,6 +707,8 @@
 				<cfqueryparam value="#left(arguments.data.DENAZMER,3)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEPRODOD,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.DEPROMER,2)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DECAPDOC ?: '',10)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.DECAPDES ?: '',10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MM_STATO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFLINGUA,2)#" cfsqltype="varchar">,
 				<cfqueryparam value="#agentCode#" cfsqltype="integer">,
@@ -677,7 +725,7 @@
 				<cfqueryparam value="#arguments.data.MMCODVAL ?: 0#" cfsqltype="integer">,
 				<cfqueryparam value="#left(arguments.data.MMCODVAR,10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMDATDOC#" cfsqltype="date">,
-				<cfqueryparam value="#arguments.data.MMDATEVA#" cfsqltype="date">,
+				<cfqueryparam value="#arguments.data.MMDATEVA ?: ''#" cfsqltype="date" null="#!StructKeyExists(arguments.data, 'MMDATEVA') || IsNull(arguments.data.MMDATEVA) || !Len(arguments.data.MMDATEVA)#">,
 				<cfqueryparam value="#arguments.data.MMEVASIO#" cfsqltype="date">,
 				<cfqueryparam value="#left(arguments.data.MMNUMDOC,10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMNUMLIS ?: 1#" cfsqltype="integer">,
@@ -695,7 +743,9 @@
 				<cfqueryparam value="#arguments.data.MMPERPR4 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#arguments.data.MMPERPR5 ?: 0#" cfsqltype="decimal" scale="2">,
 				<cfqueryparam value="#left(arguments.data.MMRIFSPE,40)#" cfsqltype="varchar">,
-				<cfqueryparam value="#left(arguments.data.CFTIPCLF,50)#" cfsqltype="varchar">
+				<cfqueryparam value="#left(arguments.data.CFTIPCLF,50)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CFCODDES ?: '',15)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.MMORDPRO ?: 'N',1)#" cfsqltype="varchar">
 			)
 		</cfquery>
 
@@ -724,5 +774,17 @@
 		</cfquery>
 
 		<cfreturn local.q.nextval>
+	</cffunction>
+
+	<cffunction name="readMaxVersionNumber" access="public" returntype="numeric">
+		<cfargument name="quotationNumber" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT COALESCE( MAX( version_number ), 0 ) AS max_version
+			FROM quotations
+			WHERE quotation_number = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationNumber#">
+		</cfquery>
+
+		<cfreturn local.q.max_version>
 	</cffunction>
 </cfcomponent>

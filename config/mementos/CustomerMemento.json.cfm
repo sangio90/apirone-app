@@ -16,7 +16,8 @@
 		"SDI",
 		"shippingProfiles",
 		"lingua",
-		"accountType"
+		"accountType",
+		"industry"
 	],
 	profiles = {}
 }
