@@ -14,12 +14,12 @@
                         
                     <div class="card-body">
                         <div class="mb-3 row">
-                            <div class="col-4">
+                            <div class="col-4" id="zone-parent-container">
                                 <label class="col-sm-12 col-form-label text-start" id="zone-label-parent">Zona Padre</label>
-                                <select class="form-control" 
+                                <select class="form-control"
                                     id="parentId"
                                     name="parentId"
-                                    data-bind="source: zones, value: detailForm.data.parentZone" 
+                                    data-bind="source: zones, value: detailForm.data.parentZone"
                                     data-value-field="id"
                                     data-text-field="name">
                                 </select>

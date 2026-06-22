@@ -1229,6 +1229,13 @@ AP.quotation.zonesModal = (function () {
 			},
 
 			setupZoneModal: function (item) {
+				var hasParentZones = this.get("zones").filter(function(z) { return z.id !== ""; }).length > 0;
+				if (hasParentZones) {
+					$("#zone-parent-container").show();
+				} else {
+					$("#zone-parent-container").hide();
+				}
+
 				if (item) {
 					this.set("detailForm.data", {
 						id: item.id,
@@ -1263,12 +1270,13 @@ AP.quotation.zonesModal = (function () {
 
 			saveZone: function () {
 				var data = this.get("detailForm.data");
-				if (data.parentZone) {
-					if (data.parentZone && data.parentZone.id) {
-						data.parentZone = {id: data.parentZone.id}
-					} else {
-						data.parentZone = {id: data.parentZone}
-					}
+				var pz = data.parentZone;
+				if (pz && pz.id) {
+					data.parentZone = { id: pz.id };
+				} else if (pz && typeof pz === "string" && pz !== "") {
+					data.parentZone = { id: pz };
+				} else {
+					data.parentZone = null;
 				}
 				AP.loading.show();
 				NM.util.ajax({
