@@ -8,6 +8,7 @@ Object.assign(AP.quotation.fields, {
 	printModalRoot: $("#print-modal-root"),
 	statusModalRoot: $("#qt-status-modal-root"),
 	documentsModalRoot: $("#qt-documents-modal-root"),
+	exportProductsResultModalRoot: $("#qt-export-products-result-modal-root"),
 	totalItemBox: $("#quotation-totals-item"),
 
 	addPlateBtn: $("#qt-add-plate"),
@@ -258,21 +259,42 @@ AP.quotation.detail = (function () {
 				url: "/manager/ajax/quotations-export-products/" + AP.page.quotation.id,
 				callback: {
 					done: function (xhr) {
+						AP.loading.hide();
 						if (xhr.status == "INVALID") {
-							AP.loading.hide();
 							NM.form.showMessages(xhr.data);
 							return;
 						}
-
 						if (xhr.data.error || xhr.data.success == false) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione articoli.");
 							return;
 						}
+						var exported = xhr.data.exportedItems || [];
+						var skipped  = xhr.data.skippedItems  || [];
 
-						AP.loading.hide();
+						var $exported = $("#qt-export-products-exported");
+						var $skipped  = $("#qt-export-products-skipped");
 
-						AP.widget.notify("success", "Articoli esportati correttamente.");
+						if (exported.length) {
+							$exported.html(
+								"<p class='mb-1'><strong>Esportati (" + exported.length + "):</strong></p>" +
+								"<ul class='mb-0'>" + exported.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
+							);
+						} else {
+							$exported.html("<p class='text-muted mb-0'>Nessun nuovo articolo esportato.</p>");
+						}
+
+						if (skipped.length) {
+							$skipped.html(
+								"<hr class='my-3'>" +
+								"<p class='mb-1'><strong>Già presenti (" + skipped.length + "):</strong></p>" +
+								"<ul class='mb-0'>" + skipped.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
+							);
+						} else {
+							$skipped.html("");
+						}
+
+						AP.widget.notify("success", "Esportazione articoli completata.");
+						NM.util.openModal(AP.quotation.fields.exportProductsResultModalRoot);
 					}
 				}
 			});
@@ -285,28 +307,17 @@ AP.quotation.detail = (function () {
 				url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
 				callback: {
 					done: function (xhr) {
+						AP.loading.hide();
 						if (xhr.status == "INVALID") {
 							NM.form.showMessages(xhr.data);
 							return;
 						}
-
 						if (xhr.data.error || xhr.data.success == false) {
 							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
 							return;
 						}
-
 						$(".export-button").hide();
-						AP.widget.notify("success", "Preventivo Esportato correttamente.");
-						//TODO here verifica come mai devo lanciare due volte e come mai non compare notify
-					},
-					always: function (xhr) {
-						if (xhr && xhr.data && (xhr.data.error || xhr.data.success == false)) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
-							return;
-						}
-						AP.loading.hide();
+						AP.widget.notify("success", "Preventivo esportato correttamente.");
 					}
 				}
 			});
@@ -319,25 +330,16 @@ AP.quotation.detail = (function () {
 				url: "/manager/ajax/quotations-export-provisional/" + AP.page.quotation.id,
 				callback: {
 					done: function (xhr) {
+						AP.loading.hide();
 						if (xhr.status == "INVALID") {
 							NM.form.showMessages(xhr.data);
-							AP.loading.hide();
 							return;
 						}
-
 						if (xhr.data.error || xhr.data.success == false) {
 							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
-							AP.loading.hide();
 							return;
 						}
-
 						AP.widget.notify("success", "Ordine provvisorio esportato correttamente.");
-					},
-					always: function (xhr) {
-						if (xhr && xhr.data && (xhr.data.error || xhr.data.success == false)) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
-						}
-						AP.loading.hide();
 					}
 				}
 			});

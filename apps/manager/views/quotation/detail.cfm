@@ -11,7 +11,7 @@
                     <div class="col-2">#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit", class="w-100" )#</div>
                     <div class="col-2">#button( bind="click:exportProducts, enabled: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="w-100 export-button" )#</div>
                     <div class="col-2">#button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="w-100 export-button" )#</div>
-                    <div class="col-2">#button( bind="click:exportProvisional, enabled: canEdit", size="sm", label="Esporta provvisorio", icon="file-export", class="w-100" )#</div>
+                    <div class="col-2">#button( bind="click:exportProvisional, enabled: canEdit", size="sm", label="Esporta provvisorio", icon="file-export", class="w-100", variant="outline-primary" )#</div>
                     <div class="col-4">
                         <cfif prc.quotation.getSentToClient() ?: false>
                             <button type="button" class="btn btn-primary btn-sm w-100" disabled>
@@ -208,6 +208,7 @@
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
     #view( "quotation/documents-modal" )#
+    #view( "quotation/export-products-result-modal" )#
 
     #view( "quotation/totals" )#
 

@@ -258,7 +258,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var result = {
 			"success" = true,
-			"error" = null
+			"error" = null,
+			"exportedItems" = [],
+			"skippedItems" = []
 		};
 
 		transaction {
@@ -293,6 +295,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						);
 
 						if ( existingCodes.len() > 0 ) {
+							ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
 							continue;
 						}
 
@@ -302,6 +305,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						exportCode.setCounter( "000000" );
 						exportCodeService.create( "exportCode" = exportCode );
 						result.success = getDao().exportProduct( dataExport );
+						ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
 
 						continue;
 					} else {
@@ -338,6 +342,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
 						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
 						if ( existingCode.len() > 0 ) {
+							ArrayAppend( result.skippedItems, Left( existingCode[1].getName(), 15 ) );
 							continue;
 						}
 
@@ -548,6 +553,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 
 					result.success = getDao().exportProduct( dataExport );
+					ArrayAppend( result.exportedItems, description );
 
 					var allComponents = [];
 					for ( var productComponent in productComponents ) {
