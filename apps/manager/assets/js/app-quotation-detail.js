@@ -111,8 +111,8 @@ AP.quotation.detail = (function () {
 		});
 	};
 
-	var setQuotationItems = function (items) {
-		var typeId = viewModel.get("typeId");
+	var setQuotationItems = function (items, typeId) {
+		if (!typeId) typeId = viewModel.get("typeId");
 
 		if (typeId == "plate") {
 			viewModel.set("quotationItemsPlate", items);
@@ -731,6 +731,7 @@ AP.quotation.detail = (function () {
 				url = url + "?quotationZoneId=" + AP.getUserPref("quotation." + AP.page.quotation.id + ".zone.id");
 			}
 
+			var requestTypeId = typeId;
 			NM.util.ajax({
 				method: "GET",
 				url: url,
@@ -745,7 +746,7 @@ AP.quotation.detail = (function () {
 							item.special = item.special == 'true'
 						})
 
-						setQuotationItems(xhr.data);
+						setQuotationItems(xhr.data, requestTypeId);
 						setTimeout(initSortable, 150);
 					}
 				}

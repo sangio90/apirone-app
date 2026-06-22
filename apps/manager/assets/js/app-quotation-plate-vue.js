@@ -2007,24 +2007,30 @@ AP.plate.modal = ( function() {
                  */
                 onFruitSearchInput: function() {
                     const term = this.fruitSearchTerm;
+                    clearTimeout( this._fruitSearchTimer );
                     if ( term.length < 3 ) {
                         this.fruitSuggestions = [];
                         return;
                     }
-                    this.fruitSuggestLoading = true;
-                    ajax( {
-                        method: "GET",
-                        url: BASE + "/fruits?str=" + encodeURIComponent( term ) + "&lineId=" + ( this.detailForm.data.product.line.id || "" ),
-                        callback: {
-                            done: ( xhr ) => {
-                                this.fruitSuggestions = xhr.data || [];
-                                this.fruitSuggestLoading = false;
+                    this._fruitSearchTimer = setTimeout( () => {
+                        if ( this.fruitSearchTerm !== term ) return;
+                        this.fruitSuggestLoading = true;
+                        ajax( {
+                            method: "GET",
+                            url: BASE + "/fruits?str=" + encodeURIComponent( term ) + "&lineId=" + ( this.detailForm.data.product.line.id || "" ),
+                            callback: {
+                                done: ( xhr ) => {
+                                    if ( this.fruitSearchTerm !== term ) return;
+                                    this.fruitSuggestions = xhr.data || [];
+                                    this.fruitSuggestLoading = false;
+                                },
+                                fail: () => {
+                                    if ( this.fruitSearchTerm !== term ) return;
+                                    this.fruitSuggestLoading = false;
+                                },
                             },
-                            fail: () => {
-                                this.fruitSuggestLoading = false;
-                            },
-                        },
-                    } );
+                        } );
+                    }, 300 );
                 },
 
                 /**
@@ -2048,25 +2054,31 @@ AP.plate.modal = ( function() {
                 onPositionSearchInput: function() {
                     const term = this.positionSearchTerm;
                     const zoneId = this.detailForm.data.quotationZoneId;
+                    clearTimeout( this._positionSearchTimer );
                     if ( term.length < 2 || !zoneId ) {
                         this.positionSuggestions = [];
                         this.detailForm.data.position = { id: "", code: term };
                         return;
                     }
-                    this.positionSuggestLoading = true;
-                    ajax( {
-                        method: "GET",
-                        url: BASE + "/quotations/zones/" + zoneId + "/positions?str=" + encodeURIComponent( term ),
-                        callback: {
-                            done: ( xhr ) => {
-                                this.positionSuggestions = xhr.data || [];
-                                this.positionSuggestLoading = false;
+                    this._positionSearchTimer = setTimeout( () => {
+                        if ( this.positionSearchTerm !== term ) return;
+                        this.positionSuggestLoading = true;
+                        ajax( {
+                            method: "GET",
+                            url: BASE + "/quotations/zones/" + zoneId + "/positions?str=" + encodeURIComponent( term ),
+                            callback: {
+                                done: ( xhr ) => {
+                                    if ( this.positionSearchTerm !== term ) return;
+                                    this.positionSuggestions = xhr.data || [];
+                                    this.positionSuggestLoading = false;
+                                },
+                                fail: () => {
+                                    if ( this.positionSearchTerm !== term ) return;
+                                    this.positionSuggestLoading = false;
+                                },
                             },
-                            fail: () => {
-                                this.positionSuggestLoading = false;
-                            },
-                        },
-                    } );
+                        } );
+                    }, 300 );
                 },
 
                 /**
