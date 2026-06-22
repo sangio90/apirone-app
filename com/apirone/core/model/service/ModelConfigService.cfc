@@ -51,14 +51,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( record.model_config_id );
 		}
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.model_config_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		for ( var record in records ) {
@@ -72,9 +66,82 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	/**
+	 * Recupera in batch più ModelConfig dato un array di ID.
+	 * Restituisce uno Struct chiave = modelConfigId, valore = bean ModelConfig.
+	 * Precarica Model, ProductCategory e Line in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di modelConfigId
+	 * @return Struct mappato per modelConfigId -> ModelConfig
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti gli ID delle FK da precaricare in batch
+		var modelIds    = [];
+		var categoryIds = [];
+		var lineIds     = [];
+
+		for ( var record in records ) {
+			if ( !IsNull( record.model_id ) ) {
+				modelIds.append( record.model_id );
+			}
+			if ( !IsNull( record.product_category_id ) ) {
+				categoryIds.append( record.product_category_id );
+			}
+			if ( !IsNull( record.line_id ) ) {
+				lineIds.append( record.line_id );
+			}
+		}
+
+		// Precarica le entity FK con getMany() esistenti (1 query ciascuna)
+		var modelMap = {};
+		if ( ArrayLen( modelIds ) ) {
+			modelMap = getModelService().getMany( modelIds );
+		}
+
+		var categoryMap = {};
+		if ( ArrayLen( categoryIds ) ) {
+			categoryMap = getProductCategoryService().getMany( categoryIds );
+		}
+
+		var lineMap = {};
+		if ( ArrayLen( lineIds ) ) {
+			lineMap = getLineService().getMany( lineIds );
+		}
+
+		// Costruisce i bean con le mappe pre-caricate
+		for ( var record in records ) {
+			var bean = super.bean( "ModelConfig" );
+
+			// Campi diretti dal record
+			bean.setId( record.model_config_id );
+			bean.setHeight( record.height );
+			bean.setWidth( record.width );
+
+			// Entity collegate dalle mappe pre-caricate
+			if ( StructKeyExists( modelMap, record.model_id ) ) {
+				bean.setModel( modelMap[ record.model_id ] );
+			}
+
+			if ( StructKeyExists( categoryMap, record.product_category_id ) ) {
+				bean.setProductCategory( categoryMap[ record.product_category_id ] );
+			}
+
+			if ( StructKeyExists( lineMap, record.line_id ) ) {
+				bean.setLine( lineMap[ record.line_id ] );
+			}
+
+			map[ record.model_config_id ] = bean;
+		}
+
+		return map;
+	}
+
 
 	/*
-    	private method
+     	private method
 	*/
 
 	private com.apirone.core.model.bean.ModelConfig function build( required String modelConfigId ){

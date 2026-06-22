@@ -35,19 +35,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.add( record.product_category_line_id );
 		}
 
-		// Carica tutti i record completi in un'unica query e costruisce una mappa id -> bean
-		if ( ids.len() ) {
-			var fullRecords = getDao().readByIds( ids );
-			var beanMap = {};
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
-			for ( var fullRecord in fullRecords ) {
-				beanMap[ fullRecord.product_category_line_id ] = buildFromRow( fullRecord );
-			}
-
-			// Itera i record originali per preservare l'ordinamento della find
-			for ( var record in records ) {
-				rows.add( beanMap[ record.product_category_line_id ] );
-			}
+		// Itera i record originali per preservare l'ordinamento della find
+		for ( var record in records ) {
+			rows.add( beanMap[ record.product_category_line_id ] );
 		}
 
 		result.setData( rows );
@@ -95,6 +88,65 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+
+	/**
+	 * Recupera in batch più ProductCategoryLine dato un array di ID.
+	 * Restituisce uno Struct chiave = productCategoryLineId, valore = bean ProductCategoryLine.
+	 * Precarica linee e categorie in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di productCategoryLineId
+	 * @return Struct mappato per productCategoryLineId -> ProductCategoryLine
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie gli ID unici di linee e categorie da tutti i record
+		var lineIds     = [];
+		var categoryIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.line_id ) ) {
+				lineIds.append( record.line_id );
+			}
+			if ( !IsNull( record.product_category_id ) ) {
+				categoryIds.append( record.product_category_id );
+			}
+		}
+
+		// Precarica le linee in batch tramite LineService.getMany()
+		var lineMap = {};
+		if ( ArrayLen( lineIds ) ) {
+			lineMap = getLineService().getMany( lineIds );
+		}
+
+		// Precarica le categorie in batch tramite ProductCategoryService.getMany()
+		var categoryMap = {};
+		if ( ArrayLen( categoryIds ) ) {
+			categoryMap = getProductCategoryService().getMany( categoryIds );
+		}
+
+		for ( var record in records ) {
+			var bean = super.bean( "ProductCategoryLine" );
+
+			bean.setId( record.product_category_line_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setMarkup( record.markup );
+
+			// Line: dalla mappa pre-caricata
+			if ( StructKeyExists( lineMap, record.line_id ) ) {
+				bean.setLine( lineMap[ record.line_id ] );
+			}
+
+			// ProductCategory: dalla mappa pre-caricata
+			if ( StructKeyExists( categoryMap, record.product_category_id ) ) {
+				bean.setProductCategory( categoryMap[ record.product_category_id ] );
+			}
+
+			map[ record.product_category_line_id ] = bean;
+		}
+
+		return map;
+	}
 
 	/**
 	 * Costruisce un bean ProductCategoryLine a partire da una riga della query.

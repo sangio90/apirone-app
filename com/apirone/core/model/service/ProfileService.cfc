@@ -28,8 +28,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID per il caricamento batch
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			ids.append( record.profile_id );
+		} );
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.profile_id ] );
 		} );
 
 		result.setData( rows );
@@ -76,6 +86,90 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più Profile dato un array di ID.
+	 * Restituisce uno Struct chiave = profileId, valore = bean Profile.
+	 * Precarica lookup (profileType) e geo countries in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di profileId
+	 * @return Struct mappato per profileId -> Profile
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i country_id unici per caricarli in batch
+		var countryIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.country_id ) ) {
+				countryIds.append( record.country_id );
+			}
+		}
+
+		// Precarica i Country in batch: raccoglie i countryId unici e li carica.
+		var uniqueCountryIds = [];
+		for ( var cid in countryIds ) {
+			if ( !ArrayContains( uniqueCountryIds, cid ) ) {
+				uniqueCountryIds.append( cid );
+			}
+		}
+		var countryMap = {};
+		for ( var cid in uniqueCountryIds ) {
+			countryMap[ cid ] = getGeoService().getCountry( cid );
+		}
+
+		// Cache locale per i lookup (profileType è in-memory via LookupService)
+		var types = {};
+
+		for ( var record in records ) {
+			// Istanzia il bean corretto in base al tipo
+			switch ( record.type ) {
+				case "B":
+					var bean = super.bean( "BillingProfile" );
+					break;
+				case "S":
+					var bean = super.bean( "ShippingProfile" );
+					break;
+				case "G":
+					var bean = super.bean( "Profile" );
+					break;
+				default:
+					throw ( "Unknown profile type [#record.type#]" );
+			}
+
+			// Campi diretti dal record
+			bean.setId( record.profile_id );
+			bean.setFirstName( record.first_name );
+			bean.setLastName( record.last_name );
+			bean.setCompany( record.company );
+			bean.setVatNumber( record.vat_number );
+			bean.setEmail( record.email );
+			bean.setPhone( record.phone );
+			bean.setState( record.state );
+			bean.setCity( record.city );
+			bean.setPostalCode( record.postal_code );
+			bean.setStreet( record.street );
+			bean.setCreatedAt( record.created_at );
+
+			// ProfileType: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( types, record.type ) ) {
+				types[ record.type ] = getLookupService().get( "profileType", record.type );
+			}
+			bean.setType( types[ record.type ] );
+
+			// Country: dalla mappa pre-caricata
+			if ( !IsNull( record.country_id ) && StructKeyExists( countryMap, record.country_id ) ) {
+				bean.setCountry( countryMap[ record.country_id ] );
+			} else if ( !IsNull( record.country_id ) ) {
+				bean.setCountry( getGeoService().getCountry( record.country_id ) );
+			}
+
+			map[ record.profile_id ] = bean;
+		}
+
+		return map;
+	}
 
 	/**
 	 * Costruisce un bean Profile a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.

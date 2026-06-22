@@ -36,20 +36,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
 		var ids = [];
 		records.each( function( r ){
 			ids.append( r.location_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.location_id ] = buildFromRow( r );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -61,6 +54,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più Location dato un array di ID.
+	 * Restituisce uno Struct chiave = locationId, valore = bean Location.
+	 * Precarica le città (GeoService) in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di locationId
+	 * @return Struct mappato per locationId -> Location
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+		var cities  = {};
+
+		for ( var record in records ) {
+			var location = super.bean( "Location" );
+
+			// Campi diretti dal record
+			location.setId( record.location_id.toString() );
+			location.setAddress( record.address );
+			location.setPostalCode( record.postal_code );
+
+			// Città: cached localmente (GeoService)
+			if ( !StructKeyExists( cities, record.city_id ) ) {
+				cities[ record.city_id ] = getGeoService().getCity( cityId = record.city_id );
+			}
+			location.setCity( cities[ record.city_id ] );
+
+			map[ location.getId() ] = location;
+		}
+
+		return map;
 	}
 
 

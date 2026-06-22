@@ -37,14 +37,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.article_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.article_id ] = buildFromRow( r );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -177,6 +170,67 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+	/**
+	 * Recupera in batch più Article dato un array di ID.
+	 * Restituisce uno Struct chiave = articleId, valore = bean Article.
+	 * Precarica testi e prezzi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di articleId
+	 * @return Struct mappato per articleId -> Article
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutti gli articoli (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "article.id", arguments.ids );
+
+		// Precarica i prezzi in batch per tutti gli articoli
+		var priceMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var priceQuery = getPriceService().getDao().findByArticleIds( articleIds = arguments.ids );
+			for ( var pr in priceQuery ) {
+				if ( !StructKeyExists( priceMap, pr.article_id ) ) {
+					priceMap[ pr.article_id ] = [];
+				}
+				ArrayAppend( priceMap[ pr.article_id ], getPriceService().buildFromRow( pr ) );
+			}
+		}
+
+		// Cache locale per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Article" );
+
+			// Campi diretti dal record
+			bean.setId( record.article_id );
+			bean.setCode( record.code );
+			bean.setExternalId( record.external_id );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.article_id ) ) {
+				bean.setTexts( textMap[ record.article_id ] );
+			}
+			bean.setName( bean.getName() );
+
+			// Prezzi: dalla mappa pre-caricata
+			if ( StructKeyExists( priceMap, record.article_id ) && ArrayLen( priceMap[ record.article_id ] ) ) {
+				bean.setPrice( priceMap[ record.article_id ][ 1 ] );
+			}
+
+			map[ record.article_id ] = bean;
+		}
+
+		return map;
+	}
 
 	public Numeric  function savePrice( required com.apirone.core.model.bean.Price price ){
 

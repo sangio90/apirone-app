@@ -39,14 +39,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.company_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.company_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -102,6 +96,139 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più Company dato un array di ID.
+	 * Restituisce uno Struct chiave = companyId, valore = bean Company.
+	 * Precarica account, companyType e status in batch per evitare il problema N+1.
+	 * Le location sono caricate una volta per ogni companyId univoco.
+	 *
+	 * @ids Array di companyId
+	 * @return Struct mappato per companyId -> Company
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie gli ID unici di tutte le FK da tutti i record
+		var accountIds  = [];
+		var allTypeIds  = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.account_id ) ) {
+				accountIds.append( record.account_id );
+			}
+			// Raccoglie i typeId dal JSONB types
+			var types = IsNull( record.types ) ? [] : DeserializeJSON( record.types );
+			if ( !IsNull( types ) && ArrayLen( types ) ) {
+				for ( var tid in types ) {
+					allTypeIds.append( tid );
+				}
+			}
+		}
+
+		// Precarica le location in batch: una chiamata list() per ogni companyId univoco.
+		// LocationService.list() filtra per company_id e internamente fa già batch via search().
+		var locationMap = {};
+		for ( var cid in arguments.ids ) {
+			if ( !StructKeyExists( locationMap, cid ) ) {
+				var locs = getLocationService().list( companyId = cid ).getData();
+				if ( ArrayLen( locs ) ) {
+					locationMap[ cid ] = locs[ 1 ];
+				}
+			}
+		}
+
+		// Precarica gli account in batch: AccountService non ha getMany(), usa DAO
+		var accountMap = {};
+		if ( ArrayLen( accountIds ) ) {
+			var uniqueAccountIds = [];
+			for ( var aid in accountIds ) {
+				if ( !IsNull( aid ) ) {
+					var aidStr = aid.toString();
+					if ( !ArrayContains( uniqueAccountIds, aidStr ) ) {
+						uniqueAccountIds.append( aidStr );
+					}
+				}
+			}
+			if ( ArrayLen( uniqueAccountIds ) ) {
+				var accRecords = getAccountService().getDao().readByIds( uniqueAccountIds );
+				for ( var ar in accRecords ) {
+					var accBean = super.bean( "Account" );
+					accBean.setId( ar.account_id.toString() );
+					accBean.setEmail( ar.email );
+					accBean.setName( ar.account );
+					accBean.setPwd( ar.pwd );
+					accBean.setSerial( ar.serial );
+					accBean.setLastLoggedUserId( ar.last_logged_user_id );
+					accBean.setCreatedAt( ar.created_at );
+					accBean.setUserCount( ar.user_count );
+					accBean.setIdUtenteVerticale( ar.id_utente_verticale );
+					accBean.setIdAgenteVerticale( ar.id_agente_verticale );
+					accBean.setStatus( getStatusService().get( ar.status_id ) );
+					accountMap[ ar.account_id.toString() ] = accBean;
+				}
+			}
+		}
+
+		// Precarica i companyType in batch: CompanyTypeService non ha getMany(), usa DAO
+		var typeMap = {};
+		if ( ArrayLen( allTypeIds ) ) {
+			var typeRecords = getCompanyTypeService().getDao().readByIds( allTypeIds );
+			for ( var tr in typeRecords ) {
+				var typeBean = super.bean( "CompanyType" );
+				typeBean.setId( tr.company_type_id );
+				typeBean.setName( tr.company_type );
+				typeMap[ tr.company_type_id ] = typeBean;
+			}
+		}
+
+		// Cache locale per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var company = super.bean( "Company" );
+
+			// Campi diretti dal record
+			company.setId( record.company_id.toString() );
+			company.setName( record.company );
+			company.setVat( record.vat );
+			company.setContact( record.contact );
+			company.setPhone( record.phone );
+			company.setCode( record.code );
+
+			// Location: dalla mappa pre-caricata
+			if ( StructKeyExists( locationMap, record.company_id ) ) {
+				company.setLocation( locationMap[ record.company_id ] );
+			}
+
+			// Account: dalla mappa pre-caricata
+			if ( !IsNull( record.account_id ) && StructKeyExists( accountMap, record.account_id.toString() ) ) {
+				company.setAccount( accountMap[ record.account_id.toString() ] );
+			}
+
+			// Types: dalla mappa pre-caricata
+			var types = IsNull( record.types ) ? [] : DeserializeJSON( record.types.getValue() );
+			var typeBeans = [];
+			if ( !IsNull( types ) && ArrayLen( types ) ) {
+				for ( var typeId in types ) {
+					if ( StructKeyExists( typeMap, typeId ) ) {
+						typeBeans.append( typeMap[ typeId ] );
+					}
+				}
+			}
+			company.setTypes( ArrayLen( typeBeans ) ? typeBeans : [] );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			company.setStatus( statuses[ record.status_id ] );
+
+			map[ record.company_id ] = company;
+		}
+
+		return map;
+	}
 
 	private com.apirone.core.model.bean.Company function build( required String companyId ){
 		var record = getDao().read( arguments.companyId );

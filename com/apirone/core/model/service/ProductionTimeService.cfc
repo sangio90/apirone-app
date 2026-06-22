@@ -25,11 +25,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			ids.append( record.production_time_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.production_time_id ] );
 		} );
 
 		result.setData( rows );
@@ -37,6 +46,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più ProductionTime dato un array di ID.
+	 * Restituisce uno Struct chiave = productionTimeId, valore = bean ProductionTime.
+	 * Precarica lo Status in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di productionTimeId
+	 * @return Struct mappato per productionTimeId -> ProductionTime
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "ProductionTime" );
+
+			// Campi diretti dal record
+			bean.setId( record.production_time_id );
+			bean.setName( record.production_time );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	public String function create( required com.apirone.core.model.bean.ProductionTime productionTime ){

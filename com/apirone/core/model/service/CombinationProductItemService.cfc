@@ -13,10 +13,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Recupera i record completi dal DAO
 		var records = getDao().getByCombinationId( arguments.combinationId );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromRow( record ) );
+			ids.append( record.combination_product_item_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.combination_product_item_id ] );
 		} );
 
 		result.setData( rows );
@@ -25,6 +35,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		return result;
 		;
+	}
+
+	/**
+	 * Recupera in batch più CombinationProductItem dato un array di ID.
+	 * Restituisce uno Struct chiave = combinationProductItemId, valore = bean CombinationProductItem.
+	 * Precarica i ProductItem in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di combinationProductItemId
+	 * @return Struct mappato per combinationProductItemId -> CombinationProductItem
+	 */
+	public Struct function getMany( required Array ids ){
+		var records      = getDao().readByIds( ids = arguments.ids );
+		var map          = {};
+		var productItems = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "CombinationProductItem" );
+
+			// Campi diretti dal record
+			bean.setId( record.combination_product_item_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setCombinationId( record.combination_id );
+
+			// ProductItem: cached localmente per evitare chiamate N+1
+			if ( !StructKeyExists( productItems, record.product_item_id ) ) {
+				productItems[ record.product_item_id ] = getProductItemService().get( record.product_item_id );
+			}
+			bean.setProductItem( productItems[ record.product_item_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	public Array function list(){

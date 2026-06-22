@@ -1,13 +1,13 @@
 <cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
-		<cfargument name="reportId" type="String" required="true">
+		<cfargument name="reportId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT report_id::varchar, *
 			FROM
 				reports
 			WHERE
-				report_id = <cfqueryparam cfsqltype="String" value="#arguments.reportId#">::uuid
+				report_id = <cfqueryparam cfsqltype="Integer" value="#arguments.reportId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -42,6 +42,26 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT report_id::varchar, *
+			FROM
+				reports
+			WHERE
+				report_id IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="integer"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="String">
 		<cfargument name="report" type="com.apirone.core.model.bean.Report" required="true">
 
@@ -56,13 +76,13 @@
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
-		<cfargument name="reportId" type="String" required="true">
+		<cfargument name="reportId" type="Numeric" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM reports
 			WHERE
-				report_id = <cfqueryparam cfsqltype="String" value="#arguments.reportId#">::uuid
+				report_id = <cfqueryparam cfsqltype="Integer" value="#arguments.reportId#">
 		</cfquery>
 
 		<cfreturn true>

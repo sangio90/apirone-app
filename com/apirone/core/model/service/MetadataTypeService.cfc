@@ -37,14 +37,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.metadata_type_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.metadata_type_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -109,6 +103,89 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più MetadataType dato un array di ID.
+	 * Restituisce uno Struct chiave = metadataTypeId, valore = bean MetadataType.
+	 * Precarica status, lookup e entities con cache locale per evitare il problema N+1.
+	 *
+	 * @ids Array di metadataTypeId
+	 * @return Struct mappato per metadataTypeId -> MetadataType
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Cache locale per status
+		var statuses = {};
+
+		// Cache locali per i lookup (in-memory via LookupService)
+		var measurementUnits = {};
+		var dataTypes        = {};
+
+		// Raccoglie tutti gli ID unici di entities dai JSONB di ogni record
+		var allEntityIds = [];
+		for ( var record in records ) {
+			var entities = IsNull( record.entities ) ? [] : DeserializeJSON( record.entities );
+			if ( !IsNull( entities ) && ArrayLen( entities ) ) {
+				for ( var eid in entities ) {
+					allEntityIds.append( eid );
+				}
+			}
+		}
+
+		// Precarica tutti gli entities bean da LookupService (in-memory) con cache locale
+		var entityMap = {};
+		for ( var eid in allEntityIds ) {
+			if ( !StructKeyExists( entityMap, eid ) ) {
+				entityMap[ eid ] = getLookupService().get( "entity", eid );
+			}
+		}
+
+		for ( var record in records ) {
+			var bean = super.bean( "MetadataType" );
+
+			// Campi diretti dal record
+			bean.setId( record.metadata_type_id );
+			bean.setName( record.metadata_type );
+			bean.setCode( record.code );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// MeasurementUnit: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( measurementUnits, record.unit_id ) ) {
+				measurementUnits[ record.unit_id ] = getLookupService().get( "MeasurementUnit", record.unit_id );
+			}
+			bean.setMeasurementUnit( measurementUnits[ record.unit_id ] );
+
+			// DataType: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( dataTypes, record.datatype_id ) ) {
+				dataTypes[ record.datatype_id ] = getLookupService().get( "DataType", record.datatype_id );
+			}
+			bean.setDataType( dataTypes[ record.datatype_id ] );
+
+			// Entities: dalla mappa pre-caricata
+			var entities = IsNull( record.entities ) ? [] : DeserializeJSON( record.entities );
+			var entityBeans = [];
+			if ( !IsNull( entities ) && ArrayLen( entities ) ) {
+				for ( var eid in entities ) {
+					if ( StructKeyExists( entityMap, eid ) ) {
+						entityBeans.append( entityMap[ eid ] );
+					}
+				}
+			}
+			bean.setEntities( ArrayLen( entityBeans ) ? entityBeans : NullValue() );
+
+			map[ record.metadata_type_id ] = bean;
+		}
+
+		return map;
+	}
 
 	private com.apirone.core.model.bean.MetadataType function build( required String metadataTypeId ){
 		var record = getDao().read( arguments.metadataTypeId );

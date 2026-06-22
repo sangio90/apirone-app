@@ -42,14 +42,8 @@
 			ids.append( r.font_family_id ); // PK intero
 		} );
 
-		var beanMap = {};
-
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( r ){
-				beanMap[ r.font_family_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( r ){
@@ -110,6 +104,60 @@
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più FontFamily dato un array di ID.
+	 * Restituisce uno Struct chiave = fontFamilyId, valore = bean FontFamily.
+	 * Precarica pictograms e fontFamilySizes in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di fontFamilyId
+	 * @return Struct mappato per fontFamilyId -> FontFamily
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i pittogrammi in batch: una chiamata list() per ogni fontFamilyId univoco
+		// (il numero di famiglie è limitato dal search(), quindi U <= limit)
+		var pictogramMap = {};
+		var sizeMap      = {};
+		for ( var fid in arguments.ids ) {
+			if ( !StructKeyExists( pictogramMap, fid ) ) {
+				pictogramMap[ fid ] = getPictogramService().list( fontFamilyId = fid );
+			}
+			if ( !StructKeyExists( sizeMap, fid ) ) {
+				sizeMap[ fid ] = getFontFamilySizeService().list( fontFamilyId = fid );
+			}
+		}
+
+		for ( var record in records ) {
+			var bean = super.bean( "FontFamily" );
+
+			// Campi diretti dal record
+			bean.setId( record.font_family_id );
+			bean.setCode( record.code );
+			bean.setName( record.font_family );
+
+			// Pictograms: dalla mappa pre-caricata
+			if ( StructKeyExists( pictogramMap, record.font_family_id ) ) {
+				var pictograms = pictogramMap[ record.font_family_id ];
+				if ( Len( pictograms ) ) {
+					bean.setPictograms( pictograms );
+				}
+			}
+
+			// Sizes: dalla mappa pre-caricata
+			if ( StructKeyExists( sizeMap, record.font_family_id ) ) {
+				bean.setSizes( sizeMap[ record.font_family_id ] );
+			} else {
+				bean.setSizes( [] );
+			}
+
+			map[ record.font_family_id ] = bean;
+		}
+
+		return map;
+	}
 
 	/**
 	 * Costruisce un bean FontFamily a partire dall'ID, effettuando la lettura dal DB.

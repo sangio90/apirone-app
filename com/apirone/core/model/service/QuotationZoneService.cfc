@@ -40,17 +40,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				ids.append( record.quotation_zone_id );
 			}
 
-			var loadedRecords = getDao().readByIds( ids );
-			var recordMap = {};
-			for ( var loadedRecord in loadedRecords ) {
-				recordMap[ loadedRecord.quotation_zone_id ] = loadedRecord;
-			}
+			// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+			var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 			// Ricostruisce le righe nell'ordine del find() originale
 			for ( var record in records ) {
-				var fullRecord = recordMap[ record.quotation_zone_id ];
-				if ( !IsNull( fullRecord ) ) {
-					rows.add( buildFromRow( fullRecord ) );
+				if ( StructKeyExists( beanMap, record.quotation_zone_id ) ) {
+					rows.add( beanMap[ record.quotation_zone_id ] );
 				}
 			}
 		}
@@ -184,6 +180,91 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return newZone
+	}
+
+	/**
+	 * Recupera in batch più QuotationZone dato un array di ID.
+	 * Restituisce uno Struct chiave = zoneId, valore = bean QuotationZone.
+	 * Precarica Quotation, Origin e File in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationZoneId
+	 * @return Struct mappato per quotationZoneId -> QuotationZone
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i quotation_id e origin_id per precaricarli in batch
+		var quotationIds = [];
+		var originIds    = [];
+
+		for ( var record in records ) {
+			if ( !IsNull( record.quotation_id ) ) {
+				quotationIds.append( record.quotation_id );
+			}
+			if ( !IsNull( record.origin_id ) ) {
+				originIds.append( record.origin_id );
+			}
+		}
+
+		// Precarica le Quotation in batch (via readByIds del DAO)
+		var quotationMap = {};
+		if ( ArrayLen( quotationIds ) ) {
+			var qRecords = getQuotationService().getDao().readByIds( quotationIds );
+			for ( var qr in qRecords ) {
+				var qBean = super.bean( "Quotation" );
+				qBean.setId( qr.quotation_id );
+				qBean.setName( qr.quotation );
+				qBean.setCreatedAt( qr.created_at );
+				quotationMap[ qr.quotation_id ] = qBean;
+			}
+		}
+
+		// Precarica le Origin Zone in batch (self-reference: ricorsione gestita via getMany)
+		var originMap = {};
+		if ( ArrayLen( originIds ) ) {
+			var originRecords = getDao().readByIds( originIds );
+			for ( var or in originRecords ) {
+				var oBean = super.bean( "QuotationZone" );
+				oBean.setId( or.quotation_zone_id );
+				oBean.setName( or.quotation_zone );
+				oBean.setQuantity( or.quantity );
+				originMap[ or.quotation_zone_id ] = oBean;
+			}
+		}
+
+		// Precarica i File in batch per tutti i zone_id
+		var fileMap = getFileService().listByEntityIds( "quotationZone.id", arguments.ids );
+
+		for ( var record in records ) {
+			var bean = super.bean( "QuotationZone" );
+
+			// Campi diretti dal record
+			bean.setId( record.quotation_zone_id );
+			bean.setName( record.quotation_zone );
+			bean.setQuantity( record.quantity );
+
+			// Quotation: dalla mappa pre-caricata
+			if ( StructKeyExists( quotationMap, record.quotation_id ) ) {
+				bean.setQuotation( quotationMap[ record.quotation_id ] );
+			}
+
+			// Origin: dalla mappa pre-caricata o NullValue
+			if ( !IsNull( record.origin_id ) && StructKeyExists( originMap, record.origin_id ) ) {
+				bean.setOrigin( originMap[ record.origin_id ] );
+			} else {
+				bean.setOrigin( NullValue() );
+			}
+
+			// File: dalla mappa pre-caricata (prende il primo come immagine)
+			if ( StructKeyExists( fileMap, record.quotation_zone_id ) && ArrayLen( fileMap[ record.quotation_zone_id ] ) ) {
+				bean.setImage( fileMap[ record.quotation_zone_id ][ 1 ] );
+			}
+
+			map[ record.quotation_zone_id ] = bean;
+		}
+
+		return map;
 	}
 
 	private com.apirone.core.model.bean.QuotationZone function buildFromRow( required any record ){

@@ -37,17 +37,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				ids.append( record.quotation_status_history_id );
 			}
 
-			var loadedRecords = getDao().readByIds( ids );
-			var recordMap = {};
-			for ( var loadedRecord in loadedRecords ) {
-				recordMap[ loadedRecord.quotation_status_history_id ] = loadedRecord;
-			}
+			// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+			var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 			// Ricostruisce le righe nell'ordine del find() originale
 			for ( var record in records ) {
-				var fullRecord = recordMap[ record.quotation_status_history_id ];
-				if ( !IsNull( fullRecord ) ) {
-					rows.add( buildFromRow( fullRecord ) );
+				if ( StructKeyExists( beanMap, record.quotation_status_history_id ) ) {
+					rows.add( beanMap[ record.quotation_status_history_id ] );
 				}
 			}
 		}
@@ -88,6 +84,77 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getDao().update( arguments.quotationStatusHistory );
 
 		return arguments.quotationStatusHistory.getId();
+	}
+
+	/**
+	 * Recupera in batch più QuotationStatusHistory dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationStatusHistoryId, valore = bean QuotationStatusHistory.
+	 * Precarica User, Status e File in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationStatusHistoryId
+	 * @return Struct mappato per quotationStatusHistoryId -> QuotationStatusHistory
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti gli user_id per precaricarli in batch
+		var userIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.user_id ) ) {
+				userIds.append( record.user_id );
+			}
+		}
+
+		// Precarica gli User in batch (via readByIds del DAO, senza getMany pubblico)
+		var userMap = {};
+		if ( ArrayLen( userIds ) ) {
+			var userRecords = getUserService().getDao().readByIds( userIds );
+			for ( var ur in userRecords ) {
+				var userBean = super.bean( "User" );
+				userBean.setId( ur.user_id );
+				userBean.setName( ur.user_name );
+				userBean.setSerial( ur.serial );
+				userBean.setPhone( ur.phone );
+				userBean.setCreatedAt( ur.created_at );
+				userMap[ ur.user_id ] = userBean;
+			}
+		}
+
+		// Precarica i File in batch per tutti gli history_id
+		var fileMap = getFileService().listByEntityIds( "quotationStatusHistory.id", arguments.ids );
+
+		// Cache locale per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "QuotationStatusHistory" );
+
+			// Campi diretti dal record
+			bean.setId( record.quotation_status_history_id );
+			bean.setQuotationId( record.quotation_id );
+			bean.setCreatedAt( record.created_at );
+
+			// User: dalla mappa pre-caricata
+			if ( StructKeyExists( userMap, record.user_id ) ) {
+				bean.setUser( userMap[ record.user_id ] );
+			}
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// File: dalla mappa pre-caricata (prende il primo)
+			if ( StructKeyExists( fileMap, record.quotation_status_history_id ) && ArrayLen( fileMap[ record.quotation_status_history_id ] ) ) {
+				bean.setFile( fileMap[ record.quotation_status_history_id ][ 1 ] );
+			}
+
+			map[ record.quotation_status_history_id ] = bean;
+		}
+
+		return map;
 	}
 
 	private com.apirone.core.model.bean.QuotationStatusHistory function buildFromRow( required any record ){

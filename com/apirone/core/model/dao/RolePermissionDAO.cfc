@@ -54,6 +54,40 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "membership.roles_permissions",
+			pkColumn = "role_permission_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
+	<!---
+		Recupera in batch le RolePermission per una lista di roleId.
+		Utilizzato da RoleService.getMany() per evitare QueryExecute con list:true.
+	--->
+	<cffunction name="readByRoleIds" returntype="Query" access="public">
+		<cfargument name="roleIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.roleIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM membership.roles_permissions
+			WHERE role_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="rolePermission" type="com.apirone.core.model.bean.RolePermission" required="true">
 

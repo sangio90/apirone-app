@@ -18,11 +18,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Il find() restituisce tutte le colonne: si raccolgono gli ID per getMany()
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			ids.append( record.search_term_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.search_term_id ] );
 		} );
 
 		result.setData( rows );
@@ -30,6 +39,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più SearchTerm dato un array di ID.
+	 * Restituisce uno Struct chiave = searchTermId, valore = bean SearchTerm.
+	 * Precarica i Product in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di searchTermId
+	 * @return Struct mappato per searchTermId -> SearchTerm
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var products = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "SearchTerm" );
+
+			// Campi diretti dal record
+			bean.setId( record.search_term_id );
+			bean.setTerm( record.search_term );
+			bean.setCreatedAt( record.created_at );
+
+			// Product: cached localmente per evitare chiamate N+1
+			if ( !StructKeyExists( products, record.product_id ) ) {
+				products[ record.product_id ] = getProductService().get( record.product_id );
+			}
+			bean.setProduct( products[ record.product_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	/*

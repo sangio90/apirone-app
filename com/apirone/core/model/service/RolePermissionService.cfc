@@ -22,11 +22,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Il find() restituisce tutte le colonne: si raccolgono gli ID per getMany()
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			ids.append( record.role_permission_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.role_permission_id ] );
 		} );
 
 		result.setData( rows );
@@ -34,6 +43,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più RolePermission dato un array di ID.
+	 * Restituisce uno Struct chiave = rolePermissionId, valore = bean RolePermission.
+	 * Precarica i Permission in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di rolePermissionId
+	 * @return Struct mappato per rolePermissionId -> RolePermission
+	 */
+	public Struct function getMany( required Array ids ){
+		var records     = getDao().readByIds( ids = arguments.ids );
+		var map         = {};
+		var permissions = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "RolePermission" );
+
+			// Campi diretti dal record
+			bean.setId( record.role_permission_id );
+			bean.setRoleId( record.role_id );
+			bean.setCreatedAt( record.created_at );
+
+			// Permission: cached localmente per evitare chiamate N+1
+			if ( !StructKeyExists( permissions, record.permission_id ) ) {
+				permissions[ record.permission_id ] = getPermissionService().get( record.permission_id );
+			}
+			bean.setPermission( permissions[ record.permission_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	public String function create( required com.apirone.core.model.bean.RolePermission rolePermission ){

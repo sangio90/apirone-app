@@ -77,11 +77,11 @@ AP.product.list = ( function() {
             this.get('lines').data([]);
             let allLines = this.get("allLines");
             const category = this.get('category')
-            if (!category.id) {
+            if ( !category || !category.id ) {
                 this.get('lines').data(allLines);
             } else {
                 const categoryLines = allLines.filter(function(line) {
-                    return line.categories.filter(cat => cat.id == category.id).length > 0
+                    return line.categories && line.categories.filter(cat => cat.id == category.id).length > 0
                 })
                 this.get('lines').data(categoryLines);
             }
@@ -94,7 +94,7 @@ AP.product.list = ( function() {
             let allModels = this.get("allModels");
             const category = this.get('category')
             const categoryModels = allModels.filter(function(model) {
-                return model.categories.filter(cat => cat.id == category.id).length > 0
+                return model.categories && model.categories.filter(cat => cat.id == category.id).length > 0
             })
             this.get('models').data(categoryModels);
             this.set('model', { "id": "", "name": ""})

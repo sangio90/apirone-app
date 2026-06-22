@@ -25,11 +25,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
-		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Il find() restituisce tutte le colonne: si raccolgono gli ID per getMany()
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			ids.append( record.signage_config_item_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.signage_config_item_id ] );
 		} );
 
 		result.setData( rows );
@@ -37,6 +46,48 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più SignageConfigItem dato un array di ID.
+	 * Restituisce uno Struct chiave = signageConfigItemId, valore = bean SignageConfigItem.
+	 * Precarica i FontFamilySize in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di signageConfigItemId
+	 * @return Struct mappato per signageConfigItemId -> SignageConfigItem
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var sizes    = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "SignageConfigItem" );
+
+			// Campi diretti dal record
+			bean.setId( record.signage_config_item_id );
+			bean.setSignageConfigId( record.signage_config_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setHeight( record.height );
+			bean.setHeightInPixel( record.height_in_pixel );
+			bean.setRowCount( record.row_count );
+			bean.setCharCount( record.char_count );
+
+			// PostgreSQL JDBC restituisce le colonne JSONB come PGobject: vanno deserializzate
+			bean.setLineHeights( isNull( record.line_heights ) ? [] : deserializeJSON( record.line_heights.toString() ) );
+
+			// FontFamilySize: cached localmente per evitare chiamate N+1 (FK opzionale)
+			if ( !IsNull( record.font_family_size_id ) ) {
+				if ( !StructKeyExists( sizes, record.font_family_size_id ) ) {
+					sizes[ record.font_family_size_id ] = getFontFamilySizeService().get( record.font_family_size_id );
+				}
+				bean.setSize( sizes[ record.font_family_size_id ] );
+			}
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	public Numeric function create( required com.apirone.core.model.bean.SignageConfigItem signageConfigItem ){

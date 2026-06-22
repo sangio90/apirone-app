@@ -239,7 +239,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 
-			// Status: cached localmente (StatusService ha cache interna)
+			// Status: cached localmente
 			if ( !StructKeyExists( statuses, record.status_id ) ) {
 				statuses[ record.status_id ] = getStatusService().get( record.status_id );
 			}

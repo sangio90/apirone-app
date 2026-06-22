@@ -142,20 +142,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
 		var ids = [];
 		for ( var record in records ) {
 			ids.append( record.account_id );
 		}
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.account_id ] = buildFromRow( r );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		for ( var record in records ) {
@@ -167,6 +160,46 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più Account dato un array di ID.
+	 * Restituisce uno Struct chiave = accountId, valore = bean Account.
+	 * Precarica lo Status in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di accountId
+	 * @return Struct mappato per accountId -> Account
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var account = super.bean( "Account" );
+
+			// Campi diretti dal record
+			account.setId( record.account_id.toString() );
+			account.setEmail( record.email );
+			account.setName( record.account );
+			account.setPwd( record.pwd );
+			account.setSerial( record.serial );
+			account.setLastLoggedUserId( record.last_logged_user_id );
+			account.setCreatedAt( record.created_at );
+			account.setUserCount( record.user_count );
+			account.setIdUtenteVerticale( record.id_utente_verticale );
+			account.setIdAgenteVerticale( record.id_agente_verticale );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			account.setStatus( statuses[ record.status_id ] );
+
+			map[ account.getId() ] = account;
+		}
+
+		return map;
 	}
 
 	public Array function list(){

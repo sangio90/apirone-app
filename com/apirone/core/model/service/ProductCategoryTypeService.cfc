@@ -34,19 +34,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.add( record.product_category_type_id );
 		}
 
-		// Carica tutti i record completi in un'unica query e costruisce una mappa id -> bean
-		if ( ids.len() ) {
-			var fullRecords = getDao().readByIds( ids );
-			var beanMap = {};
+		// Carica i bean in blocco con getMany()
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
-			for ( var fullRecord in fullRecords ) {
-				beanMap[ fullRecord.product_category_type_id ] = buildFromRow( fullRecord );
-			}
-
-			// Itera i record originali per preservare l'ordinamento della find
-			for ( var record in records ) {
-				rows.add( beanMap[ record.product_category_type_id ] );
-			}
+		// Itera i record originali per preservare l'ordinamento della find
+		for ( var record in records ) {
+			rows.add( beanMap[ record.product_category_type_id ] );
 		}
 
 		result.setTotal( records.total );
@@ -54,6 +47,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setData( rows );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più ProductCategoryType dato un array di ID.
+	 * Restituisce uno Struct chiave = productCategoryTypeId, valore = bean ProductCategoryType.
+	 * Precarica lo Status in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di productCategoryTypeId
+	 * @return Struct mappato per productCategoryTypeId -> ProductCategoryType
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "ProductCategoryType" );
+
+			// Campi diretti dal record
+			bean.setId( record.product_category_type_id );
+			bean.setName( record.product_category_type );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	/**

@@ -34,14 +34,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.frame_cell_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.frame_cell_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -82,6 +76,52 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+
+	/**
+	 * Recupera in batch più FrameCell dato un array di ID.
+	 * Restituisce uno Struct chiave = frameCellId, valore = bean FrameCell.
+	 * Precarica i lookup (frameCellType, orientation) con cache locale per evitare il problema N+1.
+	 *
+	 * @ids Array di frameCellId
+	 * @return Struct mappato per frameCellId -> FrameCell
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Cache locali per i lookup (LookupService è in-memory, cache locale evita iterazioni ripetute)
+		var types        = {};
+		var orientations = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "FrameCell" );
+
+			// Campi diretti dal record
+			bean.setId( record.frame_cell_id );
+			bean.setRow( record.row );
+			bean.setCol( record.col );
+			bean.setWidth( record.width );
+			bean.setHeight( record.height );
+			bean.setFrameId( record.frame_id );
+			bean.setCreatedAt( record.created_at );
+
+			// Lookup: frameCellType cached localmente
+			if ( !StructKeyExists( types, record.type_id ) ) {
+				types[ record.type_id ] = getLookupService().get( "frameCellType", record.type_id );
+			}
+			bean.setType( types[ record.type_id ] );
+
+			// Lookup: orientation cached localmente
+			if ( !StructKeyExists( orientations, record.orientation_id ) ) {
+				orientations[ record.orientation_id ] = getLookupService().get( "orientation", record.orientation_id );
+			}
+			bean.setOrientation( orientations[ record.orientation_id ] );
+
+			map[ record.frame_cell_id ] = bean;
+		}
+
+		return map;
+	}
 
 	/*
     	private method

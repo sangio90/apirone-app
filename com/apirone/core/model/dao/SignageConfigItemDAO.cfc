@@ -55,6 +55,41 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "signage_config_items",
+			pkColumn = "signage_config_item_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
+	<!---
+		Recupera in batch più SignageConfigItem dato un array di signageConfigId.
+		Utilizzato da SignageConfigService.getMany() per il precaricamento in blocco.
+	--->
+	<cffunction name="readBySignageConfigIds" returntype="Query" access="public">
+		<cfargument name="signageConfigIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.signageConfigIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM signage_config_items
+			WHERE signage_config_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+			ORDER BY signage_config_item_id
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="Numeric" output="false">
 		<cfargument name="signageConfigItem" type="com.apirone.core.model.bean.SignageConfigItem" required="true">
 

@@ -544,6 +544,39 @@ Already listed in T2 but the `findByListOfProductItemIds()` method uses complex 
 
 ---
 
+## Phase 4b: N+1 Fix in buildFromRow() / search() — Batch getMany() &nbsp;&nbsp;`✅ DONE`
+
+> **Discovered after Phase 4:** Cache removal exposed N+1 in `buildFromRow()` called from `search()` loops. The Phase 4 services had cache removed but `search()` still iterated `buildFromRow()` with individual FK calls per record. For 100-product pages this produced 1629 queries instead of ~30.
+
+### Strategy
+
+Each affected service receives:
+1. `getMany(ids)` public method — batch-preloads FK entities and builds `struct[PK] = bean`
+2. `search()` modified to call `getMany(ids)` instead of looping `buildFromRow()`
+3. `buildFromRow()` / `build()` kept unchanged for single-record lookups
+
+### Services Fixed (45 total)
+
+#### Already fixed in Phase 3/4 (6)
+ProductService, ProductCategoryService, FinishService, LineService, AttributeService, ModelService
+
+#### Batch Subagent #1 — Simple (12) &nbsp;&nbsp;`✅ DONE`
+AccountService, AuditEntryService, CombinationProductItemService, PermissionService, MetadataService, ProductionTimeService, ProductCategoryTypeService, ReportService, RolePermissionService, SearchService, SignageConfigItemService, LocationService
+
+#### Batch Subagent #2 — Medium (14) &nbsp;&nbsp;`✅ DONE`
+ArticleService, FontService, FrameService, PictogramService, CatalogBundleService, LineCostService, ModelConfigService, QuotationItemFruitService, QuotationStatusHistoryService, QuotationZoneService, PriceService, RoleService, QuotationItemPriceService
+
+#### Batch Subagent #3 — Mixed (13) &nbsp;&nbsp;`✅ DONE`
+CompanyService, AttributeValueService, FontFamilyService, FileService, FrameCellService, ProfileService, ProductCategoryLineService, UserService, QuotationItemProductItemService, PriceTypeService, MetadataTypeService, QuotationItemProductService, SignageConfigService
+
+#### New DAO methods added
+PermissionDAO, ProductionTimeDAO, ReportDAO, RolePermissionDAO, SearchDAO, SignageConfigItemDAO, FontDAO, RoleDAO, QuotationItemProductDAO — `readByIds()`
+
+### Still TODO (5 complex services)
+QuotationService, QuotationItemService, ComponentService, ProductItemService, QuotationPriceService — these have deep FK chains, verticale dependencies, or conditional branches that need individual analysis.
+
+---
+
 ## Phase 5: CacheManager Disarm & Removal &nbsp;&nbsp;`❌ TO DO`
 
 ### 5.1 Remove CacheManager from WireBox

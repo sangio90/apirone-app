@@ -153,7 +153,7 @@
 			}
 			bean.setType( types[ record.model_type_id ] );
 
-			// Status: cached localmente (StatusService ha cache interna)
+			// Status: cached localmente
 			if ( !StructKeyExists( statuses, record.status_id ) ) {
 				statuses[ record.status_id ] = getStatusService().get( record.status_id );
 			}
@@ -169,7 +169,7 @@
 					}
 				}
 			}
-			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : [] );
 
 			// Testi: dalla mappa pre-caricata
 			if ( StructKeyExists( textMap, record.model_id ) ) {

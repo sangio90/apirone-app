@@ -41,14 +41,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.file_id ); // file_id già castato a varchar dal find()
 		} );
 
-		var beanMap = {};
-
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( r ){
-				beanMap[ r.file_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( r ){
@@ -172,6 +166,78 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più File dato un array di ID.
+	 * Restituisce uno Struct chiave = fileId, valore = bean File.
+	 * Precarica i fileType e i lookup (fileKind) con cache locale per evitare il problema N+1.
+	 *
+	 * @ids Array di fileId
+	 * @return Struct mappato per fileId -> File
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie gli ID unici dei fileType per precaricarli in batch
+		var typeIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.type_id ) ) {
+				typeIds.append( record.type_id );
+			}
+		}
+
+		// Precarica i FileType in batch: FileTypeService legge da file JSON, cache locale
+		var typeMap = {};
+		for ( var tid in typeIds ) {
+			if ( !StructKeyExists( typeMap, tid ) ) {
+				typeMap[ tid ] = getFileTypeService().get( tid );
+			}
+		}
+
+		// Cache locale per i lookup (fileKind è in-memory via LookupService)
+		var kinds = {};
+
+		for ( var record in records ) {
+			var obj = super.bean( "File" );
+
+			// Campi diretti dal record
+			obj.setId( record.file_id.toString() );
+			obj.setName( record.name );
+
+			// FileType: dalla mappa pre-caricata
+			if ( StructKeyExists( typeMap, record.type_id ) ) {
+				obj.setType( typeMap[ record.type_id ] );
+			} else {
+				obj.setType( getFileTypeService().get( record.type_id ) );
+			}
+
+			// FileKind: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( kinds, record.kind_id ) ) {
+				kinds[ record.kind_id ] = getLookupService().get( "fileKind", record.kind_id );
+
+				if ( IsNull( kinds[ record.kind_id ] ) ) {
+					Throw(
+						type    = "apirone.error.file.kindNotFound",
+						message = "File kind [#record.kind_id#] not found for fileId [#record.file_id#]"
+					);
+				}
+			}
+			obj.setKind( kinds[ record.kind_id ] );
+
+			obj.setSize( record.size );
+			obj.setWidth( record.width );
+			obj.setHeight( record.height );
+			obj.setAlt( record.alt );
+			obj.setDescription( record.description );
+			obj.setExtension( record.extension );
+			obj.setDirectory( record.directory );
+
+			map[ record.file_id ] = obj;
+		}
+
+		return map;
+	}
 
 	/**
 	 * Costruisce un bean File a partire dall'ID, effettuando la lettura dal DB.

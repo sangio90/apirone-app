@@ -33,13 +33,7 @@
 			ids.append( record.pictogram_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( record ){
-				beanMap[ record.pictogram_id ] = buildFromRow( record );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -110,6 +104,53 @@
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più Pictogram dato un array di ID.
+	 * Restituisce uno Struct chiave = pictogramId, valore = bean Pictogram.
+	 * Precarica i file in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di pictogramId
+	 * @return Struct mappato per pictogramId -> Pictogram
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i file in batch per tutti i pittogrammi (1 query invece di N)
+		var fileMap = getFileService().listByEntityIds( "pictogram.id", arguments.ids );
+
+		// Cache locali per i lookup (LookupService è in-memory, nessuna query DB aggiuntiva)
+		var codes = {};
+		var names = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Pictogram" );
+
+			// Campi diretti dal record
+			bean.setId( record.pictogram_id );
+			bean.setFontFamilyId( record.font_family_id );
+
+			// Code e Name: LookupService in-memory, cached localmente
+			var code = record.code;
+			if ( !StructKeyExists( codes, code ) ) {
+				var lookup = getLookupService().get( "PictogramCode", code );
+				codes[ code ] = lookup.getId();
+				names[ code ] = lookup.getName();
+			}
+			bean.setCode( codes[ code ] );
+			bean.setName( names[ code ] );
+
+			// Immagini: dalla mappa pre-caricata
+			if ( StructKeyExists( fileMap, record.pictogram_id ) && Len( fileMap[ record.pictogram_id ] ) ) {
+				bean.setImage( fileMap[ record.pictogram_id ][ 1 ] );
+			}
+
+			map[ record.pictogram_id ] = bean;
+		}
+
+		return map;
+	}
 
 	private com.apirone.core.model.bean.Pictogram function build( required String pictogramId ){
 		var record = getDao().read( arguments.pictogramId );

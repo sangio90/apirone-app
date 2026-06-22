@@ -187,7 +187,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setCode( record.code );
 
-			// Status: cached localmente (StatusService ha cache interna)
+			// Status: cached localmente
 			if ( !StructKeyExists( statuses, record.status_id ) ) {
 				statuses[ record.status_id ] = getStatusService().get( record.status_id );
 			}
@@ -213,7 +213,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 				}
 			}
-			bean.setCategories( ArrayLen( catBeans ) ? catBeans : NullValue() );
+			bean.setCategories( ArrayLen( catBeans ) ? catBeans : [] );
 
 			map[ record.attribute_id ] = bean;
 		}

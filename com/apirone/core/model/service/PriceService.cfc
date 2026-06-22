@@ -36,13 +36,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( record.price_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( record ){
-				beanMap[ record.price_id ] = buildFromRow( record );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -233,6 +227,74 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
     	private method
 	*/
+
+	/**
+	 * Recupera in batch più Price dato un array di ID.
+	 * Restituisce uno Struct chiave = priceId, valore = bean Price.
+	 * Precarica PriceType in batch e utilizza cache locale per status e lookup.
+	 *
+	 * @ids Array di priceId
+	 * @return Struct mappato per priceId -> Price
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i price_type_id per precaricarli in batch
+		var priceTypeIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.price_type_id ) ) {
+				priceTypeIds.append( record.price_type_id );
+			}
+		}
+
+		// Precarica i PriceType in batch
+		var priceTypeMap = {};
+		if ( ArrayLen( priceTypeIds ) ) {
+			var typeRecords = getPriceTypeService().getDao().readByIds( priceTypeIds );
+			for ( var tr in typeRecords ) {
+				var typeBean = getPriceTypeService().buildFromRow( tr );
+				priceTypeMap[ tr.price_type_id ] = typeBean;
+			}
+		}
+
+		// Cache locali per method, status
+		var methods  = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Price" );
+
+			// Campi diretti dal record
+			bean.setId( record.price_id );
+			bean.setAmount( record.amount );
+			bean.setCreatedAt( record.created_at );
+
+			// Method: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( methods, record.method_id ) ) {
+				methods[ record.method_id ] = getLookupService().get( "priceMethod", record.method_id );
+			}
+			bean.setMethod( methods[ record.method_id ] );
+
+			// Type: dalla mappa pre-caricata
+			if ( StructKeyExists( priceTypeMap, record.price_type_id ) ) {
+				bean.setType( priceTypeMap[ record.price_type_id ] );
+			}
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Entity (costruita inline dal record)
+			bean.setEntity( getEntity( record ) );
+
+			map[ record.price_id ] = bean;
+		}
+
+		return map;
+	}
 
 	private com.apirone.core.model.bean.Price function build( required String priceId ){
 		var record = getDao().read( arguments.priceId );

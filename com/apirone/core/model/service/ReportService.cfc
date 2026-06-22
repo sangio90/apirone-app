@@ -28,11 +28,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
-		// Il search() del DAO ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Il search() del DAO ora restituisce tutte le colonne: si possono usare gli ID per getMany()
 		var records = getDao().search( argumentCollection = arguments );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		for ( var record in records ) {
-			rows.add( buildFromSearchRow( record ) )
+			ids.add( record.report_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Itera i record originali per preservare l'ordinamento
+		for ( var record in records ) {
+			rows.add( beanMap[ record.report_id ] );
 		}
 
 		result.setData( rows );
@@ -40,6 +49,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più Report dato un array di ID.
+	 * Restituisce uno Struct chiave = reportId, valore = bean Report.
+	 * Precarica lo Status in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di reportId
+	 * @return Struct mappato per reportId -> Report
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Report" );
+
+			// Campi diretti dal record
+			bean.setId( record.report_id );
+			bean.setName( record.report );
+			bean.setExampleData( record.example_data );
+			bean.setExampleFile( record.example_file );
+			bean.setFileName( record.file_name );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	/**

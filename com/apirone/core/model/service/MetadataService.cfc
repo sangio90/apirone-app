@@ -29,19 +29,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
 		var ids = [];
 		records.each( function( record ){
 			ids.append( record.metadata_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-			allRecords.each( function( record ){
-				beanMap[ record.metadata_id ] = buildFromRow( record );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -53,6 +47,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più Metadata dato un array di ID.
+	 * Restituisce uno Struct chiave = metadataId, valore = bean Metadata.
+	 * Precarica i MetadataType in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di metadataId
+	 * @return Struct mappato per metadataId -> Metadata
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+		var types   = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Metadata" );
+
+			// Campi diretti dal record
+			bean.setId( record.metadata_id );
+			bean.setCreatedAt( record.created_at );
+
+			// MetadataType: cached localmente per evitare chiamate N+1
+			if ( !StructKeyExists( types, record.metadata_type_id ) ) {
+				types[ record.metadata_type_id ] = getMetadataTypeService().get( record.metadata_type_id );
+			}
+			bean.setType( types[ record.metadata_type_id ] );
+
+			bean.setEntity( getEntity( record ) );
+			bean.setValue( getValue( record ) );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
 	}
 
 	public Numeric function update( required com.apirone.core.model.bean.Metadata metadata ){

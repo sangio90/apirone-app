@@ -45,14 +45,7 @@
 			ids.append( record.quotation_item_price_id );
 		}
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.quotation_item_price_id ] = buildFromRow( r );
-			} );
-		}
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		for ( var record in records ) {
@@ -116,6 +109,67 @@
 		}
 
 		return arguments.quotationItemPrice.getId();
+	}
+
+	/**
+	 * Recupera in batch più QuotationItemPrice dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationItemPriceId, valore = bean QuotationItemPrice.
+	 * Precarica le QuotationItemPriceLine in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationItemPriceId
+	 * @return Struct mappato per quotationItemPriceId -> QuotationItemPrice
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica le QuotationItemPriceLine in batch per tutti i price_id
+		var lineMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var idsList = ArrayToList( arguments.ids );
+			var lineRecords = QueryExecute(
+				"SELECT * FROM quotation_item_price_lines WHERE quotation_item_price_id IN ( :ids )",
+				{ ids: { value: idsList, list: true, cfsqltype: "integer" } },
+				{ datasource: "apirone" }
+			);
+			for ( var lr in lineRecords ) {
+				var priceId = lr.quotation_item_price_id;
+				if ( !StructKeyExists( lineMap, priceId ) ) {
+					lineMap[ priceId ] = [];
+				}
+				var lineBean = super.bean( "QuotationItemPriceLine" );
+				lineBean.setId( lr.quotation_item_price_line_id );
+				lineBean.setAmount( lr.amount );
+				lineBean.setCost( lr.cost );
+				lineBean.setQuotationItemPriceId( lr.quotation_item_price_id );
+				lineBean.setName( lr.name );
+				lineBean.setCreatedAt( lr.created_at );
+				ArrayAppend( lineMap[ priceId ], lineBean );
+			}
+		}
+
+		for ( var record in records ) {
+			var bean   = super.bean( "QuotationItemPrice" );
+			var method = super.bean( "PriceMethod" );
+
+			// Campi diretti dal record
+			bean.setDiscount1( record.discount1 );
+			bean.setDiscount2( record.discount2 );
+			bean.setAmount( record.amount );
+			bean.setId( record.quotation_item_price_id );
+
+			// Method (PriceMethod è un bean semplice senza FK)
+			bean.setMethod( method.setId( record.price_method_id ) );
+
+			// Lines: dalla mappa pre-caricata
+			if ( StructKeyExists( lineMap, record.quotation_item_price_id ) ) {
+				bean.setLines( lineMap[ record.quotation_item_price_id ] );
+			}
+
+			map[ record.quotation_item_price_id ] = bean;
+		}
+
+		return map;
 	}
 
 	private com.apirone.core.model.bean.QuotationItemPrice function build( required String quotationItemPriceId ){

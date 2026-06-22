@@ -25,11 +25,21 @@
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby, "font" );
 
-		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
+		// Il find() restituisce gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.font_id );
+		} );
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( buildFromFindRow( record ) );
+			rows.add( beanMap[ record.font_id ] );
 		} );
 
 		result.setData( rows );
@@ -140,8 +150,74 @@
 
 
 	/*
-    	private method
+     	private method
 	*/
+
+	/**
+	 * Recupera in batch più Font dato un array di ID.
+	 * Restituisce uno Struct chiave = fontId, valore = bean Font.
+	 * Precarica FontFamily e testi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di fontId
+	 * @return Struct mappato per fontId -> Font
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i font_family_id per precaricarli in batch
+		var familyIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.font_family_id ) ) {
+				familyIds.append( record.font_family_id );
+			}
+		}
+
+		// Precarica le FontFamily in batch (via readByIds del DAO, senza getMany pubblico)
+		var familyMap = {};
+		if ( ArrayLen( familyIds ) ) {
+			var familyRecords = getFontFamilyService().getDao().readByIds( familyIds );
+			for ( var fr in familyRecords ) {
+				var familyBean = super.bean( "FontFamily" );
+				familyBean.setId( fr.font_family_id );
+				familyBean.setCode( fr.code );
+				familyBean.setName( fr.font_family );
+				familyMap[ fr.font_family_id ] = familyBean;
+			}
+		}
+
+		// Precarica i testi in batch per tutti i font (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "font.id", arguments.ids );
+
+		// Costruisce i bean con le mappe pre-caricate
+		for ( var record in records ) {
+			var bean = super.bean( "Font" );
+
+			// Campi diretti dal record
+			bean.setId( record.font_id );
+			bean.setCode( record.code );
+			bean.setDirectory( record.directory );
+			bean.setHeightWidthRatio( record.height_width_ratio );
+
+			// FontFamily: dalla mappa pre-caricata
+			if ( !IsNull( record.font_family_id ) && StructKeyExists( familyMap, record.font_family_id ) ) {
+				bean.setFontFamily( familyMap[ record.font_family_id ] );
+			} else {
+				bean.setFontFamily( super.bean( "FontFamily" ) );
+			}
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.font_id ) ) {
+				bean.setTexts( textMap[ record.font_id ] );
+			}
+
+			bean.setCreatedAt( record.created_at );
+
+			map[ record.font_id ] = bean;
+		}
+
+		return map;
+	}
 
 	/**
 	 * Costruisce un bean Font a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.

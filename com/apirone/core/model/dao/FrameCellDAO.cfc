@@ -31,6 +31,26 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch i FrameCell per una lista di frameId.
+		Utilizzato da FrameService.getMany() per evitare QueryExecute con list:true.
+	--->
+	<cffunction name="readByFrameIds" returntype="Query" access="public">
+		<cfargument name="frameIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.frameIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT frame_id::varchar, *
+			FROM frame_cells
+			WHERE frame_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="frameId" type="String">
 

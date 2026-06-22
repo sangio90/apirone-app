@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productService" inject="ProductService";
 	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="quotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
+	property name="productItemService" inject="ProductItemService";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitId ){
 		return build( arguments.quotationItemFruitId );
@@ -36,17 +37,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				ids.append( record.quotation_item_fruit_id );
 			}
 
-			var loadedRecords = getDao().readByIds( ids );
-			var recordMap = {};
-			for ( var loadedRecord in loadedRecords ) {
-				recordMap[ loadedRecord.quotation_item_fruit_id ] = loadedRecord;
-			}
+			// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+			var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 			// Ricostruisce le righe nell'ordine del find() originale
 			for ( var record in records ) {
-				var fullRecord = recordMap[ record.quotation_item_fruit_id ];
-				if ( !IsNull( fullRecord ) ) {
-					rows.add( buildFromRow( fullRecord ) );
+				if ( StructKeyExists( beanMap, record.quotation_item_fruit_id ) ) {
+					rows.add( beanMap[ record.quotation_item_fruit_id ] );
 				}
 			}
 		}
@@ -129,6 +126,180 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	/*
 		private methods
 	*/
+
+	/*
+		private methods
+	*/
+
+	/**
+	 * Recupera in batch più QuotationItemFruit dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationItemFruitId, valore = bean QuotationItemFruit.
+	 * Precarica Product, ProductItem e FruitPosition in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationItemFruitId
+	 * @return Struct mappato per quotationItemFruitId -> QuotationItemFruit
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i fruit_id per precaricare i Product in batch
+		var fruitIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.fruit_id ) ) {
+				fruitIds.append( record.fruit_id );
+			}
+		}
+
+		// Precarica i Product in batch (via readByIds del DAO, senza getMany pubblico)
+		var productMap = {};
+		if ( ArrayLen( fruitIds ) ) {
+			var productRecords = getProductService().getDao().readByIds( fruitIds );
+			for ( var pr in productRecords ) {
+				var productBean = resolveProductType( pr );
+				productMap[ pr.product_id ] = productBean;
+			}
+		}
+
+		// Precarica i ProductItem in batch per tutti i quotation_item_fruit_id
+		var itemMap = {};
+		var allProductItemIds = [];
+		if ( ArrayLen( arguments.ids ) ) {
+			var idsList = ArrayToList( arguments.ids );
+			var itemRecords = QueryExecute(
+				"SELECT * FROM quotation_item_product_items WHERE quotation_item_fruit_id IN ( :ids )",
+				{ ids: { value: idsList, list: true, cfsqltype: "integer" } },
+				{ datasource: "apirone" }
+			);
+			for ( var ir in itemRecords ) {
+				var fruitId = ir.quotation_item_fruit_id;
+				if ( !StructKeyExists( itemMap, fruitId ) ) {
+					itemMap[ fruitId ] = [];
+				}
+				if ( !IsNull( ir.product_item_id ) ) {
+					allProductItemIds.append( ir.product_item_id );
+				}
+				var itemBean = super.bean( "QuotationItemProductItem" );
+				itemBean.setId( ir.quotation_item_product_item_id );
+				itemBean.setQuotationItemId( ir.quotation_item_id );
+				itemBean.setLevel( ir.level );
+				itemBean.setNote( ir.note );
+				// product_item_id salvato temporaneamente per il lookup batch
+				itemBean._productItemId = ir.product_item_id;
+				ArrayAppend( itemMap[ fruitId ], itemBean );
+			}
+		}
+
+		// Precarica i ProductItem in batch (1 query) e collega ai QIPI bean
+		if ( ArrayLen( allProductItemIds ) ) {
+			var uniquePiIds = [];
+			for ( var pid in allProductItemIds ) {
+				if ( !IsNull( pid ) && !ArrayContains( uniquePiIds, pid ) ) {
+					uniquePiIds.append( pid );
+				}
+			}
+			if ( ArrayLen( uniquePiIds ) ) {
+				var piRecords = getProductItemService().getDao().readByIds( uniquePiIds );
+				var piMap = {};
+				for ( var pir in piRecords ) {
+					var piBean = super.bean( "ProductItem" );
+					piBean.setId( pir.product_item_id );
+					piBean.setProductId( pir.product_id );
+					piBean.setCreatedAt( pir.created_at );
+					piBean.setImportant( pir.important );
+					piBean.setOrderBy( pir.orderby );
+					piMap[ pir.product_item_id ] = piBean;
+				}
+				// Collega i ProductItem ai beans QuotationItemProductItem
+				for ( var fid in itemMap ) {
+					for ( var itemBean in itemMap[ fid ] ) {
+						if ( StructKeyExists( itemBean, "_productItemId" ) && StructKeyExists( piMap, itemBean._productItemId ) ) {
+							itemBean.setProductItem( piMap[ itemBean._productItemId ] );
+						}
+						StructDelete( itemBean, "_productItemId" );
+					}
+				}
+			}
+		}
+
+		// Precarica le FruitPosition in batch per tutti i quotation_item_fruit_id
+		var positionMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var idsList = ArrayToList( arguments.ids );
+			var posRecords = QueryExecute(
+				"SELECT * FROM quotation_item_fruit_positions WHERE quotation_item_fruit_id IN ( :ids ) ORDER BY quotation_item_fruit_id, ""order""",
+				{ ids: { value: idsList, list: true, cfsqltype: "integer" } },
+				{ datasource: "apirone" }
+			);
+			for ( var posr in posRecords ) {
+				var fruitId = posr.quotation_item_fruit_id;
+				if ( !StructKeyExists( positionMap, fruitId ) ) {
+					positionMap[ fruitId ] = [];
+				}
+				ArrayAppend( positionMap[ fruitId ], {
+					'position' = posr.position,
+					'order'    = posr.order
+				} );
+			}
+		}
+
+		// Costruisce i bean con le mappe pre-caricate
+		for ( var record in records ) {
+			var bean = super.bean( "QuotationItemFruit" );
+
+			// Campi diretti dal record
+			bean.setId( record.quotation_item_fruit_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setNote( record.note );
+
+			// Product: dalla mappa pre-caricata
+			if ( StructKeyExists( productMap, record.fruit_id ) ) {
+				bean.setFruit( productMap[ record.fruit_id ] );
+			}
+
+			// Items: dalla mappa pre-caricata
+			if ( StructKeyExists( itemMap, record.quotation_item_fruit_id ) && ArrayLen( itemMap[ record.quotation_item_fruit_id ] ) ) {
+				bean.setItems( itemMap[ record.quotation_item_fruit_id ] );
+			}
+
+			// Positions: dalla mappa pre-caricata
+			if ( StructKeyExists( positionMap, record.quotation_item_fruit_id ) && ArrayLen( positionMap[ record.quotation_item_fruit_id ] ) ) {
+				bean.setPositions( positionMap[ record.quotation_item_fruit_id ] );
+			}
+
+			map[ record.quotation_item_fruit_id ] = bean;
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un Product bean semplificato dal record, determinando il tipo
+	 * (ProductBase o ProductComplex) in base alla presenza di catalog_bundle_id.
+	 */
+	private com.apirone.core.model.bean.Product function resolveProductType( required any pr ){
+		if ( IsNull( pr.catalog_bundle_id ) ) {
+			var bean = super.bean( "ProductBase" );
+			bean.setCode( pr.code );
+			bean.setPositionCount( pr.position_count );
+		} else {
+			var bean = super.bean( "ProductComplex" );
+		}
+
+		// Campi comuni
+		bean.setId( pr.product_id.toString() );
+		bean.setSerial( pr.serial );
+		bean.setCreatedAt( pr.created_at );
+		bean.setSpecial( BooleanFormat( pr.special ) );
+		bean.setMinQuantity( pr.min_quantity );
+		bean.setMaxQuantity( pr.max_quantity );
+		bean.setMarginTop( pr.margin_top );
+		bean.setMarginLeft( pr.margin_left );
+		bean.setPlateWidth( pr.plate_width );
+		bean.setPlateHeight( pr.plate_height );
+
+		return bean;
+	}
 
 	private com.apirone.core.model.bean.QuotationItemFruit function buildFromRow( required any record ){
 		var bean = super.bean( "QuotationItemFruit" );

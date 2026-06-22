@@ -60,14 +60,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( r.catalog_bundle_id );
 		} );
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.catalog_bundle_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
@@ -79,6 +73,80 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più CatalogBundle dato un array di ID.
+	 * Restituisce uno Struct chiave = catalogBundleId, valore = bean CatalogBundle.
+	 * Precarica Line, Model e Category in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di catalogBundleId
+	 * @return Struct mappato per catalogBundleId -> CatalogBundle
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti gli ID delle FK da precaricare in batch
+		var lineIds     = [];
+		var modelIds    = [];
+		var categoryIds = [];
+
+		for ( var record in records ) {
+			if ( !IsNull( record.line_id ) ) {
+				lineIds.append( record.line_id );
+			}
+			if ( !IsNull( record.model_id ) ) {
+				modelIds.append( record.model_id );
+			}
+			if ( !IsNull( record.product_category_id ) ) {
+				categoryIds.append( record.product_category_id );
+			}
+		}
+
+		// Precarica le entity FK con getMany() esistenti (1 query ciascuna)
+		var lineMap = {};
+		if ( ArrayLen( lineIds ) ) {
+			lineMap = getLineService().getMany( lineIds );
+		}
+
+		var modelMap = {};
+		if ( ArrayLen( modelIds ) ) {
+			modelMap = getModelService().getMany( modelIds );
+		}
+
+		var categoryMap = {};
+		if ( ArrayLen( categoryIds ) ) {
+			categoryMap = getProductCategoryService().getMany( categoryIds );
+		}
+
+		// Costruisce i bean con le mappe pre-caricate
+		for ( var record in records ) {
+			var bean = super.bean( "CatalogBundle" );
+
+			// Campi diretti dal record
+			bean.setId( record.catalog_bundle_id );
+			bean.setName( record.catalog_bundle );
+			bean.setCreatedAt( record.created_at );
+			bean.setMarkupValue( record.markup_value );
+
+			// Entity collegate dalle mappe pre-caricate
+			if ( StructKeyExists( lineMap, record.line_id ) ) {
+				bean.setLine( lineMap[ record.line_id ] );
+			}
+
+			if ( StructKeyExists( modelMap, record.model_id ) ) {
+				bean.setModel( modelMap[ record.model_id ] );
+			}
+
+			if ( StructKeyExists( categoryMap, record.product_category_id ) ) {
+				bean.setCategory( categoryMap[ record.product_category_id ] );
+			}
+
+			map[ record.catalog_bundle_id ] = bean;
+		}
+
+		return map;
 	}
 
 	public com.apirone.core.model.bean.CatalogBundle function getOrCreate(

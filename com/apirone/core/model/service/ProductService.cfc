@@ -513,7 +513,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 					}
 				}
-				bean.setLines( ArrayLen( lineBeans ) ? lineBeans : NullValue() );
+				bean.setLines( ArrayLen( lineBeans ) ? lineBeans : [] );
 			} else {
 				var bean = super.bean( "ProductComplex" );
 
@@ -544,7 +544,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setPlateWidth( r.plate_width );
 			bean.setPlateHeight( r.plate_height );
 
-			// Status: cached localmente (StatusService ha cache interna)
+			// Status: cached localmente
 			if ( !StructKeyExists( statuses, r.status_id ) ) {
 				statuses[ r.status_id ] = getStatusService().get( r.status_id );
 			}
@@ -565,7 +565,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 				}
 			}
-			bean.setImportantAttributes( ArrayLen( attrBeans ) ? attrBeans : NullValue() );
+			bean.setImportantAttributes( ArrayLen( attrBeans ) ? attrBeans : [] );
 
 			// Prezzi dalla mappa batch
 			if ( StructKeyExists( priceMap, r.product_id ) ) {
