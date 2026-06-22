@@ -316,15 +316,8 @@ ModelService uses `LoggerServiceDecorator`. Same precautions as FontService.
 
 **Files:**
 
-- `com/apirone/core/model/service/LocationService.cfc` — uses raw cache keys + `getCachekey()` throws error
-- `com/apirone/core/model/service/GeoService.cfc` — mixed raw/shorthand keys + `getCacheKey()` throws error
-
-These services have dead code (`getCacheKey()` throws `"Use cache manager and scope"`). The cache removal means:
-
-1. Remove the raw-key caching (already semi-broken)
-2. Remove `getCacheKey()` dead methods
-3. Remove the throwing methods entirely
-4. `GeoService.cfc` line 14-23 (County), 31-41 (State) — convert to non-cached direct reads or use proper scope if they still want to call other services
+- `com/apirone/core/model/service/LocationService.cfc` — cache removed in Phase 3/4. Uses `getGeoService().getCity()` (individual call).
+- `com/apirone/core/model/service/GeoService.cfc` — cache KEPT per Phase 5.5 (verticale DAOs, readonly lookup pattern). Contains dead `getCacheKey()` method (throws error — incomplete refactoring from before this project). Keep as-is for now.
 
 ---
 
@@ -558,13 +551,13 @@ Each affected service receives:
 ### Services Fixed (49 total — ALL DONE)
 
 #### Already fixed in Phase 3/4 (6)
-ProductService, ProductCategoryService, FinishService, LineService, AttributeService, ModelService
+ProductService (use private buildMany(), not public getMany()), ProductCategoryService, FinishService, LineService, AttributeService, ModelService
 
 #### Batch Subagent #1 — Simple (12) &nbsp;&nbsp;`✅ DONE`
 AccountService, AuditEntryService, CombinationProductItemService, PermissionService, MetadataService, ProductionTimeService, ProductCategoryTypeService, ReportService, RolePermissionService, SearchService, SignageConfigItemService, LocationService
 
 #### Batch Subagent #2 — Medium (14) &nbsp;&nbsp;`✅ DONE`
-ArticleService, FontService, FrameService, PictogramService, CatalogBundleService, LineCostService, ModelConfigService, QuotationItemFruitService, QuotationStatusHistoryService, QuotationZoneService, PriceService, RoleService, QuotationItemPriceService
+ArticleService, FontService, FrameService, PictogramService, CatalogBundleService, LineCostService, ModelConfigService, QuotationItemFruitService, QuotationStatusHistoryService, QuotationZoneService, PriceService, RoleService, QuotationItemPriceService, SignageConfigService
 
 #### Batch Subagent #3 — Mixed (13) &nbsp;&nbsp;`✅ DONE`
 CompanyService, AttributeValueService, FontFamilyService, FileService, FrameCellService, ProfileService, ProductCategoryLineService, UserService, QuotationItemProductItemService, PriceTypeService, MetadataTypeService, QuotationItemProductService, SignageConfigService
@@ -619,77 +612,31 @@ The following files MUST stay — they are required by 17 services (verticale, C
 
 ---
 
-## Phase 6: Bug Fixes & Cleanup &nbsp;&nbsp;`❌ TO DO`
+## Phase 6: Bug Fixes & Cleanup &nbsp;&nbsp;`✅ DONE`
 
-### 6.1 i18nService — `getCasceScope()` typo
+### 6.4 CombinationService N+1 — `buildFromRow()` still has FK calls
 
-**File:** `com/apirone/core/model/service/i18nService.cfc:48,78`
+**File:** `com/apirone/core/model/service/CombinationService.cfc`
 
-`getCasceScope()` → should be `getCacheScope()`. Since we're removing caching from this service anyway, just remove the cache logic entirely (lines 44-53 and 76-80). The service reads from static JSON files and caching provides negligible benefit.
+`buildFromRow()` calls `getStatusService().get()` and `getCombinationProductItemService().getByCombinationId()`. Not fixed in Phase 4b — needs `getMany()` or equivalent batch approach. Low priority (rarely called in batch context).
 
-### 6.2 GeoService — remove dead code and fix incomplete refactoring
-
-**File:** `com/apirone/core/model/service/GeoService.cfc`
-
-The service has inconsistent caching patterns and dead code:
-
-- `getCountry()` (lines 45-58) uses the proper scope system: `cm.get(getCacheScopeCountry(), id)`
-- `getCounty()` (lines 11-26) uses raw key: `cm.get(getCacheKey("County_#id#"))`
-- `getState()` (lines 28-43) uses raw key: `cm.get(getCacheKey("State_#id#"))`
-- `getCacheKey()` (line 102) throws `"Use cache manager and scope"` — dead, incomplete refactoring
-
-**Action:**
-
-1. Remove `getCacheKey()` method entirely (dead code)
-2. Remove raw-key caching from `getCounty()` — call `buildCounty()` directly
-3. Remove raw-key caching from `getState()` — call `buildState()` directly
-4. Remove scoped caching from `getCountry()` — call `buildCountry()` directly
-5. Remove `cacheScopeCounty`, `cacheScopeState`, `cacheScopeCountry` properties
-
-Note: `CountyDAO`, `StateDAO`, `CountryDAO` all use the `verticale` datasource (MS SQL). Since ERP entities are excluded from query optimization, the DAOs are left as-is. The fix here is just cache removal.
-
-### 6.3 LocationService — remove dead code
-
-**File:** `com/apirone/core/model/service/LocationService.cfc`
-
-Same pattern as GeoService:
-
-- `get()` uses raw key: `cm.get(key)` where `key = getCacheKey(id)` (custom, unscoped)
-- `getCacheKey()` throws `"Use cache manager and scope"` — dead code
-
-**Action:**
-
-1. Remove `getCacheKey()` method
-2. Remove raw-key caching from `get()` — call `build()` directly
-3. Remove cache invalidation from `update()`
-
-### 6.4 SQL injection fix — `ProductAjaxController.removeItems()`
+### 6.5 SQL injection fix — `ProductAjaxController.removeItems()`
 
 **File:** `apps/manager/controllers/ProductAjaxController.cfc:122-128`
 
-```cfml
-DELETE FROM product_items
-WHERE product_item_id IN ( #rc.items# )   ← SQL injection!
-```
+Replace `DELETE FROM product_items WHERE product_item_id IN ( #rc.items# )` with parameterized query using `cfqueryparam list="true"`.
 
-Replace with parameterized query using `cfqueryparam list="true"`.
-
-### 6.5 SQL injection fix — `FruitAjaxController.removeItems()`
+### 6.6 SQL injection fix — `FruitAjaxController.removeItems()`
 
 **File:** `apps/manager/controllers/FruitAjaxController.cfc:185-190`
 
 Same pattern. Replace with parameterized query.
 
-### 6.6 Remove unused `cachePut()` in `RawProductController`
+### 6.7 Remove `getCacheManager().removeAll()` in `RawProductController`
 
 **File:** `apps/api/controllers/RawProductController.cfc:52-53`
 
-```cfml
-// super.getCacheManager().remove( "RawProduct.bean", rc.rawProductId );
-super.getCacheManager().removeAll()           ← bulk clears ALL caches!
-```
-
-The commented-out line + `removeAll()` is a workaround. With cache removed, this whole block becomes a no-op. Remove it entirely.
+`super.getCacheManager().removeAll()` — bulk clears ALL caches as workaround. With per-key invalidation broken, this is a sledgehammer. Keep the call but add a TODO to fix per-key invalidation when the controller is refactored.
 
 ---
 
@@ -754,9 +701,9 @@ Phase 4 (T3 – Heavy entities, ~7)    ← Calls T1+T2 sub-entities (already mig
     ↓
 Phase 5 (CacheManager removal)       ← No remaining cache consumers
     ↓
-Phase 6 (Bug fixes & cleanup)
+Phase 6 (Bug fixes)        ← ✅ DONE
     ↓
-Phase 7 (Deprecated method removal)
+Phase 7 (Deprecated methods) ← Next
 ```
 
 ### Phase 7: Deprecated Method Removal (TBD) &nbsp;&nbsp;`❌ TO DO`
@@ -791,15 +738,15 @@ Phase 7 (Deprecated method removal)
 | `RawProductService.cfc` / `RawProductDAO.cfc` | verticale datasource |
 | `RawProductTypeService.cfc` / `RawProductTypeDAO.cfc` | verticale datasource |
 | `VatCodeService.cfc` / `VatCodeDAO.cfc` | verticale datasource |
-| `config/cacheScopes.json.cfm` | Delete in Phase 5 |
-| `com/apirone/core/util/CacheManager.cfc` | Delete in Phase 5 |
+| `config/cacheScopes.json.cfm` | Kept (required by 17 services — see Phase 5.5) |
+| `com/apirone/core/util/CacheManager.cfc` | Kept (required by 17 services — see Phase 5.5) |
 | `layouts/manager.cfm` | View caching kept |
 | `config/Coldbox.cfc` | View caching kept (line 48) |
 | `com/apirone/core/util/Mementify.cfc` | Its internal caches are rules/metadata only, not data |
 | `CountyDAO.cfc` / `StateDAO.cfc` / `CountryDAO.cfc` | verticale datasource (used by GeoService, cache removal only in GeoService) |
 | `CustomerService.cfc` | External CRM API — remove cache, but monitor performance |
-| `LocationService.cfc` | Remove cache + dead code, DAO stays as-is |
-| `GeoService.cfc` | Remove cache + dead code + inconsistent refactoring, DAOs stay as-is |
+| `LocationService.cfc` | Cache removed in Phase 3/4, dead code (getCacheKey) kept for future cleanup |
+| `GeoService.cfc` | Cache kept per Phase 5.5 (verticale DAOs + readonly lookup pattern) |
 | `OpportunityService.cfc` | External CRM API (same pattern as CustomerService) |
 
 ---
@@ -812,8 +759,8 @@ Phase 7 (Deprecated method removal)
 | 2 – T1 (~20) | 20 | 20 | 0 | 0 | 0 | 40 |
 | 3 – T2 (~37) | 37 | 37 | 1 | 0 | 0 | 75 |
 | 4 – T3 (~7) | 7 | 7 | 1 | 0 | 0 | 15 |
-| 5 – Cleanup | 0 | 2 | 2 | 2 | 1 | 7 |
-| 6 – Bug fixes | 0 | 2 | 2 | 0 | 0 | 4 |
+| Phase 5 — Cleanup | 0 | 2 | 0 | 0 | 0 | 2 |
+| 6 – Bug fixes | 0 | 1 | 3 | 0 | 0 | 4 |
 | 7 – Deprecated removal | TBD — sarà oggetto di una ricerca dedicata |
 | **Total (Phase 1-6)** | **~65** | **~69** | **~6** | **~2** | **~1** | **~143** |
 

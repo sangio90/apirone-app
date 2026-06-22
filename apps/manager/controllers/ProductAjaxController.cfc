@@ -123,7 +123,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		<!--- TODO: better than this --->
 		<cfquery datasource="apirone">
 			DELETE FROM product_items
-			WHERE product_item_id IN ( #rc.items# )
+			WHERE product_item_id IN ( <cfqueryparam value="#rc.items#" list="true" cfsqltype="integer"> )
 		</cfquery>
 		```
 
@@ -402,11 +402,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		for ( var row in rows.getData() ) {
 
 			var line = {
-				"id"        = row.getId(),
+				"id"        = row.getId().toString(),
 				"shortId"   = row.getShortId(),
 				"status"    = row.getStatus(),
 				"productId" = row.getProductId(),
-				"name"      = row.getName()
+				"name"      = row.getShortId()
 			};
 
 			data.add( line );

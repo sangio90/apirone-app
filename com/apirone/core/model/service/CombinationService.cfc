@@ -33,14 +33,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( record.combination_id );
 		}
 
-		var beanMap = {};
-		if ( ArrayLen( ids ) ) {
-			var allRecords = getDao().readByIds( ids );
-
-			allRecords.each( function( r ){
-				beanMap[ r.combination_id ] = buildFromRow( r );
-			} );
-		}
+		// Costruisce tutti i bean in batch con getMany() (delega a buildFromRow)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		for ( var record in records ) {
@@ -346,6 +340,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return uniqueCombinations;
 	}
 	// Fine helper per calcolo ricorsione
+
+	/**
+	 * Recupera in batch più Combination dato un array di ID.
+	 * Delega a buildFromRow() per ogni record — nessuna duplicazione di logica.
+	 *
+	 * @ids Array di combinationId
+	 * @return Struct mappato per combinationId -> Combination
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		for ( var r in records ) {
+			map[ r.combination_id ] = buildFromRow( r );
+		}
+
+		return map;
+	}
 
 	private com.apirone.core.model.bean.Combination function build( required String combinationId ){
 		var record = getDao().read( arguments.combinationId );
