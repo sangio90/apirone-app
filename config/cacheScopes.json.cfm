@@ -47,6 +47,7 @@
     "Quotation.bean": {},
     "QuotationItem.bean": {},
     "QuotationItemPosition.bean": {},
+    "QuotationItemDraft.bean": {},
     "QuotationItemExported.bean": {},
     "QuotationExported.bean": {},
     "QuotationItemExportedRow.bean": {},

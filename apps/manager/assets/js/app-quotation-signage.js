@@ -1292,6 +1292,23 @@ AP.signage.modal = ( function() {
                         AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );
                         viewModel.set( "detailForm", defaultDetailForm );
 
+                        if ( AP.page.pendingDraftId && xhr.data && xhr.data.id ) {
+                            $( "#signage-modal" ).modal( "hide" );
+                            var draftId = AP.page.pendingDraftId;
+                            AP.page.pendingDraftId = null;
+                            $.ajax({
+                                method: "POST",
+                                url: "/manager/ajax/quotation-item-drafts/" + draftId + "/apply",
+                                data: JSON.stringify({ quotationItemId: xhr.data.id }),
+                                contentType: "application/json"
+                            }).always(function() {
+                                if ( window.plantPositionsVm ) {
+                                    window.plantPositionsVm.getItems();
+                                }
+                            });
+                            return;
+                        }
+
                         const modal = $( "#posizione-in-pianta-modal" );
                         function handlerSi() {
                             // TODO aggiungere id zona

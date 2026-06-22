@@ -494,6 +494,7 @@
 		get( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.list" ).end();
 		post( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.upload" ).end();
 
+		get( "/ajax/quotations/:id/draft-count" ).to( "QuotationAjaxController.draftCount" ).end();
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
@@ -504,6 +505,14 @@
 		delete( "/ajax/quotation-item-positions/:key" ).to( "QuotationItemPositionAjaxController.delete" ).end();
 		post( "/ajax/quotation-item-positions/" ).to( "QuotationItemPositionAjaxController.save" ).end();
 		post( "/ajax/quotation-item-positions-print" ).to( "QuotationItemPositionAjaxController.print" ).end();
+
+		get( "/ajax/quotation-item-drafts/zone/:zoneId" ).to( "QuotationItemDraftAjaxController.list" ).end();
+		post( "/ajax/quotation-item-drafts/:id/position" ).to( "QuotationItemDraftAjaxController.updatePosition" ).end();
+		post( "/ajax/quotation-item-drafts/:id/convert" ).to( "QuotationItemDraftAjaxController.convert" ).end();
+		post( "/ajax/quotation-item-drafts/:id/apply" ).to( "QuotationItemDraftAjaxController.applyToItem" ).end();
+		get( "/ajax/quotation-item-drafts/:id" ).to( "QuotationItemDraftAjaxController.get" ).end();
+		delete( "/ajax/quotation-item-drafts/:id" ).to( "QuotationItemDraftAjaxController.delete" ).end();
+		post( "/ajax/quotation-item-drafts/" ).to( "QuotationItemDraftAjaxController.create" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();

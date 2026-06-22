@@ -1311,6 +1311,18 @@ AP.plate.modal = ( function() {
 						const pd = viewModel.get( "detailForm.data" );
 						resetDetailForm();
 
+						if ( AP.page.pendingDraftId && xhr.data && xhr.data.id ) {
+							$.ajax({
+								method: "POST",
+								url: "/manager/ajax/quotation-item-drafts/" + AP.page.pendingDraftId + "/apply",
+								data: JSON.stringify({ quotationItemId: xhr.data.id }),
+								contentType: "application/json"
+							}).always(function() {
+								window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + pd.quotationZone.id;
+							});
+							return;
+						}
+
 						const modal = $( "#posizione-in-pianta-modal")
 						function handlerSi() {
 							//TODO aggiungere id zona

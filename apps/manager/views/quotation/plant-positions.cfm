@@ -123,6 +123,45 @@
                                                     </template>
                                                 </template>
                                             </div>
+
+                                            <!-- Marker draft (segnaposto non ancora configurati) -->
+                                            <template v-for="draft in drafts">
+                                                <div
+                                                    class="pin pin-draft"
+                                                    :style="getDraftPinStyle(draft)"
+                                                    @click.stop="selectDraft(draft)"
+                                                    @mousedown.stop="startDraftDrag($event, draft)"
+                                                    :key="'dpin-' + draft.id"
+                                                ></div>
+                                                <div class="pin-label pin-label-draft" :style="getDraftLabelStyle(draft)" :key="'dlabel-' + draft.id">
+                                                    {{ draft.itemType }}
+                                                </div>
+                                                <template v-if="selectedDraftId === draft.id">
+                                                    <img
+                                                        src="/assets/main/img/rotation-arrow.png"
+                                                        alt="Ruota"
+                                                        class="rotation-arrow"
+                                                        :style="getDraftArrowStyle(draft)"
+                                                        @mousedown.stop="startDraftRotate($event, draft)"
+                                                        :key="'darrow-' + draft.id"
+                                                    />
+                                                    <img
+                                                        src="/assets/main/img/delete-icon.jpg"
+                                                        alt="Elimina"
+                                                        class="delete-icon"
+                                                        :style="getDraftDeleteStyle(draft)"
+                                                        @click.stop="deleteDraft(draft)"
+                                                        :key="'ddelete-' + draft.id"
+                                                    />
+                                                    <div
+                                                        class="draft-configure-btn"
+                                                        :style="{ position: 'absolute', left: (draft.coordinateX * 100) + '%', top: 'calc(' + (draft.coordinateY * 100) + '% + 50px)', transform: 'translate(-50%, 0)', pointerEvents: 'auto' }"
+                                                        @click.stop="openConfigureDraft(draft)"
+                                                        :key="'dcfg-' + draft.id"
+                                                    >Configura</div>
+                                                </template>
+                                            </template>
+
                                         </div>
                                     </div>
                                 </div>
@@ -181,6 +220,8 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
                         </div>
 					</div>
 				</section>
@@ -310,5 +351,38 @@
         max-width: 400px !important;
         max-height: none !important;
     }
+    .pin-draft {
+        border: 3px dashed ##999 !important;
+        background-color: rgba(200, 200, 200, 0.65) !important;
+    }
+    .pin-label-draft {
+        color: ##333;
+        font-weight: bold;
+        font-size: 9px;
+    }
+    .draft-configure-btn {
+        background: ##0d6efd;
+        color: white;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        white-space: nowrap;
+        z-index: 10;
+        pointer-events: auto;
+    }
+    .draft-configure-btn:hover {
+        background: ##0b5ed7;
+    }
     </style>
+
+    #view( "quotation/signage-modal" )#
+    #view( "quotation/accessory-modal" )#
+    #view( "quotation/plate-modal-vue" )#
+    #view( "quotation/posizione-in-pianta-modal" )#
+    #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
+    #template( view="jstemplate/quotation/quotation-position-suggest-row-tmpl" )#
+    #template( view="jstemplate/quotation/signage-line-row-tmpl" )#
+    #template( view="jstemplate/quotation/signage-line-preview-row-tmpl" )#
+
 </cfoutput>

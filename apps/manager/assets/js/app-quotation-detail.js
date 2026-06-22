@@ -1076,9 +1076,26 @@ AP.quotation.detail = (function () {
 
 		AP.quotation.detail.showTotals();
 
+		// Badge + warning segnaposto non configurati sulla mappa
+		$.get("/manager/ajax/quotations/" + AP.page.quotation.id + "/draft-count")
+			.done(function(res) {
+				var count = res && res.data ? res.data.count : 0;
+				if (count > 0) {
+					$("#plant-draft-badge").text(count).show();
+					var label = count === 1
+						? "C'è 1 articolo posizionato in pianta non ancora configurato."
+						: "Ci sono " + count + " articoli posizionati in pianta non ancora configurati.";
+					$("#plant-draft-warning-text").text(label);
+					$("#plant-draft-warning-link").attr("href", "/manager/quotation-plant-positions/" + AP.page.quotation.id);
+					$("#plant-draft-warning").show();
+					$(".qt-draft-block").prop("disabled", true);
+				}
+			});
+
 		// Controlla URL hash per auto-aprire edit modal
 		// console.log( "init:checkUrlHash" );
 		pub.checkUrlHash();
+
 
 		if (AP.page.quotation) {
 

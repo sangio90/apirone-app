@@ -631,6 +631,13 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	}
 
+	function draftCount( event, rc, prc ){
+		var result = super.getResult();
+		var count  = super.fire( "QuotationItemDraft.countByQuotation", [ rc.id ] );
+		result.setData( { "count" = count } );
+		event.setValue( "result", result );
+	}
+
 	public Struct function getTotals( quotationId ){
 
 		var service = super.service( "QuotationPrice" );

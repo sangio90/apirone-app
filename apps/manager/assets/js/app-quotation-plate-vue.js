@@ -2255,7 +2255,7 @@ AP.plate.modal = ( function() {
                                 this.smallLoading = false;
                                 AP.loading.hide();
                                 AP.widget.notify( "success", "Placca salvata correttamente." );
-                                this.showPostSaveModal( parsedData.quotationId );
+                                this.showPostSaveModal( parsedData.quotationId, xhr.data && xhr.data.id );
                             },
                             fail: () => {
                                 this.smallLoading = false;
@@ -2272,7 +2272,24 @@ AP.plate.modal = ( function() {
                  * Altrimenti reindirizza alla scheda quotazione dopo un breve timeout.
                  * @param {string} parsedQuotationId - Identificativo della quotazione.
                  */
-                showPostSaveModal: function( parsedQuotationId ) {
+                showPostSaveModal: function( parsedQuotationId, newItemId ) {
+                    if ( AP.page.pendingDraftId && newItemId ) {
+                        AP.plate.fields.modalRoot.modal( "hide" );
+                        var draftId = AP.page.pendingDraftId;
+                        AP.page.pendingDraftId = null;
+                        $.ajax({
+                            method: "POST",
+                            url: "/manager/ajax/quotation-item-drafts/" + draftId + "/apply",
+                            data: JSON.stringify({ quotationItemId: newItemId }),
+                            contentType: "application/json"
+                        }).always(function() {
+                            if ( window.plantPositionsVm ) {
+                                window.plantPositionsVm.getItems();
+                            }
+                        });
+                        return;
+                    }
+
                     const pd = this.detailForm.data;
                     const modal = $( "#posizione-in-pianta-modal" );
 

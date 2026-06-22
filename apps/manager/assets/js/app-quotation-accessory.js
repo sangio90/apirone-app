@@ -827,6 +827,23 @@ AP.accessory.modal = ( function() {
                                 $( "#accessory-modal" ).hide();
 								AP.loading.hide()
 
+								if ( AP.page.pendingDraftId && xhr.data && xhr.data.id ) {
+									$( "#accessory-modal" ).modal( "hide" );
+									var draftId = AP.page.pendingDraftId;
+									AP.page.pendingDraftId = null;
+									$.ajax({
+										method: "POST",
+										url: "/manager/ajax/quotation-item-drafts/" + draftId + "/apply",
+										data: JSON.stringify({ quotationItemId: xhr.data.id }),
+										contentType: "application/json"
+									}).always(function() {
+										if ( window.plantPositionsVm ) {
+											window.plantPositionsVm.getItems();
+										}
+									});
+									return;
+								}
+
 								const modal = $( "#posizione-in-pianta-modal")
 								function handlerSi() {
 									//TODO aggiungere id zona

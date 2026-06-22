@@ -106,7 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -327,7 +327,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -491,7 +491,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
 		
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -685,7 +685,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}

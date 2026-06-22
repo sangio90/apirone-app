@@ -20,7 +20,20 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.baseUrl = baseUrl;
 		prc.quotation = quotation;
+
+		prc.page = getData().page;
+		prc.page[ "quotation" ] = { "id" = quotation.getId() };
+		prc.page[ "canEdit" ]   = true;
+		prc.page[ "canSee" ]    = false;
+		prc.page[ "canRevise" ] = false;
+
+		prc.cssFiles.add( "quotation" );
 		prc.jsFiles.add( "app-quotation-plant-positions" );
+		prc.jsFiles.add( "app-quotation-pricing" );
+		prc.jsFiles.add( "app-quotation-plate-designer" );
+		prc.jsFiles.add( "app-quotation-plate-vue" );
+		prc.jsFiles.add( "app-quotation-signage" );
+		prc.jsFiles.add( "app-quotation-accessory" );
 
 		event.setView( "quotation/plant-positions" );
 	}
