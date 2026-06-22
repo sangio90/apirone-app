@@ -151,6 +151,7 @@ AP.accessory.modal = ( function() {
         checkCanSave: function() {
             var vm = viewModel;
             if (
+                AP.page.canEdit &&
                 vm.get( "detailForm.data.quotationItem.quantity" ) > 0 &&
                 vm.get( "detailForm.data.quotationItem.product.finish.id" ) != "" &&
                 vm.get( "detailForm.data.quotationItem.product.category.id" ) != "" &&

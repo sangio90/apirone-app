@@ -303,6 +303,7 @@ AP.plate.modal = ( function() {
                 productItemsImages: {}, /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
                 activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
                 smallLoading: false, /** Flag di caricamento. */
+                canEdit: AP.page.canEdit, /** Flag che indica se il preventivo è modificabile. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {

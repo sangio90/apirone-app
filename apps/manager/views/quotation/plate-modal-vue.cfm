@@ -472,11 +472,11 @@
                                 </div>
                                 <div class="col-md-6 float-end">
                                 <!--- Colonna destra del footer: pulsanti di azione allineati a destra. --->
-                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" v-show="!detailForm.isClone" @click="save">
+                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" v-show="!detailForm.isClone && canEdit" @click="save">
                                     <!--- save: salva l'articolo (creazione o aggiornamento) tramite chiamata AJAX. btn-primary: stile Bootstrap pulsante primario (blu). --->
                                         <i class="fas fa-save"></i> Salva
                                     </button>
-                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" v-show="detailForm.isClone" @click="save">
+                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" v-show="detailForm.isClone && canEdit" @click="save">
                                     <!--- cloneButton: pulsante per clonare l'articolo. v-show: nascosto di default, mostrato da Vue in contesto clone. btn-warning: stile Bootstrap giallo. @click="save": anche il clone usa la stessa funzione save. --->
                                         <i class="fas fa-save"></i> Clona
                                     </button>
