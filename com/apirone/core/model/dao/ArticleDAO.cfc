@@ -132,8 +132,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT article_id::varchar, *
 			FROM articles
-			WHERE article_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE article_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

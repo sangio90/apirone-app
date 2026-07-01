@@ -30,7 +30,7 @@
 				origin_id::varchar,
 				*
 			FROM quotation_zones
-			WHERE quotation_zone_id::varchar IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="varchar"> )
+			WHERE quotation_zone_id = ANY( <cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[] )
 		</cfquery>
 
 		<cfreturn local.q>

@@ -138,8 +138,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT attribute_id::varchar, *
 			FROM attributes
-			WHERE attribute_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE attribute_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

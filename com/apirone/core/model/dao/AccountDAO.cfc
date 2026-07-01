@@ -277,8 +277,8 @@
 				account_id::varchar,
 				*
 			FROM membership.accounts
-			WHERE account_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE account_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

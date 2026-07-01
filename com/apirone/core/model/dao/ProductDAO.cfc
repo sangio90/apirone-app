@@ -381,8 +381,8 @@
 				attributes_important::varchar,
 				*
 			FROM products
-			WHERE product_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE product_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

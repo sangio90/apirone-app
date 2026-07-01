@@ -190,8 +190,8 @@
 				product_id::varchar,
 				*
 			FROM product_items
-			WHERE product_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE product_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 			ORDER BY
 				orderby ASC

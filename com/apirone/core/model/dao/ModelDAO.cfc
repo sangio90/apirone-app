@@ -42,8 +42,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT model_id::varchar, *
 			FROM models
-			WHERE model_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE model_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

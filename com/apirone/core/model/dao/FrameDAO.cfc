@@ -29,8 +29,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT frame_id::varchar, *
 			FROM frames
-			WHERE frame_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE frame_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

@@ -82,8 +82,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM fonts
-			WHERE font_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE font_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
 			)
 		</cfquery>
 

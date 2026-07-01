@@ -153,8 +153,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM prices
-			WHERE product_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE product_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 
@@ -173,8 +173,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM prices
-			WHERE article_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE article_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

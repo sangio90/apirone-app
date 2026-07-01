@@ -29,8 +29,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT line_id::varchar, *
 			FROM lines
-			WHERE line_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE line_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

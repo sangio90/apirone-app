@@ -28,7 +28,7 @@
 				quotation_item_id::varchar,
 				*
 			FROM quotation_item_product_items
-			WHERE quotation_item_product_item_id::varchar IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="varchar"> )
+			WHERE quotation_item_product_item_id = ANY( <cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[] )
 		</cfquery>
 
 		<cfreturn local.q>
@@ -201,8 +201,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM quotation_item_product_items
-			WHERE quotation_item_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE quotation_item_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

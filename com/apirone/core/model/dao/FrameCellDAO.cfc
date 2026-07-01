@@ -25,7 +25,9 @@
 			FROM
 				frame_cells
 			WHERE
-				frame_cell_id::varchar IN (<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="varchar">)
+				frame_cell_id IN (
+					<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="integer">
+				)
 		</cfquery>
 
 		<cfreturn local.q>
@@ -33,7 +35,6 @@
 
 	<!---
 		Recupera in batch i FrameCell per una lista di frameId.
-		Utilizzato da FrameService.getMany() per evitare QueryExecute con list:true.
 	--->
 	<cffunction name="readByFrameIds" returntype="Query" access="public">
 		<cfargument name="frameIds" type="Array" required="true">
@@ -43,8 +44,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT frame_id::varchar, *
 			FROM frame_cells
-			WHERE frame_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE frame_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

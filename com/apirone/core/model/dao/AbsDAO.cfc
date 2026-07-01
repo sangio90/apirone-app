@@ -168,13 +168,13 @@
 		<cfargument name="pkColumn" type="String" required="true">
 		<cfargument name="ids" type="Array" required="true">
 
-		<cfset var idsList = ArrayToList(arguments.ids)>
+		<cfset var idsList = ArrayToList( arguments.ids )>
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM #arguments.table#
-			WHERE #arguments.pkColumn#::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE #arguments.pkColumn# = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

@@ -63,8 +63,8 @@
 				attribute_id::varchar,
 				*
 			FROM attributes_raw_values
-			WHERE attribute_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE attribute_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 			ORDER BY orderby
 		</cfquery>

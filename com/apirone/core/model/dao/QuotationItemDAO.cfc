@@ -375,8 +375,8 @@
 				quotation_zone_id::varchar,
 				*
 			FROM quotation_items
-			WHERE quotation_item_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE quotation_item_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

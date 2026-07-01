@@ -29,8 +29,8 @@
 			SELECT file_id::varchar, *
 			FROM files
 			WHERE deleted_at IS NULL
-			AND file_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			AND file_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 
@@ -214,8 +214,8 @@
 			SELECT file_id::varchar, *
 			FROM files
 			WHERE deleted_at IS NULL
-			AND #field.name#::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			AND #field.name# = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 

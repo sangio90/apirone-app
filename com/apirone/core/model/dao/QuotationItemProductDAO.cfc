@@ -121,8 +121,8 @@
 				origin_id::varchar,
 				*
 			FROM quotation_item_products
-			WHERE quotation_item_product_id::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			WHERE quotation_item_product_id = ANY(
+				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
 			)
 		</cfquery>
 
