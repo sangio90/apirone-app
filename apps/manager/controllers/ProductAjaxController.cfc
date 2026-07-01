@@ -406,7 +406,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				"shortId"   = row.getShortId(),
 				"status"    = row.getStatus(),
 				"productId" = row.getProductId(),
-				"name"      = row.getShortId()
+				"name"      = row.getName()
 			};
 
 			data.add( line );
