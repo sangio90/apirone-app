@@ -8,11 +8,13 @@
     "Lead.bean": {},
     "Opportunity.bean": {},
     "PaymentMethod.bean": {},
+    "QuotationItemDraft.bean": {},
     "RawProduct.bean": {},
     "RawProductType.bean": {},
     "Status.bean": {},
     "SystemColor.bean": {},
     "Variant.bean": {},
     "VatCode.bean": {},
+    "FrameBlock.bean": {},
     "verticale.query": {}
 }

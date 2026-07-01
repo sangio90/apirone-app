@@ -47,6 +47,12 @@ AP.quotation.plantPositions = (function () {
 				showAccessori: true,
 				showSegnaletica: true,
 				showPlacche: true,
+				drafts: [],
+				draggingDraft: false,
+				draggedDraft: null,
+				isRotatingDraft: false,
+				rotatedDraft: null,
+				selectedDraftId: null,
             },
 
 			watch: {
@@ -182,6 +188,7 @@ AP.quotation.plantPositions = (function () {
                             });
                         }
                         self.quotationItems = res.data;
+                        await self.getDrafts();
 
                     } catch (err) {
                         AP.widget.notify( "error", "Errore durante il caricamento degli Articoli.");
@@ -487,14 +494,188 @@ AP.quotation.plantPositions = (function () {
                     })
                     return quotationItemPositions;
                 },
-				addAccessorio() {
-					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+				addAccessorio() { this.addDraft('ACC'); },
+				addSegnaletica() { this.addDraft('SEG'); },
+				addPlacca()     { this.addDraft('PLA'); },
+
+				async addDraft(itemType) {
+					if (!this.selectedZoneId) {
+						AP.widget.notify('warning', 'Selezionare prima una zona.');
+						return;
+					}
+					try {
+						const res = await $.ajax({
+							url: '/manager/ajax/quotation-item-drafts/',
+							method: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({
+								quotationId: this.quotationId,
+								quotationZoneId: this.selectedZoneId,
+								itemType: itemType
+							})
+						});
+						this.drafts.push(res.data);
+					} catch(e) {
+						AP.widget.notify('error', 'Errore durante la creazione del segnaposto.');
+					}
 				},
-				addSegnaletica() {
-					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+
+				async getDrafts() {
+					if (!this.selectedZoneId) { this.drafts = []; return; }
+					try {
+						const res = await $.ajax({
+							url: '/manager/ajax/quotation-item-drafts/zone/' + this.selectedZoneId,
+							method: 'GET'
+						});
+						this.drafts = res.data || [];
+					} catch(e) {
+						AP.widget.notify('error', 'Errore durante il caricamento dei segnaposto.');
+					}
 				},
-				addPlacca() {
-					alert('Funzione da implementare, per ora bisogna PRIMA aggiungere l\'articolo nel preventivo, POI entrare nella planimetria e posizionarlo')
+
+				getDraftPinStyle(draft) {
+					return {
+						left: (draft.coordinateX * 100) + '%',
+						top:  (draft.coordinateY * 100) + '%',
+						transform: 'translate(-50%, -50%) rotate(' + (Number(draft.angle) + 135 || 135) + 'deg)'
+					};
+				},
+
+				getDraftLabelStyle(draft) {
+					return {
+						position: 'absolute',
+						left: (draft.coordinateX * 100) + '%',
+						top:  (draft.coordinateY * 100) + '%',
+						transform: 'translate(-50%, -50%)'
+					};
+				},
+
+				getDraftArrowStyle(draft) {
+					const offset = 30;
+					return {
+						position: 'absolute',
+						left: 'calc(' + (draft.coordinateX * 100) + '% + ' + offset + 'px)',
+						top:  'calc(' + (draft.coordinateY * 100) + '% - ' + offset + 'px)',
+						pointerEvents: 'auto',
+						cursor: 'move'
+					};
+				},
+
+				getDraftDeleteStyle(draft) {
+					const offset = 30;
+					return {
+						position: 'absolute',
+						left: 'calc(' + (draft.coordinateX * 100) + '% + ' + offset + 'px)',
+						top:  'calc(' + (draft.coordinateY * 100) + '% + ' + offset + 'px)',
+						pointerEvents: 'auto',
+						cursor: 'pointer'
+					};
+				},
+
+				selectDraft(draft) {
+					this.selectedDraftId = (this.selectedDraftId === draft.id) ? null : draft.id;
+				},
+
+				startDraftDrag(event, draft) {
+					event.preventDefault();
+					this.draggingDraft = true;
+					this.draggedDraft  = draft;
+					document.addEventListener('mousemove', this.onDraftDrag);
+					document.addEventListener('mouseup',   this.stopDraftDrag);
+				},
+
+				onDraftDrag(event) {
+					if (!this.draggingDraft || !this.draggedDraft) return;
+					const el   = document.getElementById('plant-to-capture');
+					if (!el) return;
+					const rect = el.getBoundingClientRect();
+					const x    = event.clientX - rect.left;
+					const y    = event.clientY - rect.top;
+					if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+					this.draggedDraft.coordinateX = +(x / rect.width).toFixed(4);
+					this.draggedDraft.coordinateY = +(y / rect.height).toFixed(4);
+				},
+
+				async stopDraftDrag() {
+					if (!this.draggingDraft || !this.draggedDraft) return;
+					document.removeEventListener('mousemove', this.onDraftDrag);
+					document.removeEventListener('mouseup',   this.stopDraftDrag);
+					const draft = this.draggedDraft;
+					this.draggingDraft = false;
+					this.draggedDraft  = null;
+					try {
+						await $.ajax({
+							url: '/manager/ajax/quotation-item-drafts/' + draft.id + '/position',
+							method: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({ coordinateX: draft.coordinateX, coordinateY: draft.coordinateY, angle: draft.angle || 0 })
+						});
+					} catch(e) {
+						AP.widget.notify('error', 'Errore salvataggio posizione segnaposto.');
+					}
+				},
+
+				startDraftRotate(event, draft) {
+					event.preventDefault();
+					this.isRotatingDraft = true;
+					this.rotatedDraft    = draft;
+					this.initialMouseX   = event.clientX;
+					this.initialAngle    = draft.angle || 0;
+					document.addEventListener('mousemove', this.onDraftRotate);
+					document.addEventListener('mouseup',   this.stopDraftRotate);
+				},
+
+				onDraftRotate(event) {
+					if (!this.isRotatingDraft || !this.rotatedDraft) return;
+					const delta    = event.clientX - this.initialMouseX;
+					const newAngle = this.initialAngle + Math.round(delta * this.rotationSpeedFactor);
+					if (event.shiftKey) {
+						this.rotatedDraft.angle = newAngle;
+					} else {
+						this.rotatedDraft.angle = Math.round(newAngle / 45) * 45;
+					}
+				},
+
+				async stopDraftRotate() {
+					if (!this.isRotatingDraft || !this.rotatedDraft) return;
+					document.removeEventListener('mousemove', this.onDraftRotate);
+					document.removeEventListener('mouseup',   this.stopDraftRotate);
+					const draft = this.rotatedDraft;
+					this.isRotatingDraft = false;
+					this.rotatedDraft    = null;
+					try {
+						await $.ajax({
+							url: '/manager/ajax/quotation-item-drafts/' + draft.id + '/position',
+							method: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({ coordinateX: draft.coordinateX, coordinateY: draft.coordinateY, angle: draft.angle || 0 })
+						});
+					} catch(e) {
+						AP.widget.notify('error', 'Errore salvataggio rotazione segnaposto.');
+					}
+				},
+
+				async deleteDraft(draft) {
+					if (!window.confirm('Eliminare questo segnaposto?')) return;
+					try {
+						await $.ajax({ url: '/manager/ajax/quotation-item-drafts/' + draft.id, method: 'DELETE' });
+						this.drafts = this.drafts.filter(d => d.id !== draft.id);
+						if (this.selectedDraftId === draft.id) this.selectedDraftId = null;
+					} catch(e) {
+						AP.widget.notify('error', 'Errore eliminazione segnaposto.');
+					}
+				},
+
+				openConfigureDraft(draft) {
+					AP.page.pendingDraftId = draft.id;
+					// Aggiorna lo shim detail.config con la zona corrente
+					var self = this;
+					var currentZone = self.zones.find(function(z) { return z.id === self.selectedZoneId; }) || { id: self.selectedZoneId, name: "" };
+					AP.quotation.detail._plantZone = { id: currentZone.id, name: currentZone.name };
+					AP.quotation.detail._plantZones = self.zones.map(function(z) { return { id: z.id, name: z.name }; });
+					if (draft.itemType === "ACC") AP.accessory.modal.new();
+					else if (draft.itemType === "SEG") AP.signage.modal.new();
+					else if (draft.itemType === "PLA") AP.plate.modal.new();
 				},
             },
 
@@ -510,7 +691,19 @@ AP.quotation.plantPositions = (function () {
             }
         });
 
+        // Espone il VM per uso delle modali accessorio/segnaletica/placca
+        window.plantPositionsVm = vm;
 
+        // Shim AP.quotation.detail.config() richiesto dalle modali Kendo/Vue
+        AP.namespace("quotation.detail");
+        AP.quotation.detail._plantZone  = { id: "", name: "" };
+        AP.quotation.detail._plantZones = [];
+        AP.quotation.detail.config = function() {
+            return {
+                zone:  AP.quotation.detail._plantZone,
+                zones: AP.quotation.detail._plantZones
+            };
+        };
 
         AP.loading && AP.loading.hide();
     };

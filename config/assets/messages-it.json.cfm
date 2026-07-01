@@ -46,6 +46,8 @@
     },
 
     "product": {
+        "created": "Prodotto caricato",
+        "updated": "Prodotto aggiornato",
         "itemsDeleted": "Ho cancellato tutti gli attributi",
         "itemsAdded": "Attributi aggiunti con successo",
         "valueAdded": "Valore aggiunto",
@@ -89,9 +91,15 @@
         "created": "Permesso Ruolo impostato"
     },    
     
+    "catalogBundle": {
+        "created": "Bundle caricato",
+        "updated": "Bundle aggiornato",
+        "updatedNotAllRecords": "Non tutti i bundle sono stati aggiornati"
+    },
+
     "file": {
         "imageCreated": "Immagine salvata",
-    },    
+    },
     
     "home": {
     },

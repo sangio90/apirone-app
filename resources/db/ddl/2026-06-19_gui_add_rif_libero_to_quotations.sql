@@ -1,0 +1,1 @@
+ALTER TABLE quotations ADD COLUMN rif_libero VARCHAR(100) NULL;

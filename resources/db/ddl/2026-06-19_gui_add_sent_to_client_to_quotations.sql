@@ -1,0 +1,1 @@
+ALTER TABLE quotations ADD COLUMN sent_to_client BOOLEAN NOT NULL DEFAULT FALSE;

@@ -38,6 +38,12 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="referenteAmministrativo" type="String";
 	property name="referenteSpedizione" type="String";
 	property name="customerType" type="String";
+	property name="industry" type="String";
+	property name="rifLibero" type="String";
+	property name="dataEvasione" type="Date";
+	property name="sentToClient" type="Boolean";
+	property name="dataConfermaOrdine" type="Date";
+	property name="codiceSdi" type="String";
 
 	public Quotation function init(){
 		return this;

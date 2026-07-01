@@ -60,8 +60,38 @@
 					</div>
 
 					<div class="row d-flex align-items-center mb-3">
-						<label class="text-end col-3">Cliente </label>
+						<label class="text-end col-3">Data prevista evasione</label>
 						<div class="col-9">
+							<input type="date" class="form-control"
+								data-bind="value: detailForm.data.dataEvasione">
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
+						<label class="text-end col-3">Rif. Libero</label>
+						<div class="col-9">
+							<input type="text" class="form-control" maxlength="100"
+								data-bind="value: detailForm.data.rifLibero">
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
+						<label class="text-end col-3">Settore </label>
+						<div class="col-9">
+							<input type="text" class="form-control" data-bind="value: detailForm.data.industryLabel" readonly>
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3" data-bind="visible: detailForm.data.dataConfermaOrdine">
+						<label class="text-end col-3">Data conferma ordine</label>
+						<div class="col-9">
+							<input type="date" class="form-control" data-bind="value: detailForm.data.dataConfermaOrdine" readonly>
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
+						<label class="text-end col-3">Cliente </label>
+						<div class="col-6">
 							<input type="text" name="customer" class="form-control" id="qt-customer"
 								data-bind="source: crmCustomers, value: detailForm.data.customer"
 								data-text-field="displayLabel"
@@ -69,6 +99,10 @@
 								data-value-primitive="false"
 								data-minlength="4"
 								data-filter="contains">
+						</div>
+						<div class="col-3">
+							<input type="text" class="form-control" maxlength="15" placeholder="SDI"
+								data-bind="value: detailForm.data.codiceSdi" readonly>
 						</div>
 					</div>
 

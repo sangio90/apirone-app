@@ -36,7 +36,8 @@ AP.quotation.header = ( function() {
             customer: {
                 id: "",
                 name: "",
-                ragioneSociale: ""
+                ragioneSociale: "",
+                industry: ""
             },
             shippingProfile: {
                 id: "",
@@ -126,6 +127,11 @@ AP.quotation.header = ( function() {
 			referenteAmministrativo: "",
 			referenteSpedizione: "",
 			customerType: "",
+			industry: "",
+			industryLabel: "",
+			rifLibero: "",
+			dataEvasione: null,
+			codiceSdi: "",
         },
         title: "Modifica preventivo",
         totals: {
@@ -413,6 +419,14 @@ AP.quotation.header = ( function() {
                 status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
                 const parsedData = viewModel.get( "detailForm.data" );
 
+                // Date-only fields must be sent as "YYYY-MM-DD" strings, not Date objects.
+                // JSON.stringify on a Date uses UTC, causing an off-by-one for UTC+ timezones
+                // (e.g. local Dec 21 00:00 UTC+1 → "2026-12-20T23:00:00Z" → server stores Dec 20).
+                [ "quotationDate", "validityDate", "dataEvasione" ].forEach( function( f ) {
+                    var v = parsedData.get( f );
+                    if ( v instanceof Date ) { parsedData.set( f, kendo.toString( v, "yyyy-MM-dd" ) ); }
+                } );
+
 	                NM.util.ajax( {
                     method: "POST",
                     url: "/manager/ajax/quotations",
@@ -473,8 +487,45 @@ AP.quotation.header = ( function() {
                 done: function( xhr ) {
                     viewModel.set( "detailForm.data", xhr.data );
 
+                    // Native <input type="date"> requires exactly "YYYY-MM-DD".
+                    // Mementify serializes Date beans as "YYYY-MM-DD HH:mm:ss" — reformat here.
+                    ["quotationDate", "validityDate", "dataEvasione"].forEach( function( f ) {
+                        if ( xhr.data[ f ] ) {
+                            var d = kendo.parseDate( xhr.data[ f ] );
+                            if ( d ) viewModel.set( "detailForm.data." + f, kendo.toString( d, "yyyy-MM-dd" ) );
+                        }
+                    } );
+
+                    var loadedIndustry = xhr.data.industry || "";
+                    if (loadedIndustry) {
+                        var industryMapLoad = {
+                            "CAT": "Catena Alberghiera", "HOT": "Hotel", "HO1": "Hotel 1 stella",
+                            "HO2": "Hotel 2 stelle", "HO3": "Hotel 3 stelle", "HO4": "Hotel 4 stelle",
+                            "HO5": "Hotel 5 stelle", "BEB": "Bed & Breakfast", "RIS": "Ristorante/Bar",
+                            "AGR": "Agriturismo", "CAM": "Camping", "AGE": "Agente/Segnalatore",
+                            "CLI": "Clinica/Casa di Riposo", "RES": "Residence",
+                            "UFF": "Uffici/Centro direzionale", "ARC": "Architetto/Ing.",
+                            "CEN": "Centro Congressi/Fiere/Casinò", "CON": "Contract",
+                            "RIV": "Rivenditore", "IMC": "Impresa di costruzioni",
+                            "COl": "Collegio Professionale", "AZI": "Azienda", "PRO": "Procurement",
+                            "COS": "Consultant", "ELE": "Elettricista", "ENT": "Ente Pubblico",
+                            "NEG": "Negozio", "AGA": "Agente Apir", "CCR": "Concorrente",
+                            "PRI": "Residenziale", "Installatore Elettrico": "Installatore Elettrico",
+                            "Tour Operator": "Tour Operator", "Other": "Altro"
+                        };
+                        viewModel.set("detailForm.data.industryLabel", industryMapLoad[loadedIndustry] || loadedIndustry);
+                    }
+
                     setTimeout( function() {
                         syncAgentiEnabled();
+                        if ( !AP.page.canEdit ) {
+                            var $form = $( '#quotation-header-form' );
+                            $form.find( 'input:not([type=hidden]), textarea' ).prop( 'readonly', true );
+                            $form.find( 'select' ).each( function() {
+                                var ddl = $( this ).data( 'kendoDropDownList' );
+                                if ( ddl ) { ddl.enable( false ); } else { $( this ).prop( 'disabled', true ); }
+                            } );
+                        }
                         AP.loading.hide();
                     }, 1000 );
 
@@ -536,6 +587,26 @@ AP.quotation.header = ( function() {
 				}
 				var accountType = customer && typeof customer === "object" ? customer.accountType : null;
 				viewModel.set("detailForm.data.customerType", accountType || "");
+				var industry = customer && typeof customer === "object" ? customer.industry : null;
+				viewModel.set("detailForm.data.industry", industry || "");
+				var industryMap = {
+					"CAT": "Catena Alberghiera", "HOT": "Hotel", "HO1": "Hotel 1 stella",
+					"HO2": "Hotel 2 stelle", "HO3": "Hotel 3 stelle", "HO4": "Hotel 4 stelle",
+					"HO5": "Hotel 5 stelle", "BEB": "Bed & Breakfast", "RIS": "Ristorante/Bar",
+					"AGR": "Agriturismo", "CAM": "Camping", "AGE": "Agente/Segnalatore",
+					"CLI": "Clinica/Casa di Riposo", "RES": "Residence",
+					"UFF": "Uffici/Centro direzionale", "ARC": "Architetto/Ing.",
+					"CEN": "Centro Congressi/Fiere/Casinò", "CON": "Contract",
+					"RIV": "Rivenditore", "IMC": "Impresa di costruzioni",
+					"COl": "Collegio Professionale", "AZI": "Azienda", "PRO": "Procurement",
+					"COS": "Consultant", "ELE": "Elettricista", "ENT": "Ente Pubblico",
+					"NEG": "Negozio", "AGA": "Agente Apir", "CCR": "Concorrente",
+					"PRI": "Residenziale", "Installatore Elettrico": "Installatore Elettrico",
+					"Tour Operator": "Tour Operator", "Other": "Altro"
+				};
+				viewModel.set("detailForm.data.industryLabel", industry ? (industryMap[industry] || industry) : "");
+				var sdi = customer && typeof customer === "object" ? (customer.SDI || "") : "";
+				viewModel.set("detailForm.data.codiceSdi", sdi);
 				if (customer && typeof customer === "object" && customer.id) {
 					var ac = $( "#qt-customer" ).data( "kendoAutoComplete" );
 					if (ac) ac.value( buildCustomerDisplay( customer ) );

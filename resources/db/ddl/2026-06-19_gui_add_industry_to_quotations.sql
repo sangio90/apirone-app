@@ -1,0 +1,1 @@
+ALTER TABLE quotations ADD COLUMN industry VARCHAR(50) NULL;

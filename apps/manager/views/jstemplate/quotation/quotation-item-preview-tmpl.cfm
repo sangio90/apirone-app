@@ -42,7 +42,7 @@
                             <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image" draggable="false">
                         </div>
                         <div data-bind="visible: canSee">
-                            <img data-bind="attr: { src: getImageSrc }" class="qt-item-image" style="cursor: default" draggable="false">
+                            <img data-bind="attr: { src: getImageSrc }, click:edit" class="qt-item-image" draggable="false">
                         </div>
                     </div>
                 </div>

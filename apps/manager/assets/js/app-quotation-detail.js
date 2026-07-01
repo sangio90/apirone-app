@@ -8,6 +8,7 @@ Object.assign(AP.quotation.fields, {
 	printModalRoot: $("#print-modal-root"),
 	statusModalRoot: $("#qt-status-modal-root"),
 	documentsModalRoot: $("#qt-documents-modal-root"),
+	exportProductsResultModalRoot: $("#qt-export-products-result-modal-root"),
 	totalItemBox: $("#quotation-totals-item"),
 
 	addPlateBtn: $("#qt-add-plate"),
@@ -110,8 +111,8 @@ AP.quotation.detail = (function () {
 		});
 	};
 
-	var setQuotationItems = function (items) {
-		var typeId = viewModel.get("typeId");
+	var setQuotationItems = function (items, typeId) {
+		if (!typeId) typeId = viewModel.get("typeId");
 
 		if (typeId == "plate") {
 			viewModel.set("quotationItemsPlate", items);
@@ -166,6 +167,7 @@ AP.quotation.detail = (function () {
 		},
 		canEdit: AP.page.canEdit,
 		canSee: AP.page.canSee,
+		canRevise: AP.page.canRevise || false,
 
 		target: null,
 		zones: new kendo.data.DataSource(),
@@ -257,21 +259,42 @@ AP.quotation.detail = (function () {
 				url: "/manager/ajax/quotations-export-products/" + AP.page.quotation.id,
 				callback: {
 					done: function (xhr) {
+						AP.loading.hide();
 						if (xhr.status == "INVALID") {
-							AP.loading.hide();
 							NM.form.showMessages(xhr.data);
 							return;
 						}
-
 						if (xhr.data.error || xhr.data.success == false) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione articoli.");
 							return;
 						}
+						var exported = xhr.data.exportedItems || [];
+						var skipped  = xhr.data.skippedItems  || [];
 
-						AP.loading.hide();
+						var $exported = $("#qt-export-products-exported");
+						var $skipped  = $("#qt-export-products-skipped");
 
-						AP.widget.notify("success", "Articoli esportati correttamente.");
+						if (exported.length) {
+							$exported.html(
+								"<p class='mb-1'><strong>Esportati (" + exported.length + "):</strong></p>" +
+								"<ul class='mb-0'>" + exported.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
+							);
+						} else {
+							$exported.html("<p class='text-muted mb-0'>Nessun nuovo articolo esportato.</p>");
+						}
+
+						if (skipped.length) {
+							$skipped.html(
+								"<hr class='my-3'>" +
+								"<p class='mb-1'><strong>Già presenti (" + skipped.length + "):</strong></p>" +
+								"<ul class='mb-0'>" + skipped.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
+							);
+						} else {
+							$skipped.html("");
+						}
+
+						AP.widget.notify("success", "Esportazione articoli completata.");
+						NM.util.openModal(AP.quotation.fields.exportProductsResultModalRoot);
 					}
 				}
 			});
@@ -284,28 +307,39 @@ AP.quotation.detail = (function () {
 				url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
 				callback: {
 					done: function (xhr) {
+						AP.loading.hide();
 						if (xhr.status == "INVALID") {
 							NM.form.showMessages(xhr.data);
 							return;
 						}
-
 						if (xhr.data.error || xhr.data.success == false) {
 							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
 							return;
 						}
-
 						$(".export-button").hide();
-						AP.widget.notify("success", "Preventivo Esportato correttamente.");
-						//TODO here verifica come mai devo lanciare due volte e come mai non compare notify
-					},
-					always: function (xhr) {
-						if (xhr && xhr.data && (xhr.data.error || xhr.data.success == false)) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							AP.loading.hide();
+						AP.widget.notify("success", "Preventivo esportato correttamente.");
+					}
+				}
+			});
+		},
+
+		exportProvisional: function () {
+			AP.loading.show();
+			NM.util.ajax({
+				method: "GET",
+				url: "/manager/ajax/quotations-export-provisional/" + AP.page.quotation.id,
+				callback: {
+					done: function (xhr) {
+						AP.loading.hide();
+						if (xhr.status == "INVALID") {
+							NM.form.showMessages(xhr.data);
 							return;
 						}
-						AP.loading.hide();
+						if (xhr.data.error || xhr.data.success == false) {
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
+							return;
+						}
+						AP.widget.notify("success", "Ordine provvisorio esportato correttamente.");
 					}
 				}
 			});
@@ -444,12 +478,23 @@ AP.quotation.detail = (function () {
 		approveQuotation: function (event) {
 			event.stopPropagation();
 
+			var maxAmount = AP.page.userRole ? parseFloat(AP.page.userRole.quotationMaxAmount) : 0;
+			var pricingData = {};
+			try { pricingData = AP.quotation.totalPricing.getTotals() || {}; } catch(e) {}
+			var currentTotal = parseFloat(pricingData.total) || 0;
+			var needsEscalation = maxAmount > 0 && currentTotal > maxAmount;
+
+			var fmt = function(n) { return Number(n).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €"; };
+
 			bootbox.confirm({
-				title: "Conferma approvazione",
-				message: "Sei sicuro di voler approvare questo preventivo?",
+				size: 'large',
+				title: needsEscalation ? "Richiesta approvazione superiore" : "Conferma approvazione",
+				message: needsEscalation
+					? "Il totale del preventivo (" + fmt(currentTotal) + ") supera il tuo massimale (" + fmt(maxAmount) + "). Vuoi inviare la richiesta di approvazione a un superiore?"
+					: "Sei sicuro di voler approvare questo preventivo?",
 				buttons: {
 					confirm: {
-						label: "Si, confermo",
+						label: needsEscalation ? "Sì, invia richiesta" : "Sì, confermo",
 						className: "btn-primary",
 					},
 					cancel: {
@@ -480,6 +525,74 @@ AP.quotation.detail = (function () {
 				},
 			});
 
+			return false;
+		},
+
+		markAsSent: function (event) {
+			event.stopPropagation();
+			bootbox.confirm({
+				size: 'large',
+				title: "Invia a cliente",
+				message: "Sei sicuro di voler contrassegnare questo preventivo come inviato al cliente? Il preventivo diventerà non modificabile.",
+				buttons: {
+					confirm: { label: "Sì, invia", className: "btn-success" },
+					cancel: { label: "Annulla", className: "btn-secondary" },
+				},
+				callback: function (result) {
+					if (!result) return;
+					AP.loading.show();
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/markasSent",
+						callback: {
+							done: function (xhr) {
+								AP.loading.hide();
+								const status = xhr.status ? xhr.status.toLowerCase() : 'error';
+								AP.widget.notify(status, xhr.data.message);
+								if (status === 'success') {
+									setTimeout(() => { window.location.reload(); }, 1500);
+								}
+							}
+						}
+					});
+				},
+			});
+			return false;
+		},
+
+		createRevision: function (event) {
+			event.stopPropagation();
+			bootbox.confirm({
+				size: 'large',
+				title: "Modifica preventivo",
+				message: "Questo preventivo è già stato inviato al cliente. Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?",
+				buttons: {
+					confirm: { label: "Sì, crea revisione", className: "btn-warning" },
+					cancel: { label: "Annulla", className: "btn-secondary" },
+				},
+				callback: function (result) {
+					if (!result) return;
+					AP.loading.show();
+					NM.util.ajax({
+						method: "POST",
+						url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/createrevision",
+						callback: {
+							done: function (xhr) {
+								AP.loading.hide();
+								const status = xhr.status ? xhr.status.toLowerCase() : 'error';
+								if (status === 'success' && xhr.data.payload && xhr.data.payload.id) {
+									AP.widget.notify('success', xhr.data.message);
+									setTimeout(() => {
+										window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+									}, 1500);
+								} else {
+									AP.widget.notify('error', xhr.data.message || 'Errore durante la creazione della revisione.');
+								}
+							}
+						}
+					});
+				},
+			});
 			return false;
 		},
 
@@ -618,6 +731,7 @@ AP.quotation.detail = (function () {
 				url = url + "?quotationZoneId=" + AP.getUserPref("quotation." + AP.page.quotation.id + ".zone.id");
 			}
 
+			var requestTypeId = typeId;
 			NM.util.ajax({
 				method: "GET",
 				url: url,
@@ -632,7 +746,7 @@ AP.quotation.detail = (function () {
 							item.special = item.special == 'true'
 						})
 
-						setQuotationItems(xhr.data);
+						setQuotationItems(xhr.data, requestTypeId);
 						setTimeout(initSortable, 150);
 					}
 				}
@@ -963,9 +1077,26 @@ AP.quotation.detail = (function () {
 
 		AP.quotation.detail.showTotals();
 
+		// Badge + warning segnaposto non configurati sulla mappa
+		$.get("/manager/ajax/quotations/" + AP.page.quotation.id + "/draft-count")
+			.done(function(res) {
+				var count = res && res.data ? res.data.count : 0;
+				if (count > 0) {
+					$("#plant-draft-badge").text(count).show();
+					var label = count === 1
+						? "C'è 1 articolo posizionato in pianta non ancora configurato."
+						: "Ci sono " + count + " articoli posizionati in pianta non ancora configurati.";
+					$("#plant-draft-warning-text").text(label);
+					$("#plant-draft-warning-link").attr("href", "/manager/quotation-plant-positions/" + AP.page.quotation.id);
+					$("#plant-draft-warning").show();
+					$(".qt-draft-block").prop("disabled", true);
+				}
+			});
+
 		// Controlla URL hash per auto-aprire edit modal
 		// console.log( "init:checkUrlHash" );
 		pub.checkUrlHash();
+
 
 		if (AP.page.quotation) {
 
@@ -1099,6 +1230,13 @@ AP.quotation.zonesModal = (function () {
 			},
 
 			setupZoneModal: function (item) {
+				var hasParentZones = this.get("zones").filter(function(z) { return z.id !== ""; }).length > 0;
+				if (hasParentZones) {
+					$("#zone-parent-container").show();
+				} else {
+					$("#zone-parent-container").hide();
+				}
+
 				if (item) {
 					this.set("detailForm.data", {
 						id: item.id,
@@ -1133,12 +1271,13 @@ AP.quotation.zonesModal = (function () {
 
 			saveZone: function () {
 				var data = this.get("detailForm.data");
-				if (data.parentZone) {
-					if (data.parentZone && data.parentZone.id) {
-						data.parentZone = {id: data.parentZone.id}
-					} else {
-						data.parentZone = {id: data.parentZone}
-					}
+				var pz = data.parentZone;
+				if (pz && pz.id) {
+					data.parentZone = { id: pz.id };
+				} else if (pz && typeof pz === "string" && pz !== "") {
+					data.parentZone = { id: pz };
+				} else {
+					data.parentZone = null;
 				}
 				AP.loading.show();
 				NM.util.ajax({

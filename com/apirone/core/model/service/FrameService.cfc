@@ -4,6 +4,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 	property name="frameCellService" inject="FrameCellService";
+	property name="frameBlockService" inject="FrameBlockService";
 
 	public com.apirone.core.model.bean.Frame function get( required String frameId ){
 		return build( arguments.frameId );
@@ -64,6 +65,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
+		if( ( !IsNull( arguments.frame.getBlocks() ) ) ) {
+
+			for( var block in arguments.frame.getBlocks() ) {
+				block.setFrameId( newId );
+				getFrameBlockService().create( block );
+			}
+
+		}
+
 		return newId;
 	}
 
@@ -84,9 +94,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			}
 
+			getFrameBlockService().deleteByFrameId( arguments.frame.getId() );
+
+			if( ( !IsNull( arguments.frame.getBlocks() ) ) ) {
+
+				for( var block in arguments.frame.getBlocks() ) {
+					block.setFrameId( frame.getId() );
+					getFrameBlockService().create( block );
+				}
+
+			}
+
 		}
 
 		return arguments.frame.getId();
+	}
+
+	public Any function getByCode( required String code ){
+		var record = getDao().readByCode( arguments.code );
+
+		if ( record.recordCount ) {
+			return get( record.frame_id );
+		}
+
+		return NullValue();
 	}
 
 	public Boolean function codeExists( required String code, String excludedId = "" ){
@@ -178,6 +209,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
+		// Precarica i FrameBlock in batch
+		var blockMap = {};
+		if ( ArrayLen( frameIds ) ) {
+			var blockRecords = getFrameBlockService().getDao().readByFrameIds( frameIds = frameIds );
+			for ( var br in blockRecords ) {
+				var frameId = br.frame_id;
+				if ( !StructKeyExists( blockMap, frameId ) ) {
+					blockMap[ frameId ] = [];
+				}
+				var blockBean = super.bean( "FrameBlock" );
+				blockBean.setId( br.frame_block_id );
+				blockBean.setOrder( br.order );
+				blockBean.setSlotCount( br.slot_count );
+				blockBean.setMarginTopMm( br.margin_top_mm );
+				blockBean.setMarginLeftMm( br.margin_left_mm );
+				blockBean.setOrientationMode( br.orientation_mode );
+				blockBean.setRotatable( br.rotatable );
+				blockBean.setFrameId( br.frame_id );
+				blockBean.setCreatedAt( br.created_at );
+				ArrayAppend( blockMap[ frameId ], blockBean );
+			}
+		}
+
 		for ( var record in records ) {
 			var bean = super.bean( "Frame" );
 
@@ -208,6 +262,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// FrameCell: dalla mappa pre-caricata
 			if ( StructKeyExists( cellMap, record.frame_id ) && ArrayLen( cellMap[ record.frame_id ] ) ) {
 				bean.setCells( cellMap[ record.frame_id ] );
+			}
+
+			// FrameBlock: dalla mappa pre-caricata
+			if ( StructKeyExists( blockMap, record.frame_id ) && ArrayLen( blockMap[ record.frame_id ] ) ) {
+				bean.setBlocks( blockMap[ record.frame_id ] );
 			}
 
 			map[ record.frame_id ] = bean;

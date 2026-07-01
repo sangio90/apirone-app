@@ -13,6 +13,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		for ( var row in rows.getData() ) {
 			var obj = memy.convert( row, "list" );
+
+			// prodotti senza finitura: la griglia binda finish.name
+			if ( !obj.keyExists( "finish" ) || IsNull( obj.finish ) ) {
+				obj[ "finish" ] = { "id" = "", "name" = "" };
+			}
+
 			data.add( obj );
 		}
 
@@ -275,16 +281,90 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var result = super.getResult();
 
-		var product    = super.bean( "Product" );
+		var json = DeserializeJSON( GetHTTPRequestData().content );
+
+		// con linea + modello il prodotto è "complesso": il service risolve/crea
+		// automaticamente il catalog bundle (categoria + linea + modello)
+		var hasBundle = !IsNull( json.line ) && Len( json.line.id )
+			&& !IsNull( json.model ) && Len( json.model.id );
+
+		// finiture selezionate: multiselect (array di {id}) o legacy singola
+		var finishIds = [];
+		if ( !IsNull( json.selectedFinishes ) && IsArray( json.selectedFinishes ) ) {
+			for ( var thisFinish in json.selectedFinishes ) {
+				finishIds.add( thisFinish.id );
+			}
+		} else if ( !IsNull( json.finish ) && Len( json.finish.id ) ) {
+			finishIds.add( json.finish.id );
+		}
+
+		// update: comportamento singolo invariato
+		if ( Len( json.id ) ) {
+			var product = buildProductBean( json, hasBundle, ArrayLen( finishIds ) ? finishIds[ 1 ] : "" );
+			product.setId( json.id );
+
+			var thisId = super.fire( "product.update", [ product ] );
+
+			result.setData( { "message" = completeMessage( "product.updated" ) }, { "payload" = { id = thisId } } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		// create: un prodotto per ogni finitura selezionata (o uno senza finitura)
+		if ( !ArrayLen( finishIds ) ) {
+			finishIds.add( "" );
+		}
+
+		var created = 0;
+		var skipped = 0;
+		var lastId  = "";
+
+		for ( var finishId in finishIds ) {
+
+			// salta le combinazioni già esistenti
+			if ( hasBundle && Len( finishId ) ) {
+				var existing = super.service( "Product" ).list(
+					modelId    = json.model.id,
+					lineId     = json.line.id,
+					finishId   = finishId,
+					categoryId = json.category.id
+				);
+
+				if ( ArrayLen( existing ) ) {
+					skipped++;
+					continue;
+				}
+			}
+
+			var product = buildProductBean( json, hasBundle, finishId );
+
+			lastId = super.fire( "product.create", [ product ] );
+			created++;
+		}
+
+		var msgText = "Prodotti creati: #created#";
+		if ( skipped ) {
+			msgText &= " — combinazioni già esistenti saltate: #skipped#";
+		}
+
+		result.setData(
+			{ "message" = { "id" = "product.created", "text" = msgText } },
+			{ "payload" = { id = lastId, created = created, skipped = skipped } }
+		);
+
+		event.setValue( "result", result );
+	}
+
+	private Any function buildProductBean( required Struct json, required Boolean hasBundle, String finishId = "" ){
+
+		var product    = arguments.hasBundle ? super.bean( "ProductComplex" ) : super.bean( "Product" );
 		var status     = super.bean( "Status" );
 		var statusText = super.bean( "Status" );
 		var text       = super.bean( "Text" );
 		var lang       = super.bean( "Lang" );
+		var textKind   = super.bean( "TextKind" );
 		var category   = super.bean( "ProductCategory" );
 
-		var json = DeserializeJSON( GetHTTPRequestData().content );
-
-		product.setId( json.id );
 		product.setCode( json.code );
 
 		product.setStatus( status.setId( json.status.id ) );
@@ -292,6 +372,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		text.setLang( lang.setId( "IT" ) );
 		text.setStatus( statusText.setId( "ACT" ) );
+		text.setKind( textKind.setId( "NAME" ) );
 
 		text.setId( json?.nameItem?.id );
 		text.setName( json.nameItem.name );
@@ -299,19 +380,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		product.setTexts( [ text ] );
 		product.setCategory( category.setId( json.category.id ) );
 
-		if ( !Len( json.id ) ) {
-			var messageId = "product.created";
-			var thisId    = super.fire( "product.create", [ product ] )
-		} else {
-			var messageId = "product.updated";
-			var thisId    = super.fire( "product.update", [ product ] )
+		if ( arguments.hasBundle ) {
+			var line  = super.bean( "Line" );
+			var model = super.bean( "Model" );
+			var bundleCategory = super.bean( "ProductCategory" );
+			var bundle = super.bean( "CatalogBundle" );
+
+			// ProductComplex legge linea/modello/categoria dal catalogBundle:
+			// va impostato un bundle transitorio, il service lo risolve/crea (getOrCreate)
+			bundle.setLine( line.setId( json.line.id ) );
+			bundle.setModel( model.setId( json.model.id ) );
+			bundle.setCategory( bundleCategory.setId( json.category.id ) );
+
+			product.setCatalogBundle( bundle );
 		}
 
-		var message = completeMessage( messageId );
+		if ( Len( arguments.finishId ) ) {
+			var finish = super.bean( "Finish" );
+			product.setFinish( finish.setId( arguments.finishId ) );
+		}
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
-
-		event.setValue( "result", result );
+		return product;
 	}
 
 	function saveDetail( event, rc, prc ){

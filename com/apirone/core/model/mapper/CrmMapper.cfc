@@ -56,6 +56,7 @@
 		customer.setContactPersonName(data.referente_nome ?: "");
 		customer.setContactPersonEmail(data.referente_email ?: "");
 		customer.setAccountType( data.account_type ?: "" );
+		customer.setIndustry( data.industry ?: "" );
 
 		return customer;
 	}

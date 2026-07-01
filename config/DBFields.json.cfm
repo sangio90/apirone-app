@@ -320,6 +320,15 @@
         "type": "Integer"
     },
 
+    "frameBlock.order": {
+        "name": "\"order\"",
+        "type": "Integer"
+    },
+    "frameBlock.id": {
+        "name": "frame_block_id",
+        "type": "Integer"
+    },
+
     "frame.id": {
         "name": "frame_id",
         "type": "uuid"

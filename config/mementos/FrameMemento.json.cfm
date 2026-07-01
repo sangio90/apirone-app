@@ -21,7 +21,8 @@
 				"status",
 				"createdAt",
 				"cells",
-				"grid"
+				"grid",
+				"blocks"
 			]
 		},
 		minimal = {

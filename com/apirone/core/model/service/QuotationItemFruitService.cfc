@@ -94,6 +94,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 02 positions
 		for( var position in arguments.quotationItemFruit?.getPositions() ){
+			if ( !StructKeyExists( position, 'id' ) && StructKeyExists( position, 'position' ) ) {
+				position[ 'id' ] = position.position;
+			}
 			getQuotationItemFruitPositionService().create( newId, position.id, position.order );
 		}
 

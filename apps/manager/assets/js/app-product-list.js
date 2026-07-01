@@ -27,14 +27,22 @@ AP.product.list = ( function() {
         items: NM.kendo.dataSource( { url: "/manager/ajax/products" } )
     };
 
+    // placeholder in testa alle liste: senza, Kendo seleziona il primo elemento reale
+    function withPlaceholder( items, textField ) {
+        var placeholder = { id: "" };
+        placeholder[ textField || "name" ] = "-- seleziona";
+        return [ placeholder ].concat( items || [] );
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
             code: "",
             positionCount: "",
-            category: {
-                id: 167 // TODO: add dynamic value according to current category
-            },
+            category: { id: "" },
+            line: { id: "" },
+            model: { id: "" },
+            selectedFinishes: [],
             nameItem: {
                 id: "",
                 name: "",
@@ -47,6 +55,10 @@ AP.product.list = ( function() {
             }
         },
         statuses: AP.page.statuses,
+        categories: withPlaceholder( AP.page.categories ),
+        lines: withPlaceholder( AP.page.lines ),
+        models: withPlaceholder( AP.page.models, "code" ),
+        finishes: AP.page.finishes || [], // multiselect: niente placeholder
 
         title: "Carica prodotto"
     };
@@ -80,8 +92,9 @@ AP.product.list = ( function() {
             if ( !category || !category.id ) {
                 this.get('lines').data(allLines);
             } else {
+                // line.categories può essere null per le linee senza categorie associate
                 const categoryLines = allLines.filter(function(line) {
-                    return line.categories && line.categories.filter(cat => cat.id == category.id).length > 0
+                    return ( line.categories || [] ).filter(cat => cat.id == category.id).length > 0
                 })
                 this.get('lines').data(categoryLines);
             }
@@ -93,8 +106,13 @@ AP.product.list = ( function() {
             this.get('models').data([]);
             let allModels = this.get("allModels");
             const category = this.get('category')
+            if (!category || !category.id) {
+                this.get('models').data(allModels);
+                this.set('model', { "id": "", "name": ""})
+                return;
+            }
             const categoryModels = allModels.filter(function(model) {
-                return model.categories && model.categories.filter(cat => cat.id == category.id).length > 0
+                return ( model.categories || [] ).filter(cat => cat.id == category.id).length > 0
             })
             this.get('models').data(categoryModels);
             this.set('model', { "id": "", "name": ""})
@@ -122,7 +140,45 @@ AP.product.list = ( function() {
         },
 
         resetForm: function() {
-            viewModel.set( "detailForm", defaultDetailForm );
+            viewModel.set( "detailForm", JSON.parse( JSON.stringify( defaultDetailForm ) ) );
+        },
+
+        new: function( event ) {
+            this.resetForm();
+
+            NM.util.openModal( AP.fields.product.detailRoot );
+
+            return false;
+        },
+
+        save: function( event ) {
+            var thisForm = AP.fields.product.detailForm;
+            var status = thisForm.find( ".status" );
+
+            if ( !thisForm.valid() ) {
+                return false;
+            }
+
+            status.html( "<img src='/assets/main/img/ajax-loading.svg' width='20' height='20'>" );
+
+            NM.util.ajax( {
+                method: "POST",
+                url: "/manager/ajax/products",
+                data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
+                callback: {
+                    done: function( xhr ) {
+                        status.html( "" );
+
+                        AP.widget.notify( "success", xhr.data.message.text );
+
+                        setTimeout( () => AP.fields.product.detailRoot.modal( "hide" ), 500 );
+
+                        viewModel.rows.read();
+                    },
+                },
+            } );
+
+            return false;
         },
 
         attributes: function( event ) {

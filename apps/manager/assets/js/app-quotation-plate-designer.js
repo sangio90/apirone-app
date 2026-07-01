@@ -222,6 +222,104 @@ AP.plate.grid = ( function() {
 
             return result;
         },
+
+        // ===================== Placche a blocchi =====================
+
+        /**
+         * Set degli id slot occupati dai frutti (placche a blocchi).
+         * @param {Array} fruits
+         * @param {Fruit} [excludeFruit] - frutto da escludere (es. quello in drag)
+         * @returns {Set<string>}
+         */
+        collectOccupiedSlotIds( fruits, excludeFruit ) {
+            const occupied = new Set();
+
+            for ( const fruit of fruits ) {
+                if ( excludeFruit && fruit == excludeFruit ) {
+                    continue;
+                }
+                for ( const cellId of fruit.cellIds ) {
+                    occupied.add( String( cellId.id ) );
+                }
+            }
+
+            return occupied;
+        },
+
+        /**
+         * Verifica che gli slot slotIndex..slotIndex+span-1 di un blocco siano liberi.
+         */
+        isBlockRunFree( block, slotIndex, span, occupiedSlotIds ) {
+            if ( slotIndex < 0 || slotIndex + span > block.cells.length ) {
+                return false;
+            }
+
+            for ( let i = slotIndex; i < slotIndex + span; i++ ) {
+                if ( occupiedSlotIds.has( String( block.cells[i].id ) ) ) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        /**
+         * Prima posizione libera per un frutto su una placca a blocchi:
+         * cerca in ogni blocco compatibile (stesso orientamento celle) una
+         * sequenza di slot liberi della lunghezza richiesta.
+         * @returns {{cell: Cell}|null}
+         */
+        findFirstFreeBlockPosition( plate, span, fruitOrientation, fruits ) {
+            const occupied = utils.collectOccupiedSlotIds( fruits );
+
+            for ( const block of plate.blocks ) {
+                if ( fruitOrientation && block.cellOrientation != fruitOrientation ) {
+                    continue;
+                }
+
+                for ( let s = 0; s + span <= block.cells.length; s++ ) {
+                    if ( utils.isBlockRunFree( block, s, span, occupied ) ) {
+                        return { cell: block.cells[s] };
+                    }
+                }
+            }
+
+            return null;
+        },
+
+        /**
+         * Cella di ancoraggio più vicina alla posizione di rilascio, fra i blocchi
+         * con lo stesso orientamento del frutto e con spazio libero sufficiente.
+         * @returns {{cell: Cell}|null}
+         */
+        findNearestBlockAnchor( plate, fruit, dropPosition, fruits ) {
+            const span = Math.max( fruit.rowSpan, fruit.columnSpan );
+            const occupied = utils.collectOccupiedSlotIds( fruits, fruit );
+
+            let best = null;
+            let bestDistance = Infinity;
+
+            for ( const block of plate.blocks ) {
+                if ( block.cellOrientation != fruit.orientation ) {
+                    continue;
+                }
+
+                for ( let s = 0; s + span <= block.cells.length; s++ ) {
+                    const cell = block.cells[s];
+
+                    const distance =
+                        Math.pow( cell.left - dropPosition.left, 2 ) +
+                        Math.pow( cell.top - dropPosition.top, 2 );
+
+                    if ( distance < bestDistance && utils.isBlockRunFree( block, s, span, occupied ) ) {
+                        bestDistance = distance;
+                        best = { cell: cell };
+                    }
+                }
+            }
+
+            return best;
+        },
     };
 
     class FruitGridPosition {
@@ -296,12 +394,37 @@ AP.plate.grid = ( function() {
             this.grid = args.grid;
             this.isSpecial = args.isSpecial;
             this.cellOrientation = args.cellOrientation;
+
+            // Placche a blocchi (configurazione su DB): array di blocchi
+            // { left, top, width, height, cellOrientation, orientationMode, slots: [{id, order}] }
+            // Le coordinate sono in px (scala 1mm = 1px).
+            this.blocks = args.blocks || null;
+
+            // callback (blockOrder) per la rotazione del singolo blocco dal preventivo
+            this.onRotateBlock = args.onRotateBlock || null;
+
+            if ( this.isBlockPlate() ) {
+                // width/height sono le dimensioni del canvas (sfondo placca),
+                // già calcolate per l'orientamento corrente: annulla lo swap
+                // width/height fatto da Rectangle
+                this.width = args.width;
+                this.height = args.height;
+            }
+        }
+
+        isBlockPlate() {
+            return !!( this.blocks && this.blocks.length );
         }
 
         /**
          * Creates HTML nodes and inserts them in the DOM to visualize grid property
          */
         drawGridWithin( $rootNode ) {
+            if ( this.isBlockPlate() ) {
+                this.drawBlocksWithin( $rootNode );
+                return;
+            }
+
             $rootNode.empty();
 
             const $plateBackground = $( "<div/>", {
@@ -451,6 +574,185 @@ AP.plate.grid = ( function() {
                 }
             }
         }
+
+        /**
+         * Rendering per le placche a blocchi: ogni blocco è un contenitore
+         * posizionato in assoluto (margini in mm, scala 1mm = 1px) con dentro
+         * gli slot in fila (HOR) o in colonna (VER).
+         *
+         * Costruisce anche this.grid in formato compatibile con la logica
+         * esistente: un blocco HOR contribuisce con una riga di n celle,
+         * un blocco VER con n righe da una cella.
+         */
+        drawBlocksWithin( $rootNode ) {
+            $rootNode.empty();
+
+            const $plateBackground = $( "<div/>", {
+                class: "plate-background",
+                id: "plate-background",
+                css: {
+                    width: `${this.width}px`,
+                    height: `${this.height}px`,
+                    "background-image": `url('${this.image}')`,
+                    position: "relative",
+                },
+                appendTo: $rootNode,
+            } );
+
+            $( "#plate-background" ).append( '<div class="attributes" style="position: absolute; width: 100%; height: 100%;"></div>' );
+
+            const platePosition = $plateBackground.position();
+
+            this.top = platePosition.top;
+            this.left = platePosition.left;
+
+            const $plateLayers = $( "<div/>", {
+                id: "plate-layers",
+                appendTo: $plateBackground,
+            } );
+
+            // bounding box dei blocchi: la griglia occupa solo questo spazio,
+            // centrato nel canvas dalla flex di .plate-background (come legacy)
+            let bboxWidth = 0;
+            let bboxHeight = 0;
+            for ( const block of this.blocks ) {
+                bboxWidth = Math.max( bboxWidth, block.left + block.width );
+                bboxHeight = Math.max( bboxHeight, block.top + block.height );
+            }
+
+            const $plateGrid = $( "<div/>", {
+                id: "plate-grid",
+                css: {
+                    display: "block",
+                    position: "relative",
+                    width: `${bboxWidth}px`,
+                    height: `${bboxHeight}px`,
+                },
+                appendTo: $plateLayers,
+            } );
+
+            const $fruits = $( "<div/>", {
+                id: "quotation-plate-fruits",
+                appendTo: $plateLayers,
+            } );
+
+            this.grid = [];
+
+            const slotDimensions = constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE];
+
+            for ( let blockIndex = 0; blockIndex < this.blocks.length; blockIndex++ ) {
+                const block = this.blocks[blockIndex];
+                const isHorizontal = block.cellOrientation == orientation.HORIZONTAL;
+
+                const $block = $( "<div/>", {
+                    class: "plate-block",
+                    css: {
+                        position: "absolute",
+                        top: `${block.top}px`,
+                        left: `${block.left}px`,
+                        width: `${block.width}px`,
+                        height: `${block.height}px`,
+                    },
+                    appendTo: $plateGrid,
+                } );
+
+                if ( this.onRotateBlock && !!block.rotatable ) {
+                    const blockOrder = block.order;
+                    const self = this;
+
+                    $( "<button/>", {
+                        type: "button",
+                        class: "plate-block-rotate",
+                        title: "Ruota blocco",
+                        html: '<i class="fas fa-sync-alt"></i>',
+                        css: {
+                            // dentro al blocco: fuori verrebbe tagliato
+                            // dall'overflow hidden dei layer della placca
+                            position: "absolute",
+                            top: "4px",
+                            right: "4px",
+                            width: "32px",
+                            height: "32px",
+                            padding: "0",
+                            "border-radius": "50%",
+                            border: "1px solid #999",
+                            background: "rgba(255, 255, 255, 0.9)",
+                            "box-shadow": "0 1px 3px rgba(0, 0, 0, 0.3)",
+                            cursor: "pointer",
+                            "font-size": "14px",
+                            "line-height": "1",
+                            "z-index": 10,
+                        },
+                        click: function( event ) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            self.onRotateBlock( blockOrder );
+                        },
+                        appendTo: $block,
+                    } );
+                }
+
+                block.cells = [];
+
+                let rowForHorizontalBlock = null;
+
+                if ( isHorizontal ) {
+                    rowForHorizontalBlock = [];
+                    this.grid.push( rowForHorizontalBlock );
+                }
+
+                for ( let slotIndex = 0; slotIndex < block.slots.length; slotIndex++ ) {
+                    const slotData = block.slots[slotIndex];
+
+                    // Rectangle scambia width/height per i blocchi VER
+                    const cell = new Cell(
+                        slotDimensions.width,
+                        slotDimensions.height,
+                        block.cellOrientation,
+                        CELL_TYPE.FREE,
+                        slotData.id,
+                        slotData.order,
+                    );
+
+                    cell.blockIndex = blockIndex;
+                    cell.slotIndex = slotIndex;
+                    cell.block = block;
+
+                    const offsetTop = isHorizontal ? 0 : slotIndex * cell.height;
+                    const offsetLeft = isHorizontal ? slotIndex * cell.width : 0;
+
+                    const $plateCell = $( "<div/>", {
+                        class: "grid-column",
+                        css: {
+                            position: "absolute",
+                            top: `${offsetTop}px`,
+                            left: `${offsetLeft}px`,
+                            width: `${cell.width}px`,
+                            height: `${cell.height}px`,
+                        },
+                        appendTo: $block,
+                    } );
+
+                    cell.$element = $plateCell;
+
+                    // coordinate assolute rispetto all'origine della placca
+                    cell.top = block.top + offsetTop;
+                    cell.left = block.left + offsetLeft;
+
+                    block.cells.push( cell );
+
+                    if ( isHorizontal ) {
+                        cell.gridRow = this.grid.length - 1;
+                        cell.gridColumn = rowForHorizontalBlock.length;
+                        rowForHorizontalBlock.push( cell );
+                    } else {
+                        cell.gridRow = this.grid.length;
+                        cell.gridColumn = 0;
+                        this.grid.push( [ cell ] );
+                    }
+                }
+            }
+        }
     }
 
     class Cell extends Rectangle {
@@ -561,10 +863,20 @@ AP.plate.grid = ( function() {
 
             const grid = fruitsController.plate.grid;
 
+            // Cella di ancoraggio: nelle placche a blocchi il frutto non deve
+            // mai estendersi oltre il proprio blocco
+            const anchorRow = grid[this._gridPosition.row];
+            const anchorCell = anchorRow ? anchorRow[this._gridPosition.column] : null;
+            const anchorBlockIndex = anchorCell ? anchorCell.blockIndex : undefined;
+
             // Calcola tutte le celle occupate dal frutto
             for ( let row = this._gridPosition.row; row < this._gridPosition.row + this.rowSpan && row < grid.length; row++ ) {
                 for ( let col = this._gridPosition.column; col < this._gridPosition.column + this.columnSpan && col < grid[row].length; col++ ) {
                     if ( grid[row][col] && grid[row][col].id ) {
+                        if ( anchorBlockIndex !== undefined && grid[row][col].blockIndex !== anchorBlockIndex ) {
+                            continue;
+                        }
+
                         this.cellIds.push( {
                             id: grid[row][col].id,
                             order: grid[row][col].order
@@ -822,12 +1134,48 @@ AP.plate.grid = ( function() {
             }
         }
 
+        /**
+         * Verifica se c'è spazio per posizionare il frutto sulla placca
+         * (senza spostare i frutti già presenti).
+         * @param {Object} selectedFruit - frutto mappato da mapFruitForPlate
+         * @returns {boolean}
+         */
+        canPlaceFruit( selectedFruit ) {
+            if ( this.plate.isBlockPlate() ) {
+                const span = selectedFruit.columnSpan || 1;
+
+                return !!(
+                    utils.findFirstFreeBlockPosition( this.plate, span, this.plate.cellOrientation, this.fruits ) ||
+                    utils.findFirstFreeBlockPosition( this.plate, span, null, this.fruits )
+                );
+            }
+
+            const tempFruit = new Fruit( {
+                width: selectedFruit.width,
+                height: selectedFruit.height,
+                rowSpan: selectedFruit.rowSpan,
+                columnSpan: selectedFruit.columnSpan,
+                orientation: this.plate.cellOrientation,
+                id: selectedFruit.id,
+                fruitId: selectedFruit.fruitId,
+            } );
+
+            const freePosition = utils.findFirstFreePosition( tempFruit );
+
+            return freePosition.row != null && freePosition.column != null;
+        }
+
         // renamed from "onSelectFruit"
         addFruitToPlate( selectedFruit ) {
 
             // console.log( "addFruitToPlate:this.plate", this.plate );
             // console.log( "addFruitToPlate:selectedFruit.image.uri", selectedFruit.image?.uri );
             // console.log( "addFruitToPlate:selectedFruit", selectedFruit );
+
+            if ( this.plate.isBlockPlate() ) {
+                this.addFruitToBlockPlate( selectedFruit );
+                return;
+            }
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
@@ -860,35 +1208,98 @@ AP.plate.grid = ( function() {
 
         }
 
-        addFruitToPositions( selectedFruit, positionIds ) {
+        /**
+         * Aggiunge un frutto alla prima posizione libera di una placca a blocchi.
+         * Il frutto assume l'orientamento del blocco che lo ospita: prova prima
+         * i blocchi con l'orientamento corrente della placca, poi gli altri.
+         */
+        addFruitToBlockPlate( selectedFruit ) {
+            const span = selectedFruit.columnSpan || 1;
+
+            let target = utils.findFirstFreeBlockPosition(
+                this.plate,
+                span,
+                this.plate.cellOrientation,
+                this.fruits,
+            );
+
+            if ( !target ) {
+                // nessuno spazio nei blocchi con l'orientamento della placca:
+                // prova nei blocchi fissi con l'altro orientamento
+                target = utils.findFirstFreeBlockPosition(
+                    this.plate,
+                    span,
+                    null,
+                    this.fruits,
+                );
+            }
+
+            if ( !target ) {
+                return;
+            }
 
             const fruitObj = new Fruit( {
                 width: selectedFruit.width,
                 height: selectedFruit.height,
                 rowSpan: selectedFruit.rowSpan,
                 columnSpan: selectedFruit.columnSpan,
-                orientation: this.plate.cellOrientation,
-                id: selectedFruit.id, // ID univoco già generato da createFruit()
-                fruitId: selectedFruit.fruitId, // ID del prodotto frutto originale
+                orientation: target.cell.block.cellOrientation,
+                id: selectedFruit.id,
+                fruitId: selectedFruit.fruitId,
                 code: selectedFruit.code,
                 name: selectedFruit.name,
                 image: selectedFruit.image,
             } );
 
+            fruitObj.gridPosition = new FruitGridPosition(
+                target.cell.gridRow,
+                target.cell.gridColumn,
+            );
+
+            this.fruits.push( fruitObj );
+
+            fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
+            fruitObj.initDraggableWidget( this );
+        }
+
+        addFruitToPositions( selectedFruit, positionIds ) {
+
             // Trova la posizione della prima cella nell'array
+            // (confronto come stringhe: gli id possono essere guid legacy
+            // o interi, e dal DB arrivano comunque come stringhe)
             const grid = this.plate.grid;
             let foundPosition = null;
+            let anchorCell = null;
 
             for ( let y = 0; y < grid.length && !foundPosition; y++ ) {
                 for ( let x = 0; x < grid[y].length && !foundPosition; x++ ) {
                     const cell = grid[y][x];
 
                     // Verifica se questa cella è la prima nell'array di positionIds
-                    if ( cell.id === positionIds[0] ) {
+                    if ( String( cell.id ) === String( positionIds[0] ) ) {
                         foundPosition = { row: y, column: x };
+                        anchorCell = cell;
                     }
                 }
             }
+
+            // nelle placche a blocchi il frutto assume l'orientamento del blocco
+            const fruitOrientation = ( this.plate.isBlockPlate() && anchorCell )
+                ? anchorCell.block.cellOrientation
+                : this.plate.cellOrientation;
+
+            const fruitObj = new Fruit( {
+                width: selectedFruit.width,
+                height: selectedFruit.height,
+                rowSpan: selectedFruit.rowSpan,
+                columnSpan: selectedFruit.columnSpan,
+                orientation: fruitOrientation,
+                id: selectedFruit.id, // ID univoco già generato da createFruit()
+                fruitId: selectedFruit.fruitId, // ID del prodotto frutto originale
+                code: selectedFruit.code,
+                name: selectedFruit.name,
+                image: selectedFruit.image,
+            } );
 
             if ( foundPosition ) {
                 fruitObj.gridPosition = new FruitGridPosition(
@@ -900,6 +1311,10 @@ AP.plate.grid = ( function() {
 
                 fruitObj.drawWithin( $( "#quotation-plate-fruits" ) );
                 fruitObj.initDraggableWidget( this );
+            } else if ( this.plate.isBlockPlate() ) {
+                // positionIds sono GUID legacy, non corrispondono agli slot interi del blocco:
+                // posiziona il frutto nel primo slot libero disponibile
+                this.addFruitToBlockPlate( selectedFruit );
             } else {
                 console.error( "addFruitToPositions: Position not found for positionIds", positionIds );
             }
@@ -1115,6 +1530,38 @@ AP.plate.grid = ( function() {
             // console.log( "onDragging;newFruitPosition", newFruitPosition );
             // console.log( "onDragging;ui", ui );
 
+            if ( this.plate.isBlockPlate() ) {
+                const anchor = utils.findNearestBlockAnchor(
+                    this.plate,
+                    fruit,
+                    newFruitPosition,
+                    this.fruits,
+                );
+
+                for ( const row of this.plate.grid ) {
+                    for ( const cell of row ) {
+                        cell.setIsOverlapped( false );
+                    }
+                }
+
+                if ( anchor ) {
+                    const anchorPosition = {
+                        top: anchor.cell.top,
+                        bottom: anchor.cell.top + fruit.height,
+                        left: anchor.cell.left,
+                        right: anchor.cell.left + fruit.width,
+                    };
+
+                    for ( const row of this.plate.grid ) {
+                        for ( const cell of row ) {
+                            cell.setIfOverlappedBy( anchorPosition );
+                        }
+                    }
+                }
+
+                return;
+            }
+
             const { row, column } = utils.convertAbsolutePositionToGridPosition(
                 ui,
                 newFruitPosition,
@@ -1161,6 +1608,34 @@ AP.plate.grid = ( function() {
                 for ( const cell of row ) {
                     cell.setIsOverlapped( false );
                 }
+            }
+
+            if ( this.plate.isBlockPlate() ) {
+                const anchor = utils.findNearestBlockAnchor(
+                    this.plate,
+                    fruit,
+                    {
+                        top: ui.position.top,
+                        bottom: ui.position.top + fruit.height,
+                        left: ui.position.left,
+                        right: ui.position.left + fruit.width,
+                    },
+                    this.fruits,
+                );
+
+                if ( anchor ) {
+                    fruit.gridPosition = new FruitGridPosition(
+                        anchor.cell.gridRow,
+                        anchor.cell.gridColumn,
+                    );
+                } else {
+                    fruit.restorePositionToLastSnapshot();
+                }
+
+                fruit.stopDragging();
+                this.renderFruits();
+
+                return;
             }
 
             const newFruitPosition = {

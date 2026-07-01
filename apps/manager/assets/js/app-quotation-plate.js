@@ -494,8 +494,9 @@ AP.plate.modal = ( function() {
                         if (viewModel.get('detailForm.data.fruits') && viewModel.get('detailForm.data.fruits')._data && viewModel.get('detailForm.data.fruits')._data.length) {
                             for(let f in viewModel.get('detailForm.data.fruits')._data) {
                                 const fruit = viewModel.get('detailForm.data.fruits')._data[f]
-                                if (fruit.id && fruit.items._data.length) {
-                                    const fruitItems = fruit.items._data
+                                const _fruitItemsData = fruit.items?._data ?? (Array.isArray(fruit.items) ? fruit.items : []);
+                                if (fruit.id && _fruitItemsData.length) {
+                                    const fruitItems = _fruitItemsData
                                     for (let fi in fruitItems) {
                                         fi = fruitItems[fi]
                                         if (fi.attributeId && fi.attributeId != '') {
@@ -1310,6 +1311,18 @@ AP.plate.modal = ( function() {
 						const pd = viewModel.get( "detailForm.data" );
 						resetDetailForm();
 
+						if ( AP.page.pendingDraftId && xhr.data && xhr.data.id ) {
+							$.ajax({
+								method: "POST",
+								url: "/manager/ajax/quotation-item-drafts/" + AP.page.pendingDraftId + "/apply",
+								data: JSON.stringify({ quotationItemId: xhr.data.id }),
+								contentType: "application/json"
+							}).always(function() {
+								window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + pd.quotationZone.id;
+							});
+							return;
+						}
+
 						const modal = $( "#posizione-in-pianta-modal")
 						function handlerSi() {
 							//TODO aggiungere id zona
@@ -1370,6 +1383,10 @@ AP.plate.modal = ( function() {
          */
         loadFruits: async function( onDone ) {
             var id = viewModel.get( "detailForm.data.id" );
+            var PLUG_IDS = [
+                "5f4ec169-c445-40a0-8c94-1dc22c21be79",
+                "452e03e4-ddf4-4042-ac87-b0f17489c4e1",
+            ];
 
             await NM.util.ajax( {
                 method: "GET",
@@ -1379,6 +1396,7 @@ AP.plate.modal = ( function() {
                         let fruitQuotationItemProductItems = []
                         for ( var i = 0; i < xhr.data.length; i++ ) {
                             var thisFruit = xhr.data[i];
+                            if ( PLUG_IDS.includes( thisFruit.fruit.id.toLowerCase() ) ) continue;
                             var newFruit = createFruit( { position: 1, fruit: thisFruit.fruit, id: thisFruit.id } );
 
                             viewModel.set( "currentFruit", newFruit );

@@ -51,6 +51,7 @@
 		/*
 			catalog bundle
 		*/
+		post( "/ajax/catalog-bundles/detail" ).to( "CatalogBundleAjaxController.saveDetail" ).end();
 		get( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.list" ).end();
 		post( "/ajax/catalog-bundles" ).to( "CatalogBundleAjaxController.save" ).end();
 		delete( "/signages/catalog-bundles" ).to( "CatalogBundleAjaxController.delete" ).end();
@@ -315,7 +316,8 @@
 		delete( "/ajax/frames" ).to( "FrameAjaxController.delete" ).end();
 		post( "/ajax/frames" ).to( "FrameAjaxController.save" ).end();
 		get( "/ajax/frames" ).to( "FrameAjaxController.list" ).end();
-		get( "/frames" ).to( "FrameController.list" ).end();
+		get( "/frames-legacy" ).to( "FrameController.list" ).end();
+		get( "/frames" ).to( "FrameController.builder" ).end();
 
 
 		/*
@@ -453,6 +455,7 @@
 			quotations
 		*/
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
+		get( "/ajax/quotations-export-provisional/:id" ).to( "QuotationAjaxController.exportProvisional" ).end();
 		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
@@ -464,6 +467,8 @@
 		get( "/ajax/quotations/signage-configs" ).to( "QuotationSignageAjaxController.list" ).end();
 		get( "/ajax/quotations/signage/:id" ).to( "QuotationItemAjaxController.get" ).end();
 		get( "/ajax/quotations_approve/:id" ).to( "QuotationAjaxController.approveQuotation" ).end();
+		post( "/ajax/quotations/:id/markasSent" ).to( "QuotationAjaxController.markAsSent" ).end();
+		post( "/ajax/quotations/:id/createrevision" ).to( "QuotationAjaxController.createRevision" ).end();
 
 		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
@@ -489,6 +494,7 @@
 		get( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.list" ).end();
 		post( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.upload" ).end();
 
+		get( "/ajax/quotations/:id/draft-count" ).to( "QuotationAjaxController.draftCount" ).end();
 		get( "/ajax/quotations/:id" ).to( "QuotationAjaxController.get" ).end();
 
 		get( "/quotations/new" ).to( "QuotationController.new" ).end();
@@ -499,6 +505,14 @@
 		delete( "/ajax/quotation-item-positions/:key" ).to( "QuotationItemPositionAjaxController.delete" ).end();
 		post( "/ajax/quotation-item-positions/" ).to( "QuotationItemPositionAjaxController.save" ).end();
 		post( "/ajax/quotation-item-positions-print" ).to( "QuotationItemPositionAjaxController.print" ).end();
+
+		get( "/ajax/quotation-item-drafts/zone/:zoneId" ).to( "QuotationItemDraftAjaxController.list" ).end();
+		post( "/ajax/quotation-item-drafts/:id/position" ).to( "QuotationItemDraftAjaxController.updatePosition" ).end();
+		post( "/ajax/quotation-item-drafts/:id/convert" ).to( "QuotationItemDraftAjaxController.convert" ).end();
+		post( "/ajax/quotation-item-drafts/:id/apply" ).to( "QuotationItemDraftAjaxController.applyToItem" ).end();
+		get( "/ajax/quotation-item-drafts/:id" ).to( "QuotationItemDraftAjaxController.get" ).end();
+		delete( "/ajax/quotation-item-drafts/:id" ).to( "QuotationItemDraftAjaxController.delete" ).end();
+		post( "/ajax/quotation-item-drafts/" ).to( "QuotationItemDraftAjaxController.create" ).end();
 
 		get( "/ajax/quotations" ).to( "QuotationAjaxController.list" ).end();
 		delete( "/ajax/quotations" ).to( "QuotationAjaxController.delete" ).end();

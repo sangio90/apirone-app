@@ -124,6 +124,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			messageId = "quotationZone.created";
 			thisId    = create( quotationZone )
 
+			if ( !isNull( zoneToDuplicate.getImage() ) ) {
+				getFileService().duplicateForZone( zoneToDuplicate.getImage().getId(), thisId );
+			}
+
 			var duplicatedZone = duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId, quotation: quotation  );
 			if (arguments.duplicaConSottozone) {
 				var sottozone = list( originId = zoneToDuplicate.getId() )
@@ -134,6 +138,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					newSottozona.setQuantity( sottozona.getQuantity() );
 					newSottozona.setOrigin( duplicatedZone );
 					var newSottozonaId = create( newSottozona )
+					if ( !isNull( sottozona.getImage() ) ) {
+						getFileService().duplicateForZone( sottozona.getImage().getId(), newSottozonaId );
+					}
 					//in caso di duplica all'interno di un preventivo passare quotation è superfluo, perché sto clonando una zona dentro lo stesso preventivo
 					//in caso però di duplica del preventivo (e.g. approvazione preventivo) il preventivo che passo è quello clonato, quindi i nuovi items che creo dentro duplicateZoneItems, porteranno l'id del quotation clonato
 					duplicateZoneItems( duplicatedZoneId: sottozona.getId(), newZoneId: newSottozonaId, quotation: quotation );

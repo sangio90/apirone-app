@@ -1,0 +1,1 @@
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS codice_sdi VARCHAR(15);

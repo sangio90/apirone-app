@@ -106,7 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -279,7 +279,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			} );
 
 			if ( json.quotationItem.product.keyExists( "items" ) ) {
-				var productItemsData = json.quotationItem.product.items._data;
+				var _items1 = json.quotationItem.product.items ?: [];
+				var productItemsData = isArray( _items1 ) ? _items1 : ( structKeyExists( _items1, "_data" ) ? _items1._data : [] );
 				productItemsData.each( function( productItemRow ){
 					var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 						return v.selected;
@@ -326,7 +327,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		
 		var message = completeMessage( messageId );
 
-		result.setData( { "message" = message }, { "payload" = { "id" = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -444,7 +445,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				)
 			} );
 
-			var productItemsData = json.quotationItem.product.items._data;
+			var _items2 = json.quotationItem.product.items ?: [];
+			var productItemsData = isArray( _items2 ) ? _items2 : ( structKeyExists( _items2, "_data" ) ? _items2._data : [] );
 			productItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 					return v.selected;
@@ -489,7 +491,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
 		
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
@@ -526,6 +528,13 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setCustomImage( json.item.customImage );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 		bean.setNote( json.item.note )
+
+		// override orientamento dei singoli blocchi (placche a blocchi)
+		if ( !IsNull( json.item.blockOrientations ) && IsStruct( json.item.blockOrientations ) && !StructIsEmpty( json.item.blockOrientations ) ) {
+			bean.setBlockOrientations( SerializeJSON( json.item.blockOrientations ) );
+		} else {
+			bean.setBlockOrientations( "" );
+		}
 
 		if( Len( json.item?.position?.code ) ) {
 			var position = populatePositionBean( json.item.position );
@@ -573,7 +582,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var items = [];
 
-			var fruitProductItemsData = thisFruit.items._data;
+			var _fruitItems = thisFruit.items ?: [];
+			var fruitProductItemsData = isArray( _fruitItems ) ? _fruitItems : ( structKeyExists( _fruitItems, "_data" ) ? _fruitItems._data : [] );
 
 			fruitProductItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -604,6 +614,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		}
 
+		var plugBeans = super.fire( "QuotationItem.buildPlugFruitBeans", { "data" = json } );
+		for ( var plugBean in plugBeans ) {
+			beanFruits.add( plugBean );
+		}
+
 		bean.setFruits( beanFruits );
 
 		var message = 'Errore durante il salvataggio della placca.'
@@ -624,7 +639,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				super.fire( "quotationItemProductItem.delete", { "productItemId" = quotationItemProductItem.getId() } )
 			} );
 
-			var productItemsData = json.item.product.items._data;
+			var _items3 = json.item.product.items ?: [];
+			var productItemsData = isArray( _items3 ) ? _items3 : ( structKeyExists( _items3, "_data" ) ? _items3._data : [] );
 
 			productItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -669,7 +685,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
 
-		result.setData( { "message" = message }, { "payload" = { id = thisId } } );
+		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}

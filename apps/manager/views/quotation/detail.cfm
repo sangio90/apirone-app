@@ -1,27 +1,52 @@
 ﻿<cfoutput>
     <div id="quotation-detail-root">
         <div class="row mb-3">
-            <div class="col-4">
+            <div class="col-5">
                 <h2>#prc.title#</h2>
+                #button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left" )#
             </div>
 
-            <div class="col-8 text-end mt-3">
-				#button( href="/manager/quotations", size="sm", label="Torna ai preventivi", icon="arrow-left", class="me-4" )#
-				#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
-                #button( bind="click:exportProducts, visible: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="export-button" )#
-                #button( bind="click:export, visible: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button" )#
-				<button type="button"
-                        class="btn btn-primary btn-sm"
-                        data-role-list="ADM/CMA"
-                        data-bind="click: openStatusModal, roleEnable: this">
-
-                    <i class="fas fa-check-circle"></i>
-                    Status: #prc.quotation.getStatusHistory().getStatus().getName()#
-                </button>
-				#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open" )#
-				#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
-				#button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
-			</div>
+            <div class="col-7 mt-1">
+                <div class="row g-2 mb-2">
+                    <div class="col-2">#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit", class="w-100" )#</div>
+                    <div class="col-2">#button( bind="click:exportProducts, enabled: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="w-100 export-button qt-draft-block" )#</div>
+                    <div class="col-2">#button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="w-100 export-button qt-draft-block" )#</div>
+                    <div class="col-2">#button( bind="click:exportProvisional, enabled: canEdit", size="sm", label="Esporta provvisorio", icon="file-export", class="w-100 qt-draft-block", variant="outline-primary" )#</div>
+                    <div class="col-4">
+                        <cfif prc.quotation.getSentToClient() ?: false>
+                            <button type="button" class="btn btn-primary btn-sm w-100" disabled>
+                                <i class="fas fa-check-circle"></i>
+                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                            </button>
+                        <cfelse>
+                            <button type="button"
+                                    id="qt-status-btn"
+                                    class="btn btn-primary btn-sm w-100 qt-draft-block"
+                                    data-role-list="ADM/CMA"
+                                    data-bind="click: openStatusModal, roleEnable: this">
+                                <i class="fas fa-check-circle"></i>
+                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                            </button>
+                        </cfif>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-3">#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open", class="w-100" )#</div>
+                    <div class="col-3">#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print", class="w-100" )#</div>
+                    <div class="col-3" style="position:relative;">
+                        #button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map", class="w-100" )#
+                        <span id="plant-draft-badge" class="badge bg-danger position-absolute top-0 end-0 mt-1 me-1" style="display:none;font-size:10px;"></span>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bind="click:markAsSent, visible:canEdit">
+                            <i class="fas fa-paper-plane"></i> Inviato a cliente
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm w-100" data-bind="click:createRevision, visible:canRevise">
+                            <i class="fas fa-pencil-alt"></i> Modifica preventivo
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <div class="export-button-tooltip col-6 text-end">
 				<p class="export-button-tooltip" style="color: red; display: none">
@@ -29,6 +54,16 @@
                 </p>
 			</div>
 
+        </div>
+
+        <div id="plant-draft-warning" class="row" style="display:none;">
+            <div class="col-lg-12">
+                <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-2" role="alert">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="plant-draft-warning-text"></span>
+                    <a id="plant-draft-warning-link" href="##" class="ms-2 alert-link fw-semibold">Vai alla pianta</a>
+                </div>
+            </div>
         </div>
 
         <div class="row">
@@ -112,7 +147,7 @@
                                                 #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
                                                 #addButton( label="Aggiungi servizio", id="qt-add-article", bind="click:addArticle", style="display: none" )#
                                                 <cfif #prc.quotation.getStatusHistory().getStatus().getId() == 'LAV'#>
-                                                    <button class="btn btn-success btn-md" id="qt-update-prices" type="button" data-bind="click:approveQuotation">
+                                                    <button class="btn btn-success btn-md qt-draft-block" id="qt-concludi-btn" type="button" data-bind="click:approveQuotation">
                                                         <i class="fas fa-check"></i> Concludi preventivo
                                                     </button>
                                                 </cfif>
@@ -187,6 +222,7 @@
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
     #view( "quotation/documents-modal" )#
+    #view( "quotation/export-products-result-modal" )#
 
     #view( "quotation/totals" )#
 

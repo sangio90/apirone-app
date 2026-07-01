@@ -1,4 +1,8 @@
-﻿component extends="com.apirone.core.controller.AbsController" {
+component extends="com.apirone.core.controller.AbsController" {
+
+	// Dimensioni fisiche di uno slot (mezzofrutto). Scala di disegno: 1mm = 1px.
+	variables.SLOT_WIDTH_MM  = 45;
+	variables.SLOT_HEIGHT_MM = 180;
 
 	function list( event, rc, prc ){
 		var data   = [];
@@ -21,36 +25,194 @@
 		param rc.id = "___";
 		param rc.orientationId = "";
 		param rc.productId = "";
+		param rc.blockOrientations = "";
 
-		var result  = super.getResult();
+		var result = super.getResult();
 
-		/*
-		var orientationsMap = {
-            "HAV": [ 
-                { "id": "HOR", "name": "Orizzontale" }, 
-                { "id": "VER", "name": "Verticale" } 
-            ],
-            "HOR": [ { "id": "HOR", "name": "Orizzontale" } ],
-            "VER": [ { "id": "VER", "name": "Verticale" } ]
-        };
-		*/		
+		var bean = super.fire( "frame.get", [ rc.id ] );
 
+		var obj = "";
 
-		var bean   = super.fire( "frame.get", [ rc.id ] );
+		if ( !IsNull( bean.getBlocks() ) && ArrayLen( bean.getBlocks() ) ) {
+			obj = buildBlocksResponse( bean, rc.orientationId, rc.blockOrientations );
+		} else {
+			// fallback transitorio: placche non ancora migrate, lette dal file JSON
+			obj = buildLegacyFileResponse( bean, rc.orientationId );
+		}
+
+		obj["image"] = "";
+
+		if ( Len( rc.productId ) ) {
+			var product = super.fire( "product.get", [ rc.productId ] );
+			var image = product.getImage( typeId = (obj.orientation.getId() == 'HOR' ? 'horizontal' : 'vertical') );
+			if ( Len( image ) ) {
+				obj["image"] = super.getMementify().convert( image );
+			}
+		}
+
+		// le lookup orientation vengono serializzate alla fine
+		obj["orientation"]     = super.getMementify().convert( obj.orientation );
+		obj["cellOrientation"] = super.getMementify().convert( obj.cellOrientation );
+
+		var availableOrientations = [];
+		for ( var ori in obj.availableOrientations ) {
+			availableOrientations.add( super.getMementify().convert( ori ) );
+		}
+		obj["availableOrientations"] = availableOrientations;
+
+		result.setData( obj );
+
+		event.setValue( "result", result );
+	}
+
+	/**
+	 * Costruisce la risposta per le placche a blocchi (configurazione su DB).
+	 *
+	 * - Gli slot sono numerati con interi progressivi per placca (1..N), uguali in HOR e VER.
+	 * - I blocchi scorrono lungo l'asse della placca (orizzontale in HOR, verticale in VER).
+	 * - Margini: lungo l'asse di flusso il margine è riferito al blocco precedente
+	 *   (LEFT con placca orizzontale, TOP con placca verticale; per il primo blocco
+	 *   è riferito al bordo della placca); l'altro margine è sempre riferito al
+	 *   bordo della placca.
+	 * - I blocchi con orientation_mode fisso (HOR/VER) mantengono il proprio
+	 *   orientamento celle in entrambe le viste.
+	 * - blockOrientations (JSON {"<order>":"HOR|VER"}): override per singolo
+	 *   blocco, usato dai preventivi per ruotare un blocco alla volta.
+	 */
+	private Struct function buildBlocksResponse( required Any bean, String orientationId = "", String blockOrientations = "" ){
+
+		var overrides = {};
+		if ( Len( arguments.blockOrientations ) && IsJSON( arguments.blockOrientations ) ) {
+			overrides = DeserializeJSON( arguments.blockOrientations );
+		}
+
+		var frameOrientationId = bean.getOrientation().getId();
+
+		var orientationIds = [];
+		if ( frameOrientationId == "HAV" ) {
+			orientationIds = [ "HOR", "VER" ];
+		} else {
+			orientationIds = [ frameOrientationId ];
+		}
+
+		var thisOrientationId = ( frameOrientationId == "VER" ? "VER" : "HOR" );
+		if ( Len( arguments.orientationId ) && ArrayFind( orientationIds, arguments.orientationId ) ) {
+			thisOrientationId = arguments.orientationId;
+		}
+
+		var blocks = [];
+		var slotCounter = 0;
+		var flowCursor  = 0; // bordo finale (destro o inferiore) del blocco precedente
+		var plateWidth  = 0;
+		var plateHeight = 0;
+
+		for ( var block in bean.getBlocks() ) {
+
+			var mode = block.getOrientationMode();
+			var effectiveOri = ( mode == "HAV" ? thisOrientationId : mode );
+
+			// override per singolo blocco (rotazione dal preventivo)
+			var orderKey = ToString( block.getOrder() );
+			if ( StructKeyExists( overrides, orderKey ) && ListFindNoCase( "HOR,VER", overrides[ orderKey ] ) ) {
+				effectiveOri = UCase( overrides[ orderKey ] );
+			}
+
+			var blockWidth  = 0;
+			var blockHeight = 0;
+
+			if ( effectiveOri == "HOR" ) {
+				blockWidth  = block.getSlotCount() * variables.SLOT_WIDTH_MM;
+				blockHeight = variables.SLOT_HEIGHT_MM;
+			} else {
+				blockWidth  = variables.SLOT_HEIGHT_MM;
+				blockHeight = block.getSlotCount() * variables.SLOT_WIDTH_MM;
+			}
+
+			var blockLeft = 0;
+			var blockTop  = 0;
+
+			if ( thisOrientationId == "HOR" ) {
+				blockLeft  = flowCursor + block.getMarginLeftMm();
+				blockTop   = block.getMarginTopMm();
+				flowCursor = blockLeft + blockWidth;
+			} else {
+				blockTop   = flowCursor + block.getMarginTopMm();
+				blockLeft  = block.getMarginLeftMm();
+				flowCursor = blockTop + blockHeight;
+			}
+
+			var slots = [];
+			for ( var i = 1; i <= block.getSlotCount(); i++ ) {
+				slotCounter++;
+				slots.add( {
+					"id"    = slotCounter,
+					"order" = slotCounter - 1,
+					"type"  = "_"
+				} );
+			}
+
+			blocks.add( {
+				"id"              = block.getId(),
+				"order"           = block.getOrder(),
+				"orientationMode" = mode,
+				"rotatable"       = block.getRotatable(),
+				"slotCount"       = block.getSlotCount(),
+				"marginTopMm"     = block.getMarginTopMm(),
+				"marginLeftMm"    = block.getMarginLeftMm(),
+				"left"            = blockLeft,
+				"top"             = blockTop,
+				"width"           = blockWidth,
+				"height"          = blockHeight,
+				"cellOrientation" = effectiveOri,
+				"slots"           = slots
+			} );
+
+			plateWidth  = Max( plateWidth, blockLeft + blockWidth );
+			plateHeight = Max( plateHeight, blockTop + blockHeight );
+		}
+
+		var availableOrientations = [];
+		for ( var thisOri in orientationIds ) {
+			availableOrientations.add( super.service( "Lookup" ).get( "orientation", thisOri ) );
+		}
+
+		var obj = super.getMementify().convert( bean, "detail" );
+
+		obj.remove( "cells" );
+		obj.remove( "grid" );
+
+		obj["orientation"]     = super.service( "Lookup" ).get( "orientation", thisOrientationId );
+		obj["cellOrientation"] = super.service( "Lookup" ).get( "orientation", thisOrientationId );
+		obj["availableOrientations"] = availableOrientations;
+
+		obj["blocks"] = blocks;
+		obj["width"]  = plateWidth;
+		obj["height"] = plateHeight;
+
+		obj["slotSize"] = {
+			"width"  = variables.SLOT_WIDTH_MM,
+			"height" = variables.SLOT_HEIGHT_MM
+		};
+
+		return obj;
+	}
+
+	/**
+	 * Risposta legacy basata sui file /config/data/plates/grid_<code>.json.cfm.
+	 * Mantenuta come fallback finche' tutte le placche non sono migrate a blocchi.
+	 */
+	private Struct function buildLegacyFileResponse( required Any bean, String orientationId = "" ){
+
 		var code   = bean.getCode();
 		var config = DeserializeJSON( FileRead( ExpandPath( "/config/data/plates/grid_#code#.json.cfm" ) ) );
 
-		//var availableOrientations = orientationsMap[ bean.getOrientation().getId() ];
-
 		var thisOrientationId = "";
-		var orientationIds = "";
 
-		if( Len( rc.orientationId ) ) {
-			thisOrientationId = rc.orientationId;
+		if ( Len( arguments.orientationId ) && StructKeyExists( config.frame.orientations, arguments.orientationId ) ) {
+			thisOrientationId = arguments.orientationId;
 		} else {
 			// se non lo passo, il primo disponibile
-			var firstOri = ListFirst( StructKeyList( config.frame.orientations ) );
-			thisOrientationId = firstOri;
+			thisOrientationId = ListFirst( StructKeyList( config.frame.orientations ) );
 		}
 
 		var orientationConfig = config.frame.orientations[ thisOrientationId ];
@@ -58,37 +220,21 @@
 
 		var availableOrientations = [];
 		for ( var thisOri in orientationIds ) {
-			//var oriStruct = config.frame.orientations[ thisOri ];
-			var oriBean   = super.service("Lookup").get( "orientation", thisOri );
-			availableOrientations.add( oriBean );
+			availableOrientations.add( super.service( "Lookup" ).get( "orientation", thisOri ) );
 		}
-
-		var plateOrientation = super.service("Lookup").get( "orientation",  thisOrientationId );
-		var cellOrientation = super.service("Lookup").get( "orientation",  orientationConfig.cellOrientation );
 
 		var obj = super.getMementify().convert( bean, "detail" );
 
-		obj["image"] = "";
+		obj.remove( "cells" );
+		obj.remove( "blocks" );
 
+		obj["orientation"]     = super.service( "Lookup" ).get( "orientation", thisOrientationId );
+		obj["cellOrientation"] = super.service( "Lookup" ).get( "orientation", orientationConfig.cellOrientation );
 		obj["availableOrientations"] = availableOrientations;
 
-		obj["orientation"]     = plateOrientation;
-		obj["cellOrientation"] = cellOrientation;
-		obj["grid"]            = orientationConfig["grid"];
+		obj["grid"] = orientationConfig["grid"];
 
-		obj.remove( "cells" );
-
-		if ( Len( rc.productId ) ) {
-			var product = super.fire( "product.get", [ rc.productId ] );
-			var image = product.getImage( typeId = (thisOrientationId == 'HOR' ? 'horizontal' : 'vertical') );
-			if ( Len( image ) ) {
-				obj["image"] = super.getMementify().convert( image );			
-			}
-		}
-
-		result.setData( obj );
-
-		event.setValue( "result", result );
+		return obj;
 	}
 
 	function codeExists( event, rc, prc ){
@@ -104,8 +250,6 @@
 
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
-		var cells = [];
-
 		var thisId     = "";
 		var messageId  = "";
 		var result = super.getResult();
@@ -115,42 +259,76 @@
 		var orientation = super.bean( "Orientation" );
 		var cellOrientation = super.bean( "Orientation" );
 
-		//dump(json.cells);
+		// payload builder: blocchi di slot
+		if ( !IsNull( json.blocks ) ) {
 
-		for ( var col in json.cells ) {
+			var blocks = [];
 
-            for ( var thisCell in col.cells ) {
+			for ( var thisBlock in json.blocks ) {
 
-                if ( thisCell.data.type.id != "COMMAND" ) {
+				var block = super.bean( "FrameBlock" );
 
-					var cell = super.bean( "FrameCell" );
-					var type = super.bean( "FrameCellType" );
-					var orientation = super.bean( "Orientation" );
+				block.setOrder( thisBlock.order );
+				block.setSlotCount( thisBlock.slotCount );
 
-					cell.setRow( thisCell.data.row )
-					cell.setCol( thisCell.data.col )
-					cell.setWidth( thisCell.data.width )
-					cell.setHeight( thisCell.data.height )
+				if ( !IsNull( thisBlock.marginTopMm ) && IsNumeric( thisBlock.marginTopMm ) ) block.setMarginTopMm( thisBlock.marginTopMm );
+				if ( !IsNull( thisBlock.marginLeftMm ) && IsNumeric( thisBlock.marginLeftMm ) ) block.setMarginLeftMm( thisBlock.marginLeftMm );
 
-					cell.setType( type.setId( thisCell.data.type.id ) )
-					cell.setOrientation( orientation.setId( thisCell.data.orientation.id ) )
+				block.setOrientationMode( thisBlock.orientationMode );
+				if ( !IsNull( thisBlock.rotatable ) ) block.setRotatable( thisBlock.rotatable );
 
-					cells.add( cell )
+				blocks.add( block );
+			}
 
-                }
+			frame.setBlocks( blocks );
+		}
 
-            }
+		// payload legacy (vecchia pagina armature a celle)
+		if ( !IsNull( json.cells ) ) {
 
-        }
+			var cells = [];
 
-		frame.setCells( cells );
+			for ( var col in json.cells ) {
+
+				for ( var thisCell in col.cells ) {
+
+					if ( thisCell.data.type.id != "COMMAND" ) {
+
+						var cell = super.bean( "FrameCell" );
+						var type = super.bean( "FrameCellType" );
+						var orientationCell = super.bean( "Orientation" );
+
+						cell.setRow( thisCell.data.row )
+						cell.setCol( thisCell.data.col )
+						cell.setWidth( thisCell.data.width )
+						cell.setHeight( thisCell.data.height )
+
+						cell.setType( type.setId( thisCell.data.type.id ) )
+						cell.setOrientation( orientationCell.setId( thisCell.data.orientation.id ) )
+
+						cells.add( cell )
+
+					}
+
+				}
+
+			}
+
+			frame.setCells( cells );
+		}
 
 		frame.setId( json?.id );
 		frame.setCode( json.code );
 		frame.setName( json.name );
 		frame.setStatus( status.setId( json.status.id ) );
 		frame.setOrientation( orientation.setId( json.Orientation.id ) );
-		frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
+
+		// cell_orientation_id: legacy, per il payload builder coincide con l'orientamento
+		if ( !IsNull( json.cellOrientation ) ) {
+			frame.setCellOrientation( cellOrientation.setId( json.cellOrientation.id ) );
+		} else {
+			frame.setCellOrientation( cellOrientation.setId( json.Orientation.id == "HAV" ? "HOR" : json.Orientation.id ) );
+		}
 
 		if ( !Len( json.id ) ) {
 			messageId = "frame.created";

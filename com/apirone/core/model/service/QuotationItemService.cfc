@@ -654,7 +654,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			frame.setOrientation( getLookupService().get( "orientation", arguments.record.orientation_id ) );
 			bean.setFrame( frame );
 
-		} else {
+				if ( !IsNull( record.block_orientations ) && Len( record.block_orientations ) ) {
+					bean.setBlockOrientations( record.block_orientations );
+				}
+
+			} else {
 
 			if ( Len( arguments.record.signage_config_item_id ) ) {
 				var bean = super.bean( "QuotationItemSignage" );
@@ -768,7 +772,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.item.product;
 
-		for ( var item in product.items._data ) {
+		var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+		for ( var item in productItemsData ) {
 			for ( var value in item.values ) {
 				if ( value.selected ) {
 					productItemsIds.add( value.productItemId );
@@ -840,9 +845,156 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			lines.add( line );
 		}
 
+		if ( isVitiAVistaNo( json ) ) {
+			for ( var plug in computePlugRuns( json ) ) {
+				var plugProductId = ( plug.type == "tappo" )
+					? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
+					: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
+				var plugProduct = super.service( "Product" ).get( plugProductId );
+				if ( IsNull( plugProduct ) ) continue;
+				var plugPrice = calculator.calculate(
+					plugProductId, 1, json.item.quotationZone.id, [], 0, 0, quotation, quotationItem
+				);
+				var plugLine = super.bean( "QuotationItemPriceLine" );
+				plugLine.setName( plug.type == "tappo" ? "Tappo" : "Mezzo tappo" );
+				plugLine.setAmount( plugPrice.finalPrice );
+				plugLine.setCost( plugPrice.totalCost );
+				lines.add( plugLine );
+			}
+		}
+
 		pricing.setLines( lines );
 
 		return pricing;
+	}
+
+	private Boolean function isVitiAVistaNo( required Struct json ) {
+		if ( !StructKeyExists( json, "item" )
+			|| !StructKeyExists( json.item, "product" )
+			|| !StructKeyExists( json.item.product, "items" )
+			|| !StructKeyExists( json.item.product.items, "_data" ) ) {
+			return false;
+		}
+		for ( var item in json.item.product.items._data ) {
+			if ( StructKeyExists( item, "attributeName" ) && item.attributeName == "VITI A VISTA" ) {
+				for ( var val in item.values ) {
+					if ( StructKeyExists( val, "selected" ) && val.selected
+						&& StructKeyExists( val, "attributeValue" )
+						&& StructKeyExists( val.attributeValue, "rawValue" )
+						&& val.attributeValue.rawValue.name == "NO" ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private Array function computePlugRuns( required Struct json ) {
+		var result = [];
+		if ( !StructKeyExists( json, "positions" )
+			|| !StructKeyExists( json, "item" )
+			|| !StructKeyExists( json.item, "product" )
+			|| !StructKeyExists( json.item.product, "frame" )
+			|| !StructKeyExists( json.item.product, "orientation" )
+			|| !Len( json.item.product.orientation.id ) ) {
+			return result;
+		}
+		// frame.code usato direttamente (path aggiornaPrezzo); frame.id come fallback (path save da client)
+		var frameCode = "";
+		var frame = "";
+		if ( StructKeyExists( json.item.product.frame, "id" ) && Len( json.item.product.frame.id ) ) {
+			frame = super.service( "Frame" ).get( json.item.product.frame.id );
+		} else if ( StructKeyExists( json.item.product.frame, "code" ) && Len( json.item.product.frame.code ) ) {
+			frame = super.service( "Frame" ).getByCode( json.item.product.frame.code );
+		}
+		if ( !IsNull( frame ) && !IsSimpleValue( frame ) ) frameCode = frame.getCode();
+		if ( !Len( frameCode ) && StructKeyExists( json.item.product.frame, "code" ) ) frameCode = json.item.product.frame.code;
+		if ( !Len( frameCode ) ) return result;
+
+		var allPositions = [];
+
+		if ( !IsNull( frame ) && !IsSimpleValue( frame ) && !IsNull( frame.getBlocks() ) && ArrayLen( frame.getBlocks() ) ) {
+			// placca a blocchi: slot numerati 1..N, indipendenti dall'orientamento.
+			// Il blocco serve per non far "cavallottare" un tappo doppio fra due blocchi.
+			var slotCounter = 0;
+			var blockIndex = 0;
+			for ( var block in frame.getBlocks() ) {
+				blockIndex++;
+				for ( var i = 1; i <= block.getSlotCount(); i++ ) {
+					slotCounter++;
+					allPositions.add( { id: slotCounter, order: slotCounter - 1, block: blockIndex } );
+				}
+			}
+		} else {
+			// placca legacy su file
+			var gridFile = ExpandPath( "/config/data/plates/grid_#frameCode#.json.cfm" );
+			if ( !FileExists( gridFile ) ) return result;
+			var gridConfig = DeserializeJSON( FileRead( gridFile ) );
+			var orientationId = json.item.product.orientation.id;
+			if ( !StructKeyExists( gridConfig.frame.orientations, orientationId ) ) return result;
+			var gridRows = gridConfig.frame.orientations[ orientationId ].grid;
+			for ( var gridRow in gridRows ) {
+				for ( var cell in gridRow ) {
+					if ( cell.type != "0" ) {
+						allPositions.add( { id: cell.id, order: cell.order, block: 0 } );
+					}
+				}
+			}
+		}
+
+		ArraySort( allPositions, function( a, b ) {
+			if ( a.order < b.order ) return -1;
+			if ( a.order > b.order ) return 1;
+			return 0;
+		} );
+		var occupiedIds = {};
+		for ( var fId in json.positions ) {
+			for ( var pos in json.positions[ fId ] ) {
+				// posizioni da client: {id: uuid, order: N}; da DB: {position: uuid, order: N}
+				var posId = StructKeyExists( pos, "id" ) ? pos.id : ( StructKeyExists( pos, "position" ) ? pos.position : "" );
+				if ( Len( posId ) ) occupiedIds[ posId ] = true;
+			}
+		}
+		var emptyPositions = [];
+		for ( var pos in allPositions ) {
+			if ( !StructKeyExists( occupiedIds, pos.id ) ) {
+				emptyPositions.add( pos );
+			}
+		}
+		var idx = 1;
+		while ( idx <= ArrayLen( emptyPositions ) ) {
+			var isDouble = idx < ArrayLen( emptyPositions )
+				&& emptyPositions[ idx + 1 ].order == emptyPositions[ idx ].order + 1
+				&& emptyPositions[ idx + 1 ].block == emptyPositions[ idx ].block;
+			if ( isDouble ) {
+				result.add( { type: "tappo", positionIds: [ emptyPositions[ idx ], emptyPositions[ idx + 1 ] ] } );
+				idx += 2;
+			} else {
+				result.add( { type: "mezzotappo", positionIds: [ emptyPositions[ idx ] ] } );
+				idx += 1;
+			}
+		}
+		return result;
+	}
+
+	public Array function buildPlugFruitBeans( required Struct data ) {
+		var json = arguments.data;
+		var result = [];
+		if ( !isVitiAVistaNo( json ) ) return result;
+		for ( var plug in computePlugRuns( json ) ) {
+			var plugProductId = ( plug.type == "tappo" )
+				? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
+				: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
+			var plugProduct = super.service( "Product" ).get( plugProductId );
+			if ( IsNull( plugProduct ) ) continue;
+			var fruitBean = super.bean( "QuotationItemFruit" );
+			fruitBean.setFruit( plugProduct );
+			fruitBean.setPositions( plug.positionIds );
+			fruitBean.setItems( [] );
+			result.add( fruitBean );
+		}
+		return result;
 	}
 
 	public com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){
@@ -876,9 +1028,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.quotationItem.product;
 
-		var product = json.quotationItem.product;
 		if ( product.keyExists( "items" ) ) {
-			for ( var item in product.items._data ) {
+			var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+			for ( var item in productItemsData ) {
 				for ( var value in item.values ) {
 					if ( value.selected ) {
 						productItemsIds.add( value.product_item_id );
@@ -950,7 +1102,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var product = json.quotationItem.product;
 		if ( product.keyExists( "items" ) ) {
-			for ( var item in product.items._data ) {
+			var productItemsData = isArray( product.items ) ? product.items : product.items._data;
+			for ( var item in productItemsData ) {
 				for ( var value in item.values ) {
 					if ( value.selected ) {
 						productItemsIds.add( value.product_item_id );
@@ -1121,10 +1274,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					]
 				});
 			}
+			var PLUG_IDS = [ "5f4ec169-c445-40a0-8c94-1dc22c21be79", "452e03e4-ddf4-4042-ac87-b0f17489c4e1" ];
+			var realFruits = [];
+			var positions = {};
 			var fruits = quotationItem.getFruits();
 			for (var fruit in fruits) {
-				var fruitItems = []
-
+				// escludi tappi esistenti: verranno ricalcolati
+				if ( PLUG_IDS.find( LCase( fruit.getFruit().getId() ) ) ) continue;
+				realFruits.append( fruit );
+				var fruitItems = [];
 				if ( !isNull( fruit.getItems() ) ) {
 					for (fruitItem in fruit.getItems()) {
 						fruitItems.append({
@@ -1142,7 +1300,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					"fruitId": fruit.getId(),
 					"items": { "_data": fruitItems }
 				});
+				// costruisce json.positions per computePlugRuns
+				var fruitPositions = fruit.getPositions();
+				if ( !isNull( fruitPositions ) && ArrayLen( fruitPositions ) ) {
+					var posArr = [];
+					for ( var fp in fruitPositions ) {
+						var posId = StructKeyExists( fp, "id" ) ? fp.id : ( StructKeyExists( fp, "position" ) ? fp.position : "" );
+						if ( Len( posId ) ) posArr.append( { id: posId, order: fp.order } );
+					}
+					positions[ fruit.getId() ] = posArr;
+				}
 			}
+			// fornisce frame.code e orientation a computePlugRuns
+			json.positions = positions;
+			json.item.product.frame = { "code": quotationItem.getProduct().getModel().getCode() };
+			json.item.product.orientation = { "id": quotationItem.getFrame().getOrientation().getId() };
+			// ricalcola i tappi e aggiorna la lista fruits
+			var plugBeans = buildPlugFruitBeans( json );
+			var allFruits = [];
+			allFruits.append( realFruits, true );
+			allFruits.append( plugBeans, true );
+			quotationItem.setFruits( allFruits );
 			var price = getPlatePricing(json)
 		}
 

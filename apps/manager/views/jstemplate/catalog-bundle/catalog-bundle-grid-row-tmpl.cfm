@@ -24,6 +24,9 @@
             <td>
                 <input type="text" class="form-control input-sm" data-bind="value: markupValue" />
             </td>
+            <td class="text-center">
+                #iconButton(bind="click:edit", icon="edit")#
+            </td>
         </tr>
     </nmscript>
 </cfoutput>

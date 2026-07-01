@@ -251,7 +251,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var result = {
 			"success" = true,
-			"error" = null
+			"error" = null,
+			"exportedItems" = [],
+			"skippedItems" = []
 		};
 
 		transaction {
@@ -416,10 +418,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
 					);
 
+						if ( existingCodes.len() > 0 ) {
+							ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
+							continue;
+						}
 					if ( existingCodes.len() > 0 ) {
 						continue;
 					}
 
+						///se non troviamo, creiamo ed esportiamo in verticale
+						var exportCode = super.bean( "ExportCode" );
+						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
+						exportCode.setCounter( "000000" );
+						exportCodeService.create( "exportCode" = exportCode );
+						result.success = getDao().exportProduct( dataExport );
+						ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
+
+						continue;
+					} else {
+						var hsCode = "";
+						try {
+							hsCode = quotationItem.getProduct().getLine().getHscode();
+						} catch ( any e ) {
+
+						}
+						var quotationImageFile = quotationItem.getImage();
+						var base64File = "";
 					var exportCode = super.bean( "ExportCode" );
 					exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
 					exportCode.setCounter( "000000" );
@@ -675,6 +699,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					};
 
 					result.success = getDao().exportProduct( dataExport );
+					ArrayAppend( result.exportedItems, description );
 
 					var allComponents = [];
 					for ( var productComponent in productComponents ) {
@@ -727,7 +752,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
+	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems, boolean provisional = false ){
 		var result = {
 			'success' = false,
 			'error' = null
@@ -738,7 +763,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var quotation = quotationItems[1].getQuotation();
 
 				getDao().deleteExport( quotationNumber = quotation.getQuotationNumber() );
-				quotationDataResult = prepareExportData(quotation);
+				quotationDataResult = prepareExportData(quotation, arguments.provisional);
 				if (!isNull(quotationDataResult.error)) {
 					result.error = quotationDataResult.error;
 					return result;
@@ -1085,7 +1110,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return componente;
 	}
 
-	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
+	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation, boolean provisional = false ){
 		var result = {
 			"data" = {},
 			"error" = null
@@ -1102,8 +1127,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MM_IDRIF" = quotation.getQuotationNumber(), // i need the same code
 			"MMNUMDOC" = quotation.getQuotationNumber() & "/" & quotation.getVersionNumber(),
 			"MMDATDOC" = quotation.getCreatedAt(),
-			"MMDATEVA" = quotation.getValidityDate(),
-			"MMRIFORD" = !IsNull( quotation.getOpportunity() ) ? quotation.getOpportunity().getName() : "",
+			"MMDATEVA" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
+			"MMEVASIO" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
+			"MMRIFORD" = quotation.getRifLibero() ?: "",
 			"MMNUMLIS" = 1,
 			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
 			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,
@@ -1144,10 +1170,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var ct = quotation.getCustomerType() ?: "";
 				return StructKeyExists( crmToErp, ct ) ? crmToErp[ ct ] : "";
 			})(),
+			"INDUSTRY" = quotation.getIndustry() ?: "",
+			"MMORDFOR" = "",
+			"CFCODDES" = quotation.getCodiceSdi() ?: "",
+			"MMORDPRO" = arguments.provisional ? "S" : "N",
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),
-			"DECAPDES" = customer.getPostalCode(),
+			"DECAPDOC" = customer.getPostalCode(),
 			"DEDESDOD" = customer.getCompany(),
 			"DEINDDOD" = customer.getStreet(),
 			"DELOCDOD" = customer.getCity(),
@@ -1156,7 +1186,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		};
 
 		if (isNull(quotation.getShippingProfile())) {
-			quotationData["DECAPDOC"] = "";
+			quotationData["DECAPDES"] = "";
 			quotationData["DEIDDMER"] = "";
 			quotationData["DEDESMER"] = "";
 			quotationData["DEINDMER"] = "";
@@ -1164,7 +1194,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quotationData["DEPROMER"] = "";
 			quotationData["DENAZMER"] = "";
 		} else {
-			quotationData["DECAPDOC"] = quotation.getShippingProfile().getPostalCode();
+			quotationData["DECAPDES"] = quotation.getShippingProfile().getPostalCode();
 			quotationData["DEIDDMER"] = quotation.getShippingProfile().getId();
 			quotationData["DEDESMER"] = quotation.getShippingProfile().getCompany();
 			quotationData["DEINDMER"] = quotation.getShippingProfile().getStreet();
@@ -1199,9 +1229,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
-		clonedQuotation.setActive( 0 );
+		clonedQuotation.setActive( 1 );
 		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
-		clonedQuotation.setVersionNumber( originalQuotation.getVersionNumber() );
+		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );

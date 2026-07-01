@@ -15,9 +15,62 @@
                     <div class="card-body">
 
                         <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Categoria</label>
+                            <div class="col-sm-10">
+                                <select required class="form-control" name="categoryId"
+                                    data-msg-required="Categoria richiesta"
+                                    data-bind="source: detailForm.categories, value: detailForm.data.category.id"
+                                    data-value-field="id"
+                                    data-text-field="name"
+>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Linea</label>
+                            <div class="col-sm-10">
+                                <select required class="form-control" name="lineId"
+                                    data-msg-required="Linea richiesta"
+                                    data-bind="source: detailForm.lines, value: detailForm.data.line.id"
+                                    data-value-field="id"
+                                    data-text-field="name"
+>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Modello</label>
+                            <div class="col-sm-10">
+                                <select required class="form-control" name="modelId"
+                                    data-msg-required="Modello richiesto"
+                                    data-bind="source: detailForm.models, value: detailForm.data.model.id"
+                                    data-value-field="id"
+                                    data-text-field="code"
+>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Finiture</label>
+                            <div class="col-sm-10">
+                                <select name="finishIds"
+                                    data-placeholder="Seleziona le finiture"
+                                    data-role="multiselect"
+                                    data-bind="source: detailForm.finishes, value: detailForm.data.selectedFinishes"
+                                    data-value-field="id"
+                                    data-text-field="name">
+                                </select>
+                                <small class="text-muted">Viene creato un prodotto per ogni finitura selezionata (le combinazioni già esistenti vengono saltate). Senza finitura il prodotto non viene trovato nel preventivo placche.</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Codice</label>
                             <div class="col-sm-10">
-                                <input type="text" required class="form-control col-sm-4" 
+                                <input type="text" required class="form-control col-sm-4"
                                     name="code"
                                     maxlength="20"
                                     data-bind="value: detailForm.data.code"

@@ -49,19 +49,15 @@ AP.quotation.list = ( function() {
                 } );
             }
 
-            if ( params.strDescription.length ) {
+            if ( params.strSearch && params.strSearch.length ) {
                 filters.push( {
-                    field: "description",
-                    operator: "contains",
-                    value: params.strDescription,
-                } );
-            }
-
-            if ( params.strNumber.length ) {
-                filters.push( {
-                    field: "quotationNumber",
-                    operator: "contains",
-                    value: params.strNumber,
+                    logic: "or",
+                    filters: [
+                        { field: "quotationNumber", operator: "contains", value: params.strSearch },
+                        { field: "name",            operator: "contains", value: params.strSearch },
+                        { field: "referentName",    operator: "contains", value: params.strSearch },
+                        { field: "rifLibero",       operator: "contains", value: params.strSearch },
+                    ]
                 } );
             }
 
@@ -132,21 +128,21 @@ AP.quotation.list = ( function() {
                 },
                 callback: function( result ) {
                     if ( result ) {
+                        AP.loading.show();
                         NM.util.ajax({
-                        method: "DELETE",
-                        url: "/manager/ajax/quotations/" + id,
-                        callback: {
-                            done: async function (xhr) {
-                                AP.widget.notify( "success", "Preventivo eliminato con successo." );
-                                AP.loading.show();
-                                await viewModel.dataSource.items.read()
-                                viewModel.rows = viewModel.dataSource.items;
-                                viewModel.search();
-                                AP.loading.hide();
+                            method: "DELETE",
+                            url: "/manager/ajax/quotations/" + id,
+                            callback: {
+                                done: async function (xhr) {
+                                    AP.widget.notify( "success", "Preventivo eliminato con successo." );
+                                    await viewModel.dataSource.items.read();
+                                    viewModel.rows = viewModel.dataSource.items;
+                                    viewModel.search();
+                                    AP.loading.hide();
+                                }
                             }
-                        }
-                    });
-                    } 
+                        });
+                    }
                 },
             } );
 		},

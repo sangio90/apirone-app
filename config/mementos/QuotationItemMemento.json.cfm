@@ -46,7 +46,8 @@
                 "position.id",
                 "position.code",
                 "status",
-                "frame"
+                "frame",
+                "blockOrientations"
             ]
         },
         edit = {
