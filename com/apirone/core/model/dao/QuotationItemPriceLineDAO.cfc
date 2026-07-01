@@ -112,4 +112,26 @@
 		<cfreturn result.recordCount>
 	</cffunction>
 
+	<!---
+		Recupera in batch le linee di prezzo per una lista di quotation_item_price_id.
+		Utilizzato da QuotationItemService.getMany() per precaricare le linee
+		e permettere il calcolo corretto di getTotal().
+	--->
+	<cffunction name="readByQuotationItemPriceIds" access="public" returntype="Query">
+		<cfargument name="quotationItemPriceIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemPriceIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT quotation_item_price_line_id, quotation_item_price_id, name, amount, cost, created_at
+			FROM quotation_item_price_lines
+			WHERE quotation_item_price_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY quotation_item_price_line_id ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="QuotationItemDAO";
 	property name="quotationItemFruitService" inject="QuotationItemFruitService";
 	property name="quotationItemPriceService" inject="QuotationItemPriceService";
+	property name="quotationItemPriceLineService" inject="QuotationItemPriceLineService";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
@@ -388,11 +389,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		// Prices (batch via nuovo readByQuotationItemIds)
-		var priceMap = {};
+		var priceMap      = {};
+		var priceBeanById = {};
 		if ( ArrayLen( arguments.ids ) ) {
 			var priceRecords = getQuotationItemPriceService().getDao().readByQuotationItemIds( arguments.ids );
+			var priceIds     = [];
 			for ( var prr in priceRecords ) {
-				// buildFromRow è privato su QuotationItemPriceService: costruzione inline
 				var priceBean = super.bean( "QuotationItemPrice" );
 				var methodBean = super.bean( "PriceMethod" );
 				priceBean.setId( prr.quotation_item_price_id );
@@ -400,8 +402,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				priceBean.setDiscount2( prr.discount2 );
 				priceBean.setAmount( prr.amount );
 				priceBean.setMethod( methodBean.setId( prr.price_method_id ) );
-				// Lines: non precaricati in batch (non critici per la lista quotazioni)
-				priceMap[ prr.quotation_item_id ] = priceBean;
+				// Mappa sia per quotation_item_id (lookup dal bean) che per price_id (aggiornamento linee)
+				priceMap[ prr.quotation_item_id ]             = priceBean;
+				priceBeanById[ prr.quotation_item_price_id ]  = priceBean;
+				priceIds.append( prr.quotation_item_price_id );
+			}
+
+			// Precarica le linee di prezzo in batch (necessarie per getTotal()
+			// che somma i line.amount per calcolare il totale)
+			if ( ArrayLen( priceIds ) ) {
+				var priceLineDao  = getQuotationItemPriceLineService().getDao();
+				var priceLineRecs = priceLineDao.readByQuotationItemPriceIds( priceIds );
+				for ( var plr in priceLineRecs ) {
+					var lineBean = super.bean( "QuotationItemPriceLine" );
+					lineBean.setName( plr.name );
+					lineBean.setAmount( plr.amount );
+					lineBean.setCost( plr.cost );
+					if ( StructKeyExists( priceBeanById, plr.quotation_item_price_id ) ) {
+						var targetPrice = priceBeanById[ plr.quotation_item_price_id ];
+						if ( IsNull( targetPrice.getLines() ) || !ArrayLen( targetPrice.getLines() ) ) {
+							targetPrice.setLines( [ lineBean ] );
+						} else {
+							var existingLines = targetPrice.getLines();
+							existingLines.append( lineBean );
+							targetPrice.setLines( existingLines );
+						}
+					}
+				}
 			}
 		}
 
