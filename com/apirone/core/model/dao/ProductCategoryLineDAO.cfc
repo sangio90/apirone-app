@@ -48,6 +48,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera tutte le righe complete per una categoria.
+		Utilizzato da ProductCategoryLineService.listByCategoryId() per evitare N+1.
+	--->
+	<cffunction name="findByCategoryId" returntype="Query" access="public">
+		<cfargument name="categoryId" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_category_line_id,
+				product_category_id,
+				line_id::varchar,
+				*
+			FROM product_category_lines
+			WHERE product_category_id = <cfqueryparam value="#arguments.categoryId#" cfsqltype="Integer">
+			ORDER BY product_category_line_id ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument
 			name    ="ProductCategoryLine"

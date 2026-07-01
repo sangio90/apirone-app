@@ -14,6 +14,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
+	/**
+	 * Recupera in batch tutte le ProductCategoryLine per una categoria.
+	 * Evita l'N+1 di list() chiamato in un loop per ogni lineId.
+	 *
+	 * @categoryId ID della categoria prodotto
+	 * @return Array di bean ProductCategoryLine
+	 */
+	public Array function listByCategoryId( required Numeric categoryId ){
+		var records = getDao().findByCategoryId( arguments.categoryId );
+		var rows    = [];
+
+		for ( var record in records ) {
+			rows.add( buildFromRow( record ) );
+		}
+
+		return rows;
+	}
+
 
 	public com.apirone.core.model.bean.Result function search(
 		String categoryId,
