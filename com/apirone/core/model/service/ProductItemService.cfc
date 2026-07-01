@@ -440,10 +440,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setComponentCount( 0 );
 			bean.setChildren( [] );
 
-			// Prezzi: dalla mappa pre-caricata
-			if ( StructKeyExists( priceMap, r.product_item_id ) ) {
-				bean.setPrices( priceMap[ r.product_item_id ] );
-			}
+			// Prezzi: dalla mappa pre-caricata (sempre un array, anche se vuoto)
+			bean.setPrices(
+				StructKeyExists( priceMap, r.product_item_id ) ? priceMap[ r.product_item_id ] : []
+			);
 
 			// Immagini: prima per productItemId, fallback per attributeValueId
 			if ( StructKeyExists( fileMap, r.product_item_id ) && Len( fileMap[ r.product_item_id ] ) ) {

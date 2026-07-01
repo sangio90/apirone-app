@@ -165,7 +165,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
-		var oldBean = get( arguments.quotationItem.getId() );
+		// Carica il bean esistente via batch getMany() per evitare la cascata N+1
+		var beanMap = getMany( [ arguments.quotationItem.getId() ] );
+		var oldBean = StructKeyExists( beanMap, arguments.quotationItem.getId() )
+			? beanMap[ arguments.quotationItem.getId() ]
+			: NullValue();
 
 		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 			var fruitIdsToDeleted = [];
@@ -524,6 +528,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var frame = super.bean( "Frame" );
 				frame.setOrientation( getLookupService().get( "orientation", r.orientation_id ) );
 				bean.setFrame( frame );
+
+				// Block orientations dalla colonna del record
+				if ( !IsNull( r.block_orientations ) && Len( r.block_orientations ) ) {
+					bean.setBlockOrientations( r.block_orientations );
+				}
 			} else {
 				if ( Len( r.signage_config_item_id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
@@ -639,33 +648,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.QuotationItem function buildFromRow( required any record ){
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.record.quotation_item_id );
 
-		var pricing = super.bean( "QuotationItemPrice" );
-		var priceMethod = super.bean( "PriceMethod" );
-
 		if ( fruits.len() > 0 ) {
-			arraySort(fruits, function(a, b) {
-				return a.getPositions()[1].order - b.getPositions()[1].order;
-			});
+			arraySort( fruits, function( a, b ){
+				return a.getPositions()[ 1 ].order - b.getPositions()[ 1 ].order;
+			} );
 			var bean = super.bean( "QuotationItemPlate" );
 			var frame = super.bean( "Frame" );
 
-			bean.setFruits( fruits )
+			bean.setFruits( fruits );
 
 			frame.setOrientation( getLookupService().get( "orientation", arguments.record.orientation_id ) );
 			bean.setFrame( frame );
 
-				if ( !IsNull( record.block_orientations ) && Len( record.block_orientations ) ) {
-					bean.setBlockOrientations( record.block_orientations );
-				}
-
-			} else {
-
+			if ( !IsNull( arguments.record.block_orientations ) && Len( arguments.record.block_orientations ) ) {
+				bean.setBlockOrientations( arguments.record.block_orientations );
+			}
+		} else {
 			if ( Len( arguments.record.signage_config_item_id ) ) {
 				var bean = super.bean( "QuotationItemSignage" );
 			} else {
 				var bean = super.bean( "QuotationItem" );
 			}
-
 		}
 
 		var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.record.quotation_item_id );
@@ -784,12 +787,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		//TODO debuggare qui per capire cosa fare per il discorso "ok placca senza frutti e aggiunta tappi"
 		var quotationItem = null;
 		if (json.item.id != "") {
-			quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+			var qiMap = getMany( [ json.item.id ] );
+			quotationItem = StructKeyExists( qiMap, json.item.id )
+				? qiMap[ json.item.id ]
+				: null;
 		}
 
 		var quotation = null;
 		if (json.quotationId != "") {
-			var quotation = super.service( "Quotation" ).get( json.quotationId );
+			var qMap = super.service( "Quotation" ).getMany( [ json.quotationId ] );
+			quotation = StructKeyExists( qMap, json.quotationId )
+				? qMap[ json.quotationId ]
+				: null;
 		}
 
 		var platePrice = calculator.calculate(
@@ -1044,8 +1053,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
 		}
 
-		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
+		var qMap = getQuotationService().getMany( [ json.quotationId ] );
+		var quotation = StructKeyExists( qMap, json.quotationId )
+			? qMap[ json.quotationId ]
+			: null;
+		var quotationItem = null;
+		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+			var qiMap = getMany( [ json.quotationItem.id ] );
+			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
+				? qiMap[ json.quotationItem.id ]
+				: null;
+		}
 
 		var signagePrice = calculator.calculate(
 			product.id,
@@ -1112,8 +1130,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
+		var qMap = getQuotationService().getMany( [ json.quotationId ] );
+		var quotation = StructKeyExists( qMap, json.quotationId )
+			? qMap[ json.quotationId ]
+			: null;
+		var quotationItem = null;
+		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+			var qiMap = getMany( [ json.quotationItem.id ] );
+			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
+				? qiMap[ json.quotationItem.id ]
+				: null;
+		}
 
 		var price = calculator.calculate(
 			product.id,
@@ -1173,19 +1200,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"quotationId" = quotationId,
 			"lineId" = lineId,
 			"finishId" = finishId
-		)
+		);
 
-		for (var row in rows) {
-			var data = {}
-			var quotationItem = get( quotationItemId = row.quotation_item_id );
+		// Precarica tutti i QuotationItem in batch per evitare N+1
+		var itemIds = [];
+		for ( var row in rows ) {
+			itemIds.append( row.quotation_item_id );
+		}
+		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		for ( var row in rows ) {
+			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
+				? itemMap[ row.quotation_item_id ]
+				: NullValue();
 			if (
-				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") &&
-				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")
+				IsNull( quotationItem ) ||
+				( !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") &&
+				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") )
 			) {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem)
+			aggiornaPrezzo(quotationItem);
 		}
 	}
 
@@ -1198,12 +1234,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"quotationItemId" = quotationItemId,
 			"quotationId" = quotationId,
 			"productId" = productId
-		)
+		);
 
-		for (var row in rows) {
-			var data = {}
-			var quotationItem = get( quotationItemId = row.quotation_item_id );
+		// Precarica tutti i QuotationItem in batch per evitare N+1
+		var itemIds = [];
+		for ( var row in rows ) {
+			itemIds.append( row.quotation_item_id );
+		}
+		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		for ( var row in rows ) {
+			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
+				? itemMap[ row.quotation_item_id ]
+				: NullValue();
 			if (
+				IsNull( quotationItem ) ||
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") ||
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") ||
 				!isNull(quotationItem.getArticle())
@@ -1211,7 +1256,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem)
+			aggiornaPrezzo(quotationItem);
 		}
 	}
 

@@ -60,7 +60,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public Struct function getMany( required Array ids ){
 		var records = getDao().readByIds( ids = arguments.ids );
 		var map     = {};
-		var types   = {};
+
+		// Raccoglie tutti i metadata_type_id per precaricarli in batch
+		var typeIds     = [];
+		var typeIdsSeen = {};
+		for ( var record in records ) {
+			if ( !StructKeyExists( typeIdsSeen, record.metadata_type_id ) ) {
+				typeIdsSeen[ record.metadata_type_id ] = true;
+				typeIds.append( record.metadata_type_id );
+			}
+		}
+
+		// Precarica i MetadataType in batch con getMany() pubblico (1 query)
+		var typeMap = {};
+		if ( ArrayLen( typeIds ) ) {
+			typeMap = getMetadataTypeService().getMany( typeIds );
+		}
 
 		for ( var record in records ) {
 			var bean = super.bean( "Metadata" );
@@ -69,11 +84,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.metadata_id );
 			bean.setCreatedAt( record.created_at );
 
-			// MetadataType: cached localmente per evitare chiamate N+1
-			if ( !StructKeyExists( types, record.metadata_type_id ) ) {
-				types[ record.metadata_type_id ] = getMetadataTypeService().get( record.metadata_type_id );
+			// MetadataType: dalla mappa batch
+			if ( StructKeyExists( typeMap, record.metadata_type_id ) ) {
+				bean.setType( typeMap[ record.metadata_type_id ] );
 			}
-			bean.setType( types[ record.metadata_type_id ] );
 
 			bean.setEntity( getEntity( record ) );
 			bean.setValue( getValue( record ) );
