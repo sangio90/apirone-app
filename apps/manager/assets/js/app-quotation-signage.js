@@ -114,6 +114,9 @@ AP.signage.modal = ( function() {
         },
         showCustomImage: false,
         showImage: true,
+        showJsonPanel: false,
+        jsonExportText: "",
+        jsonExportLoading: false,
 
         // aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
@@ -200,6 +203,9 @@ AP.signage.modal = ( function() {
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+            viewModel.set( "showJsonPanel", false );
+            viewModel.set( "jsonExportText", "" );
+            viewModel.set( "jsonExportLoading", false );
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageLine" ).prop( "disabled", false );
@@ -207,6 +213,31 @@ AP.signage.modal = ( function() {
             $( "#signageFinish" ).prop( "disabled", false );
             $( "#signageFont" ).prop( "disabled", false );
             $( "#product-items" ).empty();
+        },
+
+        toggleJsonExport: function() {
+            if ( viewModel.get( "showJsonPanel" ) ) {
+                viewModel.set( "showJsonPanel", false );
+                return false;
+            }
+            var id = viewModel.get( "detailForm.data.quotationItem.id" );
+            if ( !id ) return false;
+            viewModel.set( "jsonExportLoading", true );
+            NM.util.ajax( {
+                method: "GET",
+                url: "/manager/ajax/quotation-items/signage/" + id + "/export",
+                callback: {
+                    done: function( xhr ) {
+                        viewModel.set( "jsonExportText", JSON.stringify( xhr.data, null, 2 ) );
+                        viewModel.set( "showJsonPanel", true );
+                        viewModel.set( "jsonExportLoading", false );
+                    },
+                    fail: function() {
+                        viewModel.set( "jsonExportLoading", false );
+                    }
+                }
+            } );
+            return false;
         },
 
         parsedPictograms: function() {

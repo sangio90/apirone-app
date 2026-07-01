@@ -539,8 +539,10 @@
 		*/
 		delete( "/ajax/quotation-items/signagerow" ).to( "QuotationSignageAjaxController.deleteRow" ).end();
 		post( "/ajax/quotation-items/type/:type/pricing" ).to( "QuotationItemAjaxController.calculate" ).end();
+		get( "/ajax/quotation-items/signage/:id/export" ).to( "QuotationItemAjaxController.signageExport" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/plate/:id/fruits" ).to( "QuotationItemAjaxController.listFruits" ).end();
+		get( "/ajax/quotation-items/plate/:id/export" ).to( "QuotationItemAjaxController.plateExport" ).end();
 		get( "/ajax/quotation-items/plate/:id" ).to( "QuotationItemAjaxController.editPlate" ).end();
 		post( "/ajax/quotation-items/signage" ).to( "QuotationItemAjaxController.saveSignage" ).end();
 		post( "/ajax/quotation-items/plate" ).to( "QuotationItemAjaxController.savePlate" ).end();

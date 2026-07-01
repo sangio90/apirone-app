@@ -28,8 +28,10 @@ component extends="coldbox.system.Interceptor" {
 			try {
 				var authToken = Trim( GetHTTPRequestData().Headers.authorization.replace( "Bearer", "" ) );
 
-				// used by Verticale
-				if ( authToken != "9e39d8edd05940ddab24411338e9def857679e76978041e29a1d7f956aa0be5d" ) {
+				var crmToken = server.system.properties[ "crm.api.token" ] ?: "";
+
+				if ( authToken != "9e39d8edd05940ddab24411338e9def857679e76978041e29a1d7f956aa0be5d"
+					&& ( !Len( crmToken ) || authToken != crmToken ) ) {
 					return arguments.event
 						.renderData(
 							data       = "Not Authorized. Token not valid.",

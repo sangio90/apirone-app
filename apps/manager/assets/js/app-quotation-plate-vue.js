@@ -304,6 +304,9 @@ AP.plate.modal = ( function() {
                 activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
                 smallLoading: false, /** Flag di caricamento. */
                 canEdit: AP.page.canEdit, /** Flag che indica se il preventivo è modificabile. */
+                showJsonPanel: false, /** Flag per mostrare il pannello JSON export (provvisorio). */
+                jsonExportText: "", /** Contenuto JSON dell'export placca. */
+                jsonExportLoading: false, /** Flag di caricamento per il JSON export. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
@@ -397,6 +400,8 @@ AP.plate.modal = ( function() {
                     Object.assign( this.detailForm, fresh );
                     this.detailForm.data.fruits = [];
                     this.detailForm.data.product.items = [];
+                    this.showJsonPanel = false;
+                    this.jsonExportText = "";
                 },
 
                 // MARK: Custom Image
@@ -2390,6 +2395,30 @@ AP.plate.modal = ( function() {
                     AP.deleteUserPref( "plate.modelId" );
                     AP.deleteUserPref( "plate.finishId" );
                     this.checkCanSave();
+                },
+
+                toggleJsonExport: function() {
+                    if ( this.showJsonPanel ) {
+                        this.showJsonPanel = false;
+                        return;
+                    }
+                    const id = this.detailForm.data.id;
+                    if ( !id ) return;
+                    this.jsonExportLoading = true;
+                    ajax( {
+                        method: "GET",
+                        url: BASE + "/quotation-items/plate/" + id + "/export",
+                        callback: {
+                            done: ( xhr ) => {
+                                this.jsonExportText = JSON.stringify( xhr.data, null, 2 );
+                                this.showJsonPanel = true;
+                                this.jsonExportLoading = false;
+                            },
+                            fail: () => {
+                                this.jsonExportLoading = false;
+                            },
+                        },
+                    } );
                 },
 
                 /**
