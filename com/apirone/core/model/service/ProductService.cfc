@@ -349,10 +349,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
+	 * Recupera in batch più Product dato un array di ID.
+	 * Restituisce uno Struct chiave = productId (raw varchar da DB), valore = bean Product completo.
+	 * Precarica tutte le FK entity (Category, Line, Attribute, Finish, CatalogBundle)
+	 * e le entity 1:N (Text, Price, File) in blocco per evitare il problema N+1.
+	 *
+	 * @ids Array di productId
+	 * @return Struct mappato per productId (raw) -> Product
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+
+		return buildMany( records );
+	}
+
+	/**
 	 * Costruisce in batch uno Struct mappato per product_id -> Product.
 	 * precarica tutte le FK entity (Category, Line, Attribute, Finish, CatalogBundle)
 	 * e le entity 1:N (Text, Price, File) in blocco per evitare il problema N+1.
-	 * Utilizzato esclusivamente da search() per le liste paginate.
 	 *
 	 * @records Risultato della query readByIds() con tutte le righe da elaborare
 	 * @return Struct mappato per product_id -> Product

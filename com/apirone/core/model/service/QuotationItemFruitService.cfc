@@ -158,121 +158,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// Precarica i Product in batch (via readByIds del DAO, senza getMany pubblico)
+		// Precarica i Product in batch con getMany() ottimizzato di ProductService
 		var productMap = {};
 		if ( ArrayLen( fruitIds ) ) {
-			var productRecords = getProductService().getDao().readByIds( fruitIds );
-
-			// Raccoglie i catalog_bundle_id per i ProductComplex
-			var bundleIds = [];
-			for ( var pr in productRecords ) {
-				if ( !IsNull( pr.catalog_bundle_id ) ) {
-					bundleIds.append( pr.catalog_bundle_id );
-				}
-			}
-
-			// Precarica i CatalogBundle in batch
-			var bundleMap = {};
-			if ( ArrayLen( bundleIds ) ) {
-				bundleMap = getCatalogBundleService().getMany( bundleIds );
-			}
-
-			// Precarica i testi dei prodotti in batch
-			var productTextMap = getTextService().listByEntityIds( "product.id", fruitIds );
-
-			// Precarica i prezzi dei prodotti in batch
-			var productPriceMap = getPriceService().listByProductIds( fruitIds );
-
-			// Precarica le immagini dei prodotti in batch
-			var productFileMap = getFileService().listByEntityIds( "product.id", fruitIds );
-
-			// Raccoglie i finish_id per i ProductComplex e i product_category_id per i ProductBase
-			var finishIds           = [];
-			var productCategoryIds  = [];
-			for ( var pr in productRecords ) {
-				if ( !IsNull( pr.finish_id ) ) {
-					finishIds.append( pr.finish_id );
-				}
-				if ( !IsNull( pr.product_category_id ) ) {
-					productCategoryIds.append( pr.product_category_id );
-				}
-			}
-
-			// Precarica le Finish in batch
-			var finishMap = {};
-			if ( ArrayLen( finishIds ) ) {
-				finishMap = getFinishService().getMany( finishIds );
-			}
-
-			// Precarica le ProductCategory in batch
-			var categoryMap = {};
-			if ( ArrayLen( productCategoryIds ) ) {
-				categoryMap = getProductCategoryService().getMany( productCategoryIds );
-			}
-
-			for ( var pr in productRecords ) {
-				if ( IsNull( pr.catalog_bundle_id ) ) {
-					var productBean = super.bean( "ProductBase" );
-					productBean.setCode( pr.code );
-					productBean.setPositionCount( pr.position_count );
-					// Categoria per ProductBase
-					if ( !IsNull( pr.product_category_id ) && StructKeyExists( categoryMap, pr.product_category_id ) ) {
-						productBean.setCategory( categoryMap[ pr.product_category_id ] );
-					}
-					// Lines per ProductBase
-					if ( Len( pr.lines ) ) {
-						productBean.setLines( super.getLinesBeanByIds( pr.lines ) );
-					}
-				} else {
-					var productBean = super.bean( "ProductComplex" );
-					if ( StructKeyExists( bundleMap, pr.catalog_bundle_id ) ) {
-						productBean.setCatalogBundle( bundleMap[ pr.catalog_bundle_id ] );
-						var bundle = bundleMap[ pr.catalog_bundle_id ];
-						productBean.setLine( bundle.getLine() );
-						productBean.setModel( bundle.getModel() );
-						productBean.setCategory( bundle.getCategory() );
-					}
-					// Finish per ProductComplex
-					if ( !IsNull( pr.finish_id ) && StructKeyExists( finishMap, pr.finish_id ) ) {
-						productBean.setFinish( finishMap[ pr.finish_id ] );
-					}
-				}
-
-				// Campi comuni
-				productBean.setId( pr.product_id.toString() );
-				productBean.setCreatedAt( pr.created_at );
-				productBean.setSerial( pr.serial );
-				productBean.setSpecial( BooleanFormat( pr.special ) );
-				productBean.setMinQuantity( pr.min_quantity );
-				productBean.setMaxQuantity( pr.max_quantity );
-				productBean.setMarginTop( pr.margin_top );
-				productBean.setMarginLeft( pr.margin_left );
-				productBean.setPlateWidth( pr.plate_width );
-				productBean.setPlateHeight( pr.plate_height );
-				productBean.setStatus( getStatusService().get( pr.status_id ) );
-
-				// Testi: dalla mappa pre-caricata
-				if ( StructKeyExists( productTextMap, pr.product_id ) ) {
-					productBean.setTexts( productTextMap[ pr.product_id ] );
-				}
-
-				// Prezzi: dalla mappa pre-caricata
-				if ( StructKeyExists( productPriceMap, pr.product_id ) ) {
-					productBean.setPrices( productPriceMap[ pr.product_id ] );
-				}
-
-				// Immagini: dalla mappa pre-caricata
-				if ( StructKeyExists( productFileMap, pr.product_id ) && Len( productFileMap[ pr.product_id ] ) ) {
-					productBean.setImages( productFileMap[ pr.product_id ] );
-				}
-
-				// Attributi importanti
-				if ( Len( pr.attributes_important ) ) {
-					productBean.setImportantAttributes( super.getAttributesBeanByIds( pr.attributes_important ) );
-				}
-
-				productMap[ pr.product_id ] = productBean;
-			}
+			productMap = getProductService().getMany( fruitIds );
 		}
 
 		// Precarica i ProductItem in batch per tutti i quotation_item_fruit_id
@@ -375,34 +264,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return map;
-	}
-
-	/**
-	 * Costruisce un Product bean semplificato dal record, determinando il tipo
-	 * (ProductBase o ProductComplex) in base alla presenza di catalog_bundle_id.
-	 */
-	private com.apirone.core.model.bean.Product function resolveProductType( required any pr ){
-		if ( IsNull( pr.catalog_bundle_id ) ) {
-			var bean = super.bean( "ProductBase" );
-			bean.setCode( pr.code );
-			bean.setPositionCount( pr.position_count );
-		} else {
-			var bean = super.bean( "ProductComplex" );
-		}
-
-		// Campi comuni
-		bean.setId( pr.product_id.toString() );
-		bean.setSerial( pr.serial );
-		bean.setCreatedAt( pr.created_at );
-		bean.setSpecial( BooleanFormat( pr.special ) );
-		bean.setMinQuantity( pr.min_quantity );
-		bean.setMaxQuantity( pr.max_quantity );
-		bean.setMarginTop( pr.margin_top );
-		bean.setMarginLeft( pr.margin_left );
-		bean.setPlateWidth( pr.plate_width );
-		bean.setPlateHeight( pr.plate_height );
-
-		return bean;
 	}
 
 	private com.apirone.core.model.bean.QuotationItemFruit function buildFromRow( required any record ){

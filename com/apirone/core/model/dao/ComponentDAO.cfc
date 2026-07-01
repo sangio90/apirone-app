@@ -408,4 +408,71 @@
 
 		<cfreturn local.q>
 	</cffunction>
+
+	<!---
+		Recupera in batch i componenti collegati a una lista di product_item_id.
+		Utilizzato da QuotationService.getComponents() per evitare N+1.
+	--->
+	<cffunction name="readByProductItemIds" returntype="Query" access="public">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM components
+			WHERE product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i componenti di tipo SignageItemProduct dato
+		l'ID della config segnaletica e una lista di product_item_id (join).
+		Utilizzato da QuotationService.getComponents() per evitare N+1.
+	--->
+	<cffunction name="readBySignageItemProductJoinIds" returntype="Query" access="public">
+		<cfargument name="signageConfigItemId" type="String" required="true">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM components
+			WHERE signage_config_item_join_id = <cfqueryparam value="#arguments.signageConfigItemId#" cfsqltype="Integer">
+				AND product_item_join_id IN (
+					<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+				)
+			ORDER BY created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i componenti collegati agli attributi (attribute_raw_value_id).
+		Utilizzato da QuotationService.getComponents() per il caricamento
+		dei componenti base-attribute corrispondenti a includeBaseAttributeComponents=true.
+	--->
+	<cffunction name="readByAttributeValueIds" returntype="Query" access="public">
+		<cfargument name="attributeValueIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.attributeValueIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM components
+			WHERE attribute_raw_value_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

@@ -332,75 +332,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quotationMap = getQuotationService().getMany( quotationIds );
 		}
 
-		// Product (via DAO, ProductService.getMany() è privato)
+		// Product: precarica in batch con getMany() ottimizzato di ProductService
 		var productMap = {};
 		if ( ArrayLen( productIds ) ) {
-			var pRecords = getProductService().getDao().readByIds( productIds );
-
-			// Precarica i testi dei prodotti (per getName())
-			var productTextMap = getTextService().listByEntityIds( "product.id", productIds );
-
-			// Precarica i prezzi dei prodotti in batch
-			var productPriceMap = getPriceService().listByProductIds( productIds );
-
-			// Precarica le immagini dei prodotti in batch
-			var productFileMap = getFileService().listByEntityIds( "product.id", productIds );
-
-			// Raccoglie i catalog_bundle_id per i ProductComplex
-			var bundleIds = [];
-			for ( var pr in pRecords ) {
-				if ( !IsNull( pr.catalog_bundle_id ) ) {
-					bundleIds.append( pr.catalog_bundle_id );
-				}
-			}
-
-			// Precarica i CatalogBundle in batch
-			var bundleMap = {};
-			if ( ArrayLen( bundleIds ) ) {
-				bundleMap = getCatalogBundleService().getMany( bundleIds );
-			}
-
-			for ( var pr in pRecords ) {
-				if ( IsNull( pr.catalog_bundle_id ) ) {
-					var pBean = super.bean( "ProductBase" );
-					pBean.setCode( pr.code );
-					pBean.setPositionCount( pr.position_count );
-				} else {
-					var pBean = super.bean( "ProductComplex" );
-					if ( StructKeyExists( bundleMap, pr.catalog_bundle_id ) ) {
-						pBean.setCatalogBundle( bundleMap[ pr.catalog_bundle_id ] );
-						// Propaga line, model, category dal bundle (coerente con buildFromRow)
-						var bundle = bundleMap[ pr.catalog_bundle_id ];
-						pBean.setLine( bundle.getLine() );
-						pBean.setModel( bundle.getModel() );
-						pBean.setCategory( bundle.getCategory() );
-					}
-				}
-				pBean.setId( pr.product_id.toString() );
-				pBean.setCreatedAt( pr.created_at );
-				pBean.setSerial( pr.serial );
-				pBean.setSpecial( BooleanFormat( pr.special ) );
-				pBean.setMinQuantity( pr.min_quantity );
-				pBean.setMaxQuantity( pr.max_quantity );
-				pBean.setMarginTop( pr.margin_top );
-				pBean.setMarginLeft( pr.margin_left );
-				pBean.setPlateWidth( pr.plate_width );
-				pBean.setPlateHeight( pr.plate_height );
-				pBean.setStatus( getStatusService().get( pr.status_id ) );
-				// Testi: dalla mappa pre-caricata
-				if ( StructKeyExists( productTextMap, pr.product_id ) ) {
-					pBean.setTexts( productTextMap[ pr.product_id ] );
-				}
-				// Prezzi: dalla mappa pre-caricata
-				if ( StructKeyExists( productPriceMap, pr.product_id ) ) {
-					pBean.setPrices( productPriceMap[ pr.product_id ] );
-				}
-				// Immagini: dalla mappa pre-caricata
-				if ( StructKeyExists( productFileMap, pr.product_id ) && Len( productFileMap[ pr.product_id ] ) ) {
-					pBean.setImages( productFileMap[ pr.product_id ] );
-				}
-				productMap[ pr.product_id ] = pBean;
-			}
+			productMap = getProductService().getMany( productIds );
 		}
 
 		// Article

@@ -256,274 +256,406 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			if ( arguments.quotationItems.len() ) {
-				// ciclo su tutti i prodotti del preventivo
+
+				// --- Fase 1: pre-raccolta degli ID da tutti i quotationItem per il caricamento batch ---
+				// Le tuple memorizzate verranno poi usate nella fase 2 per l'assemblaggio senza chiamate get() individuali.
+				var exportTuples        = [];
+				var allProductIds       = [];
+				var allCategoryIds      = [];
+				var allLineIds          = [];
+				var allModelIds         = [];
+				var allFinishIds        = [];
+				var allProductItemIds   = [];
+				var allFruitProductIds  = [];
+				var allSignConfigItemIds = [];
+				var allSignConfigIds    = [];
+
 				for ( var quotationItem in arguments.quotationItems ) {
-					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
-					//se tipo servizio, la gestione è light
-					if (!isNull(quotationItem.getArticle())) {
-						var dataExport = {
-							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) & RepeatString(
-								"0",
-								35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) )
-							),
-							"ARDESSUP"  = "",
-							"ARDATCAR"  = Now(),
-							"ARUNMIS1"  = "PZ",
-							"VARCOD"    = "0000000000",
-							"VARNOT"    = "",
-							"CLCODICE"  = "000000",
-							"CLANNOTA"  = quotationItem.getNote(),
-							"ARIMG_64" = "",
-							"ARSPECIA" = isSpeciale,
-							"ARCODNOM" = ""
-						}
-
-						// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
-						var existingCodes = exportCodeService.list(
-							str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
-						);
-
-						if ( existingCodes.len() > 0 ) {
-							continue;
-						}
-
-						///se non troviamo, creiamo ed esportiamo in verticale
-						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
-						exportCode.setCounter( "000000" );
-						exportCodeService.create( "exportCode" = exportCode );
-						result.success = getDao().exportProduct( dataExport );
-
+					// Gli articoli (servizi) non hanno dati prodotto - saltati nella pre-raccolta
+					if ( !IsNull( quotationItem.getArticle() ) ) {
 						continue;
-					} else {
-						var hsCode = "";
-						try {
-							hsCode = quotationItem.getProduct().getLine().getHscode();
-						} catch ( any e ) {
+					}
 
+					if ( IsNull( quotationItem.getHash() ) || Trim( quotationItem.getHash() ) == "" ) {
+						continue;
+					}
+
+					var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+					if ( IsNull( productHash ) ) {
+						continue;
+					}
+
+					var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
+					if ( existingCode.len() > 0 ) {
+						continue;
+					}
+
+					var quotationItemData = deserializeJson( productHash.getJsonData() );
+
+					// Raccoglie tutti gli ID unici per il caricamento batch
+					ArrayAppend( allProductIds, quotationItemData.productId );
+					ArrayAppend( allCategoryIds, quotationItemData.categoryId );
+					ArrayAppend( allLineIds, quotationItemData.lineId );
+					ArrayAppend( allModelIds, quotationItemData.modelId );
+					ArrayAppend( allFinishIds, quotationItemData.finishId );
+
+					if ( StructKeyExists( quotationItemData, "productItems" ) ) {
+						for ( var pi in quotationItemData.productItems ) {
+							ArrayAppend( allProductItemIds, pi.productItemId );
 						}
-						var quotationImageFile = quotationItem.getImage();
-						var base64File = "";
+					}
 
-						try {
-							var path = expandPath("/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName());
-							var file = FileReadBinary(path);
-							if (!isNull(file)) {
-								base64File = ToBase64(file);
-							}
-						} catch ( any e ) {
+					if ( StructKeyExists( quotationItemData, "signageRows" ) && StructKeyExists( quotationItemData, "signageConfigItemId" ) ) {
+						ArrayAppend( allSignConfigItemIds, quotationItemData.signageConfigItemId );
+					}
 
-						}
-
-						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
-						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
-							result.success = false;
-							result.error = 'Hash riga preventivo non trovata.';
-						}
-						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
-						if ( isNull(productHash) ) {
-							result.success = false;
-							result.error = 'Hash prodotto non trovato.';
-						}
-						//appurato che la riga di preventivo ha un hash associato e che l'hash corrisponda effettivamente ad un record sulla tabella degli hash
-						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
-						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
-						if ( existingCode.len() > 0 ) {
-							continue;
-						}
-
-						//se non lo troviamo, trasformiamo i dati da jason a struttura e poterla consultare e poter creare un nuovo codice
-						//e i nuovi record nella tabella degli articoli e delle rispettive diba su verticale.
-						var quotationItemData = deserializeJson( productHash.getJsonData() );
-						var code = "";
-
-						//prime due cose: cerchiamo il prodotto corrispondente all'id preso dall'hash e prendiamo categoria,
-						//linea, modello e finitura per comporre la prima parte del codice.
-						var product = getProductService().get( quotationItemData.productId );
-						var category = getProductCategoryService().get( quotationItemData.categoryId );
-						if ( IsNull( product ) || IsNull( category ) ) {
-							result.success = false;
-							result.error = 'Prodotto o Categoria Prodotto non trovata.'
-							return result;
-						}
-
-						var categoryCode = Trim( category.getCode() );
-						code &= categoryCode;
-						var note = "";
-
-						var line = getLineService().get( quotationItemData.lineId );
-						if ( IsNull( line ) ) {
-							result.success = false;
-							result.error = "Linea prodotto non trovata."
-							return result;
-						}
-						var lineCode = Trim( line.getCode() );
-						code &= lineCode;
-
-						var model = getModelService().get( quotationItemData.modelId );
-						if ( IsNull( model ) ) {
-							result.success = false;
-							result.error = "Modello prodotto non trovato."
-							return result;
-						}
-						code &= Trim( model.getCode() );
-
-						var finish = getFinishService().get( quotationItemData.finishId );
-						if ( IsNull( finish ) ) {
-							result.success = false;
-							result.error = "Finitura prodotto non trovata."
-							return result;
-						}
-						var finishCode = Trim( finish.getCode() );
-						code &= finishCode;
-
-						var description = product.getDescription().left( 35 );
-
-						//inizializiamo il codice variane, il codice colore e le note segnaletica.
-						var arKey = code;
-						var colCode  = "000000";
-						var varCode  = "";
-						var noteSegnaletica = '';
-
-						//se l'articolo è una segnaletica
-						if (StructKeyExists( quotationItemData, "signageRows" ) ) {
-							var signageConfigItem = getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
-							var fontSize = signageConfigItem.getSize().getName();
-							var signageConfig = getSignageConfigService().get( signageConfigItem.getSignageConfigId() );
-							var fontCode = signageConfig.getFont().getCode();
-							var fontName = signageConfig.getFont().getName();
-							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
-							//il varcode viene popolato con
-							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
-							var signageRowsCounter = 1;
-							for ( var signageRow in quotationItemData.signageRows ) {
-								noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow['text-align'] & ': Testo: "' & signageRow.content & '"";';
-								signageRowsCounter++;
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
+						for ( var fruit in quotationItemData.fruits ) {
+							ArrayAppend( allFruitProductIds, fruit.product );
+							if ( StructKeyExists( fruit, "productItems" ) ) {
+								for ( var fi in fruit.productItems ) {
+									ArrayAppend( allProductItemIds, fi.productItemId );
+								}
 							}
 						}
+					}
 
-						var productItemIds = [];
-						var productItems   = [];
-						var importantAttributes = product.getImportantAttributes();
-						for ( var quotationItemProductItem in quotationItemData.productItems ) {
-							var productItem = getProductItemService().get( quotationItemProductItem.productItemId );
-							if ( !IsNull( productItem ) ) {
-								var attributeValue = productItem.getAttributeValue();
-								var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
+					// Memorizza la tupla per la fase 2: item originale, dati deserializzati e productHash
+					ArrayAppend( exportTuples, {
+						item = quotationItem,
+						data = quotationItemData,
+						hash = productHash
+					} );
+				}
 
-								if ( IsNull( attribute ) ) {
-									result.success = false;
-									result.error = 'Attributo Prodotto non trovato.';
-									return result;
-								}
-								var rawValue = attributeValue.getRawValue();
-								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
-								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
+				// --- Fase 2: caricamento batch di tutte le entity ---
+				// Carica i Product con getMany() ottimizzato (incluse tutte le sub-entity: categorie, testi, prezzi, file, attributi)
+				var productMap = {};
+				if ( ArrayLen( allProductIds ) ) {
+					productMap = getProductService().getMany( allProductIds );
+				}
 
-								var isImportant = false;
-								if (!isNull(importantAttributes)) {
-									isImportant = importantAttributes.some(function(item) {
-										return item.getId() == attribute.getId();
-									});
-								}
+				// Carica ProductCategory, Line, Model, Finish con i rispettivi getMany()
+				var categoryMap = {};
+				if ( ArrayLen( allCategoryIds ) ) {
+					categoryMap = getProductCategoryService().getMany( allCategoryIds );
+				}
 
-								if (isImportant) {
-									if ( varCode.len() < 10 ) {
-										varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-										arrayAppend(productItems, {
-											"important"   = true,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									} else {
-										arrayAppend(productItems, {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-									}
+				var lineMap = {};
+				if ( ArrayLen( allLineIds ) ) {
+					lineMap = getLineService().getMany( allLineIds );
+				}
+
+				var modelMap = {};
+				if ( ArrayLen( allModelIds ) ) {
+					modelMap = getModelService().getMany( allModelIds );
+				}
+
+				var finishMap = {};
+				if ( ArrayLen( allFinishIds ) ) {
+					finishMap = getFinishService().getMany( allFinishIds );
+				}
+
+				var productItemMap = {};
+				if ( ArrayLen( allProductItemIds ) ) {
+					productItemMap = getProductItemService().getMany( allProductItemIds );
+				}
+
+				// Carica anche i fruit product (sono Product, ma con ID separato)
+				var fruitProductMap = {};
+				if ( ArrayLen( allFruitProductIds ) ) {
+					fruitProductMap = getProductService().getMany( allFruitProductIds );
+				}
+
+				// Carica SignageConfigItem e SignageConfig in batch
+				var signConfigItemMap = {};
+				if ( ArrayLen( allSignConfigItemIds ) ) {
+					signConfigItemMap = getSignageConfigItemService().getMany( allSignConfigItemIds );
+				}
+
+				// Raccoglie i signage_config_id dai SignageConfigItem caricati per il caricamento batch delle config
+				for ( var scid in allSignConfigItemIds ) {
+					if ( StructKeyExists( signConfigItemMap, scid ) ) {
+						ArrayAppend( allSignConfigIds, signConfigItemMap[ scid ].getSignageConfigId() );
+					}
+				}
+				var signConfigMap = {};
+				if ( ArrayLen( allSignConfigIds ) ) {
+					signConfigMap = getSignageConfigService().getMany( allSignConfigIds );
+				}
+
+				// --- Fase 3a: elaborazione degli articoli (servizi) - riutilizza la logica originale ---
+				for ( var quotationItem in arguments.quotationItems ) {
+					if ( IsNull( quotationItem.getArticle() ) ) {
+						continue;
+					}
+
+					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
+
+					var dataExport = {
+						"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
+						"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
+						"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len( quotationItem.getArticle().getDescription() ) ) & RepeatString(
+							"0",
+							35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len( quotationItem.getArticle().getDescription() ) ) )
+						),
+						"ARDESSUP"  = "",
+						"ARDATCAR"  = Now(),
+						"ARUNMIS1"  = "PZ",
+						"VARCOD"    = "0000000000",
+						"VARNOT"    = "",
+						"CLCODICE"  = "000000",
+						"CLANNOTA"  = quotationItem.getNote(),
+						"ARIMG_64"  = "",
+						"ARSPECIA"  = isSpeciale,
+						"ARCODNOM"  = ""
+					};
+
+					// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
+					var existingCodes = exportCodeService.list(
+						str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
+					);
+
+					if ( existingCodes.len() > 0 ) {
+						continue;
+					}
+
+					var exportCode = super.bean( "ExportCode" );
+					exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
+					exportCode.setCounter( "000000" );
+					exportCodeService.create( "exportCode" = exportCode );
+					result.success = getDao().exportProduct( dataExport );
+				}
+
+				// --- Fase 3b: elaborazione dei prodotti usando esclusivamente le mappe batch ---
+				for ( var tuple in exportTuples ) {
+					var quotationItem     = tuple.item;
+					var quotationItemData = tuple.data;
+					var productHash       = tuple.hash;
+
+					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
+
+					var hsCode = "";
+					try {
+						hsCode = quotationItem.getProduct().getLine().getHscode();
+					} catch ( any e ) {
+					}
+
+					var quotationImageFile = quotationItem.getImage();
+					var base64File         = "";
+
+					try {
+						var path = ExpandPath( "/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName() );
+						var file = FileReadBinary( path );
+						if ( !IsNull( file ) ) {
+							base64File = ToBase64( file );
+						}
+					} catch ( any e ) {
+					}
+
+					var code = "";
+
+					// Recupera il prodotto e la categoria dalla mappa batch (con fallback individuale difensivo)
+					var product = StructKeyExists( productMap, quotationItemData.productId )
+						? productMap[ quotationItemData.productId ]
+						: getProductService().get( quotationItemData.productId );
+					var category = StructKeyExists( categoryMap, quotationItemData.categoryId )
+						? categoryMap[ quotationItemData.categoryId ]
+						: getProductCategoryService().get( quotationItemData.categoryId );
+					if ( IsNull( product ) || IsNull( category ) ) {
+						result.success = false;
+						result.error   = 'Prodotto o Categoria Prodotto non trovata.';
+						return result;
+					}
+
+					var categoryCode = Trim( category.getCode() );
+					code &= categoryCode;
+					var note = "";
+
+					var line = StructKeyExists( lineMap, quotationItemData.lineId )
+						? lineMap[ quotationItemData.lineId ]
+						: getLineService().get( quotationItemData.lineId );
+					if ( IsNull( line ) ) {
+						result.success = false;
+						result.error   = "Linea prodotto non trovata.";
+						return result;
+					}
+					var lineCode = Trim( line.getCode() );
+					code &= lineCode;
+
+					var model = StructKeyExists( modelMap, quotationItemData.modelId )
+						? modelMap[ quotationItemData.modelId ]
+						: getModelService().get( quotationItemData.modelId );
+					if ( IsNull( model ) ) {
+						result.success = false;
+						result.error   = "Modello prodotto non trovato.";
+						return result;
+					}
+					code &= Trim( model.getCode() );
+
+					var finish = StructKeyExists( finishMap, quotationItemData.finishId )
+						? finishMap[ quotationItemData.finishId ]
+						: getFinishService().get( quotationItemData.finishId );
+					if ( IsNull( finish ) ) {
+						result.success = false;
+						result.error   = "Finitura prodotto non trovata.";
+						return result;
+					}
+					var finishCode = Trim( finish.getCode() );
+					code &= finishCode;
+
+					var description = product.getDescription().left( 35 );
+
+					var arKey           = code;
+					var colCode         = "000000";
+					var varCode         = "";
+					var noteSegnaletica = '';
+
+					// Segnaletica: recupera SignageConfigItem e SignageConfig dalle mappe batch
+					if ( StructKeyExists( quotationItemData, "signageRows" ) ) {
+						var signageConfigItem = StructKeyExists( signConfigItemMap, quotationItemData.signageConfigItemId )
+							? signConfigItemMap[ quotationItemData.signageConfigItemId ]
+							: getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
+						var fontSize     = signageConfigItem.getSize().getName();
+						var signageConfigId = signageConfigItem.getSignageConfigId();
+						var signageConfig = StructKeyExists( signConfigMap, signageConfigId )
+							? signConfigMap[ signageConfigId ]
+							: getSignageConfigService().get( signageConfigId );
+						var fontCode     = signageConfig.getFont().getCode();
+						var fontName     = signageConfig.getFont().getName();
+						note &= "Font: " & fontName & "; Font Size: " & fontSize & "; ";
+						varCode = right( "00000" & fontCode, 5 ) & right( "00000" & fontSize, 5 );
+						var signageRowsCounter = 1;
+						for ( var signageRow in quotationItemData.signageRows ) {
+							noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow[ 'text-align' ] & ': Testo: "' & signageRow.content & '"";';
+							signageRowsCounter++;
+						}
+					}
+
+					var productItemIds     = [];
+					var productItems       = [];
+					var importantAttributes = product.getImportantAttributes();
+					for ( var quotationItemProductItem in quotationItemData.productItems ) {
+						var productItem = StructKeyExists( productItemMap, quotationItemProductItem.productItemId )
+							? productItemMap[ quotationItemProductItem.productItemId ]
+							: getProductItemService().get( quotationItemProductItem.productItemId );
+						if ( !IsNull( productItem ) ) {
+							var attributeValue = productItem.getAttributeValue();
+							// attributeService.get() è mantenuto come chiamata individuale:
+							// l'attributeId proviene dal ProductItem già caricato, non è pre-raccoglibile.
+							var attribute = attributeService.get( attributeId = attributeValue.getAttributeId() );
+
+							if ( IsNull( attribute ) ) {
+								result.success = false;
+								result.error   = 'Attributo Prodotto non trovato.';
+								return result;
+							}
+							var rawValue = attributeValue.getRawValue();
+
+							var isImportant = false;
+							if ( !IsNull( importantAttributes ) ) {
+								isImportant = importantAttributes.some( function( item ){
+									return item.getId() == attribute.getId();
+								} );
+							}
+
+							if ( isImportant ) {
+								if ( varCode.len() < 10 ) {
+									varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+									arrayAppend( productItems, {
+										"important"   = true,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
 								} else {
-									arrayAppend(productItems, {
+									arrayAppend( productItems, {
 										"important"   = false,
 										"rawValueId"  = rawValue.getId(),
 										"attributeId" = attributeValue.getAttributeId()
 									} );
 								}
-								arrayAppend(productItemIds, productItem.getId())
+							} else {
+								arrayAppend( productItems, {
+									"important"   = false,
+									"rawValueId"  = rawValue.getId(),
+									"attributeId" = attributeValue.getAttributeId()
+								} );
 							}
-
-							note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+							arrayAppend( productItemIds, productItem.getId() );
 						}
 
-						var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
-						varCode &= RepeatString( "0", 10 - Len( varCode ) )
-
-						//se placca
-						if (StructKeyExists( quotationItemData, "fruits" ) ) {
-							var orientation = quotationItem.getFrame().getOrientation().getName()
-							note &= "Orientamento: " & orientation & ";";
-
-							var fruits = quotationItemData.fruits;
-							if (Len(fruits)) {
-								note &= " Frutti: "
-							}
-							fruitsIndex = 1;
-							var fruitsComponents = []
-							for ( var fruit in fruits ) {
-								var fruitBean = getProductService().get( fruit.product );
-								note &= " " & fruitBean.getCode()
-								var fruitItems = fruit.productItems;
-								if (Len(fruitItems)) {
-									note &= ": "
-									fruitsProductItems[fruitsIndex] = [];
-									fruitsProductItemIds[fruitsIndex] = [];
-									for ( var fruitItem in fruitItems ) {
-										var fruitItemBean = getProductItemService().get( fruitItem.productItemId );
-										var attributeValue = fruitItemBean.getAttributeValue();
-										var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
-
-										if ( IsNull( attribute ) ) {
-											result.success = false;
-											result.error = 'Attributo Frutto non trovato.';
-											return result;
-										}
-										var rawValue = attributeValue.getRawValue();
-										arrayAppend( fruitsProductItems[fruitsIndex], {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-										arrayAppend( fruitsProductItemIds[fruitsIndex], productItem.getId() );
-										note &= attribute.getName() & ": " & rawValue.getName() & "; ";
-										if (fruitItem.note != "") {
-											note &= " Note: " & fruitItem.note & "; ";
-										}
-									}
-
-								}
-								//per ogni frutto recupero i componenti
-								arrayAppend(fruitsComponents, getComponents( fruit.product, quotationItem, fruitsProductItemIds[fruitsIndex] ));
-								fruitsIndex++;
-							}
-						}
-
-						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( code & varCode );
-						exportCode.setProductHashId( productHash.getId() );
-						var maxCounter = exportCodeService.max( exportCode = code & varCode );
-						if (maxCounter > 0) {
-							var newMaxCounter = NumberFormat( maxCounter + 1, "000000" )
-							exportCode.setCounter( newMaxCounter );
-							colCode = newMaxCounter
-						} else {
-							exportCode.setCounter( "000001" );
-							colCode = "000001"
-						}
-						var exportCodeId = exportCodeService.create( "exportCode" = exportCode );
+						note &= attribute.getName() & ": " & rawValue.getName() & "; ";
 					}
 
+					var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
+					varCode &= RepeatString( "0", 10 - Len( varCode ) );
+
+					// Placca: recupera i fruit product e i productItem dalle mappe batch
+					var fruitsComponents     = [];
+					var fruitsProductItems   = {};
+					var fruitsProductItemIds = {};
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
+						var orientation = quotationItem.getFrame().getOrientation().getName();
+						note &= "Orientamento: " & orientation & ";";
+
+						var fruits = quotationItemData.fruits;
+						if ( Len( fruits ) ) {
+							note &= " Frutti: ";
+						}
+						var fruitsIndex = 1;
+						for ( var fruit in fruits ) {
+							var fruitBean = StructKeyExists( fruitProductMap, fruit.product )
+								? fruitProductMap[ fruit.product ]
+								: getProductService().get( fruit.product );
+							note &= " " & fruitBean.getCode();
+							var fruitItems = fruit.productItems;
+							fruitsProductItems[ fruitsIndex ]     = [];
+							fruitsProductItemIds[ fruitsIndex ]   = [];
+							if ( Len( fruitItems ) ) {
+								note &= ": ";
+								for ( var fruitItem in fruitItems ) {
+									var fruitItemBean = StructKeyExists( productItemMap, fruitItem.productItemId )
+										? productItemMap[ fruitItem.productItemId ]
+										: getProductItemService().get( fruitItem.productItemId );
+									var attributeValue = fruitItemBean.getAttributeValue();
+									var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
+
+									if ( IsNull( attribute ) ) {
+										result.success = false;
+										result.error   = 'Attributo Frutto non trovato.';
+										return result;
+									}
+									var rawValue = attributeValue.getRawValue();
+									arrayAppend( fruitsProductItems[ fruitsIndex ], {
+										"important"   = false,
+										"rawValueId"  = rawValue.getId(),
+										"attributeId" = attributeValue.getAttributeId()
+									} );
+									arrayAppend( fruitsProductItemIds[ fruitsIndex ], fruitItemBean.getId() );
+									note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+									if ( fruitItem.note != "" ) {
+										note &= " Note: " & fruitItem.note & "; ";
+									}
+								}
+							}
+							arrayAppend( fruitsComponents, getComponents( fruit.product, quotationItem, fruitsProductItemIds[ fruitsIndex ] ) );
+							fruitsIndex++;
+						}
+					}
+
+					var exportCode = super.bean( "ExportCode" );
+					exportCode.setName( code & varCode );
+					exportCode.setProductHashId( productHash.getId() );
+					var maxCounter = exportCodeService.max( exportCode = code & varCode );
+					if ( maxCounter > 0 ) {
+						var newMaxCounter = NumberFormat( maxCounter + 1, "000000" );
+						exportCode.setCounter( newMaxCounter );
+						colCode = newMaxCounter;
+					} else {
+						exportCode.setCounter( "000001" );
+						colCode = "000001";
+					}
+					exportCodeService.create( "exportCode" = exportCode );
 
 					arKey = code & varCode & colCode;
 					var dataExport = {
@@ -534,13 +666,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						"ARDATCAR"  = Now(),
 						"ARUNMIS1"  = "PZ",
 						"VARCOD"    = varCode,
-						"VARNOT" = noteSegnaletica,
+						"VARNOT"    = noteSegnaletica,
 						"CLCODICE"  = colCode,
 						"CLANNOTA"  = note,
 						"ARIMG_64"  = base64File,
-						"ARSPECIA" = isSpeciale,
-						"ARCODNOM" = hsCode
-					}
+						"ARSPECIA"  = isSpeciale,
+						"ARCODNOM"  = hsCode
+					};
 
 					result.success = getDao().exportProduct( dataExport );
 
@@ -550,46 +682,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODART  = dataExport.ARCODART;
 						productComponent.DSCODVAR  = dataExport.VARCOD;
 						productComponent.DSCODCOL  = dataExport.CLCODICE;
-
-						ArrayAppend(allComponents, productComponent);
+						ArrayAppend( allComponents, productComponent );
 					}
 
-					if (StructKeyExists( quotationItemData, "fruits" ) ) {
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
 						for ( var fruitComponents in fruitsComponents ) {
 							for ( var fruitComponent in fruitComponents ) {
 								fruitComponent.DS_CHIAVE = dataExport.AR_CHIAVE;
 								fruitComponent.DSCODART  = dataExport.ARCODART;
 								fruitComponent.DSCODVAR  = dataExport.VARCOD;
 								fruitComponent.DSCODCOL  = dataExport.CLCODICE;
-
-								ArrayAppend(allComponents, fruitComponent);
+								ArrayAppend( allComponents, fruitComponent );
 							}
 						}
 					}
 
 					var grouped = {};
-
-					for (var row in allComponents) {
+					for ( var row in allComponents ) {
 						var key = row.DSCODMAT & "|" & row.DSVARMAT & "|" & row.DSCOLMAT;
-						if ( !structKeyExists(grouped, key) ) {
-							grouped[key] = duplicate(row);
-							grouped[key].DSQTAMOV = val(row.DSQTAMOV);
+						if ( !structKeyExists( grouped, key ) ) {
+							grouped[ key ]             = duplicate( row );
+							grouped[ key ].DSQTAMOV    = val( row.DSQTAMOV );
 						} else {
-							grouped[key].DSQTAMOV += val(row.DSQTAMOV);
+							grouped[ key ].DSQTAMOV += val( row.DSQTAMOV );
 						}
 					}
 					var parsedComponents = [];
-
-					for (var key in grouped) {
-						arrayAppend(parsedComponents, grouped[key]);
+					for ( var key in grouped ) {
+						arrayAppend( parsedComponents, grouped[ key ] );
 					}
 
 					var counter = 0;
-					for (var row in parsedComponents) {
+					for ( var row in parsedComponents ) {
 						counter++;
 						row.CPROWNUM = counter;
 						row.CPROWORD = counter * 10;
-						row.DSDATCRE = DateFormat(now(), "yyyy-mm-dd");
+						row.DSDATCRE = DateFormat( now(), "yyyy-mm-dd" );
 						result.success = getDao().exportDiba( row );
 					}
 				}
@@ -792,10 +920,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return finalPrice / divisor;
 	}
 
-	public function getComponents(
+	public Array function getComponents(
 		required String productId,
 		required quotationItem,
-		Array productItemIds
+		Array productItemIds = []
 	){
 		var quantity      = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
 		var allComponents = [];
@@ -816,34 +944,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 
 			for ( var bundleComponent in bundleComponents ) {
-				ArrayAppend(allComponents, parseComponent( bundleComponent ));
+				ArrayAppend( allComponents, parseComponent( bundleComponent ) );
 			}
 
 			if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+				var signageConfigItemId = quotationItem.getSignageConfigItem().getId();
+
 				var signageComponents = componentSvc.list(
-					signageConfigItemId            = quotationItem.getSignageConfigItem().getId(),
+					signageConfigItemId            = signageConfigItemId,
 					includeBaseAttributeComponents = true
 				);
 
 				if ( productItemIds.len() > 0 ) {
-					for ( var productItemId in productItemIds ) {
-						var signageProductComponents = componentSvc.list(
-							signageItemProduct = {
-								signageConfigItemId = quotationItem.getSignageConfigItem().getId(),
-								productItemId       = productItemId
-							},
-
-							includeBaseAttributeComponents = true
-						);
-
-						for ( var signageProductComponent in signageProductComponents ) {
-							ArrayAppend(allComponents, parseComponent( signageProductComponent ));
-						}
+					var signageProductComps = componentSvc.listBySignageItemProductJoinIds(
+						signageConfigItemId = signageConfigItemId,
+						productItemIds      = productItemIds
+					);
+					for ( var spc in signageProductComps ) {
+						ArrayAppend( allComponents, parseComponent( spc ) );
 					}
 				}
 
 				for ( var signageComponent in signageComponents ) {
-					ArrayAppend(allComponents, parseComponent( signageComponent ));
+					ArrayAppend( allComponents, parseComponent( signageComponent ) );
 				}
 			}
 		}
@@ -851,17 +974,91 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productComponents = componentSvc.list( productId = product.getId(), includeBaseAttributeComponents = true );
 
 		for ( var productComponent in productComponents ) {
-			ArrayAppend(allComponents, parseComponent( productComponent ));
+			ArrayAppend( allComponents, parseComponent( productComponent ) );
 		}
 
 		if ( productItemIds.len() > 0 ) {
-			for ( var productItemId in productItemIds ) {
-				var productItemComponents = componentSvc.list(
-					productItemId                  = productItemId,
-					includeBaseAttributeComponents = true
-				);
-				for ( var productItemComponent in productItemComponents ) {
-					ArrayAppend(allComponents, parseComponent( productItemComponent ));
+			// Own components: batch con listByProductItemIds()
+			var ownComponents = componentSvc.listByProductItemIds( productItemIds );
+			for ( var oc in ownComponents ) {
+				ArrayAppend( allComponents, parseComponent( oc ) );
+			}
+
+			// Base attribute components: corrisponde a includeBaseAttributeComponents=true
+			// dell'originale searchByProductItemId() in ComponentService
+			var compDao = componentSvc.getDao();
+			var piMap   = getProductItemService().getMany( productItemIds );
+			var attrValueIds = [];
+
+			for ( var pid in productItemIds ) {
+				if ( StructKeyExists( piMap, pid ) ) {
+					var piBean  = piMap[ pid ];
+					var attrVal = piBean.getAttributeValue();
+					if ( !IsNull( attrVal ) && Len( attrVal.getId() ) ) {
+						ArrayAppend( attrValueIds, attrVal.getId() );
+					}
+				}
+			}
+
+			if ( ArrayLen( attrValueIds ) ) {
+				var attrRecords = compDao.readByAttributeValueIds( attrValueIds );
+
+				// Raggruppa i componenti per attribute_raw_value_id
+				var attrValueToCompIds = {};
+				for ( var ar in attrRecords ) {
+					if ( !StructKeyExists( attrValueToCompIds, ar.attribute_raw_value_id ) ) {
+						attrValueToCompIds[ ar.attribute_raw_value_id ] = [];
+					}
+					ArrayAppend( attrValueToCompIds[ ar.attribute_raw_value_id ], ar.component_id );
+				}
+
+				// Raccoglie tutti i component ID e carica i bean con getMany()
+				var allAttrCompIds = [];
+				for ( var avid in attrValueToCompIds ) {
+					for ( var cid in attrValueToCompIds[ avid ] ) {
+						ArrayAppend( allAttrCompIds, cid );
+					}
+				}
+
+				if ( ArrayLen( allAttrCompIds ) ) {
+					var attrBeanMap = componentSvc.getMany( allAttrCompIds );
+
+					for ( var pid in productItemIds ) {
+						if ( !StructKeyExists( piMap, pid ) ) {
+							continue;
+						}
+						var piBean  = piMap[ pid ];
+						var attrVal = piBean.getAttributeValue();
+						if ( IsNull( attrVal ) || !Len( attrVal.getId() ) ) {
+							continue;
+						}
+						// Recupera solo i componenti dell'attributo di QUESTO specifico productItemId
+						var myAttrCompIds = StructKeyExists( attrValueToCompIds, attrVal.getId() )
+							? attrValueToCompIds[ attrVal.getId() ]
+							: [];
+
+						for ( var acid in myAttrCompIds ) {
+							if ( !StructKeyExists( attrBeanMap, acid ) ) {
+								continue;
+							}
+							var attrComp = attrBeanMap[ acid ];
+
+							// Costruisce wrapper ComponentProductItem con type "base",
+							// replicando la logica di searchByProductItemId() in ComponentService
+							var baseBean = super.bean( "ComponentProductItem" );
+							baseBean.setRawMemento( attrComp.getRawMemento() );
+							baseBean.setProductItem( piBean );
+							baseBean.setTypeId( "base" );
+
+							var overrideSvc = componentSvc.getComponentOverrideService();
+							var override    = overrideSvc.list( piBean.getId(), attrComp.getId() );
+							if ( ArrayLen( override ) ) {
+								baseBean.setOverride( override[ 1 ] );
+							}
+
+							ArrayAppend( allComponents, parseComponent( baseBean ) );
+						}
+					}
 				}
 			}
 		}

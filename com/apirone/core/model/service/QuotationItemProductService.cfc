@@ -110,36 +110,16 @@
 			}
 		}
 
-		// Precarica i Product in batch: ProductService non ha getMany() pubblico (usa buildMany interno).
-		// Usiamo ProductDAO.readByIds e costruiamo bean minimali.
+		// Precarica i Product in batch con getMany() ottimizzato di ProductService
 		var productMap = {};
-		if ( ArrayLen( productIds ) ) {
-			var uniqueProductIds = [];
-			for ( var pid in productIds ) {
-				if ( !IsNull( pid ) && !ArrayContains( uniqueProductIds, pid ) ) {
-					uniqueProductIds.append( pid );
-				}
+		var uniqueProductIds = [];
+		for ( var pid in productIds ) {
+			if ( !IsNull( pid ) && !ArrayContains( uniqueProductIds, pid ) ) {
+				uniqueProductIds.append( pid );
 			}
-			if ( ArrayLen( uniqueProductIds ) ) {
-				var prodRecords = getProductService().getDao().readByIds( uniqueProductIds );
-
-				// Precarica i testi per i Product in batch
-				var prodTextMap = getTextService().listByEntityIds( "product.id", uniqueProductIds );
-
-				for ( var pr in prodRecords ) {
-					var prodBean = super.bean( "Product" );
-					prodBean.setId( pr.product_id.toString() );
-					prodBean.setSerial( pr.serial );
-					prodBean.setCreatedAt( pr.created_at );
-					prodBean.setMinQuantity( pr.min_quantity );
-					prodBean.setMaxQuantity( pr.max_quantity );
-					// Testi: dalla mappa pre-caricata
-					if ( StructKeyExists( prodTextMap, pr.product_id ) ) {
-						prodBean.setTexts( prodTextMap[ pr.product_id ] );
-					}
-					prodMap[ pr.product_id.toString() ] = prodBean;
-				}
-			}
+		}
+		if ( ArrayLen( uniqueProductIds ) ) {
+			productMap = getProductService().getMany( uniqueProductIds );
 		}
 
 		// Precarica i QuotationItem in batch: QuotationItemService non ha getMany(), è pesante.
