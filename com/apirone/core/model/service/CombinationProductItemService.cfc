@@ -81,6 +81,43 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return map;
 	}
 
+	/**
+	 * Recupera in batch i CombinationProductItem raggruppati per combination_id.
+	 * Restituisce uno Struct chiave = combinationId, valore = Array di bean CombinationProductItem.
+	 * Utilizzato da CombinationService.getMany() per evitare l'N+1 di getByCombinationId().
+	 *
+	 * @combinationIds Array di combinationId
+	 * @return Struct mappato per combinationId -> Array[CombinationProductItem]
+	 */
+	public Struct function listByCombinationIds( required Array combinationIds ){
+		var records = getDao().readByCombinationIds( arguments.combinationIds );
+		var result  = {};
+
+		// Raccoglie tutti i PK e carica i bean completi con getMany()
+		var ids = [];
+		for ( var record in records ) {
+			ArrayAppend( ids, record.combination_product_item_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Raggruppa i bean per combination_id
+		for ( var id in ids ) {
+			if ( !StructKeyExists( beanMap, id ) ) {
+				continue;
+			}
+			var bean           = beanMap[ id ];
+			var combinationId  = bean.getCombinationId();
+
+			if ( !StructKeyExists( result, combinationId ) ) {
+				result[ combinationId ] = [];
+			}
+			ArrayAppend( result[ combinationId ], bean );
+		}
+
+		return result;
+	}
+
 	public Array function list(){
 		// TODO: check formatter
 		arguments[ "limit" ] = -1;

@@ -42,6 +42,30 @@
 				combination_product_items
 			WHERE
 				combination_id = <cfqueryparam cfsqltype="varchar" value="#arguments.combinationId#">::uuid
+			ORDER BY created_at asc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i CombinationProductItem per una lista di combination_id.
+		Utilizzato da CombinationService.getMany() per evitare N+1 su buildFromRow.
+	--->
+	<cffunction name="readByCombinationIds" access="public" returntype="Query">
+		<cfargument name="combinationIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.combinationIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				combination_product_item_id::varchar,
+				*
+			FROM combination_product_items
+			WHERE combination_id::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+			ORDER BY created_at asc
 		</cfquery>
 
 		<cfreturn local.q>

@@ -33,7 +33,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ids.append( record.combination_id );
 		}
 
-		// Costruisce tutti i bean in batch con getMany() (delega a buildFromRow)
+		// Costruisce tutti i bean in batch con getMany() (batch-load inline CombinationProductItem)
 		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
 
 		// Ricostruisce le righe nell'ordine del find() originale
@@ -343,7 +343,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	/**
 	 * Recupera in batch più Combination dato un array di ID.
-	 * Delega a buildFromRow() per ogni record — nessuna duplicazione di logica.
+	 * Precarica Status (cache interno) e CombinationProductItem in batch
+	 * per evitare l'N+1 di getByCombinationId() chiamato da buildFromRow.
 	 *
 	 * @ids Array di combinationId
 	 * @return Struct mappato per combinationId -> Combination
@@ -352,8 +353,48 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().readByIds( ids = arguments.ids );
 		var map     = {};
 
+		// Precarica tutti i CombinationProductItem in batch, raggruppati per combination_id
+		var productItemsByCombinationId = getCombinationProductItemService().listByCombinationIds( arguments.ids );
+
 		for ( var r in records ) {
-			map[ r.combination_id ] = buildFromRow( r );
+			var bean = super.bean( "Combination" );
+
+			// Campi diretti dal record
+			bean.setId( r.combination_id );
+			bean.setCreatedAt( r.created_at );
+			bean.setProductId( r.product_id );
+
+			// Status: chiamata individuale (cache interno, readonly lookup)
+			bean.setStatus( getStatusService().get( r.status_id ) );
+
+			// CombinationProductItem: dalla mappa batch
+			if ( StructKeyExists( productItemsByCombinationId, r.combination_id ) ) {
+				bean.setProductItems( productItemsByCombinationId[ r.combination_id ] );
+			} else {
+				bean.setProductItems( [] );
+			}
+
+			// Nome: dal campo DB combination oppure calcolato dai productItems
+			if ( !IsNull( r.combination ) ) {
+				bean.setName( r.combination );
+			} else {
+				var items = bean.getProductItems();
+				var name  = "";
+
+				for ( var i = 1; i <= items.len(); i++ ) {
+					name &= items[ i ].getProductItem().getAttribute().getName();
+					name &= ": ";
+					name &= items[ i ].getProductItem().getAttributeValue().getRawValue().getName();
+
+					if ( i < items.len() ) {
+						name &= " - ";
+					}
+				}
+
+				bean.setName( name );
+			}
+
+			map[ r.combination_id ] = bean;
 		}
 
 		return map;
