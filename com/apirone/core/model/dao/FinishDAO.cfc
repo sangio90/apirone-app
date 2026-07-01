@@ -36,7 +36,7 @@
 				*
 			FROM finishes
 			WHERE finish_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 

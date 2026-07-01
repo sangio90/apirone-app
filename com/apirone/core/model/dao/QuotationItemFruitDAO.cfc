@@ -115,7 +115,7 @@
 				quotation_item_id::varchar
 			FROM quotation_item_fruits
 			WHERE quotation_item_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 

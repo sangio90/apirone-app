@@ -133,7 +133,7 @@
 			SELECT article_id::varchar, *
 			FROM articles
 			WHERE article_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 

@@ -28,7 +28,7 @@
 				quotation_item_id::varchar,
 				*
 			FROM quotation_item_product_items
-			WHERE quotation_item_product_item_id = ANY( <cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[] )
+			WHERE quotation_item_product_item_id = ANY( ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[] )
 		</cfquery>
 
 		<cfreturn local.q>
@@ -202,7 +202,7 @@
 			SELECT *
 			FROM quotation_item_product_items
 			WHERE quotation_item_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 

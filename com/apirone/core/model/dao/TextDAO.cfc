@@ -256,8 +256,8 @@
 				country_id::varchar,
 				*
 			FROM texts
-			WHERE #field.name# = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+			WHERE #field.name#::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
 			)
 		</cfquery>
 

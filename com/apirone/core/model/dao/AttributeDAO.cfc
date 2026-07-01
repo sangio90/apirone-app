@@ -139,7 +139,7 @@
 			SELECT attribute_id::varchar, *
 			FROM attributes
 			WHERE attribute_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 

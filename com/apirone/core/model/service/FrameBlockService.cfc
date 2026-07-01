@@ -2,21 +2,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="FrameBlockDAO";
 
-	property name="cacheScope" type="String" default="FrameBlock.bean";
-
 	public com.apirone.core.model.bean.FrameBlock function get( required String frameBlockId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.frameBlockId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.frameBlockId );
-		cm.put( getCacheScope(), arguments.frameBlockId, bean );
-
-		return bean;
+		return build( arguments.frameBlockId );
 	}
 
 	public Array function list(){
@@ -37,10 +24,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( frameBlockId = record.frame_block_id ) );
+			ids.append( record.frame_block_id );
+		} );
+
+		// Costruisce tutti i bean in batch
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+			for ( var r in allRecords ) {
+				beanMap[ r.frame_block_id ] = buildFromRow( r );
+			}
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.frame_block_id ] );
 		} );
 
 		result.setData( rows );
@@ -66,8 +70,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().deleteByFrameId( frameId = arguments.frameId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.frameId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -88,26 +90,33 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.frameBlockId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "FrameBlock" );
-
-			bean.setId( record.frame_block_id );
-
-			bean.setOrder( record.order );
-			bean.setSlotCount( record.slot_count );
-
-			if ( !IsNull( record.margin_top_mm ) ) bean.setMarginTopMm( record.margin_top_mm );
-			if ( !IsNull( record.margin_left_mm ) ) bean.setMarginLeftMm( record.margin_left_mm );
-
-			bean.setOrientationMode( record.orientation_mode );
-			if ( !IsNull( record.rotatable ) ) bean.setRotatable( record.rotatable );
-
-			bean.setFrameId( record.frame_id );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean FrameBlock a partire da una riga del query.
+	 */
+	private com.apirone.core.model.bean.FrameBlock function buildFromRow( required any record ){
+		var bean = super.bean( "FrameBlock" );
+
+		bean.setId( arguments.record.frame_block_id );
+
+		bean.setOrder( arguments.record.order );
+		bean.setSlotCount( arguments.record.slot_count );
+
+		if ( !IsNull( arguments.record.margin_top_mm ) ) bean.setMarginTopMm( arguments.record.margin_top_mm );
+		if ( !IsNull( arguments.record.margin_left_mm ) ) bean.setMarginLeftMm( arguments.record.margin_left_mm );
+
+		bean.setOrientationMode( arguments.record.orientation_mode );
+		if ( !IsNull( arguments.record.rotatable ) ) bean.setRotatable( arguments.record.rotatable );
+
+		bean.setFrameId( arguments.record.frame_id );
+		bean.setCreatedAt( arguments.record.created_at );
+
+		return bean;
 	}
 
 }

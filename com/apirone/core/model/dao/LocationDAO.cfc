@@ -28,7 +28,7 @@
 			FROM
 				locations
 			WHERE
-				location_id = ANY(<cfqueryparam value="#ArrayToList( arguments.ids )#" list="false" cfsqltype="varchar">::uuid[])
+				location_id = ANY(ARRAY[<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="varchar">]::uuid[])
 		</cfquery>
 
 		<cfreturn local.q>

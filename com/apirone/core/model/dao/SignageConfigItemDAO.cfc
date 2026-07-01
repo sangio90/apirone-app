@@ -82,7 +82,7 @@
 			SELECT *
 			FROM signage_config_items
 			WHERE signage_config_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 			ORDER BY signage_config_item_id
 		</cfquery>

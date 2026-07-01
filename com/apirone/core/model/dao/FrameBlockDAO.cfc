@@ -13,6 +13,16 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table    = "frame_blocks",
+			pkColumn = "frame_block_id",
+			ids      = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="frameId" type="String">
 
@@ -81,6 +91,27 @@
 		</cfquery>
 
 		<cfreturn true>
+	</cffunction>
+
+	<!---
+		Recupera in batch i FrameBlock per una lista di frameId.
+		Utilizzato da FrameService.getMany() per evitare N+1.
+	--->
+	<cffunction name="readByFrameIds" returntype="Query" access="public">
+		<cfargument name="frameIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.frameIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT frame_id::varchar, *
+			FROM frame_blocks
+			WHERE frame_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			ORDER BY "order"
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 
 </cfcomponent>

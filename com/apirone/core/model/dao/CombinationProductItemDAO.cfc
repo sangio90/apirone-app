@@ -63,7 +63,7 @@
 				*
 			FROM combination_product_items
 			WHERE combination_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 			ORDER BY created_at asc
 		</cfquery>

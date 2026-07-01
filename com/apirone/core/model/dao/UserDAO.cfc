@@ -34,7 +34,7 @@
 				user_id::varchar,
 				*
 			FROM membership.users
-			WHERE user_id = ANY( <cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[] )
+			WHERE user_id = ANY( ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[] )
 		</cfquery>
 
 		<cfreturn local.q>

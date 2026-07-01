@@ -30,7 +30,7 @@
 			SELECT line_id::varchar, *
 			FROM lines
 			WHERE line_id = ANY(
-				<cfqueryparam value="#idsList#" list="false" cfsqltype="varchar">::uuid[]
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>
 
