@@ -767,6 +767,32 @@
 		<cfreturn local.qTotal.total_amount>
 	</cffunction>
 
+	<!---
+		Calcola in batch il totale per una lista di quotationId.
+		Evita l'N+1 di getQuotationTotal() chiamato per ogni riga in getMany().
+	--->
+	<cffunction name="getQuotationTotals" access="public" returntype="Struct">
+		<cfargument name="quotationIds" type="Array" required="true">
+
+		<cfset var result   = {} />
+		<cfset var idsList  = ArrayToList( arguments.quotationIds ) />
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT quotation_id, COALESCE(SUM(price * quantity), 0) AS total_amount
+			FROM quotation_items
+			WHERE quotation_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			GROUP BY quotation_id
+		</cfquery>
+
+		<cfloop query="local.q">
+			<cfset result[ local.q.quotation_id ] = local.q.total_amount />
+		</cfloop>
+
+		<cfreturn result />
+	</cffunction>
+
 	<cffunction name="readNextNumber" access="public" returntype="numeric">
 
 		<cfquery name="local.q" datasource="apirone">

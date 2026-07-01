@@ -386,7 +386,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					signConfigMap = getSignageConfigService().getMany( allSignConfigIds );
 				}
 
-				// --- Fase 3a: elaborazione degli articoli (servizi) - riutilizza la logica originale ---
+				// --- Fase 3a: elaborazione degli articoli (servizi) ---
 				for ( var quotationItem in arguments.quotationItems ) {
 					if ( IsNull( quotationItem.getArticle() ) ) {
 						continue;
@@ -418,37 +418,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
 					);
 
-						if ( existingCodes.len() > 0 ) {
-							ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
-							continue;
-						}
 					if ( existingCodes.len() > 0 ) {
+						ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
 						continue;
 					}
 
-						///se non troviamo, creiamo ed esportiamo in verticale
-						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
-						exportCode.setCounter( "000000" );
-						exportCodeService.create( "exportCode" = exportCode );
-						result.success = getDao().exportProduct( dataExport );
-						ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
-
-						continue;
-					} else {
-						var hsCode = "";
-						try {
-							hsCode = quotationItem.getProduct().getLine().getHscode();
-						} catch ( any e ) {
-
-						}
-						var quotationImageFile = quotationItem.getImage();
-						var base64File = "";
 					var exportCode = super.bean( "ExportCode" );
 					exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
 					exportCode.setCounter( "000000" );
 					exportCodeService.create( "exportCode" = exportCode );
 					result.success = getDao().exportProduct( dataExport );
+					ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
 				}
 
 				// --- Fase 3b: elaborazione dei prodotti usando esclusivamente le mappe batch ---
@@ -584,20 +564,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							}
 
 							if ( isImportant ) {
-								if ( varCode.len() < 10 ) {
-									varCode &= Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-									arrayAppend( productItems, {
-										"important"   = true,
-										"rawValueId"  = rawValue.getId(),
-										"attributeId" = attributeValue.getAttributeId()
-									} );
-								} else {
-									arrayAppend( productItems, {
-										"important"   = false,
-										"rawValueId"  = rawValue.getId(),
-										"attributeId" = attributeValue.getAttributeId()
-									} );
+								var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+								if ( varCode.len() + slotCode.len() > 10 ) {
+									result.success = false;
+									result.error = 'Il codice variante supera i 10 caratteri: attributo "'
+										& Trim( attribute.getCode() )
+										& '" (valore "'
+										& Trim( rawValue.getCode() )
+										& '") non entra nel codice variante (già '
+										& varCode.len()
+										& ' su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
+									return result;
 								}
+
+								varCode &= slotCode;
+								arrayAppend( productItems, {
+									"important"   = true,
+									"rawValueId"  = rawValue.getId(),
+									"attributeId" = attributeValue.getAttributeId()
+								} );
 							} else {
 								arrayAppend( productItems, {
 									"important"   = false,
@@ -1246,6 +1231,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return clonedQuotationId;
 	}
 
+	public Void function markAsSent( required String quotationId ){
+		getDao().markAsSent( arguments.quotationId );
+	}
+
+	public String function createRevision( required com.apirone.core.model.bean.Quotation quotation ){
+		var originalQuotation = arguments.quotation;
+		var clonedQuotation   = Duplicate( originalQuotation );
+		clonedQuotation.setId( "" );
+		clonedQuotation.setActive( 1 );
+		clonedQuotation.setSentToClient( false );
+		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
+		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
+		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+
+		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
+		for ( var quotationZone in quotationZones ) {
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId );
+		}
+
+		return clonedQuotationId;
+	}
+
 	/*
 		private method
 	*/
@@ -1322,6 +1329,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			statusHistoryMap = getQuotationStatusHistoryService().getMany( statusHistoryIds );
 		}
 
+		// Precarica i totali calcolati in batch (1 query invece di N)
+		var quotationIds = [];
+		for ( var r in records ) {
+			quotationIds.append( r.quotation_id );
+		}
+		var totalMap = getDao().getQuotationTotals( quotationIds );
+
 		// Costruisce i bean Quotation con le mappe pre-caricate
 		for ( var r in records ) {
 			var bean = super.bean( "Quotation" );
@@ -1383,6 +1397,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( r.referente_amministrativo ) ) bean.setReferenteAmministrativo( r.referente_amministrativo );
 			if ( Len( r.referente_spedizione ) ) bean.setReferenteSpedizione( r.referente_spedizione );
 			if ( Len( r.customer_type ) ) bean.setCustomerType( r.customer_type );
+			if ( Len( r.industry ) ) bean.setIndustry( r.industry );
+			if ( Len( r.rif_libero ) ) bean.setRifLibero( r.rif_libero );
+			if ( IsDate( r.data_evasione ) ) bean.setDataEvasione( r.data_evasione );
+			if ( !IsNull( r.sent_to_client ) ) bean.setSentToClient( r.sent_to_client );
+			if ( !IsNull( r.data_conferma_ordine ) && IsDate( r.data_conferma_ordine ) ) bean.setDataConfermaOrdine( r.data_conferma_ordine );
+			if ( Len( r.codice_sdi ) ) bean.setCodiceSdi( r.codice_sdi );
 
 			// Customer: chiamata individuale (CRM API, cache interna)
 			if ( !IsNull( r.customer_id ) ) {
@@ -1410,9 +1430,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setVatCode( getVatCodeService().get( r.vat_code_id ) );
 			}
 
-			// Totale calcolato: query individuale (SUM per quotation_id)
+			// Totale calcolato: dalla mappa batch
 			bean.setCalculatedAmount(
-				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+				StructKeyExists( totalMap, r.quotation_id ) ? totalMap[ r.quotation_id ] : 0
 			);
 
 			map[ r.quotation_id ] = bean;
@@ -1474,6 +1494,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( Len( arguments.record.referente_amministrativo ) ) bean.setReferenteAmministrativo( arguments.record.referente_amministrativo );
 		if ( Len( arguments.record.referente_spedizione ) ) bean.setReferenteSpedizione( arguments.record.referente_spedizione );
 		if ( Len( arguments.record.customer_type ) ) bean.setCustomerType( arguments.record.customer_type );
+		if ( Len( arguments.record.industry ) ) bean.setIndustry( arguments.record.industry );
+		if ( Len( arguments.record.rif_libero ) ) bean.setRifLibero( arguments.record.rif_libero );
+		if ( IsDate( arguments.record.data_evasione ) ) bean.setDataEvasione( arguments.record.data_evasione );
+		if ( !IsNull( arguments.record.sent_to_client ) ) bean.setSentToClient( arguments.record.sent_to_client );
+		if ( !IsNull( arguments.record.data_conferma_ordine ) && IsDate( arguments.record.data_conferma_ordine ) ) bean.setDataConfermaOrdine( arguments.record.data_conferma_ordine );
+		if ( Len( arguments.record.codice_sdi ) ) bean.setCodiceSdi( arguments.record.codice_sdi );
 
 		//by a trigger from history
 		//bean.setStatus( getStatusService().get( arguments.record.status_id ) );

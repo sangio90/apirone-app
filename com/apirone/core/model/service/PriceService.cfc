@@ -360,13 +360,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().findByProductIds( productIds = arguments.productIds );
 		var map     = {};
 
+		// Raccoglie tutti i PK e carica i bean completi in batch con getMany() (include PriceType batch)
+		var ids = [];
+		for ( var record in records ) {
+			ArrayAppend( ids, record.price_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
 		// Raggruppa i risultati della query per productId
 		for ( var record in records ) {
 			var productId = record.product_id;
 			if ( !StructKeyExists( map, productId ) ) {
 				map[ productId ] = [];
 			}
-			var bean = buildFromRow( record );
+			var bean = beanMap[ record.price_id ];
 			ArrayAppend( map[ productId ], bean );
 		}
 
