@@ -46,9 +46,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * @return Struct mappato per combinationProductItemId -> CombinationProductItem
 	 */
 	public Struct function getMany( required Array ids ){
-		var records      = getDao().readByIds( ids = arguments.ids );
-		var map          = {};
-		var productItems = {};
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i product_item_id per il precaricamento batch
+		var productItemIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.product_item_id ) ) {
+				productItemIds.append( record.product_item_id );
+			}
+		}
+
+		// Precarica tutti i ProductItem con una sola chiamata batch
+		var productItemMap = ArrayLen( productItemIds )
+			? getProductItemService().getMany( productItemIds )
+			: {};
 
 		for ( var record in records ) {
 			var bean = super.bean( "CombinationProductItem" );
@@ -58,11 +70,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setCreatedAt( record.created_at );
 			bean.setCombinationId( record.combination_id );
 
-			// ProductItem: cached localmente per evitare chiamate N+1
-			if ( !StructKeyExists( productItems, record.product_item_id ) ) {
-				productItems[ record.product_item_id ] = getProductItemService().get( record.product_item_id );
+			// ProductItem: dalla mappa pre-caricata in batch
+			if ( StructKeyExists( productItemMap, record.product_item_id ) ) {
+				bean.setProductItem( productItemMap[ record.product_item_id ] );
 			}
-			bean.setProductItem( productItems[ record.product_item_id ] );
 
 			map[ bean.getId() ] = bean;
 		}
