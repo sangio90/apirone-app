@@ -23,7 +23,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().read( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( buildFromQueryRow( record ) );
+			rows.add( buildFromRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -33,13 +33,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * Costruisce un bean Pricelist a partire dall'ID. Delega a buildFromQueryRow() dopo la lettura del record.
+	 * Costruisce un bean Pricelist a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
 	 */
 	private com.apirone.core.model.bean.Pricelist function build( required String pricelistId ){
 		var record = getDao().read( arguments.pricelistId );
 
 		if ( record.RecordCount ) {
-			return buildFromQueryRow( record );
+			return buildFromRow( record );
 		}
 
 		return NullValue();
@@ -49,7 +49,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Costruisce un bean Pricelist a partire da una riga della query, senza chiamata DB aggiuntiva.
 	 * Utilizzato sia da build() (record singolo) che da read() (iterazione batch).
 	 */
-	private com.apirone.core.model.bean.Pricelist function buildFromQueryRow( required any record ){
+	private com.apirone.core.model.bean.Pricelist function buildFromRow( required any record ){
 		var obj = super.bean( "Pricelist" );
 
 		// Campi diretti dal record (il pricelist non ha sub-entity)
