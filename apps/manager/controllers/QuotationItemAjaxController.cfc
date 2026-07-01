@@ -148,6 +148,198 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function plateExport( event, rc, prc ){
+		var result = super.getResult();
+		var langId = "IT";
+
+		var item = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+
+		var data = {
+			"id"       = item.getId(),
+			"quantita" = item.getQuantity(),
+			"note"     = item.getNote(),
+			"speciale" = item.getSpecial()
+		};
+
+		if ( !isNull( item.getQuotationZone() ) ) {
+			data["zona"] = item.getQuotationZone().getName();
+		}
+
+		if ( !isNull( item.getPosition() ) ) {
+			data["posizione"] = item.getPosition().getCode();
+		}
+
+		var product = item.getProduct();
+		var attributiPlacca = [];
+		for ( var qi in item.getItems() ) {
+			var pi = qi.getProductItem();
+			ArrayAppend( attributiPlacca, {
+				"attributo" = pi.getAttribute().getName( langId ),
+				"valore"    = pi.getAttributeValue().getName( langId ),
+				"nota"      = qi.getNote()
+			});
+		}
+		data["prodotto"] = {
+			"id"       = product.getId(),
+			"codice"   = product.getCode(),
+			"linea"    = product.getLine().getName( langId ),
+			"modello"  = product.getModel().getCode() & " – " & product.getModel().getName( langId ),
+			"finitura" = product.getFinish().getCode() & " – " & product.getFinish().getName( langId ),
+			"attributi" = attributiPlacca
+		};
+
+		if ( !isNull( item.getFrame() ) ) {
+			data["frame"] = {
+				"codice"       = item.getFrame().getCode(),
+				"orientamento" = item.getFrame().getOrientation().getId()
+			};
+		}
+
+		var frutti = [];
+		var fruitOrder = 1;
+		for ( var fruit in item.getFruits() ) {
+			var fruttoProdotto = fruit.getFruit();
+			var slots = [];
+			for ( var pos in fruit.getPositions() ) {
+				ArrayAppend( slots, { "slot" = pos.position, "ordine" = pos.order } );
+			}
+			var attributiFrutto = [];
+			for ( var qif in fruit.getItems() ) {
+				var pif = qif.getProductItem();
+				ArrayAppend( attributiFrutto, {
+					"attributo" = pif.getAttribute().getName( langId ),
+					"valore"    = pif.getAttributeValue().getName( langId ),
+					"nota"      = qif.getNote()
+				});
+			}
+			ArrayAppend( frutti, {
+				"ordine"  = fruitOrder,
+				"note"    = fruit.getNote(),
+				"prodotto" = {
+					"id"       = fruttoProdotto.getId(),
+					"codice"   = fruttoProdotto.getCode(),
+					"nome"     = fruttoProdotto.getName( langId ),
+					"linea"    = fruttoProdotto.getLine().getName( langId ),
+					"modello"  = fruttoProdotto.getModel().getCode() & " – " & fruttoProdotto.getModel().getName( langId ),
+					"finitura" = fruttoProdotto.getFinish().getCode() & " – " & fruttoProdotto.getFinish().getName( langId )
+				},
+				"slots"     = slots,
+				"attributi" = attributiFrutto
+			});
+			fruitOrder++;
+		}
+		data["frutti"] = frutti;
+
+		if ( !isNull( item.getPrice() ) ) {
+			var price = item.getPrice();
+			var righe = [];
+			for ( var line in price.getLines() ) {
+				ArrayAppend( righe, {
+					"nome"    = line.getName(),
+					"importo" = line.getAmount(),
+					"costo"   = line.getCost()
+				});
+			}
+			data["prezzo"] = {
+				"totale"       = price.getTotal(),
+				"costo_totale" = price.getCost(),
+				"sconto1"      = !isNull( price.getDiscount1() ) ? price.getDiscount1() : 0,
+				"sconto2"      = !isNull( price.getDiscount2() ) ? price.getDiscount2() : 0,
+				"metodo"       = price.getMethod().getId(),
+				"righe"        = righe
+			};
+		}
+
+		result.setData( data );
+		event.setValue( "result", result );
+	}
+
+	function signageExport( event, rc, prc ){
+		var result = super.getResult();
+		var langId = "IT";
+
+		var item = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+
+		var data = {
+			"id"       = item.getId(),
+			"quantita" = item.getQuantity(),
+			"note"     = item.getNote(),
+			"speciale" = item.getSpecial()
+		};
+
+		if ( !isNull( item.getQuotationZone() ) ) {
+			data["zona"] = item.getQuotationZone().getName();
+		}
+
+		if ( !isNull( item.getPosition() ) ) {
+			data["posizione"] = item.getPosition().getCode();
+		}
+
+		var product = item.getProduct();
+		var attributiSegnaletica = [];
+		if ( !isNull( item.getItems() ) ) {
+			for ( var qi in item.getItems() ) {
+				var pi = qi.getProductItem();
+				ArrayAppend( attributiSegnaletica, {
+					"attributo" = pi.getAttribute().getName( langId ),
+					"valore"    = pi.getAttributeValue().getName( langId ),
+					"nota"      = qi.getNote()
+				});
+			}
+		}
+		data["prodotto"] = {
+			"id"        = product.getId(),
+			"codice"    = product.getCode(),
+			"linea"     = product.getLine().getName( langId ),
+			"modello"   = product.getModel().getCode() & " – " & product.getModel().getName( langId ),
+			"finitura"  = product.getFinish().getCode() & " – " & product.getFinish().getName( langId ),
+			"attributi" = attributiSegnaletica
+		};
+
+		var configItem = item.getSignageConfigItem();
+		var signageConfig = super.fire( "SignageConfig.get", { signageConfigId = configItem.getSignageConfigId() } );
+		data["segnaletica"] = {
+			"font"         = signageConfig.getFont().getName( langId ),
+			"altezza_font" = configItem.getHeightInPixel(),
+			"righe_max"    = configItem.getRowCount(),
+			"char_max"     = configItem.getCharCount()
+		};
+
+		var righe = [];
+		for ( var row in item.getSignageRows() ) {
+			ArrayAppend( righe, {
+				"ordine"       = row.getOrderby(),
+				"allineamento" = row.getTextAlign(),
+				"contenuto"    = row.getContent(),
+				"char_count"   = row.getCharCount()
+			});
+		}
+		data["righe"] = righe;
+
+		if ( !isNull( item.getPrice() ) ) {
+			var price = item.getPrice();
+			var righePrezzo = [];
+			for ( var line in price.getLines() ) {
+				ArrayAppend( righePrezzo, {
+					"nome"    = line.getName(),
+					"importo" = line.getAmount(),
+					"costo"   = line.getCost()
+				});
+			}
+			data["prezzo"] = {
+				"totale"       = price.getTotal(),
+				"costo_totale" = price.getCost(),
+				"sconto1"      = !isNull( price.getDiscount1() ) ? price.getDiscount1() : 0,
+				"sconto2"      = !isNull( price.getDiscount2() ) ? price.getDiscount2() : 0,
+				"metodo"       = price.getMethod().getId(),
+				"righe"        = righePrezzo
+			};
+		}
+
+		result.setData( data );
+		event.setValue( "result", result );
+	}
+
 	function editSignage( event, rc, prc ){
 		
 		var data   = {};

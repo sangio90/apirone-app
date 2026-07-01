@@ -158,9 +158,18 @@
                         </div>
                     </div>
 
+                    <div data-bind="visible: showJsonPanel" class="row mx-0 border-top pt-2 pb-1">
+                        <div class="col-12">
+                            <textarea class="form-control form-control-sm" style="font-size:10px; font-family:monospace; height:220px;" data-bind="value: jsonExportText" readonly></textarea>
+                        </div>
+                    </div>
+
                     <footer class="card-footer">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 fs-10">
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bind="click:toggleJsonExport, visible:detailForm.data.quotationItem.id">
+                                    <i class="fas fa-code"></i> JSON
+                                </button>
                                 <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci configurazione</button>
                             </div>
 
