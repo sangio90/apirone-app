@@ -5,21 +5,8 @@
 	property name="pictogramService" inject="PictogramService";
 	property name="fontFamilySizeService" inject="FontFamilySizeService";
 
-	property name="cacheScope" type="String" default="FontFamily.bean";
-
 	public com.apirone.core.model.bean.FontFamily function get( required String fontFamilyId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.fontFamilyId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.fontFamilyId );
-		cm.put( getCacheScope(), arguments.fontFamilyId, bean );
-
-		return bean;
+		return build( arguments.fontFamilyId );
 	}
 
 	public com.apirone.core.model.bean.FontFamily function getFontFamilyBySignageConfigId( required Numeric signageConfigId ){
@@ -46,10 +33,21 @@
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments.orderby );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( fontFamilyId = record.font_family_id ) );
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids     = [];
+		records.each( function( r ){
+			ids.append( r.font_family_id ); // PK intero
+		} );
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( r ){
+			rows.add( beanMap[ r.font_family_id ] );
 		} );
 
 		result.setData( rows );
@@ -79,7 +77,6 @@
 
 	public String function update( required com.apirone.core.model.bean.FontFamily fontFamily ){
 		getDao().update( arguments.fontFamily );
-		super.getCacheManager().remove( getCacheScope(), arguments.fontFamily.getId() );
 
 		return arguments.fontFamily.getId();
 	}
@@ -100,8 +97,6 @@
 			payload = { "id" = arguments.fontFamilyId }
 		);
 
-		super.getCacheManager().remove( getCacheScope(), arguments.fontFamilyId );
-
 		return outcome;
 	}
 
@@ -110,30 +105,98 @@
     	private method
 	*/
 
-	private com.apirone.core.model.bean.FontFamily function build( required String fontFamilyId ){
-		var record = getDao().read( arguments.fontFamilyId );
+	/**
+	 * Recupera in batch più FontFamily dato un array di ID.
+	 * Restituisce uno Struct chiave = fontFamilyId, valore = bean FontFamily.
+	 * Precarica pictograms e fontFamilySizes in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di fontFamilyId
+	 * @return Struct mappato per fontFamilyId -> FontFamily
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-		if ( record.recordCount ) {
+		// Precarica i pittogrammi in batch: una chiamata list() per ogni fontFamilyId univoco
+		// (il numero di famiglie è limitato dal search(), quindi U <= limit)
+		var pictogramMap = {};
+		var sizeMap      = {};
+		for ( var fid in arguments.ids ) {
+			if ( !StructKeyExists( pictogramMap, fid ) ) {
+				pictogramMap[ fid ] = getPictogramService().list( fontFamilyId = fid );
+			}
+			if ( !StructKeyExists( sizeMap, fid ) ) {
+				sizeMap[ fid ] = getFontFamilySizeService().list( fontFamilyId = fid );
+			}
+		}
+
+		for ( var record in records ) {
 			var bean = super.bean( "FontFamily" );
 
+			// Campi diretti dal record
 			bean.setId( record.font_family_id );
 			bean.setCode( record.code );
 			bean.setName( record.font_family );
 
-			var pictograms = getPictogramService().list( fontFamilyId = arguments.fontFamilyId );
-
-			if ( Len( pictograms ) ) {
-				bean.setPictograms( pictograms );
+			// Pictograms: dalla mappa pre-caricata
+			if ( StructKeyExists( pictogramMap, record.font_family_id ) ) {
+				var pictograms = pictogramMap[ record.font_family_id ];
+				if ( Len( pictograms ) ) {
+					bean.setPictograms( pictograms );
+				}
 			}
 
-			var sizes = getFontFamilySizeService().list( fontFamilyId = arguments.fontFamilyId );
+			// Sizes: dalla mappa pre-caricata
+			if ( StructKeyExists( sizeMap, record.font_family_id ) ) {
+				bean.setSizes( sizeMap[ record.font_family_id ] );
+			} else {
+				bean.setSizes( [] );
+			}
 
-			bean.setSizes( sizes );
+			map[ record.font_family_id ] = bean;
+		}
 
-			return bean;
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean FontFamily a partire dall'ID, effettuando la lettura dal DB.
+	 */
+	private com.apirone.core.model.bean.FontFamily function build( required String fontFamilyId ){
+		var record = getDao().read( arguments.fontFamilyId );
+
+		if ( record.recordCount ) {
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean FontFamily a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * Le sub-entity (pictograms, sizes) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.FontFamily function buildFromRow( required any record ){
+		var bean = super.bean( "FontFamily" );
+
+		// Campi diretti dal record
+		bean.setId( record.font_family_id );
+		bean.setCode( record.code );
+		bean.setName( record.font_family );
+
+		// Entity collegate (caricate singolarmente)
+		var pictograms = getPictogramService().list( fontFamilyId = record.font_family_id );
+
+		if ( Len( pictograms ) ) {
+			bean.setPictograms( pictograms );
+		}
+
+		var sizes = getFontFamilySizeService().list( fontFamilyId = record.font_family_id );
+
+		bean.setSizes( sizes );
+
+		return bean;
 	}
 
 }

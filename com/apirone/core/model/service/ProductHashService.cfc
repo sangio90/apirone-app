@@ -3,26 +3,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="ProductHashDAO";
 	property name="ProductItemService" inject="ProductItemService";
 	property name="QuotationItemService" inject="QuotationItemService";
-	property name="cacheScope" type="String" default="ProductHash.bean";
 
 	public com.apirone.core.model.bean.ProductHash function get( required Numeric productHashId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.productHashId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.productHashId );
-		cm.put( getCacheScope(), arguments.productHashId, bean );
-
-		return bean;
+		return build( arguments.productHashId );
 	}
 
 	public com.apirone.core.model.bean.ProductHash function getByHash( required String hash ){
-		var cm = getCacheManager();
-
 		var record = getDao().find( argumentCollection = arguments );
 
 		if (Len(record)) {
@@ -43,15 +29,35 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.Result function search(
 		Numeric productHashId,
 		String hash,
-		String jsonData,
+		String jsonData
 	){
 		var rows   = [];
 		var result = super.getResult();
+
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( record.product_hash_id ) );
-		} );
+		// Raccoglie gli ID restituiti dalla find per un caricamento batch
+		var ids = [];
+		for ( var record in records ) {
+			ids.add( record.product_hash_id );
+		}
+
+		var beanMap = {};
+
+		// Carica tutti i record completi in un'unica query e costruisce una mappa id -> bean
+		if ( ids.len() ) {
+			var fullRecords = getDao().readByIds( ids );
+
+			for ( var fullRecord in fullRecords ) {
+				beanMap[ fullRecord.product_hash_id ] = buildFromRow( fullRecord );
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				rows.add( beanMap[ record.product_hash_id ] );
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -68,9 +74,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.productHashId );
-				cm.remove( getCacheScope(), arguments.productHashId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -91,42 +95,53 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Numeric function update( required com.apirone.core.model.bean.ProductHash productHash ){
 		getDao().update( arguments.productHash );
-		super.getCacheManager().remove( getCacheScope(), productHash.getId() );
 
 		return arguments.productHash.getId();
+	}
+
+	/**
+	 * Costruisce un bean ProductHash a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.ProductHash function buildFromRow( required any record ){
+		var bean = super.bean( "ProductHash" );
+
+		// Campi diretti dal record
+		bean.setId( record.product_hash_id );
+		bean.setHash( record.hash );
+		bean.setJsonData( record.json_data );
+
+		return bean;
 	}
 
 	private com.apirone.core.model.bean.ProductHash function build( required Numeric productHashId ){
 		var record = getDao().read( arguments.productHashId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ProductHash" );
-
-			bean.setId( record.product_hash_id );
-
-			bean.setHash( record.hash );
-			bean.setJsonData( record.json_data );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
 	}
 
 	public String function createHash( required String quotationItemId ){
-		var quotationItem = getQuotationItemService().get( quotationItemId );
+		// Carica il QuotationItem completo via batch getMany() invece del
+		// singolo get() -> buildFromRow() che causa cascata N+1
+		var beanMap        = getQuotationItemService().getMany( [ arguments.quotationItemId ] );
+		var quotationItem = StructKeyExists( beanMap, arguments.quotationItemId )
+			? beanMap[ arguments.quotationItemId ]
+			: NullValue();
 
 		var jsonData = prepareQuotationItemJson( quotationItem );
 
 		if (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
 			jsonData = prepareQuotationItemSignageJson( quotationItem, jsonData );
 
-		} elseif (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
+		} else if (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
 			jsonData = prepareQuotationItemPlateJson( quotationItem, jsonData );
 		}
 
 		var bean = prepareBean(jsonData);
-		
+
 		if (IsNull( bean.getId() ) or Trim(bean.getId()) == '') {
 			create( bean );
 		}
@@ -218,15 +233,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private function prepareBean( jsonData ){
 		var sorted = sortTopLevelStruct(jsonData);
 		var jsonData = serializeJson( sorted );
-		
+
 		var hashValue = hash(jsonData, "MD5");
 
 		var existProductHash = search( jsonData = jsonData );
-		
+
 		if ( existProductHash.getCount() > 0 ) {
 			return existProductHash.getData()[1]
 		}
-		
+
 		var bean = super.bean( "ProductHash" );
 		bean.setHash( hashValue );
 		bean.setJsonData( jsonData );

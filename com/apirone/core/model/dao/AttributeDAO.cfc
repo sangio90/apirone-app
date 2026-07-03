@@ -56,7 +56,7 @@
 				<cfif !IsNull( arguments.categoryId )>
 					AND categories @> ANY ('{[#sanitizeSQL( arguments.categoryId )#]}')
 				</cfif>
-			GROUP BY 
+			GROUP BY
 				attribute_id
 			ORDER BY
 				attribute_id
@@ -125,5 +125,24 @@
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
+	</cffunction>
+
+	<!---
+		Recupera in batch più attributi dato un array di ID.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT attribute_id::varchar, *
+			FROM attributes
+			WHERE attribute_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 </cfcomponent>

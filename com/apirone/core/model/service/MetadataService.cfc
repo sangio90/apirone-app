@@ -2,21 +2,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="MetadataDAO";
 	property name="metadataTypeService" inject="MetadataTypeService";
-	property name="cacheScope" type="String" default="Metadata.bean";
 
 	public com.apirone.core.model.bean.Metadata function get( required String metadataId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.metadataId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.metadataId );
-		cm.put( getCacheScope(), arguments.metadataId, bean );
-
-		return bean;
+		return build( arguments.metadataId );
 	}
 
 	public Array function list(){
@@ -38,10 +26,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( metadataId = record.metadata_id ) );
+			ids.append( record.metadata_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.metadata_id ] );
 		} );
 
 		result.setData( rows );
@@ -51,12 +49,57 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	/**
+	 * Recupera in batch più Metadata dato un array di ID.
+	 * Restituisce uno Struct chiave = metadataId, valore = bean Metadata.
+	 * Precarica i MetadataType in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di metadataId
+	 * @return Struct mappato per metadataId -> Metadata
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i metadata_type_id per precaricarli in batch
+		var typeIds     = [];
+		var typeIdsSeen = {};
+		for ( var record in records ) {
+			if ( !StructKeyExists( typeIdsSeen, record.metadata_type_id ) ) {
+				typeIdsSeen[ record.metadata_type_id ] = true;
+				typeIds.append( record.metadata_type_id );
+			}
+		}
+
+		// Precarica i MetadataType in batch con getMany() pubblico (1 query)
+		var typeMap = {};
+		if ( ArrayLen( typeIds ) ) {
+			typeMap = getMetadataTypeService().getMany( typeIds );
+		}
+
+		for ( var record in records ) {
+			var bean = super.bean( "Metadata" );
+
+			// Campi diretti dal record
+			bean.setId( record.metadata_id );
+			bean.setCreatedAt( record.created_at );
+
+			// MetadataType: dalla mappa batch
+			if ( StructKeyExists( typeMap, record.metadata_type_id ) ) {
+				bean.setType( typeMap[ record.metadata_type_id ] );
+			}
+
+			bean.setEntity( getEntity( record ) );
+			bean.setValue( getValue( record ) );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
+	}
+
 	public Numeric function update( required com.apirone.core.model.bean.Metadata metadata ){
 		getDao().update( arguments.metadata );
-
-		var id = arguments.metadata.getId();
-
-		super.getCacheManager().remove( getCacheScope(), arguments.metadata.getId() );
 
 		return arguments.metadata.getId();
 	}
@@ -78,8 +121,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.metadataId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.metadataId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -100,20 +141,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.metadataId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Metadata" );
-
-			// MetadataType first
-			bean.setType( getMetadataTypeService().get( record.metadata_type_id ) )
-
-			bean.setId( record.metadata_id );
-			bean.setEntity( getEntity( record ) );
-			bean.setValue( getValue( record ) );
-			bean.setCreatedAt( record.created_at );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Metadata a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.Metadata function buildFromRow( required any record ){
+		var bean = super.bean( "Metadata" );
+
+		// Campi diretti dal record
+		bean.setId( record.metadata_id );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setType( getMetadataTypeService().get( record.metadata_type_id ) );
+		bean.setEntity( getEntity( record ) );
+		bean.setValue( getValue( record ) );
+
+		return bean;
 	}
 
 	private Any function getValue( required record ){
@@ -152,7 +202,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var entity = super.bean( "Entity" );
 
 		if ( Len( record.raw_value_id ) ) {
-			
+
 			entity.setKey( "rawValue.id" );
 			entity.setValue( record.raw_value_id );
 

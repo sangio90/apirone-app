@@ -23,6 +23,9 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				search_term_id,
+				search_term,
+				created_at,
+				product_id::varchar,
 				COUNT(search_term_id) OVER() AS total
 			FROM
 				utils.search_terms
@@ -47,6 +50,20 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "utils.search_terms",
+			pkColumn = "search_term_id",
+			ids     = arguments.ids
+		)>
 	</cffunction>
 
 	<cffunction name="delete" returntype="Numeric">

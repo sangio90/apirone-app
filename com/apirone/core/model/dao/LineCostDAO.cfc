@@ -13,6 +13,24 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM
+				line_costs
+			WHERE
+				line_cost_id IN (<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="integer">)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
@@ -111,4 +129,3 @@
 		<cfreturn local.q.recordCount>
 	</cffunction>
 </cfcomponent>
-

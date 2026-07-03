@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="dao" inject="QuotationItemDAO";
 	property name="quotationItemFruitService" inject="QuotationItemFruitService";
 	property name="quotationItemPriceService" inject="QuotationItemPriceService";
+	property name="quotationItemPriceLineService" inject="QuotationItemPriceLineService";
 	property name="QuotationService" inject="QuotationService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
@@ -16,28 +17,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
 	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
 	property name="LookupService" inject="LookupService";
+	property name="CatalogBundleService" inject="CatalogBundleService";
+	property name="TextService" inject="TextService";
+	property name="PriceService" inject="PriceService";
+	property name="ProductItemService" inject="ProductItemService";
 
-	property name="cacheScope" type="String" default="QuotationItem.bean";
-
-	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId, Boolean useCache = true ){
-		var cm    = getCacheManager();
-		if (useCache) {
-			var cache = cm.get( getCacheScope(), arguments.quotationItemId );
-
-			if ( cache.status ) {
-				return cache.data;
-			}
-		}
-
-		var bean = build( arguments.quotationItemId );
-
-		cm.put(
-			getCacheScope(),
-			arguments.quotationItemId,
-			bean
-		);
-
-		return bean;
+	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
+		return build( arguments.quotationItemId );
 	}
 
 	public Array function list(){
@@ -45,12 +31,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments ).getData();
 	}
 
-	//{26 marzo 2026} aggiunto parametro useCache = false perche durante la procedura di quotationItemAjaxController.updateAllPrices la cache condizionava in maniera errata il calcolo
-	// vedi get()
 	public com.apirone.core.model.bean.Result function search(
 		String str,
 		String mode,
-		Boolean useCache = true,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotation.id" } ]
@@ -59,11 +42,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var rows    = [];
 		var result  = super.getResult();
-		var records = getDao().find( argumentCollection = arguments );
-		var useCache = arguments.useCache;
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
+		var records = getDao().find( argumentCollection = arguments );
+
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.quotation_item_id );
+		} );
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale, applicando il filtro mode
 		records.each( function( record ) {
-			var quotationItem = get( quotationItemId = record.quotation_item_id, useCache = useCache );
+			var quotationItem = beanMap[ record.quotation_item_id ];
 			if ( IsNull( mode ) ) {
 				rows.add( quotationItem );
 			} else {
@@ -98,13 +92,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemId = arguments.quotationItemId } );
-		getDao().delete( arguments.quotationItemId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.quotationItemId );
-				cm.remove( getCacheScope(), arguments.quotationItemId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -175,7 +166,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
-		var oldBean = get( arguments.quotationItem.getId() );
+		// Carica il bean esistente via batch getMany() per evitare la cascata N+1
+		var beanMap = getMany( [ arguments.quotationItem.getId() ] );
+		var oldBean = StructKeyExists( beanMap, arguments.quotationItem.getId() )
+			? beanMap[ arguments.quotationItem.getId() ]
+			: NullValue();
 
 		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 			var fruitIdsToDeleted = [];
@@ -199,8 +194,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			arguments.quotationItem = ensurePosition( arguments.quotationItem );
 
 			getDao().update( arguments.quotationItem );
-
-			super.getCacheManager().remove( getCacheScope(), arguments.quotationItem.getId() );
 
 			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 				for( var thisFruitId in fruitIdsToDeleted ) {
@@ -268,7 +261,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Boolean function updateHash( required String quotationItemId, required String hash ){
 		getDao().updateHash( quotationItemId, hash );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemId );
 		return true;
 	}
 
@@ -294,114 +286,489 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotationItem;
 	}
 
-	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
-		var record = getDao().read( arguments.quotationItemId );
-		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.quotationItemId )
-		if ( record.recordCount ) {
+	/**
+	 * Recupera in batch più QuotationItem dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationItemId, valore = bean QuotationItem.
+	 * precarica tutte le FK correlate (Quotation, Product, Article, Zone, SignageConfigItem,
+	 * Fruits, Prices, Files, ProductItems, SignageRows, Positions) in batch per evitare
+	 * il problema N+1, il più pesante di tutta l'applicazione.
+	 *
+	 * @ids Array di quotationItemId
+	 * @return Struct mappato per quotationItemId -> QuotationItem
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-			var pricing = super.bean( "QuotationItemPrice" );
-			var priceMethod = super.bean( "PriceMethod" );
+		// --- Fase 1: raccoglie gli ID delle FK dai record ---
+		var quotationIds    = [];
+		var productIds      = [];
+		var articleIds      = [];
+		var zoneIds         = [];
+		var signageConfigItemIds = [];
+		var zonePositionIds = [];
 
-			if ( fruits.len() > 0 ) {
-				arraySort(fruits, function(a, b) {
-					return a.getPositions()[1].order - b.getPositions()[1].order;
-				});
+		for ( var r in records ) {
+			if ( !IsNull( r.quotation_id ) ) {
+				quotationIds.append( r.quotation_id );
+			}
+			if ( Len( r.product_id ) ) {
+				productIds.append( r.product_id );
+			}
+			if ( Len( r.article_id ) ) {
+				articleIds.append( r.article_id );
+			}
+			if ( !IsNull( r.quotation_zone_id ) ) {
+				zoneIds.append( r.quotation_zone_id );
+			}
+			if ( Len( r.signage_config_item_id ) ) {
+				signageConfigItemIds.append( r.signage_config_item_id );
+			}
+			if ( Len( r.quotation_zone_position_id ) ) {
+				zonePositionIds.append( r.quotation_zone_position_id );
+			}
+		}
+
+		// --- Fase 2: precarica tutte le entity in batch ---
+
+		// Quotation (getMany() ora esiste e batch-carica Owner, StatusHistory)
+		var quotationMap = {};
+		if ( ArrayLen( quotationIds ) ) {
+			quotationMap = getQuotationService().getMany( quotationIds );
+		}
+
+		// Product: precarica in batch con getMany() ottimizzato di ProductService
+		var productMap = {};
+		if ( ArrayLen( productIds ) ) {
+			productMap = getProductService().getMany( productIds );
+		}
+
+		// Article
+		var articleMap = {};
+		if ( ArrayLen( articleIds ) ) {
+			articleMap = getArticleService().getMany( articleIds );
+		}
+
+		// QuotationZone
+		var zoneMap = {};
+		if ( ArrayLen( zoneIds ) ) {
+			zoneMap = getQuotationZoneService().getMany( zoneIds );
+		}
+
+		// SignageConfigItem
+		var signageConfigItemMap = {};
+		if ( ArrayLen( signageConfigItemIds ) ) {
+			signageConfigItemMap = getSignageConfigItemService().getMany( signageConfigItemIds );
+		}
+
+		// Fruits: legge i record via DAO, raccoglie i PK, carica con getMany()
+		var fruitMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var fruitRecords = getQuotationItemFruitService().getDao().findByQuotationItemIds( arguments.ids );
+			var fruitIds = [];
+			var fruitGroup = {};
+			for ( var fr in fruitRecords ) {
+				fruitIds.append( fr.quotation_item_fruit_id );
+				if ( !StructKeyExists( fruitGroup, fr.quotation_item_id ) ) {
+					fruitGroup[ fr.quotation_item_id ] = [];
+				}
+				fruitGroup[ fr.quotation_item_id ].append( fr.quotation_item_fruit_id );
+			}
+			// Carica i bean completi con getMany() ottimizzato
+			if ( ArrayLen( fruitIds ) ) {
+				var fruitBeanMap = getQuotationItemFruitService().getMany( fruitIds );
+				for ( var qid in fruitGroup ) {
+					fruitMap[ qid ] = [];
+					for ( var fid in fruitGroup[ qid ] ) {
+						if ( StructKeyExists( fruitBeanMap, fid ) ) {
+							fruitMap[ qid ].append( fruitBeanMap[ fid ] );
+						}
+					}
+				}
+			}
+		}
+
+		// Prices (batch via nuovo readByQuotationItemIds)
+		var priceMap      = {};
+		var priceBeanById = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var priceRecords = getQuotationItemPriceService().getDao().readByQuotationItemIds( arguments.ids );
+			var priceIds     = [];
+			for ( var prr in priceRecords ) {
+				var priceBean = super.bean( "QuotationItemPrice" );
+				var methodBean = super.bean( "PriceMethod" );
+				priceBean.setId( prr.quotation_item_price_id );
+				priceBean.setDiscount1( prr.discount1 );
+				priceBean.setDiscount2( prr.discount2 );
+				priceBean.setAmount( prr.amount );
+				priceBean.setMethod( methodBean.setId( prr.price_method_id ) );
+				// Mappa sia per quotation_item_id (lookup dal bean) che per price_id (aggiornamento linee)
+				priceMap[ prr.quotation_item_id ]             = priceBean;
+				priceBeanById[ prr.quotation_item_price_id ]  = priceBean;
+				priceIds.append( prr.quotation_item_price_id );
+			}
+
+			// Precarica le linee di prezzo in batch (necessarie per getTotal()
+			// che somma i line.amount per calcolare il totale)
+			if ( ArrayLen( priceIds ) ) {
+				var priceLineDao  = getQuotationItemPriceLineService().getDao();
+				var priceLineRecs = priceLineDao.readByQuotationItemPriceIds( priceIds );
+				for ( var plr in priceLineRecs ) {
+					var lineBean = super.bean( "QuotationItemPriceLine" );
+					lineBean.setName( plr.name );
+					lineBean.setAmount( plr.amount );
+					lineBean.setCost( plr.cost );
+					if ( StructKeyExists( priceBeanById, plr.quotation_item_price_id ) ) {
+						var targetPrice = priceBeanById[ plr.quotation_item_price_id ];
+						if ( IsNull( targetPrice.getLines() ) || !ArrayLen( targetPrice.getLines() ) ) {
+							targetPrice.setLines( [ lineBean ] );
+						} else {
+							var existingLines = targetPrice.getLines();
+							existingLines.append( lineBean );
+							targetPrice.setLines( existingLines );
+						}
+					}
+				}
+			}
+		}
+
+		// Files (listByEntityIds)
+		var fileMap = getFileService().listByEntityIds( "quotationItem.id", arguments.ids );
+
+		// ProductItems (batch via DAO, raggruppati per quotationItemId)
+		var productItemMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var idsList = ArrayToList( arguments.ids );
+			var qipiRecords = getQuotationItemProductItemService().getDao().readByQuotationItemIds( arguments.ids );
+
+			// Raccoglie i product_item_id e origin_id per precaricamento batch
+			var qipiProductItemIds = [];
+			var qipiOriginIds      = [];
+			for ( var qr in qipiRecords ) {
+				if ( !IsNull( qr.product_item_id ) ) {
+					qipiProductItemIds.append( qr.product_item_id );
+				}
+				if ( !IsNull( qr.origin_id ) ) {
+					qipiOriginIds.append( qr.origin_id );
+				}
+			}
+
+			// Precarica i ProductItem in batch con getMany() ottimizzato
+			var qipiProductItemMap = {};
+			if ( ArrayLen( qipiProductItemIds ) ) {
+				qipiProductItemMap = getProductItemService().getMany( qipiProductItemIds );
+			}
+			// Aggiunge anche gli origin_id alla mappa se non già presenti
+			if ( ArrayLen( qipiOriginIds ) ) {
+				var missingOriginIds = [];
+				for ( var oid in qipiOriginIds ) {
+					if ( !StructKeyExists( qipiProductItemMap, oid ) ) {
+						missingOriginIds.append( oid );
+					}
+				}
+				if ( ArrayLen( missingOriginIds ) ) {
+					var extraOriginMap = getProductItemService().getMany( missingOriginIds );
+					for ( var key in extraOriginMap ) {
+						qipiProductItemMap[ key ] = extraOriginMap[ key ];
+					}
+				}
+			}
+
+			for ( var qr in qipiRecords ) {
+				if ( !StructKeyExists( productItemMap, qr.quotation_item_id ) ) {
+					productItemMap[ qr.quotation_item_id ] = [];
+				}
+				var qipiBean = super.bean( "QuotationItemProductItem" );
+				qipiBean.setId( qr.quotation_item_product_item_id );
+				qipiBean.setQuotationItemId( qr.quotation_item_id );
+				qipiBean.setLevel( qr.level );
+				qipiBean.setNote( qr.note );
+				// ProductItem: dalla mappa pre-caricata
+				if ( !IsNull( qr.product_item_id ) && StructKeyExists( qipiProductItemMap, qr.product_item_id ) ) {
+					qipiBean.setProductItem( qipiProductItemMap[ qr.product_item_id ] );
+				}
+				// Origin: dalla mappa pre-caricata (usa gli stessi ProductItem già caricati)
+				if ( !IsNull( qr.origin_id ) && StructKeyExists( qipiProductItemMap, qr.origin_id ) ) {
+					qipiBean.setOrigin( qipiProductItemMap[ qr.origin_id ] );
+				}
+				productItemMap[ qr.quotation_item_id ].append( qipiBean );
+			}
+		}
+
+		// SignageRows (batch via nuovo readByQuotationItemIds)
+		var signageRowMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var rowRecords = getQuotationItemSignageRowService().getDao().readByQuotationItemIds( arguments.ids );
+			for ( var srr in rowRecords ) {
+				if ( !StructKeyExists( signageRowMap, srr.quotation_item_id ) ) {
+					signageRowMap[ srr.quotation_item_id ] = [];
+				}
+				var rowBean = super.bean( "QuotationItemSignageRow" );
+				rowBean.setId( srr.quotation_item_signage_row_id.toString() );
+				rowBean.setQuotationItemId( srr.quotation_item_id.toString() );
+				rowBean.setTextAlign( srr.text_align );
+				rowBean.setContent( srr.content );
+				rowBean.setCharCount( srr.char_count );
+				rowBean.setOrderBy( srr.orderby );
+				signageRowMap[ srr.quotation_item_id ].append( rowBean );
+			}
+		}
+
+		// Positions (batch via nuovo readByQuotationItemIds)
+		var positionMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var posRecords = getQuotationItemPositionService().getDao().readByQuotationItemIds( arguments.ids );
+			for ( var por in posRecords ) {
+				if ( !StructKeyExists( positionMap, por.quotation_item_id ) ) {
+					positionMap[ por.quotation_item_id ] = [];
+				}
+				var posBean = super.bean( "QuotationItemPosition" );
+				posBean.setId( por.quotation_item_position_id.toString() );
+				posBean.setQuotationItemId( por.quotation_item_id.toString() );
+				posBean.setCoordinateX( por.coordinate_x );
+				posBean.setCoordinateY( por.coordinate_y );
+				posBean.setVisible( por.visible );
+				posBean.setAngle( por.angle );
+				positionMap[ por.quotation_item_id ].append( posBean );
+			}
+		}
+
+		// QuotationZonePosition: chiamate individuali (numero basso, non ha getMany)
+		var zonePositionCache = {};
+
+		// --- Fase 3: costruisce i bean QuotationItem ---
+		for ( var r in records ) {
+			// Determina il tipo (Plate, Signage, o base)
+			var fruits = [];
+			if ( StructKeyExists( fruitMap, r.quotation_item_id ) ) {
+				fruits = fruitMap[ r.quotation_item_id ];
+				ArraySort( fruits, function( a, b ){
+					return a.getPositions()[ 1 ].order - b.getPositions()[ 1 ].order;
+				} );
+			}
+
+			if ( ArrayLen( fruits ) ) {
 				var bean = super.bean( "QuotationItemPlate" );
+
+				bean.setFruits( fruits );
+
 				var frame = super.bean( "Frame" );
-
-				bean.setFruits( fruits )
-
-				frame.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
+				frame.setOrientation( getLookupService().get( "orientation", r.orientation_id ) );
 				bean.setFrame( frame );
 
-				if ( !IsNull( record.block_orientations ) && Len( record.block_orientations ) ) {
-					bean.setBlockOrientations( record.block_orientations );
+				// Block orientations dalla colonna del record
+				if ( !IsNull( r.block_orientations ) && Len( r.block_orientations ) ) {
+					bean.setBlockOrientations( r.block_orientations );
 				}
-
 			} else {
-
-				if ( Len( record.signage_config_item_id ) ) {
+				if ( Len( r.signage_config_item_id ) ) {
 					var bean = super.bean( "QuotationItemSignage" );
 				} else {
 					var bean = super.bean( "QuotationItem" );
 				}
-
 			}
 
-			var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.quotationItemId );
-			bean.setPrice( pricing );
-
-			bean.setId( record.quotation_item_id );
-			bean.setQuantity( record.quantity );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setQuotation( getQuotationService().get( record.quotation_id ) );
-			//bean.setPrice( pricing );
-
-			if ( Len( record.product_id ) ) {
-				bean.setProduct( getProductService().get( record.product_id ) );
+			// Pricing: dalla mappa batch (bean costruito inline)
+			if ( StructKeyExists( priceMap, r.quotation_item_id ) ) {
+				bean.setPrice( priceMap[ r.quotation_item_id ] );
 			}
 
-			if ( Len( record.status_id ) ) {
-				bean.setStatus( getStatusService().get( record.status_id ) );
+			// Campi diretti
+			bean.setId( r.quotation_item_id );
+			bean.setQuantity( r.quantity );
+			bean.setCreatedAt( r.created_at );
+			bean.setNote( r.note );
+			bean.setHash( r.hash );
+			if ( !IsNull( r.ordinamento ) ) bean.setOrdinamento( r.ordinamento );
+			bean.setSpecial( BooleanFormat( Val( r.special ) ) );
+			bean.setCustomImage( BooleanFormat( Val( r.custom_image ) ) );
+
+			// Quotation: dalla mappa batch
+			if ( Len( r.quotation_id ) && StructKeyExists( quotationMap, r.quotation_id ) ) {
+				bean.setQuotation( quotationMap[ r.quotation_id ] );
 			}
 
-			if ( Len( record.article_id ) ) {
-				bean.setArticle( getArticleService().get( record.article_id ) );
+			// Product: dalla mappa batch
+			if ( Len( r.product_id ) && StructKeyExists( productMap, r.product_id ) ) {
+				bean.setProduct( productMap[ r.product_id ] );
 			}
 
-			bean.setQuotationZone(
-				IsNull( record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
-					record.quotation_zone_id
-				)
-			);
+			// Status (cached)
+			if ( Len( r.status_id ) ) {
+				bean.setStatus( getStatusService().get( r.status_id ) );
+			}
 
-			if ( Len( record.signage_config_item_id ) ) {
-				bean.setSignageConfigItem( getSignageConfigItemService().get( record.signage_config_item_id ) );
+			// Article: dalla mappa batch
+			if ( Len( r.article_id ) && StructKeyExists( articleMap, r.article_id ) ) {
+				bean.setArticle( articleMap[ r.article_id ] );
+			}
 
-				if ( record.char_count ) {
-					bean.getSignageConfigItem().setCharCount( record.char_count );
+			// QuotationZone: dalla mappa batch
+			if ( !IsNull( r.quotation_zone_id ) && StructKeyExists( zoneMap, r.quotation_zone_id ) ) {
+				bean.setQuotationZone( zoneMap[ r.quotation_zone_id ] );
+			}
+
+			// SignageConfigItem: dalla mappa batch
+			if ( Len( r.signage_config_item_id ) && StructKeyExists( signageConfigItemMap, r.signage_config_item_id ) ) {
+				bean.setSignageConfigItem( signageConfigItemMap[ r.signage_config_item_id ] );
+
+				if ( r.char_count ) {
+					bean.getSignageConfigItem().setCharCount( r.char_count );
 				}
-				if ( record.height_in_pixel ) {
-					bean.getSignageConfigItem().setHeightInPixel( record.height_in_pixel );
+				if ( r.height_in_pixel ) {
+					bean.getSignageConfigItem().setHeightInPixel( r.height_in_pixel );
 				}
-				if ( record.row_count ) {
-					bean.getSignageConfigItem().setRowCount( record.row_count );
+				if ( r.row_count ) {
+					bean.getSignageConfigItem().setRowCount( r.row_count );
 				}
-
-				var signageRows = getQuotationItemSignageRowService().list( quotationItemId = quotationItemId );
-				bean.setSignageRows( signageRows );
 			}
 
-			var images = getFileService().list( quotationItemId = record.quotation_item_id );
-
-			if ( Len( images ) ) {
-				bean.setImage( images[ 1 ] );
+			// SignageRows: dalla mappa batch
+			if ( StructKeyExists( signageRowMap, r.quotation_item_id ) ) {
+				bean.setSignageRows( signageRowMap[ r.quotation_item_id ] );
 			}
 
-			var items = getQuotationItemProductItemService().list( quotationItemId = quotationItemId );
-
-			if ( Len( items ) ) {
-				bean.setItems( items );
+			// File/image: dalla mappa batch
+			if ( StructKeyExists( fileMap, r.quotation_item_id ) && Len( fileMap[ r.quotation_item_id ] ) ) {
+				bean.setImage( fileMap[ r.quotation_item_id ][ 1 ] );
 			}
 
-			bean.setNote( record.note );
-			bean.setHash( record.hash );
-			if ( !isNull( record.ordinamento ) ) bean.setOrdinamento( record.ordinamento );
-			bean.setSpecial( BooleanFormat( Val( record.special ) ) );
-			bean.setCustomImage( BooleanFormat( Val( record.custom_image ) ) );
+			// ProductItems: dalla mappa batch
+			if ( StructKeyExists( productItemMap, r.quotation_item_id ) ) {
+				bean.setItems( productItemMap[ r.quotation_item_id ] );
+			}
 
-			if( Len( record.quotation_zone_position_id ) ) {
-				bean.setPosition( getQuotationZonePositionService().get( record.quotation_zone_position_id ) );
+			// QuotationZonePosition: chiamata individuale (cache locale)
+			if ( Len( r.quotation_zone_position_id ) ) {
+				var zpid = r.quotation_zone_position_id;
+				if ( !StructKeyExists( zonePositionCache, zpid ) ) {
+					zonePositionCache[ zpid ] = getQuotationZonePositionService().get( zpid );
+				}
+				bean.setPosition( zonePositionCache[ zpid ] );
 			}
-			var quotationItemPositions = getQuotationItemPositionService().list( quotationItemId = arguments.quotationItemId );
-			if ( Len( quotationItemPositions ) ) {
-				bean.setPositions( quotationItemPositions );
+
+			// Positions: dalla mappa batch
+			if ( StructKeyExists( positionMap, r.quotation_item_id ) ) {
+				bean.setPositions( positionMap[ r.quotation_item_id ] );
 			}
-			return bean;
+
+			map[ r.quotation_item_id ] = bean;
+		}
+
+		return map;
+	}
+
+	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
+		var record = getDao().read( arguments.quotationItemId );
+
+		if ( record.recordCount ) {
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean QuotationItem a partire da una riga del query.
+	 * Le sub-entity (Fruits, Prices, Quotation, Product, Status, Article, Zone, SignageConfigItem, Files, ProductItems, Positions) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.QuotationItem function buildFromRow( required any record ){
+		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.record.quotation_item_id );
+
+		if ( fruits.len() > 0 ) {
+			arraySort( fruits, function( a, b ){
+				return a.getPositions()[ 1 ].order - b.getPositions()[ 1 ].order;
+			} );
+			var bean = super.bean( "QuotationItemPlate" );
+			var frame = super.bean( "Frame" );
+
+			bean.setFruits( fruits );
+
+			frame.setOrientation( getLookupService().get( "orientation", arguments.record.orientation_id ) );
+			bean.setFrame( frame );
+
+			if ( !IsNull( arguments.record.block_orientations ) && Len( arguments.record.block_orientations ) ) {
+				bean.setBlockOrientations( arguments.record.block_orientations );
+			}
+		} else {
+			if ( Len( arguments.record.signage_config_item_id ) ) {
+				var bean = super.bean( "QuotationItemSignage" );
+			} else {
+				var bean = super.bean( "QuotationItem" );
+			}
+		}
+
+		var pricing = getQuotationItemPriceService().getByQuotationItemId( quotationItemId = arguments.record.quotation_item_id );
+		bean.setPrice( pricing );
+
+		bean.setId( arguments.record.quotation_item_id );
+		bean.setQuantity( arguments.record.quantity );
+		bean.setCreatedAt( arguments.record.created_at );
+
+		bean.setQuotation( getQuotationService().get( arguments.record.quotation_id ) );
+		//bean.setPrice( pricing );
+
+		if ( Len( arguments.record.product_id ) ) {
+			bean.setProduct( getProductService().get( arguments.record.product_id ) );
+		}
+
+		if ( Len( arguments.record.status_id ) ) {
+			bean.setStatus( getStatusService().get( arguments.record.status_id ) );
+		}
+
+		if ( Len( arguments.record.article_id ) ) {
+			bean.setArticle( getArticleService().get( arguments.record.article_id ) );
+		}
+
+		bean.setQuotationZone(
+			IsNull( arguments.record.quotation_zone_id ) ? NullValue() : getQuotationZoneService().get(
+				arguments.record.quotation_zone_id
+			)
+		);
+
+		if ( Len( arguments.record.signage_config_item_id ) ) {
+			bean.setSignageConfigItem( getSignageConfigItemService().get( arguments.record.signage_config_item_id ) );
+
+			if ( arguments.record.char_count ) {
+				bean.getSignageConfigItem().setCharCount( arguments.record.char_count );
+			}
+			if ( arguments.record.height_in_pixel ) {
+				bean.getSignageConfigItem().setHeightInPixel( arguments.record.height_in_pixel );
+			}
+			if ( arguments.record.row_count ) {
+				bean.getSignageConfigItem().setRowCount( arguments.record.row_count );
+			}
+
+			var signageRows = getQuotationItemSignageRowService().list( quotationItemId = arguments.record.quotation_item_id );
+			bean.setSignageRows( signageRows );
+		}
+
+		var images = getFileService().list( quotationItemId = arguments.record.quotation_item_id );
+
+		if ( Len( images ) ) {
+			bean.setImage( images[ 1 ] );
+		}
+
+		var items = getQuotationItemProductItemService().list( quotationItemId = arguments.record.quotation_item_id );
+
+		if ( Len( items ) ) {
+			bean.setItems( items );
+		}
+
+		bean.setNote( arguments.record.note );
+		bean.setHash( arguments.record.hash );
+		if ( !isNull( arguments.record.ordinamento ) ) bean.setOrdinamento( arguments.record.ordinamento );
+		bean.setSpecial( BooleanFormat( Val( arguments.record.special ) ) );
+		bean.setCustomImage( BooleanFormat( Val( arguments.record.custom_image ) ) );
+
+		if( Len( arguments.record.quotation_zone_position_id ) ) {
+			bean.setPosition( getQuotationZonePositionService().get( arguments.record.quotation_zone_position_id ) );
+		}
+		var quotationItemPositions = getQuotationItemPositionService().list( quotationItemId = arguments.record.quotation_item_id );
+		if ( Len( quotationItemPositions ) ) {
+			bean.setPositions( quotationItemPositions );
+		}
+		return bean;
 	}
 
 	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
@@ -447,12 +814,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		//TODO debuggare qui per capire cosa fare per il discorso "ok placca senza frutti e aggiunta tappi"
 		var quotationItem = null;
 		if (json.item.id != "") {
-			quotationItem = super.service( "QuotationItem" ).get( json.item.id );
+			var qiMap = getMany( [ json.item.id ] );
+			quotationItem = StructKeyExists( qiMap, json.item.id )
+				? qiMap[ json.item.id ]
+				: null;
 		}
 
 		var quotation = null;
 		if (json.quotationId != "") {
-			var quotation = super.service( "Quotation" ).get( json.quotationId );
+			var qMap = super.service( "Quotation" ).getMany( [ json.quotationId ] );
+			quotation = StructKeyExists( qMap, json.quotationId )
+				? qMap[ json.quotationId ]
+				: null;
 		}
 
 		var platePrice = calculator.calculate(
@@ -707,8 +1080,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
 		}
 
-		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
+		var qMap = getQuotationService().getMany( [ json.quotationId ] );
+		var quotation = StructKeyExists( qMap, json.quotationId )
+			? qMap[ json.quotationId ]
+			: null;
+		var quotationItem = null;
+		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+			var qiMap = getMany( [ json.quotationItem.id ] );
+			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
+				? qiMap[ json.quotationItem.id ]
+				: null;
+		}
 
 		var signagePrice = calculator.calculate(
 			product.id,
@@ -775,8 +1157,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		var quotation = getQuotationService().get( json.quotationId )
-		var quotationItem = !isNull(json.quotationItem.id) && json.quotationItem.id != '' ? get( json.quotationItem.id ) : null
+		var qMap = getQuotationService().getMany( [ json.quotationId ] );
+		var quotation = StructKeyExists( qMap, json.quotationId )
+			? qMap[ json.quotationId ]
+			: null;
+		var quotationItem = null;
+		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+			var qiMap = getMany( [ json.quotationItem.id ] );
+			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
+				? qiMap[ json.quotationItem.id ]
+				: null;
+		}
 
 		var price = calculator.calculate(
 			product.id,
@@ -836,19 +1227,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"quotationId" = quotationId,
 			"lineId" = lineId,
 			"finishId" = finishId
-		)
+		);
 
-		for (var row in rows) {
-			var data = {}
-			var quotationItem = get( quotationItemId = row.quotation_item_id );
+		// Precarica tutti i QuotationItem in batch per evitare N+1
+		var itemIds = [];
+		for ( var row in rows ) {
+			itemIds.append( row.quotation_item_id );
+		}
+		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		for ( var row in rows ) {
+			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
+				? itemMap[ row.quotation_item_id ]
+				: NullValue();
 			if (
-				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") &&
-				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")
+				IsNull( quotationItem ) ||
+				( !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") &&
+				!IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") )
 			) {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem)
+			aggiornaPrezzo(quotationItem);
 		}
 	}
 
@@ -861,12 +1261,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"quotationItemId" = quotationItemId,
 			"quotationId" = quotationId,
 			"productId" = productId
-		)
+		);
 
-		for (var row in rows) {
-			var data = {}
-			var quotationItem = get( quotationItemId = row.quotation_item_id );
+		// Precarica tutti i QuotationItem in batch per evitare N+1
+		var itemIds = [];
+		for ( var row in rows ) {
+			itemIds.append( row.quotation_item_id );
+		}
+		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		for ( var row in rows ) {
+			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
+				? itemMap[ row.quotation_item_id ]
+				: NullValue();
 			if (
+				IsNull( quotationItem ) ||
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate") ||
 				IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage") ||
 				!isNull(quotationItem.getArticle())
@@ -874,7 +1283,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem)
+			aggiornaPrezzo(quotationItem);
 		}
 	}
 

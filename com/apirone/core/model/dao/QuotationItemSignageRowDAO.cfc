@@ -23,6 +23,10 @@
 			SELECT
 				quotation_item_signage_row_id::varchar,
 				quotation_item_id::varchar,
+				text_align,
+				content,
+				char_count,
+				orderby,
 				COUNT(quotation_item_signage_row_id) OVER() AS total
 			FROM
 				quotation_item_signage_rows
@@ -89,4 +93,26 @@
 		</cfquery>
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch le righe di signage collegate a più quotation_item_id.
+		Utilizzato da QuotationItemService.getMany() per evitare N+1.
+	--->
+	<cffunction name="readByQuotationItemIds" returntype="Query" access="public">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM quotation_item_signage_rows
+			WHERE quotation_item_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			ORDER BY orderby
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

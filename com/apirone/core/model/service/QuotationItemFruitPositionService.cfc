@@ -1,25 +1,9 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemFruitPositionDAO";
-	property name="cacheScope" type="String" default="QuotationItemFruitPosition.bean";
 
 	public com.apirone.core.model.bean.QuotationItemFruit function get( required Numeric quotationItemFruitPositionId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemFruitPositionId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationItemFruitPositionId );
-
-		cm.put(
-			getCacheScope(),
-			arguments.quotationItemFruitPositionId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.quotationItemFruitPositionId );
 	}
 
 	public Array function list(){
@@ -27,6 +11,9 @@
 		return search( argumentCollection = arguments ).getData();
 	}
 
+	/**
+	 * Il search() legge direttamente le colonne position e order dal find() del DAO.
+	 */
 	public com.apirone.core.model.bean.Result function search(
 		String quotationItemFruitId,
 	){
@@ -35,6 +22,7 @@
 		var result  = super.getResult();
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Costruisce struct inline dalle colonne del find()
 		records.each( function( record ){
 			rows.add( {
 				'position' = record.position,
@@ -53,13 +41,10 @@
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemFruitPositionId = arguments.quotationItemFruitPositionId } );
-		getDao().delete( arguments.quotationItemFruitPositionId );
-		
+
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().delete( arguments.quotationItemFruitPositionId );
-				cm.remove( getCacheScope(), arguments.quotationItemFruitPositionId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -75,13 +60,10 @@
 		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { quotationItemFruitId = arguments.quotationItemFruitId } );
-		getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
-		
+
 		transaction {
 			try {
-				var cm = getCacheManager();
 				getDao().deleteByQuotationItemFruitId( arguments.quotationItemFruitId );
-				cm.remove( getCacheScope(), arguments.quotationItemFruitId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -97,6 +79,13 @@
 		var newId = getDao().insert( argumentCollection = arguments );
 
 		return newId;
+	}
+
+	/**
+	 * Il DAO non ha un metodo read() per questo tipo di entity: get() non può ricostruire il bean dal DB.
+	 */
+	private com.apirone.core.model.bean.QuotationItemFruit function build( required Numeric quotationItemFruitPositionId ){
+		return NullValue();
 	}
 
 }

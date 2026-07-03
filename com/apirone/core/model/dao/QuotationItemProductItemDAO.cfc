@@ -13,6 +13,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotation_item_product_item_id::varchar,
+				quotation_item_id::varchar,
+				*
+			FROM quotation_item_product_items
+			WHERE quotation_item_product_item_id = ANY( ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[] )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="productItemId" type="String" required="false">
@@ -166,6 +187,26 @@
 				quotation_item_fruit_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemFruitId#">
 		</cfquery>
 		<cfreturn true>
+	</cffunction>
+
+	<!---
+		Recupera in batch i QIPI collegati a più quotation_item_id.
+		Utilizzato da QuotationItemService.getMany() per evitare N+1.
+	--->
+	<cffunction name="readByQuotationItemIds" returntype="Query" access="public">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM quotation_item_product_items
+			WHERE quotation_item_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 
 </cfcomponent>

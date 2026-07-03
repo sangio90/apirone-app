@@ -6,26 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" inject="LookupService";
 	property name="productCategoryTypeService" inject="ProductCategoryTypeService";
 
-	property name="cacheScope" type="String" default="ProductCategory.bean";
-
 	public com.apirone.core.model.bean.ProductCategory function get( required String productCategoryId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.productCategoryId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.productCategoryId );
-
-		cm.put(
-			getCacheScope(),
-			arguments.productCategoryId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.productCategoryId );
 	}
 
 	public Array function list(
@@ -52,14 +34,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		for ( var record in records ) {
-			rows.add( get( productCategoryId = record.product_category_id ) );
-		}
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( record ){
+			ids.append( record.product_category_id );
+		} );
 
-		result.setTotal( records.total );
-		result.setCount( records.recordCount() );
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.product_category_id ] );
+		} );
+
+		result.setTotal( Val( records.total ) );
+		result.setCount( Val( records.recordCount ) );
 		result.setData( rows );
 
 		return result;
@@ -101,8 +94,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			Throw( type = "apirone.error.noTexsProvided", message = "At least one description required" );
 		};
 
-		var cm = getCacheManager();
-
 		var id = getDao().update( arguments.ProductCategory );
 
 		for ( var text in arguments.ProductCategory.getTexts() ) {
@@ -115,8 +106,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getTextService().update( text );
 		}
-
-		cm.remove( getCacheScope(), arguments.ProductCategory.getId() );
 
 		return id;
 	}
@@ -132,8 +121,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.productCategoryId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.productCategoryId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -167,31 +154,118 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.ProductCategoryId );
 
 		if ( record.RecordCount ) {
-			var bean = super.bean( "ProductCategory" );
-
-			var texts = getTextService().list( productCategoryId = record.product_category_id );
-			bean.setTexts( texts );
-
-			// after setTexts()
-			bean.setName( bean.getName() );
-
-			bean.setId( record.product_category_id );
-			bean.setCode( record.code );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-
-			bean.setCreatedAt( record.created_at );
-
-			bean.setType(
-				getProductCategoryTypeService().get( productCategoryTypeId = record.product_category_type_id )
-			);
-
-			bean.setMode( getLookupService().get( "ProductCategoryMode", record.mode_id ) );
-
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean ProductCategory a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.ProductCategory function buildFromRow( required any record ){
+		var bean = super.bean( "ProductCategory" );
+
+		// Campi diretti dal record
+		bean.setId( record.product_category_id );
+		bean.setCode( record.code );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setType(
+			getProductCategoryTypeService().get( productCategoryTypeId = record.product_category_type_id )
+		);
+		bean.setMode( getLookupService().get( "ProductCategoryMode", record.mode_id ) );
+
+		// Testi (caricati singolarmente per categoria)
+		var texts = getTextService().list( productCategoryId = record.product_category_id );
+		bean.setTexts( texts );
+		bean.setName( bean.getName() );
+
+		return bean;
+	}
+
+	/**
+	 * Recupera in batch più ProductCategory dato un array di ID.
+	 * Restituisce uno Struct chiave = categoryId, valore = bean ProductCategory.
+	 * Sostituisce il pattern di AbsService.getCategoriesBeanByIds() che chiama get() per ogni ID.
+	 *
+	 * Precarica in batch i testi e i tipi per evitare il problema N+1.
+	 *
+	 * @ids Array di productCategoryId
+	 * @return Struct mappato per productCategoryId -> ProductCategory
+	 */
+	public Struct function getMany( required Array ids ){
+		// Carica tutti i record in una sola query
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutte le categorie (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "productCategory.id", arguments.ids );
+
+		// Raccoglie gli ID unici dei tipi per precaricarli in batch
+		var typeIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.product_category_type_id ) ) {
+				typeIds.append( record.product_category_type_id );
+			}
+		}
+
+		// Precarica i ProductCategoryType in batch e costruisce una mappa
+		var typeMap = {};
+		if ( ArrayLen( typeIds ) ) {
+			var typeRecords = getProductCategoryTypeService().getDao().readByIds( typeIds );
+			for ( var tr in typeRecords ) {
+				var typeBean = super.bean( "ProductCategoryType" );
+				typeBean.setId( tr.product_category_type_id );
+				typeBean.setName( tr.product_category_type );
+				typeBean.setCreatedAt( tr.created_at );
+				typeBean.setStatus( getStatusService().get( tr.status_id ) );
+				typeMap[ tr.product_category_type_id ] = typeBean;
+			}
+		}
+
+		// Cache locali per status e mode: evita chiamate duplicate
+		var statuses = {};
+		var modes    = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "ProductCategory" );
+
+			// Campi diretti dal record
+			bean.setId( record.product_category_id );
+			bean.setCode( record.code );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Type: dalla mappa pre-caricata
+			if ( StructKeyExists( typeMap, record.product_category_type_id ) ) {
+				bean.setType( typeMap[ record.product_category_type_id ] );
+			}
+
+			// Mode: LookupService in-memory, nessuna query DB aggiuntiva
+			if ( !StructKeyExists( modes, record.mode_id ) ) {
+				modes[ record.mode_id ] = getLookupService().get( "ProductCategoryMode", record.mode_id );
+			}
+			bean.setMode( modes[ record.mode_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.product_category_id ) ) {
+				bean.setTexts( textMap[ record.product_category_id ] );
+			}
+			bean.setName( bean.getName() );
+
+			map[ record.product_category_id ] = bean;
+		}
+
+		return map;
 	}
 
 }

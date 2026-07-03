@@ -102,8 +102,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
 
-		var product       = productSvc.get( productId );
-		var price         = product.getPrice( "PRICE" );
+		// Carica il prodotto via batch getMany() per evitare la cascata N+1
+		// di buildFromRow() (CatalogBundle, Line, Model, Category, Finish, etc.)
+		var productMap = getProductService().getMany( [ productId ] );
+		var product   = StructKeyExists( productMap, productId )
+			? productMap[ productId ]
+			: NullValue();
+		if ( IsNull( product ) ) {
+			product = productSvc.get( productId );
+		}
+		var price = product.getPrice( "PRICE" );
 
 		var quantity = arguments.quantity
 		if (!isNull(arguments.quotationItemZoneId)) {
@@ -234,6 +242,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
 		producItemtIds = productItemIds.filter(function (item) { return !isNull(item)});
 
+		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
+		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
+
 		for ( var itemId in productItemIds ) {
 			if ( IsNull( itemId ) ) {
 				throw ("Compilare tutti gli attributi!");
@@ -243,7 +254,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var itemCost = 0;
 			var compCost = 0;
 
-			var productItem = getProductItemService().get( itemId );
+			var productItem = StructKeyExists( productItemMap, itemId )
+				? productItemMap[ itemId ]
+				: getProductItemService().get( itemId );
 
 			var attributeName = "Item: #itemId#, Attributo: #productItem.getAttribute().getName()# / #productItem
 				.getAttributeValue()
@@ -598,8 +611,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		//recupero il product item id dalla struttura che uso per recuperare i componenti
 		var itemId = signageItemProduct.productItemId;
-		//recupero il product item
-		var productItem = getProductItemService().get( itemId );
+		// Carica il productItem via batch getMany() per evitare cascata N+1
+		var piMap = getProductItemService().getMany( [ itemId ] );
+		var productItem = StructKeyExists( piMap, itemId )
+			? piMap[ itemId ]
+			: getProductItemService().get( itemId );
 
 		var attributeName = "Signage Item: #itemId#, Attributo: #productItem.getAttribute().getName()# / #productItem
 			.getAttributeValue()

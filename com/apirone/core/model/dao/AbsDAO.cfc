@@ -3,40 +3,40 @@
 	<cffunction name="createOrConditions" access="public" returntype="string" output="false">
         <cfargument name="str" type="string" required="true">
         <cfargument name="fields" type="any" required="true">
-        
+
         <cfset var searchTerms = listToArray(trim(arguments.str), " ")>
         <cfset var columnArray = isArray(arguments.fields) ? arguments.fields : listToArray(arguments.fields)>
 
 		<cfset result = "(">
 		<cfset termIndex = 0>
-		
+
 		<cfloop array="#searchTerms#" index="term">
 			<cfset termIndex++>
 			<cfset trimmedTerm = trim(term)>
-			
+
 			<cfif len(trimmedTerm)>
 				<cfsavecontent variable="columnConditions">
 					<cfoutput>
 						<cfset columnCount = arrayLen(columnArray)>
 						<cfset colIndex = 0>
-						
+
 						<cfloop array="#columnArray#" index="columnName">
 							<cfset colIndex++>
 							<cfset trimmedColumn = trim(columnName)>
-							
+
 							#trimmedColumn# ILIKE <cfqueryparam cfsqltype="varchar" value="%#trimmedTerm#%">
-							
+
 							<cfif colIndex LT columnCount>
 								OR
 							</cfif>
 						</cfloop>
 					</cfoutput>
 				</cfsavecontent>
-				
+
 				<cfif termIndex NEQ 1>
 					<cfset result = result & " AND ">
 				</cfif>
-				
+
 				<cfset result = result & " ( " & trim(columnConditions) & " ) ">
 			</cfif>
 		</cfloop>
@@ -47,7 +47,7 @@
     </cffunction>
 
 
-	<!--- 
+	<!---
 		CONVERTERS FROM JSONB
 	---->
 
@@ -114,9 +114,9 @@
 
 		<cfreturn items.len() ? items : NullValue()>
 	</cffunction>
-	
-	<!--- 
-		// CONVERTERS 
+
+	<!---
+		// CONVERTERS
 	---->
 
 	<cffunction name="sanitizeSQL" returntype="String">
@@ -159,6 +159,46 @@
 
 	</cffunction>
 
+	<!---
+		Helper per letture batch. Ogni DAO concreto che implementa readByIds() può
+		delegare a questi metodi passando il nome tabella, la colonna PK e l'array di ID.
+	--->
+	<cffunction access="private" name="$readByIdsUuid" returntype="Query">
+		<cfargument name="table" type="String" required="true">
+		<cfargument name="pkColumn" type="String" required="true">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM #arguments.table#
+			WHERE #arguments.pkColumn# = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<cffunction access="private" name="$readByIdsInteger" returntype="Query">
+		<cfargument name="table" type="String" required="true">
+		<cfargument name="pkColumn" type="String" required="true">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM #arguments.table#
+			WHERE #arguments.pkColumn# IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cfscript>
 	private function getRealIP(){
 
@@ -173,7 +213,7 @@
 
 		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
 
-    }		
+    }
 	</cfscript>
 
 </cfcomponent>

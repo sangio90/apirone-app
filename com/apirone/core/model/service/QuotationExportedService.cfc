@@ -1,21 +1,9 @@
 component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationExportedDAO";
-	property name="cacheScope" type="String" default="QuotationExported.bean";
-	property name="rowCacheScope" type="String" default="QuotationExported.bean";
 
 	public com.apirone.core.model.bean.QuotationExported function get( required String quotationSerial ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.quotationSerial );
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationSerial );
-		cm.put( getCacheScope(), arguments.quotationSerial, bean );
-
-		return bean;
+		return build( arguments.quotationSerial );
 	}
 
 	public Array function list(){
@@ -26,7 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Result function search(
 		String str,
-		String quotationSerial, 
+		String quotationSerial,
 		required Numeric limit  = 15,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotationExported.shippingDate", dir = "desc" } ]
@@ -36,11 +24,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( record.MMSERIAL ) );
-		} );
+		if ( records.recordCount ) {
+			// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+			var ids = [];
+			for ( var record in records ) {
+				ids.append( record.MMSERIAL );
+			}
+
+			var loadedRecords = getDao().readByIds( ids );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.MMSERIAL ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del find() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.MMSERIAL ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildFromRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -57,11 +64,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.quotationSerial );
-
-				cm.remove( getCacheScope(), arguments.quotationSerial );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -77,43 +80,47 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		private method
 	*/
 
+	private com.apirone.core.model.bean.QuotationExported function buildFromRow( required any record ){
+		var bean = super.bean( "QuotationExported" );
+
+		// Campi diretti dal record - testa
+		bean.setKey( record.CF_IDCLI );
+		bean.setCompany( record.CFDESCR1 );
+		bean.setQuotationSerial( record.MMSERIAL );
+		bean.setQuotationCode( record.MMNUMDOC );
+		bean.setBillingStreet( record.CFINDIRI );
+		bean.setBillingCity( record.CFLOCALI );
+		bean.setBillingState( record.CFPROVIN );
+		bean.setBillingCountry( record.CFSTAISO );
+		bean.setVatNumber( record.CFPARIVA );
+		bean.setShippingStreet( record.DEINDMER );
+		bean.setShippingCity( record.DELOCMER );
+		bean.setShippingState( record.DEPROMER );
+		bean.setShippingCountry( record.DENAZMER );
+		bean.setShippingDate( record.MMDATEVA );
+		bean.setOpportunity( record.MMRIFORD );
+		bean.setPricelist( record.MMNUMLIS );
+		bean.setAgent( record.MMCODAGE );
+		bean.setNote( record.MMANNTES );
+		// Campi diretti dal record - riga
+		bean.setRowNumber( record.CPROWNUM );
+		bean.setProductCode( record.MMCODART );
+		bean.setVariantCode( record.MMCODVAR );
+		bean.setColorCode( record.MMCODCOL );
+		<!--- bean.setUm( record.MMUNIMIS ); ---->
+		bean.setQuantity( record.MMQTAMOV );
+		bean.setPrice( record.MMVALUNI );
+		bean.setDiscount1( record.MMSCOAR1 );
+		bean.setDiscount2( record.MMSCOAR2 );
+
+		return bean;
+	}
+
 	private com.apirone.core.model.bean.QuotationExported function build( required String quotationSerial ){
 		var record = getDao().read( arguments.quotationSerial );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationExported" );
-
-			//testa
-			bean.setKey( record.CF_IDCLI );
-			bean.setCompany( record.CFDESCR1 );
-			bean.setQuotationSerial( record.MMSERIAL );
-			bean.setQuotationCode( record.MMNUMDOC );
-			bean.setBillingStreet( record.CFINDIRI );
-			bean.setBillingCity( record.CFLOCALI );
-			bean.setBillingState( record.CFPROVIN );
-			bean.setBillingCountry( record.CFSTAISO );
-			bean.setVatNumber( record.CFPARIVA );
-			bean.setShippingStreet( record.DEINDMER );
-			bean.setShippingCity( record.DELOCMER );
-			bean.setShippingState( record.DEPROMER );
-			bean.setShippingCountry( record.DENAZMER );
-			bean.setShippingDate( record.MMDATEVA );
-			bean.setOpportunity( record.MMRIFORD );
-			bean.setPricelist( record.MMNUMLIS );
-			bean.setAgent( record.MMCODAGE );
-			bean.setNote( record.MMANNTES );
-			//riga
-			bean.setRowNumber( record.CPROWNUM );
-			bean.setProductCode( record.MMCODART );
-			bean.setVariantCode( record.MMCODVAR );
-			bean.setColorCode( record.MMCODCOL );
-			<!--- bean.setUm( record.MMUNIMIS ); ---->
-			bean.setQuantity( record.MMQTAMOV );
-			bean.setPrice( record.MMVALUNI );
-			bean.setDiscount1( record.MMSCOAR1 );
-			bean.setDiscount2( record.MMSCOAR2 );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
@@ -122,20 +129,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	//ROWS
 
 	public com.apirone.core.model.bean.QuotationExported function getRow( required String quotationSerial, required Numeric rowNumber ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getRowCacheScope(), arguments.quotationSerial & '_' & arguments.rowNumber );
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = buildRow( quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber );
-		cm.put( getRowCacheScope(), arguments.quotationSerial & '_' & arguments.rowNumber, bean );
-
-		return bean;
+		return buildRow( quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber );
 	}
 
 	public com.apirone.core.model.bean.Result function searchRows(
+		required String quotationSerial,
 		required Numeric limit  = -1,
 		required Numeric offset = 0,
 		required Array orderBy  = [ { field = "quotationExported.rowNumber" } ]
@@ -145,11 +143,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il findRows() restituisce solo le chiavi (più il totale per paginazione)
 		var records = getDao().findRows( argumentCollection = { quotationSerial = arguments.quotationSerial } );
 
-		records.each( function( record ){
-			rows.add( getRow( key = record.MMSERIAL, rowNumber = records.CPROWNUM ) );
-		} );
+		if ( records.recordCount ) {
+			// Carica tutte le righe per questo serial in una sola query
+			var loadedRecords = getDao().readRowsBySerial( arguments.quotationSerial );
+			var recordMap = {};
+			for ( var loadedRecord in loadedRecords ) {
+				recordMap[ loadedRecord.CPROWNUM ] = loadedRecord;
+			}
+
+			// Ricostruisce le righe nell'ordine del findRows() originale
+			for ( var record in records ) {
+				var fullRecord = recordMap[ record.CPROWNUM ];
+				if ( !IsNull( fullRecord ) ) {
+					rows.add( buildRowFromRow( fullRecord ) );
+				}
+			}
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -163,14 +175,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = getRow( quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber );
 
 		outcome.setData( { quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber } );
-		
+
 		transaction {
 			try {
-				var cm = getCacheManager();
-				
 				getDao().deleteRow( quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber );
-
-				cm.remove( getCacheScope(), arguments.quotationSerial & '_' & arguments.rowNumber );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -182,43 +190,47 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	private com.apirone.core.model.bean.QuotationExported function buildRowFromRow( required any record ){
+		var bean = super.bean( "QuotationExported" );
+
+		// Campi diretti dal record: testa
+		bean.setKey( record.CF_IDCLI );
+		bean.setCompany( record.CFDESCR1 );
+		bean.setQuotationSerial( record.MMSERIAL );
+		bean.setQuotationCode( record.MMNUMDOC );
+		bean.setBillingStreet( record.CFINDIRI );
+		bean.setBillingCity( record.CFLOCALI );
+		bean.setBillingState( record.CFPROVIN );
+		bean.setBillingCountry( record.CFSTAISO );
+		bean.setVatNumber( record.CFPARIVA );
+		bean.setShippingStreet( record.DEINDMER );
+		bean.setShippingCity( record.DELOCMER );
+		bean.setShippingState( record.DEPROMER );
+		bean.setShippingCountry( record.DENAZMER );
+		bean.setShippingDate( record.MMDATEVA );
+		bean.setOpportunity( record.MMRIFORD );
+		bean.setPricelist( record.MMNUMLIS );
+		bean.setAgent( record.MMCODAGE );
+		bean.setNote( record.MMANNTES );
+		// Campi diretti dal record: riga
+		bean.setRowNumber( record.CPROWNUM );
+		bean.setProductCode( record.MMCODART );
+		bean.setVariantCode( record.MMCODVAR );
+		bean.setColorCode( record.MMCODCOL );
+		bean.setUm( record.MMUNIMIS );
+		bean.setQuantity( record.MMQTAMOV );
+		bean.setPrice( record.MMVALUNI );
+		bean.setDiscount1( record.MMSCOAR1 );
+		bean.setDiscount2( record.MMSCOAR2 );
+
+		return bean;
+	}
+
 	private com.apirone.core.model.bean.QuotationExported function buildRow( required String quotationSerial, required Numeric rowNumber ){
 		var record = getDao().readRow( quotationSerial = arguments.quotationSerial, rowNumber = arguments.rowNumber );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationExported" );
-
-			//testa
-			bean.setKey( record.CF_IDCLI );
-			bean.setCompany( record.CFDESCR1 );
-			bean.setQuotationSerial( record.MMSERIAL );
-			bean.setQuotationCode( record.MMNUMDOC );
-			bean.setBillingStreet( record.CFINDIRI );
-			bean.setBillingCity( record.CFLOCALI );
-			bean.setBillingState( record.CFPROVIN );
-			bean.setBillingCountry( record.CFSTAISO );
-			bean.setVatNumber( record.CFPARIVA );
-			bean.setShippingStreet( record.DEINDMER );
-			bean.setShippingCity( record.DELOCMER );
-			bean.setShippingState( record.DEPROMER );
-			bean.setShippingCountry( record.DENAZMER );
-			bean.setShippingDate( record.MMDATEVA );
-			bean.setOpportunity( record.MMRIFORD );
-			bean.setPricelist( record.MMNUMLIS );
-			bean.setAgent( record.MMCODAGE );
-			bean.setNote( record.MMANNTES );
-			//riga
-			bean.setRowNumber( record.CPROWNUM );
-			bean.setProductCode( record.MMCODART );
-			bean.setVariantCode( record.MMCODVAR );
-			bean.setColorCode( record.MMCODCOL );
-			bean.setUm( record.MMUNIMIS );
-			bean.setQuantity( record.MMQTAMOV );
-			bean.setPrice( record.MMVALUNI );
-			bean.setDiscount1( record.MMSCOAR1 );
-			bean.setDiscount2( record.MMSCOAR2 );
-
-			return bean;
+			return buildRowFromRow( record );
 		}
 
 		return NullValue();

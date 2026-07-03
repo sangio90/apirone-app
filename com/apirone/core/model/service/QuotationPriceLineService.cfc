@@ -1,41 +1,24 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationPriceLineDAO";
-	
-	property name="cacheScope" type="String" default="QuotationPriceLine.bean";
 
 	public com.apirone.core.model.bean.QuotationPriceLine function get( required String quotationPriceLineId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationPriceLineId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationPriceLineId );
-
-		cm.put(
-			getCacheScope(),
-			arguments.quotationPriceLineId,
-			bean
-		);
-
-		return bean;
-
+		return build( arguments.quotationPriceLineId );
 	}
 
 	public Array function list(
 		required String quotationPriceId,
 	){
-		
-		arguments[ "orderby" ] = super.createOrderBy( arguments[ "quotationPriceLine.id" ] );
-		
+
+		arguments[ "orderby" ] = super.createOrderBy( [ { field = "quotationPriceLine.id" } ] );
+
 		var rows    = [];
-		var result  = super.getResult();
+
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			var bean = get( record.quotation_price_line_id )
+			var bean = buildFromFindRow( record );
 			rows.append( bean );
 		} );
 
@@ -61,27 +44,38 @@
 
 		return outcome;
 	}
-	
+
 	public Numeric function create( required QuotationPriceLine ){
 		var newId = getDao().insert( arguments.QuotationPriceLine );
 
 		return newId;
 	}
 
-	private com.apirone.core.model.bean.QuotationItemPrice function build( required Numeric quotationPriceLineId ){
-		var record = getDao().read( arguments.quotationItemPriceId );
-		
+	/**
+	 * Costruisce un bean QuotationPriceLine a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
+	private com.apirone.core.model.bean.QuotationPriceLine function build( required Numeric quotationPriceLineId ){
+		var record = getDao().read( arguments.quotationPriceLineId );
+
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationPriceLine" );
-
-			bean.setId( record.quotation_price_line_id );
-			bean.setAmount( record.price );
-			bean.setQuotationPriceId( record.quotation_price_id );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
-		
+
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean QuotationPriceLine a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.QuotationPriceLine function buildFromFindRow( required any record ){
+		var bean = super.bean( "QuotationPriceLine" );
+
+		// Campi diretti dal record (QuotationPriceLine non ha sub-entity)
+		bean.setId( record.quotation_price_line_id );
+		bean.setAmount( record.price );
+		bean.setQuotationPriceId( record.quotation_price_id );
+
+		return bean;
 	}
 
 }

@@ -5,31 +5,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="CombinationService" inject="CombinationService";
 	property name="ProductService" inject="ProductService";
 
-	property name="cacheScope" type="String" default="CombinationProductItem.bean";
-
 	public com.apirone.core.model.bean.CombinationProductItem function get( required String combinationId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.combinationId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.combinationId );
-		cm.put( getCacheScope(), arguments.combinationId, bean );
-
-		return bean;
+		return build( arguments.combinationId );
 	}
 
 	public com.apirone.core.model.bean.Result function getByCombinationId( required String combinationId ){
 		var rows   = [];
 		var result = super.getResult();
 
+		// Recupera i record completi dal DAO
 		var records = getDao().getByCombinationId( arguments.combinationId );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( record.combination_product_item_id ) );
+			ids.append( record.combination_product_item_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.combination_product_item_id ] );
 		} );
 
 		result.setData( rows );
@@ -40,6 +37,87 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		;
 	}
 
+	/**
+	 * Recupera in batch più CombinationProductItem dato un array di ID.
+	 * Restituisce uno Struct chiave = combinationProductItemId, valore = bean CombinationProductItem.
+	 * Precarica i ProductItem in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di combinationProductItemId
+	 * @return Struct mappato per combinationProductItemId -> CombinationProductItem
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Raccoglie tutti i product_item_id per il precaricamento batch
+		var productItemIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.product_item_id ) ) {
+				productItemIds.append( record.product_item_id );
+			}
+		}
+
+		// Precarica tutti i ProductItem con una sola chiamata batch
+		var productItemMap = ArrayLen( productItemIds )
+			? getProductItemService().getMany( productItemIds )
+			: {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "CombinationProductItem" );
+
+			// Campi diretti dal record
+			bean.setId( record.combination_product_item_id );
+			bean.setCreatedAt( record.created_at );
+			bean.setCombinationId( record.combination_id );
+
+			// ProductItem: dalla mappa pre-caricata in batch
+			if ( StructKeyExists( productItemMap, record.product_item_id ) ) {
+				bean.setProductItem( productItemMap[ record.product_item_id ] );
+			}
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
+	}
+
+	/**
+	 * Recupera in batch i CombinationProductItem raggruppati per combination_id.
+	 * Restituisce uno Struct chiave = combinationId, valore = Array di bean CombinationProductItem.
+	 * Utilizzato da CombinationService.getMany() per evitare l'N+1 di getByCombinationId().
+	 *
+	 * @combinationIds Array di combinationId
+	 * @return Struct mappato per combinationId -> Array[CombinationProductItem]
+	 */
+	public Struct function listByCombinationIds( required Array combinationIds ){
+		var records = getDao().readByCombinationIds( arguments.combinationIds );
+		var result  = {};
+
+		// Raccoglie tutti i PK e carica i bean completi con getMany()
+		var ids = [];
+		for ( var record in records ) {
+			ArrayAppend( ids, record.combination_product_item_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Raggruppa i bean per combination_id
+		for ( var id in ids ) {
+			if ( !StructKeyExists( beanMap, id ) ) {
+				continue;
+			}
+			var bean           = beanMap[ id ];
+			var combinationId  = bean.getCombinationId();
+
+			if ( !StructKeyExists( result, combinationId ) ) {
+				result[ combinationId ] = [];
+			}
+			ArrayAppend( result[ combinationId ], bean );
+		}
+
+		return result;
+	}
+
 	public Array function list(){
 		// TODO: check formatter
 		arguments[ "limit" ] = -1;
@@ -48,20 +126,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String combinationId ){
-		var combinationProductItem = super.bean( "CombinationProductItem" );
-
-		var obj = get( arguments.combinationId );
+		var outcome = super.bean( "Outcome" );
 
 		outcome.setData( { combinationId = arguments.combinationId } );
-		getDao().delete( arguments.combinationId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.combinationId );
-
-				cm.remove( getCacheScope(), arguments.combinationId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -122,8 +193,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.combinationProductItem.getId() );
-
 		return arguments.combinationProductItem.getId();
 	}
 
@@ -138,24 +207,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.combinationProductItemId );
 
 		if ( record.recordCount ) {
-
-			var bean = super.bean( "CombinationProductItem" );
-			//var combination = super.bean( "Combination" );
-			//var productItem = super.bean( "CombinationProductItem" );
-
-			bean.setId( record.combination_product_item_id );
-			bean.setCreatedAt( record.created_at );
-			bean.setCombinationId( record.combination_id );
-
-			bean.setProductItem( getProductItemService().get( record.product_item_id ) );
-
-			var productItem = getProductItemService().get( record.product_item_id );
-			bean.setProductItem( productItem );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean CombinationProductItem a partire da una riga del query.
+	 * La sub-entity ProductItem è caricata con chiamata individuale.
+	 */
+	private com.apirone.core.model.bean.CombinationProductItem function buildFromRow(
+		required any record
+	){
+		var bean = super.bean( "CombinationProductItem" );
+
+		// Campi diretti dal record
+		bean.setId( record.combination_product_item_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setCombinationId( record.combination_id );
+
+		// Entity collegate (caricate singolarmente)
+		var productItem = getProductItemService().get( record.product_item_id );
+		bean.setProductItem( productItem );
+
+		return bean;
 	}
 
 }

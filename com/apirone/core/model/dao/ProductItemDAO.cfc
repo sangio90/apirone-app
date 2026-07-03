@@ -15,6 +15,30 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_id::varchar,
+				*
+			FROM product_items
+			WHERE product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY
+				orderby ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
 		<cfargument name="originId" type="Numeric">
@@ -25,7 +49,8 @@
 
 		<cfquery name="local.q" datasource="apirone" result="local.result">
 			SELECT
-				product_item_id, origin_id, attribute_raw_value_id
+				product_item_id, origin_id, attribute_raw_value_id,
+				COUNT(product_item_id) OVER() AS total
 			FROM
 				product_items
 				<cfif !IsNull( arguments.attributeId )>
@@ -105,7 +130,7 @@
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="productId" type="String">
-		<cfargument name="productItemId" type="String">	
+		<cfargument name="productItemId" type="String">
 
 		<cfif IsNull( arguments.productItemId ) AND IsNull( arguments.productId ) AND IsNull( arguments.attributeId )>
 			<cfthrow type="apirone.error.NoArgumentsPassed" message="At least one parameter is required to delete">
@@ -131,7 +156,7 @@
 						WHERE attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">
 					)
 				</cfif>
-			RETURNING 
+			RETURNING
 				product_item_id
 		</cfquery>
 
@@ -149,4 +174,30 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i ProductItem collegati a una lista di productId.
+		Utilizzato da ProductItemService.listByProductIds() per pre-caricare item in blocco.
+	--->
+	<cffunction name="findByProductIds" returntype="Query" access="public">
+		<cfargument name="productIds" type="Array" required="true">
+
+		<!--- Converte l'array di ID in lista per la clausola IN --->
+		<cfset var idsList = ArrayToList(arguments.productIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_id::varchar,
+				*
+			FROM product_items
+			WHERE product_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			ORDER BY
+				orderby ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

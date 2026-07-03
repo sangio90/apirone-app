@@ -33,14 +33,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var lines = super.fire( "line.search", params );
 
+		// Carica tutte le ProductCategoryLine per la categoria in batch (1 query invece di N)
+		var allCategoryLines = super.service( "ProductCategoryLine" ).listByCategoryId( rc.categoryId );
+		var markupByLineId   = {};
+		for ( var pcl in allCategoryLines ) {
+			markupByLineId[ pcl.getLine().getId() ] = pcl.getMarkup();
+		}
+
 		for ( var line in lines.getData() ) {
-			var lineCategory = super
-				.service( "ProductCategoryLine" )
-				.list( categoryId = rc.categoryId, lineId = line.getId() )
+			var markup = StructKeyExists( markupByLineId, line.getId() ) ? markupByLineId[ line.getId() ] : 0;
 
 			var obj = memy.convert( line, "list" );
 
-			obj[ "markup" ] = Len( lineCategory ) ? lineCategory[ 1 ].getMarkup() : 0;
+			obj[ "markup" ] = markup;
 
 			data.add( obj );
 		}

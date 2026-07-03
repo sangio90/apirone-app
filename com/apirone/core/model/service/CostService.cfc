@@ -2,24 +2,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="CostDAO";
 
-	/*
-		not used
-	*/
-	public com.apirone.core.model.bean.Cost function get( required String priceId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.priceId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.priceId );
-		cm.put( getCacheScope(), arguments.priceId, bean );
-
-		return bean;
-	}
-
 	public com.apirone.core.model.bean.Cost function getByParams(
 		required String rawProductId,
 		String required variantId="",
@@ -32,7 +14,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		*/
 
 		var q    = "";
-		var cm   = getCacheManager();
 		var bean = super.bean( "Cost" );
 
 		// if ( rawProductId == "LAV-VERNPOLVMET" AND arguments.variantId == "VE-BINS" ) {

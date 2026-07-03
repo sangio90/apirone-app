@@ -11,7 +11,26 @@
 
 		<cfreturn local.q>
 	</cffunction>
-	
+
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="verticaleExport">
+			SELECT
+				*
+			FROM ORDINI_APIR
+			WHERE MMSERIAL IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="varchar"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="readRow" returntype="Query">
 		<cfargument name="quotationSerial" type="String" required="true">
 		<cfargument name="rowNumber" type="Numeric" required="true">
@@ -20,8 +39,26 @@
 			SELECT
 				*
 			FROM ORDINI_APIR
-			WHERE MMSERIAL = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationSerial#"> 
+			WHERE MMSERIAL = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationSerial#">
 				AND CPROWNUM = <cfqueryparam cfsqltype="Integer" value="#arguments.rowNumber#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch tutte le righe di un ordine esportato, dato il seriale.
+		Utilizzato dal Service corrispondente per caricare le righe in blocco.
+	--->
+	<cffunction name="readRowsBySerial" returntype="Query">
+		<cfargument name="quotationSerial" type="String" required="true">
+
+		<cfquery name="local.q" datasource="verticaleExport">
+			SELECT
+				*
+			FROM ORDINI_APIR
+			WHERE MMSERIAL = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationSerial#">
+			ORDER BY CPROWNUM
 		</cfquery>
 
 		<cfreturn local.q>
@@ -52,7 +89,7 @@
 				<!--- GROUP BY MMSERIAL ---->
 
 				<cfif arguments.limit GT 0>
-					OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS 
+					OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
 					FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY
 				</cfif>
 			)
@@ -60,7 +97,7 @@
 				p.MMSERIAL,
 				(SELECT COUNT(DISTINCT MMSERIAL) FROM ORDINI_APIR WHERE 1 = 1) AS total
 			FROM
-				paging p;			
+				paging p;
 		</cfquery>
 
 		<cfreturn local.q>

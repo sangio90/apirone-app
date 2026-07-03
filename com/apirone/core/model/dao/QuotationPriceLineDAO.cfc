@@ -18,6 +18,8 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_price_line_id,
+				price,
+				quotation_price_id,
 				COUNT(quotation_price_line_id) OVER() AS total
 			FROM 
 				quotation_price_lines

@@ -101,4 +101,24 @@
 
 		<cfreturn arguments.ComponentOverride.getId()>
 	</cffunction>
+
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato da ComponentOverrideService.search() per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM component_overrides
+			WHERE component_override_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

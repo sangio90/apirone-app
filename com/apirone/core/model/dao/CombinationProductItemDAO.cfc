@@ -17,6 +17,20 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più CombinationProductItem dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsUuid(
+			table   = "combination_product_items",
+			pkColumn = "combination_product_item_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="getByCombinationId" output="false">
 		<cfargument name="combinationId" type="String" required="true">
 
@@ -28,6 +42,30 @@
 				combination_product_items
 			WHERE
 				combination_id = <cfqueryparam cfsqltype="varchar" value="#arguments.combinationId#">::uuid
+			ORDER BY created_at asc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i CombinationProductItem per una lista di combination_id.
+		Utilizzato da CombinationService.getMany() per evitare N+1 su buildFromRow.
+	--->
+	<cffunction name="readByCombinationIds" access="public" returntype="Query">
+		<cfargument name="combinationIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.combinationIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				combination_product_item_id::varchar,
+				*
+			FROM combination_product_items
+			WHERE combination_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			ORDER BY created_at asc
 		</cfquery>
 
 		<cfreturn local.q>

@@ -37,6 +37,9 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				export_code_id,
+				export_code,
+				counter,
+				product_hash_id,
 				COUNT(export_code_id) OVER() AS total
 			FROM
 				export_codes

@@ -131,4 +131,23 @@
 
 		<cfreturn local.q.recordCount>
 	</cffunction>
+
+	<!---
+		Recupera in batch più catalog bundle dato un array di ID.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT line_id::varchar, model_id::varchar, catalog_bundle_id::varchar, *
+			FROM catalog_bundles
+			WHERE catalog_bundle_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

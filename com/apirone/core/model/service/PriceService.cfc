@@ -8,21 +8,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" inject="LookupService";
 	property name="articleService" inject="ArticleService";
 
-	property name="cacheScope" type="String" default="Price.bean";
-
 	public com.apirone.core.model.bean.Price function get( required String priceId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.priceId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.priceId );
-		cm.put( getCacheScope(), arguments.priceId, bean );
-
-		return bean;
+		return build( arguments.priceId );
 	}
 
 	public Array function list(){
@@ -35,15 +22,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		String productId,
 		Numeric productItemId,
 		String statusId,
-		String articleId,
+		String articleId
 	){
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		records.each( function( record ){
-			rows.add( get( record.price_id, false ) );
+			ids.append( record.price_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( record ){
+			rows.add( beanMap[ record.price_id ] );
 		} );
 
 		result.setData( rows );
@@ -68,14 +65,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					message = "Price [#arguments.priceId#] deleted.",
 					payload = { "id" = arguments.priceId }
 				);
-				super.getCacheManager().remove( getCacheScope(), arguments.priceId );
-				removeEntityCache( obj.getEntity() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.error.CannotDeletePrice" );
 				outcome.setMessage( "Cannot delete price [#arguments.priceId#]" );
-				cffile( action="APPEND" file="#ExpandPath('/debug.log')#" output="#now()# PriceService: error delete #error.message#");
 			}
 		}
 
@@ -94,13 +88,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		transaction {
 			try {
 				getDao().deleteByParams( arguments.price );
-
-				super.getCacheManager().remove( getCacheScope(), obj.getId() );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeletePrice" );
-				outcome.setMessage( "Cannot delete pricd [#obj.getId()#]" );
+				outcome.setMessage( "Cannot delete price [#obj.getId()#]" );
 			}
 		}
 
@@ -114,8 +106,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var id = getDao().insert( arguments.price );
 
-		removeEntityCache( price.getEntity() );
-
 		return id;
 	}
 
@@ -125,10 +115,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		getDao().update( arguments.price );
-
-		super.getCacheManager().remove( getCacheScope(), price.getId() );
-
-		removeEntityCache( price.getEntity() );
 
 		return arguments.price.getId();
 	}
@@ -159,26 +145,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		backupTable( "prices" );
 
-		// var records = getDao().find( argumentCollection = findCriteria );
-
 		var products = getProductService().list( argumentCollection = findCriteria );
 
 		for ( var product in products ) {
-			/*
-			var prices = getDao().find(
-				argumentCollection = { productId = product.getId(), typeId = arguments.typeId }
-			);
-			*/
 
 			var prices = list( productId = product.getId(), typeId = arguments.typeId );
 
 			if ( prices.len() ) {
-				
+
 				for ( var price in prices ) {
 					var bean   = super.bean( "Price" );
 					var entity = super.bean( "Entity" );
 
-					entity.setkey( "product.id" );
+					entity.setKey( "product.id" );
 					entity.setValue( product.getId() );
 
 					var bean = get( price.getId() );
@@ -191,9 +170,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					getDao().update( bean );
 
 					updatedRecords++;
-
-					super.getCacheManager().remove( getCacheScope(), price.getId() );
-					getProductService().removeCache( product.getId() );
 
 					super.logEvent(
 						event   = "price.UPDATED",
@@ -221,7 +197,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setType( getPriceTypeService().get( arguments.typeId ) );
 				bean.setStatus( getStatusService().get( "ACT" ) );
 
-				entity.setkey( "product.Id" );
+				entity.setKey( "product.id" );
 				entity.setValue( product.getId() );
 
 				bean.setEntity( entity );
@@ -243,8 +219,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		};
 
-		super.getCacheManager().removeAll();
-
 		return { "inserted" = insertedRecords, "updated" = updatedRecords };
 	}
 
@@ -254,50 +228,103 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private Struct function removeEntityCache( required com.apirone.core.model.bean.Entity entity ){
+	/**
+	 * Recupera in batch più Price dato un array di ID.
+	 * Restituisce uno Struct chiave = priceId, valore = bean Price.
+	 * Precarica PriceType in batch e utilizza cache locale per status e lookup.
+	 *
+	 * @ids Array di priceId
+	 * @return Struct mappato per priceId -> Price
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-		var result = {};
-
-		if( entity.getKey() == "product.id" ) {
-			getProductService().removeCache( entity.getValue() );
-			result = { key = "product.id", value = entity.getValue() }
+		// Raccoglie tutti i price_type_id per precaricarli in batch
+		var priceTypeIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.price_type_id ) ) {
+				priceTypeIds.append( record.price_type_id );
+			}
 		}
 
-		if( entity.getKey() == "productItem.id" ) {
-			getProductItemService().removeCache( entity.getValue() );
-			result = { key = "productItem.id", value = entity.getValue() }
+		// Precarica i PriceType in batch
+		var priceTypeMap = {};
+		if ( ArrayLen( priceTypeIds ) ) {
+			var typeRecords = getPriceTypeService().getDao().readByIds( priceTypeIds );
+			for ( var tr in typeRecords ) {
+				var typeBean = getPriceTypeService().buildFromRow( tr );
+				priceTypeMap[ tr.price_type_id ] = typeBean;
+			}
 		}
 
-		if( entity.getKey() == "article.id" ) {
-			getArticleService().removeCache( entity.getValue() );
-			result = { key = "article.id", value = entity.getValue() }
+		// Cache locali per method, status
+		var methods  = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Price" );
+
+			// Campi diretti dal record
+			bean.setId( record.price_id );
+			bean.setAmount( record.amount );
+			bean.setCreatedAt( record.created_at );
+
+			// Method: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( methods, record.method_id ) ) {
+				methods[ record.method_id ] = getLookupService().get( "priceMethod", record.method_id );
+			}
+			bean.setMethod( methods[ record.method_id ] );
+
+			// Type: dalla mappa pre-caricata
+			if ( StructKeyExists( priceTypeMap, record.price_type_id ) ) {
+				bean.setType( priceTypeMap[ record.price_type_id ] );
+			}
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Entity (costruita inline dal record)
+			bean.setEntity( getEntity( record ) );
+
+			map[ record.price_id ] = bean;
 		}
 
-		return result;
-
+		return map;
 	}
 
 	private com.apirone.core.model.bean.Price function build( required String priceId ){
 		var record = getDao().read( arguments.priceId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Price" );
-
-			bean.setId( record.price_id );
-
-			bean.setAmount( record.amount );
-			bean.setCreatedAt( record.created_at );
-
-			bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
-
-			bean.setType( getPriceTypeService().get( record.price_type_id ) );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setEntity( getEntity( record ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Price a partire da una riga della query, senza chiamata DB aggiuntiva
+	 * per il record principale.
+	 */
+	public com.apirone.core.model.bean.Price function buildFromRow( required any record ){
+		var bean = super.bean( "Price" );
+
+		// Campi diretti dal record
+		bean.setId( record.price_id );
+		bean.setAmount( record.amount );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setMethod( getLookupService().get( "priceMethod", record.method_id ) );
+		bean.setType( getPriceTypeService().get( record.price_type_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+		bean.setEntity( getEntity( record ) );
+
+		return bean;
 	}
 
 	private com.apirone.core.model.bean.Entity function getEntity( required record ){
@@ -319,6 +346,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		getLogger().error( "No entity linked to this price. Price Id: [#record.price_id#]" );
 
-	}	
+	}
+
+	/**
+	 * Recupera in batch tutti i prezzi collegati a una lista di productId.
+	 * Restituisce uno Struct chiave = productId, valore = Array di bean Price.
+	 * Sostituisce chiamate ripetute a list() per ogni prodotto.
+	 *
+	 * @productIds Array di productId
+	 * @return Struct mappato per productId -> Array di Price
+	 */
+	public Struct function listByProductIds( required Array productIds ){
+		var records = getDao().findByProductIds( productIds = arguments.productIds );
+		var map     = {};
+
+		// Raccoglie tutti i PK e carica i bean completi in batch con getMany() (include PriceType batch)
+		var ids = [];
+		for ( var record in records ) {
+			ArrayAppend( ids, record.price_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Raggruppa i risultati della query per productId
+		for ( var record in records ) {
+			var productId = record.product_id;
+			if ( !StructKeyExists( map, productId ) ) {
+				map[ productId ] = [];
+			}
+			var bean = beanMap[ record.price_id ];
+			ArrayAppend( map[ productId ], bean );
+		}
+
+		return map;
+	}
 
 }

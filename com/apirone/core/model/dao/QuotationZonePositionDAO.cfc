@@ -22,6 +22,10 @@
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_zone_position_id::varchar,
+				code,
+				quotation_zone_position,
+				created_at,
+				quotation_zone_id,
 				COUNT(quotation_zone_position_id) OVER() AS total
 			FROM
 				quotation_zone_positions 

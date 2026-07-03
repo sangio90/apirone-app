@@ -767,6 +767,32 @@
 		<cfreturn local.qTotal.total_amount>
 	</cffunction>
 
+	<!---
+		Calcola in batch il totale per una lista di quotationId.
+		Evita l'N+1 di getQuotationTotal() chiamato per ogni riga in getMany().
+	--->
+	<cffunction name="getQuotationTotals" access="public" returntype="Struct">
+		<cfargument name="quotationIds" type="Array" required="true">
+
+		<cfset var result   = {} />
+		<cfset var idsList  = ArrayToList( arguments.quotationIds ) />
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT quotation_id, COALESCE(SUM(price * quantity), 0) AS total_amount
+			FROM quotation_items
+			WHERE quotation_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+			GROUP BY quotation_id
+		</cfquery>
+
+		<cfloop query="local.q">
+			<cfset result[ local.q.quotation_id ] = local.q.total_amount />
+		</cfloop>
+
+		<cfreturn result />
+	</cffunction>
+
 	<cffunction name="readNextNumber" access="public" returntype="numeric">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -786,5 +812,36 @@
 		</cfquery>
 
 		<cfreturn local.q.max_version>
+	</cffunction>
+
+	<!---
+		Recupera in batch più preventivi dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotations.quotation_id::varchar,
+				lang_id::varchar,
+				pricelist_id::varchar,
+				payment_method_id::varchar,
+				currency_id::varchar,
+				billing_profile_id::varchar,
+				shipping_profile_id::varchar,
+				sales_agent_account_id::varchar,
+				graphic_technician_account_id::varchar,
+				*
+			FROM quotations
+				INNER JOIN quotation_status_history ON quotations.quotation_status_history_id = quotation_status_history.quotation_status_history_id
+			WHERE quotations.quotation_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 </cfcomponent>

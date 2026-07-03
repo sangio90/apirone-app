@@ -24,6 +24,11 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				role_id,
+				role,
+				created_at,
+				role_type_id,
+				quotation_max_discount,
+				quotation_max_amount,
 				COUNT(role_id) OVER() AS total
 			FROM
 				membership.roles
@@ -103,6 +108,26 @@
 		</cfquery>
 
 		<cfreturn local.q.recordCount>
+	</cffunction>
+
+	<!---
+		Recupera in batch più ruoli dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT role_id, *
+			FROM membership.roles
+			WHERE role_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 
 </cfcomponent>

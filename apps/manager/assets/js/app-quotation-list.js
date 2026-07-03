@@ -159,7 +159,7 @@ AP.quotation.list = ( function() {
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
         viewModel.get( "rows" ).fetch( function() {
-            viewModel.search();
+            AP.loading.hide();
         } );
         /* TODO: remove this extra code.
         // Formatting by mvvm

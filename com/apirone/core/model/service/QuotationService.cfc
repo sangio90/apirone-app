@@ -53,20 +53,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="ProductHashService" inject="ProductHashService";
 	property name="accountService" inject="AccountService";
 
-	property name="cacheScope" type="String" default="Quotation.bean";
-
 	public com.apirone.core.model.bean.Quotation function get( required String quotationId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.quotationId );
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationId );
-		cm.put( getCacheScope(), arguments.quotationId, bean );
-
-		return bean;
+		return build( arguments.quotationId );
 	}
 
 	public Number function getNextNumber(){
@@ -92,10 +80,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.quotation_id );
+		} );
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( quotationId = record.quotation_id ) );
+			rows.add( beanMap[ record.quotation_id ] );
 		} );
 
 		result.setData( rows );
@@ -167,17 +166,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			} catch ( any error ) {
 				transaction action="rollback";
-				rethrow
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteQuotation" );
 				outcome.setMessage( "Cannot delete quotation [#arguments.quotationId#]" );
-				return outcome;
+				rethrow
 			}
-
-
-		// var cm = getCacheManager();
-		// cm.remove( getCacheScope(), arguments.quotationId );
 
 
 		return outcome;
@@ -249,7 +243,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.Quotation quotation ){
 		getDao().update( arguments.quotation );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
 
 		return arguments.quotation.getId();
 	}
@@ -265,275 +258,413 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			if ( arguments.quotationItems.len() ) {
-				// ciclo su tutti i prodotti del preventivo
+
+				// --- Fase 1: pre-raccolta degli ID da tutti i quotationItem per il caricamento batch ---
+				// Le tuple memorizzate verranno poi usate nella fase 2 per l'assemblaggio senza chiamate get() individuali.
+				var exportTuples        = [];
+				var allProductIds       = [];
+				var allCategoryIds      = [];
+				var allLineIds          = [];
+				var allModelIds         = [];
+				var allFinishIds        = [];
+				var allProductItemIds   = [];
+				var allFruitProductIds  = [];
+				var allSignConfigItemIds = [];
+				var allSignConfigIds    = [];
+
 				for ( var quotationItem in arguments.quotationItems ) {
-					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
-					//se tipo servizio, la gestione è light
-					if (!isNull(quotationItem.getArticle())) {
-						var dataExport = {
-							"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
-							"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) & RepeatString(
-								"0",
-								35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len(quotationItem.getArticle().getDescription()) ) )
-							),
-							"ARDESSUP"  = "",
-							"ARDATCAR"  = Now(),
-							"ARUNMIS1"  = "PZ",
-							"VARCOD"    = "0000000000",
-							"VARNOT"    = "",
-							"CLCODICE"  = "000000",
-							"CLANNOTA"  = quotationItem.getNote(),
-							"ARIMG_64" = "",
-							"ARSPECIA" = isSpeciale,
-							"ARCODNOM" = ""
-						}
-
-						// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
-						var existingCodes = exportCodeService.list(
-							str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
-						);
-
-						if ( existingCodes.len() > 0 ) {
-							ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
-							continue;
-						}
-
-						///se non troviamo, creiamo ed esportiamo in verticale
-						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
-						exportCode.setCounter( "000000" );
-						exportCodeService.create( "exportCode" = exportCode );
-						result.success = getDao().exportProduct( dataExport );
-						ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
-
+					// Gli articoli (servizi) non hanno dati prodotto - saltati nella pre-raccolta
+					if ( !IsNull( quotationItem.getArticle() ) ) {
 						continue;
-					} else {
-						var hsCode = "";
-						try {
-							hsCode = quotationItem.getProduct().getLine().getHscode();
-						} catch ( any e ) {
+					}
 
+					if ( IsNull( quotationItem.getHash() ) || Trim( quotationItem.getHash() ) == "" ) {
+						continue;
+					}
+
+					var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+					if ( IsNull( productHash ) ) {
+						continue;
+					}
+
+					var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
+					if ( existingCode.len() > 0 ) {
+						continue;
+					}
+
+					var quotationItemData = deserializeJson( productHash.getJsonData() );
+
+					// Raccoglie tutti gli ID unici per il caricamento batch
+					ArrayAppend( allProductIds, quotationItemData.productId );
+					ArrayAppend( allCategoryIds, quotationItemData.categoryId );
+					ArrayAppend( allLineIds, quotationItemData.lineId );
+					ArrayAppend( allModelIds, quotationItemData.modelId );
+					ArrayAppend( allFinishIds, quotationItemData.finishId );
+
+					if ( StructKeyExists( quotationItemData, "productItems" ) ) {
+						for ( var pi in quotationItemData.productItems ) {
+							ArrayAppend( allProductItemIds, pi.productItemId );
 						}
-						var quotationImageFile = quotationItem.getImage();
-						var base64File = "";
+					}
 
-						try {
-							var path = expandPath("/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName());
-							var file = FileReadBinary(path);
-							if (!isNull(file)) {
-								base64File = ToBase64(file);
-							}
-						} catch ( any e ) {
+					if ( StructKeyExists( quotationItemData, "signageRows" ) && StructKeyExists( quotationItemData, "signageConfigItemId" ) ) {
+						ArrayAppend( allSignConfigItemIds, quotationItemData.signageConfigItemId );
+					}
 
-						}
-
-						//in caso il prodotto non sia un servizio, ma un prodotto con hash, la gestione è più complessa
-						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
-							result.success = false;
-							result.error = 'Hash riga preventivo non trovata.';
-						}
-						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
-						if ( isNull(productHash) ) {
-							result.success = false;
-							result.error = 'Hash prodotto non trovato.';
-						}
-						//appurato che la riga di preventivo ha un hash associato e che l'hash corrisponda effettivamente ad un record sulla tabella degli hash
-						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
-						var existingCode = exportCodeService.list( "productHashId" = productHash.getId() );
-						if ( existingCode.len() > 0 ) {
-							ArrayAppend( result.skippedItems, Left( existingCode[1].getName(), 15 ) );
-							continue;
-						}
-
-						//se non lo troviamo, trasformiamo i dati da jason a struttura e poterla consultare e poter creare un nuovo codice
-						//e i nuovi record nella tabella degli articoli e delle rispettive diba su verticale.
-						var quotationItemData = deserializeJson( productHash.getJsonData() );
-						var code = "";
-
-						//prime due cose: cerchiamo il prodotto corrispondente all'id preso dall'hash e prendiamo categoria,
-						//linea, modello e finitura per comporre la prima parte del codice.
-						var product = getProductService().get( quotationItemData.productId );
-						var category = getProductCategoryService().get( quotationItemData.categoryId );
-						if ( IsNull( product ) || IsNull( category ) ) {
-							result.success = false;
-							result.error = 'Prodotto o Categoria Prodotto non trovata.'
-							return result;
-						}
-
-						var categoryCode = Trim( category.getCode() );
-						code &= categoryCode;
-						var note = "";
-
-						var line = getLineService().get( quotationItemData.lineId );
-						if ( IsNull( line ) ) {
-							result.success = false;
-							result.error = "Linea prodotto non trovata."
-							return result;
-						}
-						var lineCode = Trim( line.getCode() );
-						code &= lineCode;
-
-						var model = getModelService().get( quotationItemData.modelId );
-						if ( IsNull( model ) ) {
-							result.success = false;
-							result.error = "Modello prodotto non trovato."
-							return result;
-						}
-						code &= Trim( model.getCode() );
-
-						var finish = getFinishService().get( quotationItemData.finishId );
-						if ( IsNull( finish ) ) {
-							result.success = false;
-							result.error = "Finitura prodotto non trovata."
-							return result;
-						}
-						var finishCode = Trim( finish.getCode() );
-						code &= finishCode;
-
-						var description = product.getDescription().left( 35 );
-
-						//inizializiamo il codice variane, il codice colore e le note segnaletica.
-						var arKey = code;
-						var colCode  = "000000";
-						var varCode  = "";
-						var noteSegnaletica = '';
-
-						//se l'articolo è una segnaletica
-						if (StructKeyExists( quotationItemData, "signageRows" ) ) {
-							var signageConfigItem = getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
-							var fontSize = signageConfigItem.getSize().getName();
-							var signageConfig = getSignageConfigService().get( signageConfigItem.getSignageConfigId() );
-							var fontCode = signageConfig.getFont().getCode();
-							var fontName = signageConfig.getFont().getName();
-							note &= "Font: " & fontName & "; Font Size: " & fontSize & "; "
-							//il varcode viene popolato con
-							varCode = right("00000" & fontCode, 5) & right("00000" & fontSize, 5);
-							var signageRowsCounter = 1;
-							for ( var signageRow in quotationItemData.signageRows ) {
-								noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow['text-align'] & ': Testo: "' & signageRow.content & '"";';
-								signageRowsCounter++;
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
+						for ( var fruit in quotationItemData.fruits ) {
+							ArrayAppend( allFruitProductIds, fruit.product );
+							if ( StructKeyExists( fruit, "productItems" ) ) {
+								for ( var fi in fruit.productItems ) {
+									ArrayAppend( allProductItemIds, fi.productItemId );
+								}
 							}
 						}
+					}
 
-						var productItemIds = [];
-						var productItems   = [];
-						var importantAttributes = product.getImportantAttributes();
-						for ( var quotationItemProductItem in quotationItemData.productItems ) {
-							var productItem = getProductItemService().get( quotationItemProductItem.productItemId );
-							if ( !IsNull( productItem ) ) {
-								var attributeValue = productItem.getAttributeValue();
-								var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
+					// Memorizza la tupla per la fase 2: item originale, dati deserializzati e productHash
+					ArrayAppend( exportTuples, {
+						item = quotationItem,
+						data = quotationItemData,
+						hash = productHash
+					} );
+				}
 
-								if ( IsNull( attribute ) ) {
+				// --- Fase 2: caricamento batch di tutte le entity ---
+				// Carica i Product con getMany() ottimizzato (incluse tutte le sub-entity: categorie, testi, prezzi, file, attributi)
+				var productMap = {};
+				if ( ArrayLen( allProductIds ) ) {
+					productMap = getProductService().getMany( allProductIds );
+				}
+
+				// Carica ProductCategory, Line, Model, Finish con i rispettivi getMany()
+				var categoryMap = {};
+				if ( ArrayLen( allCategoryIds ) ) {
+					categoryMap = getProductCategoryService().getMany( allCategoryIds );
+				}
+
+				var lineMap = {};
+				if ( ArrayLen( allLineIds ) ) {
+					lineMap = getLineService().getMany( allLineIds );
+				}
+
+				var modelMap = {};
+				if ( ArrayLen( allModelIds ) ) {
+					modelMap = getModelService().getMany( allModelIds );
+				}
+
+				var finishMap = {};
+				if ( ArrayLen( allFinishIds ) ) {
+					finishMap = getFinishService().getMany( allFinishIds );
+				}
+
+				var productItemMap = {};
+				if ( ArrayLen( allProductItemIds ) ) {
+					productItemMap = getProductItemService().getMany( allProductItemIds );
+				}
+
+				// Carica anche i fruit product (sono Product, ma con ID separato)
+				var fruitProductMap = {};
+				if ( ArrayLen( allFruitProductIds ) ) {
+					fruitProductMap = getProductService().getMany( allFruitProductIds );
+				}
+
+				// Carica SignageConfigItem e SignageConfig in batch
+				var signConfigItemMap = {};
+				if ( ArrayLen( allSignConfigItemIds ) ) {
+					signConfigItemMap = getSignageConfigItemService().getMany( allSignConfigItemIds );
+				}
+
+				// Raccoglie i signage_config_id dai SignageConfigItem caricati per il caricamento batch delle config
+				for ( var scid in allSignConfigItemIds ) {
+					if ( StructKeyExists( signConfigItemMap, scid ) ) {
+						ArrayAppend( allSignConfigIds, signConfigItemMap[ scid ].getSignageConfigId() );
+					}
+				}
+				var signConfigMap = {};
+				if ( ArrayLen( allSignConfigIds ) ) {
+					signConfigMap = getSignageConfigService().getMany( allSignConfigIds );
+				}
+
+				// --- Fase 3a: elaborazione degli articoli (servizi) ---
+				for ( var quotationItem in arguments.quotationItems ) {
+					if ( IsNull( quotationItem.getArticle() ) ) {
+						continue;
+					}
+
+					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
+
+					var dataExport = {
+						"AR_CHIAVE" = quotationItem.getArticle().getCode() & RepeatString( "0", 31 - Len( quotationItem.getArticle().getCode() ) ),
+						"ARCODART"  = quotationItem.getArticle().getCode() & RepeatString( "0", 15 - Len( quotationItem.getArticle().getCode() ) ),
+						"ARDESART"  = quotationItem.getArticle().getDescription().subString( 0, Len( quotationItem.getArticle().getDescription() ) ) & RepeatString(
+							"0",
+							35 - Len( quotationItem.getArticle().getDescription().subString( 0, Len( quotationItem.getArticle().getDescription() ) ) )
+						),
+						"ARDESSUP"  = "",
+						"ARDATCAR"  = Now(),
+						"ARUNMIS1"  = "PZ",
+						"VARCOD"    = "0000000000",
+						"VARNOT"    = "",
+						"CLCODICE"  = "000000",
+						"CLANNOTA"  = quotationItem.getNote(),
+						"ARIMG_64"  = "",
+						"ARSPECIA"  = isSpeciale,
+						"ARCODNOM"  = ""
+					};
+
+					// non abbiamo un prodotto legato a questa riga, quindi cerchiamo per codice e basta tra i codici gia esportati.
+					var existingCodes = exportCodeService.list(
+						str = quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) )
+					);
+
+					if ( existingCodes.len() > 0 ) {
+						ArrayAppend( result.skippedItems, quotationItem.getArticle().getCode() );
+						continue;
+					}
+
+					var exportCode = super.bean( "ExportCode" );
+					exportCode.setName( quotationItem.getArticle().getCode() & RepeatString( "0", 25 - Len( quotationItem.getArticle().getCode() ) ) );
+					exportCode.setCounter( "000000" );
+					exportCodeService.create( "exportCode" = exportCode );
+					result.success = getDao().exportProduct( dataExport );
+					ArrayAppend( result.exportedItems, quotationItem.getArticle().getCode() );
+				}
+
+				// --- Fase 3b: elaborazione dei prodotti usando esclusivamente le mappe batch ---
+				for ( var tuple in exportTuples ) {
+					var quotationItem     = tuple.item;
+					var quotationItemData = tuple.data;
+					var productHash       = tuple.hash;
+
+					var isSpeciale = quotationItem.getSpecial() ? "S" : "N";
+
+					var hsCode = "";
+					try {
+						hsCode = quotationItem.getProduct().getLine().getHscode();
+					} catch ( any e ) {
+					}
+
+					var quotationImageFile = quotationItem.getImage();
+					var base64File         = "";
+
+					try {
+						var path = ExpandPath( "/../repository/public/media/quotation-items/500/" & quotationImageFile.getDirectory() & "/" & quotationImageFile.getName() );
+						var file = FileReadBinary( path );
+						if ( !IsNull( file ) ) {
+							base64File = ToBase64( file );
+						}
+					} catch ( any e ) {
+					}
+
+					var code = "";
+
+					// Recupera il prodotto e la categoria dalla mappa batch (con fallback individuale difensivo)
+					var product = StructKeyExists( productMap, quotationItemData.productId )
+						? productMap[ quotationItemData.productId ]
+						: getProductService().get( quotationItemData.productId );
+					var category = StructKeyExists( categoryMap, quotationItemData.categoryId )
+						? categoryMap[ quotationItemData.categoryId ]
+						: getProductCategoryService().get( quotationItemData.categoryId );
+					if ( IsNull( product ) || IsNull( category ) ) {
+						result.success = false;
+						result.error   = 'Prodotto o Categoria Prodotto non trovata.';
+						return result;
+					}
+
+					var categoryCode = Trim( category.getCode() );
+					code &= categoryCode;
+					var note = "";
+
+					var line = StructKeyExists( lineMap, quotationItemData.lineId )
+						? lineMap[ quotationItemData.lineId ]
+						: getLineService().get( quotationItemData.lineId );
+					if ( IsNull( line ) ) {
+						result.success = false;
+						result.error   = "Linea prodotto non trovata.";
+						return result;
+					}
+					var lineCode = Trim( line.getCode() );
+					code &= lineCode;
+
+					var model = StructKeyExists( modelMap, quotationItemData.modelId )
+						? modelMap[ quotationItemData.modelId ]
+						: getModelService().get( quotationItemData.modelId );
+					if ( IsNull( model ) ) {
+						result.success = false;
+						result.error   = "Modello prodotto non trovato.";
+						return result;
+					}
+					code &= Trim( model.getCode() );
+
+					var finish = StructKeyExists( finishMap, quotationItemData.finishId )
+						? finishMap[ quotationItemData.finishId ]
+						: getFinishService().get( quotationItemData.finishId );
+					if ( IsNull( finish ) ) {
+						result.success = false;
+						result.error   = "Finitura prodotto non trovata.";
+						return result;
+					}
+					var finishCode = Trim( finish.getCode() );
+					code &= finishCode;
+
+					var description = product.getDescription().left( 35 );
+
+					var arKey           = code;
+					var colCode         = "000000";
+					var varCode         = "";
+					var noteSegnaletica = '';
+
+					// Segnaletica: recupera SignageConfigItem e SignageConfig dalle mappe batch
+					if ( StructKeyExists( quotationItemData, "signageRows" ) ) {
+						var signageConfigItem = StructKeyExists( signConfigItemMap, quotationItemData.signageConfigItemId )
+							? signConfigItemMap[ quotationItemData.signageConfigItemId ]
+							: getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
+						var fontSize     = signageConfigItem.getSize().getName();
+						var signageConfigId = signageConfigItem.getSignageConfigId();
+						var signageConfig = StructKeyExists( signConfigMap, signageConfigId )
+							? signConfigMap[ signageConfigId ]
+							: getSignageConfigService().get( signageConfigId );
+						var fontCode     = signageConfig.getFont().getCode();
+						var fontName     = signageConfig.getFont().getName();
+						note &= "Font: " & fontName & "; Font Size: " & fontSize & "; ";
+						varCode = right( "00000" & fontCode, 5 ) & right( "00000" & fontSize, 5 );
+						var signageRowsCounter = 1;
+						for ( var signageRow in quotationItemData.signageRows ) {
+							noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow[ 'text-align' ] & ': Testo: "' & signageRow.content & '"";';
+							signageRowsCounter++;
+						}
+					}
+
+					var productItemIds     = [];
+					var productItems       = [];
+					var importantAttributes = product.getImportantAttributes();
+					for ( var quotationItemProductItem in quotationItemData.productItems ) {
+						var productItem = StructKeyExists( productItemMap, quotationItemProductItem.productItemId )
+							? productItemMap[ quotationItemProductItem.productItemId ]
+							: getProductItemService().get( quotationItemProductItem.productItemId );
+						if ( !IsNull( productItem ) ) {
+							var attributeValue = productItem.getAttributeValue();
+							// attributeService.get() è mantenuto come chiamata individuale:
+							// l'attributeId proviene dal ProductItem già caricato, non è pre-raccoglibile.
+							var attribute = attributeService.get( attributeId = attributeValue.getAttributeId() );
+
+							if ( IsNull( attribute ) ) {
+								result.success = false;
+								result.error   = 'Attributo Prodotto non trovato.';
+								return result;
+							}
+							var rawValue = attributeValue.getRawValue();
+
+							var isImportant = false;
+							if ( !IsNull( importantAttributes ) ) {
+								isImportant = importantAttributes.some( function( item ){
+									return item.getId() == attribute.getId();
+								} );
+							}
+
+							if ( isImportant ) {
+								var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+								if ( varCode.len() + slotCode.len() > 10 ) {
 									result.success = false;
-									result.error = 'Attributo Prodotto non trovato.';
+									result.error = 'Il codice variante supera i 10 caratteri: attributo "'
+										& Trim( attribute.getCode() )
+										& '" (valore "'
+										& Trim( rawValue.getCode() )
+										& '") non entra nel codice variante (già '
+										& varCode.len()
+										& ' su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
 									return result;
 								}
-								var rawValue = attributeValue.getRawValue();
-								// cerco negli important attributes del prodotto l'attributo su cui sto ciclando.
-								// se lo trovo lo imposto come importante, a patto che non ne siano gia stati trovati 2 (len 10)
 
-								var isImportant = false;
-								if (!isNull(importantAttributes)) {
-									isImportant = importantAttributes.some(function(item) {
-										return item.getId() == attribute.getId();
-									});
-								}
+								varCode &= slotCode;
+								arrayAppend( productItems, {
+									"important"   = true,
+									"rawValueId"  = rawValue.getId(),
+									"attributeId" = attributeValue.getAttributeId()
+								} );
+							} else {
+								arrayAppend( productItems, {
+									"important"   = false,
+									"rawValueId"  = rawValue.getId(),
+									"attributeId" = attributeValue.getAttributeId()
+								} );
+							}
+							arrayAppend( productItemIds, productItem.getId() );
+						}
 
-								if (isImportant) {
-									var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-									if ( varCode.len() + slotCode.len() > 10 ) {
+						note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+					}
+
+					var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
+					varCode &= RepeatString( "0", 10 - Len( varCode ) );
+
+					// Placca: recupera i fruit product e i productItem dalle mappe batch
+					var fruitsComponents     = [];
+					var fruitsProductItems   = {};
+					var fruitsProductItemIds = {};
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
+						var orientation = quotationItem.getFrame().getOrientation().getName();
+						note &= "Orientamento: " & orientation & ";";
+
+						var fruits = quotationItemData.fruits;
+						if ( Len( fruits ) ) {
+							note &= " Frutti: ";
+						}
+						var fruitsIndex = 1;
+						for ( var fruit in fruits ) {
+							var fruitBean = StructKeyExists( fruitProductMap, fruit.product )
+								? fruitProductMap[ fruit.product ]
+								: getProductService().get( fruit.product );
+							note &= " " & fruitBean.getCode();
+							var fruitItems = fruit.productItems;
+							fruitsProductItems[ fruitsIndex ]     = [];
+							fruitsProductItemIds[ fruitsIndex ]   = [];
+							if ( Len( fruitItems ) ) {
+								note &= ": ";
+								for ( var fruitItem in fruitItems ) {
+									var fruitItemBean = StructKeyExists( productItemMap, fruitItem.productItemId )
+										? productItemMap[ fruitItem.productItemId ]
+										: getProductItemService().get( fruitItem.productItemId );
+									var attributeValue = fruitItemBean.getAttributeValue();
+									var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
+
+									if ( IsNull( attribute ) ) {
 										result.success = false;
-										result.error = 'Il codice variante supera i 10 caratteri: attributo "#attribute.getCode()#" (valore "#rawValue.getCode()#") non entra nel codice variante (già #varCode.len()# su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
+										result.error   = 'Attributo Frutto non trovato.';
 										return result;
 									}
-									varCode &= slotCode;
-									arrayAppend(productItems, {
-										"important"   = true,
-										"rawValueId"  = rawValue.getId(),
-										"attributeId" = attributeValue.getAttributeId()
-									} );
-								} else {
-									arrayAppend(productItems, {
+									var rawValue = attributeValue.getRawValue();
+									arrayAppend( fruitsProductItems[ fruitsIndex ], {
 										"important"   = false,
 										"rawValueId"  = rawValue.getId(),
 										"attributeId" = attributeValue.getAttributeId()
 									} );
-								}
-								arrayAppend(productItemIds, productItem.getId())
-							}
-
-							note &= attribute.getName() & ": " & rawValue.getName() & "; ";
-						}
-
-						var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
-						varCode &= RepeatString( "0", 10 - Len( varCode ) )
-
-						//se placca
-						if (StructKeyExists( quotationItemData, "fruits" ) ) {
-							var orientation = quotationItem.getFrame().getOrientation().getName()
-							note &= "Orientamento: " & orientation & ";";
-
-							var fruits = quotationItemData.fruits;
-							if (Len(fruits)) {
-								note &= " Frutti: "
-							}
-							fruitsIndex = 1;
-							var fruitsComponents = []
-							for ( var fruit in fruits ) {
-								var fruitBean = getProductService().get( fruit.product );
-								note &= " " & fruitBean.getCode()
-								var fruitItems = fruit.productItems;
-								if (Len(fruitItems)) {
-									note &= ": "
-									fruitsProductItems[fruitsIndex] = [];
-									fruitsProductItemIds[fruitsIndex] = [];
-									for ( var fruitItem in fruitItems ) {
-										var fruitItemBean = getProductItemService().get( fruitItem.productItemId );
-										var attributeValue = fruitItemBean.getAttributeValue();
-										var attribute      = attributeService.get( attributeId = attributeValue.getAttributeId() );
-
-										if ( IsNull( attribute ) ) {
-											result.success = false;
-											result.error = 'Attributo Frutto non trovato.';
-											return result;
-										}
-										var rawValue = attributeValue.getRawValue();
-										arrayAppend( fruitsProductItems[fruitsIndex], {
-											"important"   = false,
-											"rawValueId"  = rawValue.getId(),
-											"attributeId" = attributeValue.getAttributeId()
-										} );
-										arrayAppend( fruitsProductItemIds[fruitsIndex], fruitItemBean.getId() );
-										note &= attribute.getName() & ": " & rawValue.getName() & "; ";
-										if (fruitItem.note != "") {
-											note &= " Note: " & fruitItem.note & "; ";
-										}
+									arrayAppend( fruitsProductItemIds[ fruitsIndex ], fruitItemBean.getId() );
+									note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+									if ( fruitItem.note != "" ) {
+										note &= " Note: " & fruitItem.note & "; ";
 									}
-
 								}
-								//per ogni frutto recupero i componenti
-								arrayAppend(fruitsComponents, getComponents( fruit.product, quotationItem, fruitsProductItemIds[fruitsIndex] ));
-								fruitsIndex++;
 							}
+							arrayAppend( fruitsComponents, getComponents( fruit.product, quotationItem, fruitsProductItemIds[ fruitsIndex ] ) );
+							fruitsIndex++;
 						}
-
-						var exportCode = super.bean( "ExportCode" );
-						exportCode.setName( code & varCode );
-						exportCode.setProductHashId( productHash.getId() );
-						var maxCounter = exportCodeService.max( exportCode = code & varCode );
-						if (maxCounter > 0) {
-							var newMaxCounter = NumberFormat( maxCounter + 1, "000000" )
-							exportCode.setCounter( newMaxCounter );
-							colCode = newMaxCounter
-						} else {
-							exportCode.setCounter( "000001" );
-							colCode = "000001"
-						}
-						var exportCodeId = exportCodeService.create( "exportCode" = exportCode );
 					}
 
+					var exportCode = super.bean( "ExportCode" );
+					exportCode.setName( code & varCode );
+					exportCode.setProductHashId( productHash.getId() );
+					var maxCounter = exportCodeService.max( exportCode = code & varCode );
+					if ( maxCounter > 0 ) {
+						var newMaxCounter = NumberFormat( maxCounter + 1, "000000" );
+						exportCode.setCounter( newMaxCounter );
+						colCode = newMaxCounter;
+					} else {
+						exportCode.setCounter( "000001" );
+						colCode = "000001";
+					}
+					exportCodeService.create( "exportCode" = exportCode );
 
 					arKey = code & varCode & colCode;
 					var dataExport = {
@@ -544,13 +675,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						"ARDATCAR"  = Now(),
 						"ARUNMIS1"  = "PZ",
 						"VARCOD"    = varCode,
-						"VARNOT" = noteSegnaletica,
+						"VARNOT"    = noteSegnaletica,
 						"CLCODICE"  = colCode,
 						"CLANNOTA"  = note,
 						"ARIMG_64"  = base64File,
-						"ARSPECIA" = isSpeciale,
-						"ARCODNOM" = hsCode
-					}
+						"ARSPECIA"  = isSpeciale,
+						"ARCODNOM"  = hsCode
+					};
 
 					result.success = getDao().exportProduct( dataExport );
 					ArrayAppend( result.exportedItems, description );
@@ -561,46 +692,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						productComponent.DSCODART  = dataExport.ARCODART;
 						productComponent.DSCODVAR  = dataExport.VARCOD;
 						productComponent.DSCODCOL  = dataExport.CLCODICE;
-
-						ArrayAppend(allComponents, productComponent);
+						ArrayAppend( allComponents, productComponent );
 					}
 
-					if (StructKeyExists( quotationItemData, "fruits" ) ) {
+					if ( StructKeyExists( quotationItemData, "fruits" ) ) {
 						for ( var fruitComponents in fruitsComponents ) {
 							for ( var fruitComponent in fruitComponents ) {
 								fruitComponent.DS_CHIAVE = dataExport.AR_CHIAVE;
 								fruitComponent.DSCODART  = dataExport.ARCODART;
 								fruitComponent.DSCODVAR  = dataExport.VARCOD;
 								fruitComponent.DSCODCOL  = dataExport.CLCODICE;
-
-								ArrayAppend(allComponents, fruitComponent);
+								ArrayAppend( allComponents, fruitComponent );
 							}
 						}
 					}
 
 					var grouped = {};
-
-					for (var row in allComponents) {
+					for ( var row in allComponents ) {
 						var key = row.DSCODMAT & "|" & row.DSVARMAT & "|" & row.DSCOLMAT;
-						if ( !structKeyExists(grouped, key) ) {
-							grouped[key] = duplicate(row);
-							grouped[key].DSQTAMOV = val(row.DSQTAMOV);
+						if ( !structKeyExists( grouped, key ) ) {
+							grouped[ key ]             = duplicate( row );
+							grouped[ key ].DSQTAMOV    = val( row.DSQTAMOV );
 						} else {
-							grouped[key].DSQTAMOV += val(row.DSQTAMOV);
+							grouped[ key ].DSQTAMOV += val( row.DSQTAMOV );
 						}
 					}
 					var parsedComponents = [];
-
-					for (var key in grouped) {
-						arrayAppend(parsedComponents, grouped[key]);
+					for ( var key in grouped ) {
+						arrayAppend( parsedComponents, grouped[ key ] );
 					}
 
 					var counter = 0;
-					for (var row in parsedComponents) {
+					for ( var row in parsedComponents ) {
 						counter++;
 						row.CPROWNUM = counter;
 						row.CPROWORD = counter * 10;
-						row.DSDATCRE = DateFormat(now(), "yyyy-mm-dd");
+						row.DSDATCRE = DateFormat( now(), "yyyy-mm-dd" );
 						result.success = getDao().exportDiba( row );
 					}
 				}
@@ -803,10 +930,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return finalPrice / divisor;
 	}
 
-	public function getComponents(
+	public Array function getComponents(
 		required String productId,
 		required quotationItem,
-		Array productItemIds
+		Array productItemIds = []
 	){
 		var quantity      = quotationItem.getQuantity() ? quotationItem.getQuantity() : 1;
 		var allComponents = [];
@@ -827,34 +954,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			);
 
 			for ( var bundleComponent in bundleComponents ) {
-				ArrayAppend(allComponents, parseComponent( bundleComponent ));
+				ArrayAppend( allComponents, parseComponent( bundleComponent ) );
 			}
 
 			if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+				var signageConfigItemId = quotationItem.getSignageConfigItem().getId();
+
 				var signageComponents = componentSvc.list(
-					signageConfigItemId            = quotationItem.getSignageConfigItem().getId(),
+					signageConfigItemId            = signageConfigItemId,
 					includeBaseAttributeComponents = true
 				);
 
 				if ( productItemIds.len() > 0 ) {
-					for ( var productItemId in productItemIds ) {
-						var signageProductComponents = componentSvc.list(
-							signageItemProduct = {
-								signageConfigItemId = quotationItem.getSignageConfigItem().getId(),
-								productItemId       = productItemId
-							},
-
-							includeBaseAttributeComponents = true
-						);
-
-						for ( var signageProductComponent in signageProductComponents ) {
-							ArrayAppend(allComponents, parseComponent( signageProductComponent ));
-						}
+					var signageProductComps = componentSvc.listBySignageItemProductJoinIds(
+						signageConfigItemId = signageConfigItemId,
+						productItemIds      = productItemIds
+					);
+					for ( var spc in signageProductComps ) {
+						ArrayAppend( allComponents, parseComponent( spc ) );
 					}
 				}
 
 				for ( var signageComponent in signageComponents ) {
-					ArrayAppend(allComponents, parseComponent( signageComponent ));
+					ArrayAppend( allComponents, parseComponent( signageComponent ) );
 				}
 			}
 		}
@@ -862,17 +984,91 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productComponents = componentSvc.list( productId = product.getId(), includeBaseAttributeComponents = true );
 
 		for ( var productComponent in productComponents ) {
-			ArrayAppend(allComponents, parseComponent( productComponent ));
+			ArrayAppend( allComponents, parseComponent( productComponent ) );
 		}
 
 		if ( productItemIds.len() > 0 ) {
-			for ( var productItemId in productItemIds ) {
-				var productItemComponents = componentSvc.list(
-					productItemId                  = productItemId,
-					includeBaseAttributeComponents = true
-				);
-				for ( var productItemComponent in productItemComponents ) {
-					ArrayAppend(allComponents, parseComponent( productItemComponent ));
+			// Own components: batch con listByProductItemIds()
+			var ownComponents = componentSvc.listByProductItemIds( productItemIds );
+			for ( var oc in ownComponents ) {
+				ArrayAppend( allComponents, parseComponent( oc ) );
+			}
+
+			// Base attribute components: corrisponde a includeBaseAttributeComponents=true
+			// dell'originale searchByProductItemId() in ComponentService
+			var compDao = componentSvc.getDao();
+			var piMap   = getProductItemService().getMany( productItemIds );
+			var attrValueIds = [];
+
+			for ( var pid in productItemIds ) {
+				if ( StructKeyExists( piMap, pid ) ) {
+					var piBean  = piMap[ pid ];
+					var attrVal = piBean.getAttributeValue();
+					if ( !IsNull( attrVal ) && Len( attrVal.getId() ) ) {
+						ArrayAppend( attrValueIds, attrVal.getId() );
+					}
+				}
+			}
+
+			if ( ArrayLen( attrValueIds ) ) {
+				var attrRecords = compDao.readByAttributeValueIds( attrValueIds );
+
+				// Raggruppa i componenti per attribute_raw_value_id
+				var attrValueToCompIds = {};
+				for ( var ar in attrRecords ) {
+					if ( !StructKeyExists( attrValueToCompIds, ar.attribute_raw_value_id ) ) {
+						attrValueToCompIds[ ar.attribute_raw_value_id ] = [];
+					}
+					ArrayAppend( attrValueToCompIds[ ar.attribute_raw_value_id ], ar.component_id );
+				}
+
+				// Raccoglie tutti i component ID e carica i bean con getMany()
+				var allAttrCompIds = [];
+				for ( var avid in attrValueToCompIds ) {
+					for ( var cid in attrValueToCompIds[ avid ] ) {
+						ArrayAppend( allAttrCompIds, cid );
+					}
+				}
+
+				if ( ArrayLen( allAttrCompIds ) ) {
+					var attrBeanMap = componentSvc.getMany( allAttrCompIds );
+
+					for ( var pid in productItemIds ) {
+						if ( !StructKeyExists( piMap, pid ) ) {
+							continue;
+						}
+						var piBean  = piMap[ pid ];
+						var attrVal = piBean.getAttributeValue();
+						if ( IsNull( attrVal ) || !Len( attrVal.getId() ) ) {
+							continue;
+						}
+						// Recupera solo i componenti dell'attributo di QUESTO specifico productItemId
+						var myAttrCompIds = StructKeyExists( attrValueToCompIds, attrVal.getId() )
+							? attrValueToCompIds[ attrVal.getId() ]
+							: [];
+
+						for ( var acid in myAttrCompIds ) {
+							if ( !StructKeyExists( attrBeanMap, acid ) ) {
+								continue;
+							}
+							var attrComp = attrBeanMap[ acid ];
+
+							// Costruisce wrapper ComponentProductItem con type "base",
+							// replicando la logica di searchByProductItemId() in ComponentService
+							var baseBean = super.bean( "ComponentProductItem" );
+							baseBean.setRawMemento( attrComp.getRawMemento() );
+							baseBean.setProductItem( piBean );
+							baseBean.setTypeId( "base" );
+
+							var overrideSvc = componentSvc.getComponentOverrideService();
+							var override    = overrideSvc.list( piBean.getId(), attrComp.getId() );
+							if ( ArrayLen( override ) ) {
+								baseBean.setOverride( override[ 1 ] );
+							}
+
+							ArrayAppend( allComponents, parseComponent( baseBean ) );
+						}
+					}
 				}
 			}
 		}
@@ -1011,9 +1207,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		quotationService.update( originalQuotation );
 
-		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
-
 		return clonedQuotationId;
 	}
 
@@ -1032,20 +1225,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
 		}
 
-		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotation.getId() );
+		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
+		quotationService.update( originalQuotation );
 
 		return clonedQuotationId;
 	}
 
 	public Void function markAsSent( required String quotationId ){
 		getDao().markAsSent( arguments.quotationId );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationId );
 	}
 
 	public String function createRevision( required com.apirone.core.model.bean.Quotation quotation ){
 		var originalQuotation = arguments.quotation;
-		var clonedQuotation = Duplicate( originalQuotation );
+		var clonedQuotation   = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
 		clonedQuotation.setActive( 1 );
 		clonedQuotation.setSentToClient( false );
@@ -1058,16 +1250,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId );
 		}
 
-		super.getCacheManager().remove( getCacheScope(), clonedQuotationId );
-		super.getCacheManager().remove( getCacheScope(), originalQuotation.getId() );
-
 		return clonedQuotationId;
-	}
-
-	public Void function removeCache( required String quotationId ){
-
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationId );
-
 	}
 
 	/*
@@ -1100,115 +1283,285 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	}
 
-	private com.apirone.core.model.bean.Quotation function build( required String quotationId ){
-		var record = getDao().read( arguments.quotationId );
+	/**
+	 * Recupera in batch più Quotation dato un array di ID.
+	 * Restituisce uno Struct chiave = quotationId, valore = bean Quotation.
+	 * precarica User e QuotationStatusHistory in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di quotationId
+	 * @return Struct mappato per quotationId -> Quotation
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-		if ( record.recordCount ) {
+		// Raccoglie tutti gli user_id (owner, salesAgent, graphicTechnician)
+		var allUserIds = [];
+		for ( var r in records ) {
+			if ( !IsNull( r.owner_id ) ) {
+				allUserIds.append( r.owner_id );
+			}
+			if ( !IsNull( r.sales_agent_account_id ) ) {
+				allUserIds.append( r.sales_agent_account_id );
+			}
+			if ( !IsNull( r.graphic_technician_account_id ) ) {
+				allUserIds.append( r.graphic_technician_account_id );
+			}
+		}
+
+		// Precarica gli User in batch (1 query per tutti e 3 i ruoli)
+		var userMap = {};
+		if ( ArrayLen( allUserIds ) ) {
+			userMap = getUserService().getMany( allUserIds );
+		}
+
+		// Raccoglie i quotation_status_history_id
+		var statusHistoryIds = [];
+		for ( var r in records ) {
+			if ( !IsNull( r.quotation_status_history_id ) ) {
+				statusHistoryIds.append( r.quotation_status_history_id );
+			}
+		}
+
+		// Precarica i QuotationStatusHistory in batch (1 query)
+		var statusHistoryMap = {};
+		if ( ArrayLen( statusHistoryIds ) ) {
+			statusHistoryMap = getQuotationStatusHistoryService().getMany( statusHistoryIds );
+		}
+
+		// Precarica i totali calcolati in batch (1 query invece di N)
+		var quotationIds = [];
+		for ( var r in records ) {
+			quotationIds.append( r.quotation_id );
+		}
+		var totalMap = getDao().getQuotationTotals( quotationIds );
+
+		// Costruisce i bean Quotation con le mappe pre-caricate
+		for ( var r in records ) {
 			var bean = super.bean( "Quotation" );
 
-			var calculatedAmount = 0;
+			// Campi diretti dal record
+			bean.setId( r.quotation_id.toString() );
+			bean.setSerial( r.serial );
+			bean.setName( r.quotation );
+			bean.setQuotationNumber( r.quotation_number );
+			bean.setVersionNumber( r.version_number );
+			bean.setQuotationDate( r.quotation_date );
+			bean.setCreatedAt( r.created_at );
+			bean.setNote( r.note );
+			bean.setValidityDate( r.validity_date );
+			bean.setExported( r.exported );
+			bean.setActive( r.active );
 
-			bean.setId( record.quotation_id.toString() );
-			bean.setSerial( record.serial );
-			bean.setName( record.quotation );
-			bean.setQuotationNumber( record.quotation_number );
-			bean.setVersionNumber( record.version_number );
-			bean.setQuotationDate( record.quotation_date );
-			bean.setCreatedAt( record.created_at );
-			bean.setNote( record.note );
-			bean.setValidityDate( record.validity_date );
-			bean.setExported( record.exported );
-			bean.setActive( record.active );
-			bean.setLang( getLangService().get( record.lang_id ) );
-			bean.setCurrency( getCurrencyService().get( record.currency_id ) );
-			bean.setOwner( getUserService().get( record.owner_id.toString() ) );
-			bean.setPaymentMethod( getPaymentMethodService().get( record.payment_method_id ) );
+			// Lang, Currency, PaymentMethod: chiamate individuali (cache interna)
+			bean.setLang( getLangService().get( r.lang_id ) );
+			bean.setCurrency( getCurrencyService().get( r.currency_id ) );
+			bean.setPaymentMethod( getPaymentMethodService().get( r.payment_method_id ) );
 
-			bean.setNessunAgente( record.nessun_agente );
-			if ( !IsNull( record.agente1 ) && Len( record.agente1 ) ) bean.setAgente1( record.agente1.toString() );
-			if ( !IsNull( record.agente2 ) && Len( record.agente2 ) ) bean.setAgente2( record.agente2.toString() );
-			if ( !IsNull( record.agente3 ) && Len( record.agente3 ) ) bean.setAgente3( record.agente3.toString() );
-			if ( !IsNull( record.agente4 ) && Len( record.agente4 ) ) bean.setAgente4( record.agente4.toString() );
-			if ( !IsNull( record.agente5 ) && Len( record.agente5 ) ) bean.setAgente5( record.agente5.toString() );
-			if ( !IsNull( record.commission1 ) ) bean.setCommission1( record.commission1 );
-			if ( !IsNull( record.commission2 ) ) bean.setCommission2( record.commission2 );
-			if ( !IsNull( record.commission3 ) ) bean.setCommission3( record.commission3 );
-			if ( !IsNull( record.commission4 ) ) bean.setCommission4( record.commission4 );
-			if ( !IsNull( record.commission5 ) ) bean.setCommission5( record.commission5 );
-			if ( Len( record.referente_amministrativo ) ) bean.setReferenteAmministrativo( record.referente_amministrativo );
-			if ( Len( record.referente_spedizione ) ) bean.setReferenteSpedizione( record.referente_spedizione );
-			if ( Len( record.customer_type ) ) bean.setCustomerType( record.customer_type );
-			if ( Len( record.industry ) ) bean.setIndustry( record.industry );
-			if ( Len( record.rif_libero ) ) bean.setRifLibero( record.rif_libero );
-			if ( IsDate( record.data_evasione ) ) bean.setDataEvasione( record.data_evasione );
-			if ( !IsNull( record.sent_to_client ) ) bean.setSentToClient( record.sent_to_client );
-			if ( !IsNull( record.data_conferma_ordine ) && IsDate( record.data_conferma_ordine ) ) bean.setDataConfermaOrdine( record.data_conferma_ordine );
-			if ( Len( record.codice_sdi ) ) bean.setCodiceSdi( record.codice_sdi );
+			// Owner, SalesAgent, GraphicTechnician: dalla mappa batch
+			if ( !IsNull( r.owner_id ) && StructKeyExists( userMap, r.owner_id ) ) {
+				bean.setOwner( userMap[ r.owner_id ] );
+			} else if ( !IsNull( r.owner_id ) ) {
+				bean.setOwner( getUserService().get( r.owner_id.toString() ) );
+			}
 
-			//by a trigger from history
-			//bean.setStatus( getStatusService().get( record.status_id ) );
-			bean.setStatusHistory( getQuotationStatusHistoryService().get( record.quotation_status_history_id ) );
+			if ( !IsNull( r.sales_agent_account_id ) && StructKeyExists( userMap, r.sales_agent_account_id ) ) {
+				bean.setSalesAgent( userMap[ r.sales_agent_account_id ] );
+			} else if ( !IsNull( r.sales_agent_account_id ) ) {
+				bean.setSalesAgent( getUserService().get( r.sales_agent_account_id.toString() ) );
+			}
 
-			if ( !IsNull( record.customer_id ) ) {
+			if ( !IsNull( r.graphic_technician_account_id ) && StructKeyExists( userMap, r.graphic_technician_account_id ) ) {
+				bean.setGraphicTechnician( userMap[ r.graphic_technician_account_id ] );
+			} else if ( !IsNull( r.graphic_technician_account_id ) ) {
+				bean.setGraphicTechnician( getUserService().get( r.graphic_technician_account_id.toString() ) );
+			}
 
-				var customer = getCustomerService().get( record.customer_id );
+			// StatusHistory: dalla mappa batch
+			if ( !IsNull( r.quotation_status_history_id ) && StructKeyExists( statusHistoryMap, r.quotation_status_history_id ) ) {
+				bean.setStatusHistory( statusHistoryMap[ r.quotation_status_history_id ] );
+			}
+
+			// Agenti e commissioni (campi diretti)
+			bean.setNessunAgente( r.nessun_agente );
+			if ( !IsNull( r.agente1 ) && Len( r.agente1 ) ) bean.setAgente1( r.agente1.toString() );
+			if ( !IsNull( r.agente2 ) && Len( r.agente2 ) ) bean.setAgente2( r.agente2.toString() );
+			if ( !IsNull( r.agente3 ) && Len( r.agente3 ) ) bean.setAgente3( r.agente3.toString() );
+			if ( !IsNull( r.agente4 ) && Len( r.agente4 ) ) bean.setAgente4( r.agente4.toString() );
+			if ( !IsNull( r.agente5 ) && Len( r.agente5 ) ) bean.setAgente5( r.agente5.toString() );
+			if ( !IsNull( r.commission1 ) ) bean.setCommission1( r.commission1 );
+			if ( !IsNull( r.commission2 ) ) bean.setCommission2( r.commission2 );
+			if ( !IsNull( r.commission3 ) ) bean.setCommission3( r.commission3 );
+			if ( !IsNull( r.commission4 ) ) bean.setCommission4( r.commission4 );
+			if ( !IsNull( r.commission5 ) ) bean.setCommission5( r.commission5 );
+			if ( Len( r.referente_amministrativo ) ) bean.setReferenteAmministrativo( r.referente_amministrativo );
+			if ( Len( r.referente_spedizione ) ) bean.setReferenteSpedizione( r.referente_spedizione );
+			if ( Len( r.customer_type ) ) bean.setCustomerType( r.customer_type );
+			if ( Len( r.industry ) ) bean.setIndustry( r.industry );
+			if ( Len( r.rif_libero ) ) bean.setRifLibero( r.rif_libero );
+			if ( IsDate( r.data_evasione ) ) bean.setDataEvasione( r.data_evasione );
+			if ( !IsNull( r.sent_to_client ) ) bean.setSentToClient( r.sent_to_client );
+			if ( !IsNull( r.data_conferma_ordine ) && IsDate( r.data_conferma_ordine ) ) bean.setDataConfermaOrdine( r.data_conferma_ordine );
+			if ( Len( r.codice_sdi ) ) bean.setCodiceSdi( r.codice_sdi );
+
+			// Customer: chiamata individuale (CRM API, cache interna)
+			if ( !IsNull( r.customer_id ) ) {
+				var customer = getCustomerService().get( r.customer_id );
 				bean.setCustomer( customer );
 
-				// cerco l'indirizzo di spedizione tra gli indirizzi del customer
-				if ( !IsNull( record.shipping_profile_id ) ) {
-					for( var thisAddress in customer.getShippingProfiles() ) {
-						if ( thisAddress.getId() == record.shipping_profile_id ) {
+				if ( !IsNull( r.shipping_profile_id ) ) {
+					for ( var thisAddress in customer.getShippingProfiles() ) {
+						if ( thisAddress.getId() == r.shipping_profile_id ) {
 							bean.setShippingProfile( thisAddress );
 							break;
 						}
 					}
 				}
-
 			}
 
-			/*
-			var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = record.quotation_id, statusId = record.status_id );
-
-			if ( quotationStatusHistories.len() > 0 && record.status_id == 'CCN' ) {
-				var statusFiles = getFileService().list( quotationStatusHistoryId = quotationStatusHistories[1].getId() );
-				if ( statusFiles.len() > 0 ) {
-					bean.setStatusFile( statusFiles[1] )
-				}
+			// Opportunity, Lead, VatCode: chiamate individuali (CRM/verticale, cache interna)
+			if ( !IsNull( r.opportunity_id ) ) {
+				bean.setOpportunity( getOpportunityService().get( r.opportunity_id.toString() ) );
 			}
-			*/
-
-			if ( !IsNull( record.opportunity_id ) ) {
-				bean.setOpportunity( getOpportunityService().get( record.opportunity_id.toString() ) );
+			if ( !IsNull( r.lead_id ) ) {
+				bean.setLead( getLeadService().get( r.lead_id ) );
+			}
+			if ( !IsNull( r.vat_code_id ) ) {
+				bean.setVatCode( getVatCodeService().get( r.vat_code_id ) );
 			}
 
-			if ( !IsNull( record.lead_id ) ) {
-				bean.setLead( getLeadService().get( record.lead_id ) );
-			}
-
-			if ( !IsNull( record.vat_code_id ) ) {
-				bean.setVatCode( getVatCodeService().get( record.vat_code_id ) );
-			}
-
-			if ( !IsNull( record.sales_agent_account_id ) ) {
-				bean.setSalesAgent( getUserService().get( record.sales_agent_account_id.toString() ) );
-			}
-
-			if ( !IsNull( record.graphic_technician_account_id ) ) {
-				bean.setGraphicTechnician( getUserService().get( record.graphic_technician_account_id.toString() ) );
-			}
-
+			// Totale calcolato: dalla mappa batch
 			bean.setCalculatedAmount(
-				getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+				StructKeyExists( totalMap, r.quotation_id ) ? totalMap[ r.quotation_id ] : 0
 			);
 
-			// bean.setPricelist( getPricelistService().get( record.pricelist_id ) );
-			// bean.setBillingProfile( getProfileService().get( record.billing_profile_id ) );
-			// bean.setgraphicTechnician( getAccountService().get( record.graphic_technician_account_id ) );
+			map[ r.quotation_id ] = bean;
+		}
 
-			return bean;
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean Quotation a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
+	 */
+	private com.apirone.core.model.bean.Quotation function build( required String quotationId ){
+		var record = getDao().read( arguments.quotationId );
+
+		if ( record.recordCount ) {
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Quotation a partire da una riga del query.
+	 * Le sub-entity (Lang, Currency, Owner, PaymentMethod, StatusHistory, Customer, ecc.) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Quotation function buildFromRow( required any record ){
+		var bean = super.bean( "Quotation" );
+
+		var calculatedAmount = 0;
+
+		// Campi diretti dal record
+		bean.setId( arguments.record.quotation_id.toString() );
+		bean.setSerial( arguments.record.serial );
+		bean.setName( arguments.record.quotation );
+		bean.setQuotationNumber( arguments.record.quotation_number );
+		bean.setVersionNumber( arguments.record.version_number );
+		bean.setQuotationDate( arguments.record.quotation_date );
+		bean.setCreatedAt( arguments.record.created_at );
+		bean.setNote( arguments.record.note );
+		bean.setValidityDate( arguments.record.validity_date );
+		bean.setExported( arguments.record.exported );
+		bean.setActive( arguments.record.active );
+		bean.setLang( getLangService().get( arguments.record.lang_id ) );
+		bean.setCurrency( getCurrencyService().get( arguments.record.currency_id ) );
+		bean.setOwner( getUserService().get( arguments.record.owner_id.toString() ) );
+		bean.setPaymentMethod( getPaymentMethodService().get( arguments.record.payment_method_id ) );
+
+		bean.setNessunAgente( arguments.record.nessun_agente );
+		if ( !IsNull( arguments.record.agente1 ) && Len( arguments.record.agente1 ) ) bean.setAgente1( arguments.record.agente1.toString() );
+		if ( !IsNull( arguments.record.agente2 ) && Len( arguments.record.agente2 ) ) bean.setAgente2( arguments.record.agente2.toString() );
+		if ( !IsNull( arguments.record.agente3 ) && Len( arguments.record.agente3 ) ) bean.setAgente3( arguments.record.agente3.toString() );
+		if ( !IsNull( arguments.record.agente4 ) && Len( arguments.record.agente4 ) ) bean.setAgente4( arguments.record.agente4.toString() );
+		if ( !IsNull( arguments.record.agente5 ) && Len( arguments.record.agente5 ) ) bean.setAgente5( arguments.record.agente5.toString() );
+		if ( !IsNull( arguments.record.commission1 ) ) bean.setCommission1( arguments.record.commission1 );
+		if ( !IsNull( arguments.record.commission2 ) ) bean.setCommission2( arguments.record.commission2 );
+		if ( !IsNull( arguments.record.commission3 ) ) bean.setCommission3( arguments.record.commission3 );
+		if ( !IsNull( arguments.record.commission4 ) ) bean.setCommission4( arguments.record.commission4 );
+		if ( !IsNull( arguments.record.commission5 ) ) bean.setCommission5( arguments.record.commission5 );
+		if ( Len( arguments.record.referente_amministrativo ) ) bean.setReferenteAmministrativo( arguments.record.referente_amministrativo );
+		if ( Len( arguments.record.referente_spedizione ) ) bean.setReferenteSpedizione( arguments.record.referente_spedizione );
+		if ( Len( arguments.record.customer_type ) ) bean.setCustomerType( arguments.record.customer_type );
+		if ( Len( arguments.record.industry ) ) bean.setIndustry( arguments.record.industry );
+		if ( Len( arguments.record.rif_libero ) ) bean.setRifLibero( arguments.record.rif_libero );
+		if ( IsDate( arguments.record.data_evasione ) ) bean.setDataEvasione( arguments.record.data_evasione );
+		if ( !IsNull( arguments.record.sent_to_client ) ) bean.setSentToClient( arguments.record.sent_to_client );
+		if ( !IsNull( arguments.record.data_conferma_ordine ) && IsDate( arguments.record.data_conferma_ordine ) ) bean.setDataConfermaOrdine( arguments.record.data_conferma_ordine );
+		if ( Len( arguments.record.codice_sdi ) ) bean.setCodiceSdi( arguments.record.codice_sdi );
+
+		//by a trigger from history
+		//bean.setStatus( getStatusService().get( arguments.record.status_id ) );
+		bean.setStatusHistory( getQuotationStatusHistoryService().get( arguments.record.quotation_status_history_id ) );
+
+		if ( !IsNull( arguments.record.customer_id ) ) {
+
+			var customer = getCustomerService().get( arguments.record.customer_id );
+			bean.setCustomer( customer );
+
+			// cerco l'indirizzo di spedizione tra gli indirizzi del customer
+			if ( !IsNull( arguments.record.shipping_profile_id ) ) {
+				for( var thisAddress in customer.getShippingProfiles() ) {
+					if ( thisAddress.getId() == arguments.record.shipping_profile_id ) {
+						bean.setShippingProfile( thisAddress );
+						break;
+					}
+				}
+			}
+
+		}
+
+		/*
+		var quotationStatusHistories = getQuotationStatusHistoryService().list( quotationId = arguments.record.quotation_id, statusId = arguments.record.status_id );
+
+		if ( quotationStatusHistories.len() > 0 && arguments.record.status_id == 'CCN' ) {
+			var statusFiles = getFileService().list( quotationStatusHistoryId = quotationStatusHistories[1].getId() );
+			if ( statusFiles.len() > 0 ) {
+				bean.setStatusFile( statusFiles[1] )
+			}
+		}
+		*/
+
+		if ( !IsNull( arguments.record.opportunity_id ) ) {
+			bean.setOpportunity( getOpportunityService().get( arguments.record.opportunity_id.toString() ) );
+		}
+
+		if ( !IsNull( arguments.record.lead_id ) ) {
+			bean.setLead( getLeadService().get( arguments.record.lead_id ) );
+		}
+
+		if ( !IsNull( arguments.record.vat_code_id ) ) {
+			bean.setVatCode( getVatCodeService().get( arguments.record.vat_code_id ) );
+		}
+
+		if ( !IsNull( arguments.record.sales_agent_account_id ) ) {
+			bean.setSalesAgent( getUserService().get( arguments.record.sales_agent_account_id.toString() ) );
+		}
+
+		if ( !IsNull( arguments.record.graphic_technician_account_id ) ) {
+			bean.setGraphicTechnician( getUserService().get( arguments.record.graphic_technician_account_id.toString() ) );
+		}
+
+		bean.setCalculatedAmount(
+			getDao().getQuotationTotal( argumentCollection = { quotationId = bean.getId() } )
+		);
+
+		// bean.setPricelist( getPricelistService().get( arguments.record.pricelist_id ) );
+		// bean.setBillingProfile( getProfileService().get( arguments.record.billing_profile_id ) );
+		// bean.setgraphicTechnician( getAccountService().get( arguments.record.graphic_technician_account_id ) );
+
+		return bean;
 	}
 
 }

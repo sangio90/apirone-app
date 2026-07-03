@@ -7,7 +7,7 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM companies
-			WHERE 
+			WHERE
 				company_id = <cfqueryparam cfsqltype="varchar" value="#arguments.companyId#">::uuid
 		</cfquery>
 
@@ -20,8 +20,8 @@
 		<cfargument name="limit" required="true" type="Numeric" default="0">
         <cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="company">
-		<cfargument name="str" type="String">    
-		<cfargument name="vat" type="String">    
+		<cfargument name="str" type="String">
+		<cfargument name="vat" type="String">
 
         <cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -30,7 +30,7 @@
 			FROM
 				companies
 			WHERE 1=1
-                
+
 				<cfif Len( trim( arguments.str ) )>
 					AND company ILIKE <cfqueryparam value="%#arguments.str#%" cfsqltype="Varchar">
 				</cfif>
@@ -38,13 +38,13 @@
 				<cfif !isNull( arguments.vat )>
 					AND vat = <cfqueryparam value="#arguments.vat#" cfsqltype="Varchar">
 				</cfif>
-			ORDER BY 
+			ORDER BY
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				LIMIT  
+				LIMIT
 					<cfqueryparam value="#arguments.limit#" cfsqltype="integer">
-				OFFSET 
+				OFFSET
 					<cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
@@ -81,7 +81,7 @@
 		</cfquery>
 
 		<cfreturn q.company_id.toString()>
-	
+
 	</cffunction>
 
 	<cffunction name="update" returntype="String">
@@ -89,8 +89,8 @@
 		<cfargument name="company" type="com.apirone.core.model.bean.Company" required="true">
 
 		<cfquery name="local.q" datasource="apirone">
-			UPDATE companies 
-			SET 
+			UPDATE companies
+			SET
 				company = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getName()#">,
 				types = <cfqueryparam cfsqltype="other" value="#serializeJSON(arguments.company.getTypesAsArray())#">,
 				vat = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getVat()#">,
@@ -98,12 +98,12 @@
 				phone = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getPhone()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getCode()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getStatus().getId()#">
-			WHERE 
+			WHERE
 				company_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.company.getId()#">::uuid
 		</cfquery>
 
 		<cfreturn arguments.company.getId()>
-	
+
 	</cffunction>
 
 	<cffunction name="delete" returntype="Boolean">
@@ -117,7 +117,25 @@
 		</cfquery>
 
 		<cfreturn true>
-	
+
 	</cffunction>
 
+	<!---
+		Recupera in batch più aziende dato un array di ID.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.ids)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM companies
+			WHERE company_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 </cfcomponent>

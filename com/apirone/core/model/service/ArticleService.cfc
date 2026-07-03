@@ -6,21 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="textService" inject="TextService";
 	property name="priceService" inject="PriceService";
 
-	property name="cacheScope" type="String" default="Article.bean";
-
 	public com.apirone.core.model.bean.Article function get( required String articleId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.articleId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.articleId );
-		cm.put( getCacheScope(), arguments.articleId, bean );
-
-		return bean;
+		return build( arguments.articleId );
 	}
 
 	public Array function list(){
@@ -41,17 +28,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.article_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( articleId = record.article_id ) );
+			rows.add( beanMap[ record.article_id ] );
 		} );
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
 		result.setTotal( Val( records.total ) );
-
-
 
 		return result;
 	}
@@ -74,7 +69,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			var entity = super.bean( "Entity" );
 			var price = arguments.article.getPrice();
-			
+
 			price.setEntity( entity.setKey( "article.id" ) );
 			price.setEntity( entity.setValue( newId ) );
 
@@ -114,19 +109,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var entity = super.bean( "Entity" );
 		var price = arguments.article.getPrice();
-		
+
 		price.setEntity( entity.setKey( "article.id" ) );
 		price.setEntity( entity.setValue( id ) );
 
-		savePrice( price );			
+		savePrice( price );
 
 		super.logEvent(
 			event   = "article.updated",
 			message = "Article [#arguments.article.getId()#] updated",
 			payload = { "id" = arguments.article.getId() }
 		);
-
-		super.getCacheManager().remove( getCacheScope(), arguments.article.getId() );
 
 		return arguments.article.getId();
 	}
@@ -156,8 +149,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.articleId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheScope(), arguments.articleId );
-
 				// super.logAction( type = "article.DELETED", message = "Article [#arguments.articleId#] deleted" );
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -176,15 +167,70 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	public Void function removeCache( required String articleId ){
-		var cm = super.getCacheManager();
-
-		cm.remove( getCacheScope(), arguments.articleId );
-	}
-
 	/*
     	private method
 	*/
+	/**
+	 * Recupera in batch più Article dato un array di ID.
+	 * Restituisce uno Struct chiave = articleId, valore = bean Article.
+	 * Precarica testi e prezzi in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di articleId
+	 * @return Struct mappato per articleId -> Article
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+
+		// Precarica i testi in batch per tutti gli articoli (1 query invece di N)
+		var textMap = getTextService().listByEntityIds( "article.id", arguments.ids );
+
+		// Precarica i prezzi in batch per tutti gli articoli
+		var priceMap = {};
+		if ( ArrayLen( arguments.ids ) ) {
+			var priceQuery = getPriceService().getDao().findByArticleIds( articleIds = arguments.ids );
+			for ( var pr in priceQuery ) {
+				if ( !StructKeyExists( priceMap, pr.article_id ) ) {
+					priceMap[ pr.article_id ] = [];
+				}
+				ArrayAppend( priceMap[ pr.article_id ], getPriceService().buildFromRow( pr ) );
+			}
+		}
+
+		// Cache locale per status
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Article" );
+
+			// Campi diretti dal record
+			bean.setId( record.article_id );
+			bean.setCode( record.code );
+			bean.setExternalId( record.external_id );
+			bean.setCreatedAt( record.created_at );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// Testi: dalla mappa pre-caricata
+			if ( StructKeyExists( textMap, record.article_id ) ) {
+				bean.setTexts( textMap[ record.article_id ] );
+			}
+			bean.setName( bean.getName() );
+
+			// Prezzi: dalla mappa pre-caricata
+			if ( StructKeyExists( priceMap, record.article_id ) && ArrayLen( priceMap[ record.article_id ] ) ) {
+				bean.setPrice( priceMap[ record.article_id ][ 1 ] );
+			}
+
+			map[ record.article_id ] = bean;
+		}
+
+		return map;
+	}
 
 	public Numeric  function savePrice( required com.apirone.core.model.bean.Price price ){
 
@@ -193,7 +239,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		price.setType( type.setId( "SERVICE_PRICE" ) );
 		price.setMethod( method.setId( "F" ) );
-		
+
 		if ( !Len( price.getId() ) ) {
 			var thisId = getPriceService().create( price );
 		} else {
@@ -207,27 +253,35 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( arguments.articleId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "Article" );
-
-			bean.setTexts( getTextService().list( articleId = record.article_id ) );
-
-			bean.setName( bean.getName() );
-			
-			bean.setId( record.article_id );
-			bean.setCode( record.code );
-			bean.setExternalId( record.external_id );
-
-			var prices = getPriceService().list( articleId = record.article_id );
-			bean.setPrice( prices.len() ? prices[1] : NullValue() );
-			
-			bean.setCreatedAt( record.created_at );
-			
-			bean.setStatus( getStatusService().get( record.status_id ) );
-
-			return bean;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Article a partire da una riga della query.
+	 * Le sub-entity (Texts, Price, Status) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Article function buildFromRow( required any record ){
+		var bean = super.bean( "Article" );
+
+		// Testi e nome (setName va chiamato dopo setTexts)
+		bean.setTexts( getTextService().list( articleId = arguments.record.article_id ) );
+		bean.setName( bean.getName() );
+
+		// Campi diretti dal record
+		bean.setId( arguments.record.article_id );
+		bean.setCode( arguments.record.code );
+		bean.setExternalId( arguments.record.external_id );
+		bean.setCreatedAt( arguments.record.created_at );
+
+		// Sub-entity (caricate singolarmente)
+		var prices = getPriceService().list( articleId = arguments.record.article_id );
+		bean.setPrice( prices.len() ? prices[ 1 ] : NullValue() );
+		bean.setStatus( getStatusService().get( arguments.record.status_id ) );
+
+		return bean;
 	}
 
 }

@@ -13,6 +13,20 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più QuotationItemPrice dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfreturn super.$readByIdsInteger(
+			table   = "quotation_item_prices",
+			pkColumn = "quotation_item_price_id",
+			ids     = arguments.ids
+		)>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="quotationItemId" type="String" required="false">
 		<cfargument name="productId" type="String" required="false">
@@ -126,6 +140,26 @@
 
 		<cfreturn true>	
 	
+	</cffunction>
+
+	<!---
+		Recupera in batch i prezzi collegati a più quotation_item_id.
+		Utilizzato da QuotationItemService.getMany() per evitare N+1.
+	--->
+	<cffunction name="readByQuotationItemIds" returntype="Query" access="public">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM quotation_item_prices
+			WHERE quotation_item_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
 	</cffunction>
 
 </cfcomponent>

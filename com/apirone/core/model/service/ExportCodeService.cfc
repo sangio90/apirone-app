@@ -2,21 +2,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="ExportCodeDAO";
 
-	property name="cacheScope" type="String" default="ExportCode.bean";
-
 	public com.apirone.core.model.bean.ExportCode function get( required Numeric exportCodeId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.exportCodeId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.exportCodeId );
-		cm.put( getCacheScope(), arguments.exportCodeId, bean );
-
-		return bean;
+		return build( arguments.exportCodeId );
 	}
 
 	public Numeric function max(
@@ -43,10 +30,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( exportCodeId = record.export_code_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -62,15 +50,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj = get( arguments.exportCodeId );
 
 		outcome.setData( { exportCodeId = arguments.exportCodeId } );
-		getDao().delete( arguments.exportCodeId );
 
 		transaction {
 			try {
-				var cm = getCacheManager();
-
 				getDao().delete( arguments.exportCodeId );
-
-				cm.remove( getCacheScope(), arguments.exportCodeId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -88,25 +71,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.ExportCode exportCode ){
 		getDao().update( arguments.exportCode );
-		super.getCacheManager().remove( getCacheScope(), arguments.exportCode.getId() );
 
 		return arguments.exportCode.getId();
 	}
 
+	/**
+	 * Costruisce un bean ExportCode a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.ExportCode function build( required Numeric exportCodeId ){
 		var record = getDao().read( arguments.exportCodeId );
 
 		if ( record.recordCount ) {
-			var bean = super.bean( "ExportCode" );
-			bean.setId( record.export_code_id );
-			bean.setName( record.export_code );
-			bean.setCounter( record.counter );
-			bean.setProductHashId( record.product_hash_id );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean ExportCode a partire da una riga della query, senza chiamata DB aggiuntiva.
+	 */
+	private com.apirone.core.model.bean.ExportCode function buildFromFindRow( required any record ){
+		var bean = super.bean( "ExportCode" );
+
+		// Campi diretti dal record (ExportCode non ha sub-entity)
+		bean.setId( record.export_code_id );
+		bean.setName( record.export_code );
+		bean.setCounter( record.counter );
+		bean.setProductHashId( record.product_hash_id );
+
+		return bean;
 	}
 
 }

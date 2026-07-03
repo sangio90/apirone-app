@@ -4,28 +4,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="geoService" inject="GeoService";
 
 	public com.apirone.core.model.bean.Location function get( required String locationId ){
-		var cm = getCacheManager();
-
-		var key = getCacheKey( arguments.locationId );
-
-		var cache = cm.get( key );
-
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var location = build( arguments.locationId );
-		cm.put( key, location );
-		return location;
+		return build( arguments.locationId );
 	}
 
 	public String function update( required com.apirone.core.model.bean.Location location ){
-		var id = getDao().update( location = arguments.location );
-
-		getCacheManager().remove( getCachekey( id ) );
-
-		return id;
+		return getDao().update( location = arguments.location );
 	}
 
 	public String function create(
@@ -50,10 +33,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i bean in blocco con getMany()
+		var ids = [];
+		records.each( function( r ){
+			ids.append( r.location_id );
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( get( locationId = record.location_id ) );
+			rows.add( beanMap[ record.location_id ] );
 		} );
 
 		result.setData( rows );
@@ -61,6 +54,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Recupera in batch più Location dato un array di ID.
+	 * Restituisce uno Struct chiave = locationId, valore = bean Location.
+	 * Precarica le città (GeoService) in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di locationId
+	 * @return Struct mappato per locationId -> Location
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
+		var cities  = {};
+
+		for ( var record in records ) {
+			var location = super.bean( "Location" );
+
+			// Campi diretti dal record
+			location.setId( record.location_id.toString() );
+			location.setAddress( record.address );
+			location.setPostalCode( record.postal_code );
+
+			// Città: cached localmente (GeoService)
+			if ( !StructKeyExists( cities, record.city_id ) ) {
+				cities[ record.city_id ] = getGeoService().getCity( cityId = record.city_id );
+			}
+			location.setCity( cities[ record.city_id ] );
+
+			map[ location.getId() ] = location;
+		}
+
+		return map;
 	}
 
 
@@ -71,21 +97,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var record = getDao().read( locationId = arguments.locationId );
 
 		if ( record.RecordCount ) {
-			var location = super.bean( "Location" );
-			location.setId( record.location_id.toString() );
-			location.setAddress( record.address );
-			location.setPostalCode( record.postal_code );
-
-			location.setCity( getGeoService().getCity( cityId = record.city_id ) );
-
-			return location;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
 	}
 
-	private String function getCacheKey( required String id ){
-		Throw( "Use cache manager and scope" );
+	/**
+	 * Costruisce un bean Location a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 */
+	private com.apirone.core.model.bean.Location function buildFromRow( required any row ){
+		var location = super.bean( "Location" );
+
+		// Campi diretti dal record
+		location.setId( arguments.row.location_id.toString() );
+		location.setAddress( arguments.row.address );
+		location.setPostalCode( arguments.row.postal_code );
+
+		// Entity collegata (GeoService, caricata singolarmente)
+		location.setCity( getGeoService().getCity( cityId = arguments.row.city_id ) );
+
+		return location;
 	}
 
 }

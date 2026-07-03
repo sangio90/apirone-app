@@ -2,22 +2,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="CompanyTypeDAO";
 
-	property name="cacheScope" type="String" default="CompanyType.bean";
-
 	public com.apirone.core.model.bean.CompanyType function get( required String companyTypeId ){
-		var cm = super.getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.companyTypeId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var obj = build( arguments.companyTypeId );
-
-		cm.put( getCacheScope(), arguments.companyTypeId, obj );
-
-		return obj;
+		return build( arguments.companyTypeId );
 	}
 
 	public com.apirone.core.model.bean.Result function search(
@@ -32,14 +18,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids = [];
 		for ( var record in records ) {
-			rows.add( get( categoryId = record.product_category_id ) );
+			ids.append( record.company_type_id );
+		}
+
+		var beanMap = {};
+		if ( ArrayLen( ids ) ) {
+			var allRecords = getDao().readByIds( ids );
+
+			allRecords.each( function( r ){
+				beanMap[ r.company_type_id ] = buildFromRow( r );
+			} );
+		}
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		for ( var record in records ) {
+			rows.add( beanMap[ record.company_type_id ] );
 		}
 
 		result.setTotal( records.total );
-		result.setCount( records.RecordCount() );
+		result.setCount( Val( records.recordcount ) );
 		result.setData( rows );
 
 		return result;
@@ -54,23 +57,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return search( argumentCollection = arguments );
 	}
 
-	/*
-    	private method
-	*/
-
+	/**
+	 * Costruisce un bean CompanyType a partire dall'ID. Delega a buildFromRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.CompanyType function build( required String companyTypeId ){
 		var record = getDao().read( arguments.companyTypeId );
 
 		if ( record.RecordCount ) {
-			var obj = super.bean( "CompanyType" );
-
-			obj.setId( record.company_type_id );
-			obj.setName( record.company_type );
-
-			return obj;
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean CompanyType a partire da una riga del query.
+	 */
+	private com.apirone.core.model.bean.CompanyType function buildFromRow( required any record ){
+		var obj = super.bean( "CompanyType" );
+
+		// Campi diretti dal record (CompanyType non ha sub-entity)
+		obj.setId( arguments.record.company_type_id );
+		obj.setName( arguments.record.company_type );
+
+		return obj;
 	}
 
 }

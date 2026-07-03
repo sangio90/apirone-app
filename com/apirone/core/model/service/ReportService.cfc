@@ -4,21 +4,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="lookupService" inject="LookupService";
 
-	property name="cacheScope" type="String" default="Report.bean";
-
 	public com.apirone.core.model.bean.Report function get( required String reportId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.reportId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.reportId );
-		cm.put( getCacheScope(), arguments.reportId, bean );
-
-		return bean;
+		return build( arguments.reportId );
 	}
 
 	public String function create( required com.apirone.core.model.bean.Report report ){
@@ -29,8 +16,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public Boolean function delete( required String reportId ){
 		var result = getDao().delete( arguments.reportId );
-
-		getCacheManager().remove( getCacheScope(), arguments.reportId );
 
 		return result;
 	}
@@ -43,10 +28,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Il search() del DAO ora restituisce tutte le colonne: si possono usare gli ID per getMany()
 		var records = getDao().search( argumentCollection = arguments );
 
+		// Raccoglie gli ID e carica i bean in blocco con getMany()
+		var ids = [];
 		for ( var record in records ) {
-			rows.add( get( reportId = record.report_id ) )
+			ids.add( record.report_id );
+		}
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Itera i record originali per preservare l'ordinamento
+		for ( var record in records ) {
+			rows.add( beanMap[ record.report_id ] );
 		}
 
 		result.setData( rows );
@@ -57,25 +52,70 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
+	 * Recupera in batch più Report dato un array di ID.
+	 * Restituisce uno Struct chiave = reportId, valore = bean Report.
+	 * Precarica lo Status in batch locale per evitare il problema N+1.
+	 *
+	 * @ids Array di reportId
+	 * @return Struct mappato per reportId -> Report
+	 */
+	public Struct function getMany( required Array ids ){
+		var records  = getDao().readByIds( ids = arguments.ids );
+		var map      = {};
+		var statuses = {};
+
+		for ( var record in records ) {
+			var bean = super.bean( "Report" );
+
+			// Campi diretti dal record
+			bean.setId( record.report_id );
+			bean.setName( record.report );
+			bean.setExampleData( record.example_data );
+			bean.setExampleFile( record.example_file );
+			bean.setFileName( record.file_name );
+
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			map[ bean.getId() ] = bean;
+		}
+
+		return map;
+	}
+
+	/**
 	 * @private
 	 */
 	private com.apirone.core.model.bean.Report function build( required String reportId ){
 		var record = getDao().read( reportId = arguments.reportId );
 
 		if ( record.RecordCount ) {
-			var bean = super.bean( "Report" );
-
-			bean.setId( record.report_id );
-			bean.setName( record.report );
-			bean.setExampleData( record.example_data );
-			bean.setExampleFile( record.example_file );
-			bean.setFileName( record.file_name );
-			bean.setStatus( getStatusService().get( record.status_id ) );
-
-			return bean;
+			return buildFromSearchRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Report a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.Report function buildFromSearchRow( required any record ){
+		var bean = super.bean( "Report" );
+
+		// Campi diretti dal record
+		bean.setId( record.report_id );
+		bean.setName( record.report );
+		bean.setExampleData( record.example_data );
+		bean.setExampleFile( record.example_file );
+		bean.setFileName( record.file_name );
+
+		// Entity collegata (Status è un lookup leggero)
+		bean.setStatus( getStatusService().get( record.status_id ) );
+
+		return bean;
 	}
 
 }

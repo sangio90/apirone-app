@@ -20,6 +20,10 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				pictogram_dimension_id,
+				width,
+				height,
+				pictogram_id,
+				font_family_size_id,
 				COUNT(pictogram_id) OVER() AS total
 			FROM
 				pictogram_dimensions

@@ -13,6 +13,45 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM
+				frame_cells
+			WHERE
+				frame_cell_id IN (
+					<cfqueryparam value="#ArrayToList( arguments.ids )#" list="true" cfsqltype="integer">
+				)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i FrameCell per una lista di frameId.
+	--->
+	<cffunction name="readByFrameIds" returntype="Query" access="public">
+		<cfargument name="frameIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.frameIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT frame_id::varchar, *
+			FROM frame_cells
+			WHERE frame_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="frameId" type="String">
 

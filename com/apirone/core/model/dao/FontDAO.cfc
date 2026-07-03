@@ -41,6 +41,11 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				font_id::varchar,
+				code,
+				directory,
+				height_width_ratio,
+				font_family_id,
+				created_at,
 				COUNT(font_id) OVER() AS total
 			FROM
 				fonts
@@ -60,6 +65,26 @@
 				OFFSET
 					<cfqueryparam cfsqltype="integer" value="#arguments.offset#">
 			</cfif>
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM fonts
+			WHERE font_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
 		</cfquery>
 
 		<cfreturn local.q>

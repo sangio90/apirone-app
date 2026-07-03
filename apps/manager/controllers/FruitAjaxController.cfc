@@ -187,7 +187,7 @@
 		<!--- TODO: better than this --->
 		<cfquery datasource="apirone">
 			DELETE FROM product_items
-			WHERE fruit_id IN ( #rc.items# )
+			WHERE fruit_id IN ( <cfqueryparam value="#rc.items#" list="true" cfsqltype="integer"> )
 		</cfquery>
 		```
 

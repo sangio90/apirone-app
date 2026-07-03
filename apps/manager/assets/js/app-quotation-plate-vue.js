@@ -2479,6 +2479,7 @@ AP.plate.modal = ( function() {
      * @param {Function} [onSave] - Callback opzionale da eseguire dopo il salvataggio.
      */
     pub.new = async function( onSave ) {
+        AP.loading.show();
         NM.util.openModal( AP.plate.fields.modalRoot );
 
         await mountVue();
@@ -2554,6 +2555,7 @@ AP.plate.modal = ( function() {
         window.vm.fruitSearchTerm = "";
 
         plateResponse = null;
+        AP.loading.hide();
     };
 
     /**

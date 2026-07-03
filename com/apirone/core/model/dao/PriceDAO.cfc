@@ -11,6 +11,26 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query" access="public">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE price_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="productId" type="String">
@@ -119,4 +139,66 @@
 
 		<cfreturn true>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i prezzi collegati a una lista di productId.
+		Utilizzato da PriceService.listByProductIds() per pre-caricare prezzi in blocco.
+	--->
+	<cffunction name="findByProductIds" returntype="Query" access="public">
+		<cfargument name="productIds" type="Array" required="true">
+
+		<!--- Converte l'array di ID in lista per la clausola IN --->
+		<cfset var idsList = ArrayToList(arguments.productIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE product_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch tutti i prezzi collegati a una lista di articleId.
+		Utilizzato da ArticleService.getMany() per evitare QueryExecute con list:true.
+	--->
+	<cffunction name="findByArticleIds" returntype="Query" access="public">
+		<cfargument name="articleIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.articleIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE article_id = ANY(
+				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch tutti i prezzi collegati a una lista di productItemId.
+		Utilizzato da ProductItemService.getMany() per evitare N+1 query.
+	--->
+	<cffunction name="findByProductItemIds" returntype="Query" access="public">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList(arguments.productItemIds)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT *
+			FROM prices
+			WHERE product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

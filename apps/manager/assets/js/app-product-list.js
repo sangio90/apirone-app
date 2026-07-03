@@ -89,7 +89,7 @@ AP.product.list = ( function() {
             this.get('lines').data([]);
             let allLines = this.get("allLines");
             const category = this.get('category')
-            if (!category || !category.id) {
+            if ( !category || !category.id ) {
                 this.get('lines').data(allLines);
             } else {
                 // line.categories può essere null per le linee senza categorie associate

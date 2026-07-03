@@ -4,22 +4,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="statusService" inject="StatusService";
 	property name="langService" inject="LangService";
 
-	property name="cacheScope" type="String" default="FileType.bean";
-
 	public com.apirone.core.model.bean.FileType function get( required String fileTypeId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.fileTypeId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.fileTypeId );
-
-		cm.put( getCacheScope(), arguments.fileTypeId, bean );
-
-		return bean;
+		return build( arguments.fileTypeId );
 	}
 
 	/*

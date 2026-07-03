@@ -26,6 +26,18 @@
 			SELECT
 				profile_id::varchar,
 				country_id::varchar,
+				type,
+				first_name,
+				last_name,
+				company,
+				vat_number,
+				email,
+				phone,
+				state,
+				city,
+				postal_code,
+				street,
+				created_at,
 				COUNT( profile_id ) OVER() AS total
 			FROM profiles
 			WHERE 1=1

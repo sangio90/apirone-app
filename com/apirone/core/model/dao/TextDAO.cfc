@@ -18,6 +18,31 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più record dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				text_id,
+				product_id::varchar,
+				finish_id::varchar,
+				attribute_id::varchar,
+				font_id::varchar,
+				country_id::varchar,
+				*
+			FROM texts
+			WHERE text_id IN ( <cfqueryparam value="#idsList#" list="true" cfsqltype="numeric"> )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String">
 		<cfargument name="statusId" type="String">
@@ -25,7 +50,7 @@
 
 		<cfargument name="lineId" type="String">
 		<cfargument name="attributeId" type="String">
-		<cfargument name="attributeValueId" type="String">
+		<cfargument name="attributeValueId" type="Numeric">
 		<cfargument name="rawValueId" type="Numeric">
 		<cfargument name="productCategoryId" type="Numeric">
 		<cfargument name="modelId" type="String">
@@ -201,11 +226,42 @@
 						<cfqueryparam cfsqltype="#field.type#" value="#arguments.text.getEntity().getValue()#">
 					</cfif>
 				--->
-
 			WHERE
 				text_id = <cfqueryparam cfsqltype="Integer" value="#arguments.text.getId()#">
 		</cfquery>
 
 		<cfreturn arguments.text.getId()>
 	</cffunction>
+
+	<!---
+		Recupera in batch tutti i testi collegati a una lista di valori entità.
+		Utilizzato da TextService.listByEntityIds() per pre-caricare testi in blocco.
+		La colonna su cui filtrare è risolta dinamicamente tramite getDBField(entityKey).
+	--->
+	<cffunction name="findByEntityIds" returntype="Query" access="public">
+		<cfargument name="entityKey" type="String" required="true">
+		<cfargument name="entityValues" type="Array" required="true">
+
+		<!--- Risolve dinamicamente la colonna DB tramite getDBField(entityKey) --->
+		<cfset var field   = super.getDBField(arguments.entityKey)>
+		<cfset var idsList = ArrayToList(arguments.entityValues)>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				text_id,
+				product_id::varchar,
+				finish_id::varchar,
+				attribute_id::varchar,
+				font_id::varchar,
+				country_id::varchar,
+				*
+			FROM texts
+			WHERE #field.name#::varchar IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 </cfcomponent>

@@ -2,20 +2,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemSignageRowDAO";
 	property name="QuotationItemService" inject="QuotationItemService";
-	property name="cacheScope" type="String" default="QuotationItemSignageRow.bean";
 
 	public com.apirone.core.model.bean.QuotationItemSignageRow function get( required String quotationItemSignageRowId ){
-		var cm    = getCacheManager();
-		var cache = cm.get( getCacheScope(), arguments.quotationItemSignageRowId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.quotationItemSignageRowId );
-		cm.put( getCacheScope(), arguments.quotationItemSignageRowId, bean );
-
-		return bean;
+		return build( arguments.quotationItemSignageRowId );
 	}
 
 	public Array function list(){
@@ -33,10 +22,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var rows    = [];
 		var result  = super.getResult();
+
+		// Il find() ora restituisce tutte le colonne: si possono costruire i bean direttamente
 		var records = getDao().find( argumentCollection = arguments );
 
 		records.each( function( record ){
-			rows.add( get( quotationItemSignageRowId = record.quotation_item_signage_row_id ) );
+			rows.add( buildFromFindRow( record ) );
 		} );
 
 		result.setData( rows );
@@ -51,12 +42,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var obj     = get( arguments.quotationItemSignageRowId );
 
 		outcome.setData( { quotationItemSignageRowId = arguments.quotationItemSignageRowId } );
-		getDao().delete( arguments.quotationItemSignageRowId );
 
 		transaction {
 			try {
 				getDao().delete( arguments.quotationItemSignageRowId );
-				removeCache(obj)
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -67,17 +56,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
-	private Void function removeCache( required com.apirone.core.model.bean.QuotationItemSignageRow quotationItemSignageRow ){
-		var cm = super.getCacheManager();
-		cm.remove( getCacheScope(), arguments.quotationItemSignageRow.getId() );
-
-		if ( !Len( arguments.quotationItemSignageRow.getQuotationItemId() ) ) {
-			Throw( type = "apirone.error.QuotationItemSignageRow.InvalidSaveType", message = "Missing Quotation Item ID" );
-			return;
-		}
-		cm.remove( "QuotationItem.bean", arguments.quotationItemSignageRow.getQuotationItemId() );
-	}
-
 	public String function create( required com.apirone.core.model.bean.QuotationItemSignageRow quotationItemSignageRow ){
 		var newId = getDao().insert( arguments.quotationItemSignageRow );
 
@@ -86,25 +64,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItemSignageRow quotationItemSignageRow ){
 		getDao().update( arguments.quotationItemSignageRow );
-		super.getCacheManager().remove( getCacheScope(), arguments.quotationItemSignageRow.getId() );
 
 		return arguments.quotationItemSignageRow.getId();
 	}
 
+	/**
+	 * Costruisce un bean QuotationItemSignageRow a partire dall'ID. Delega a buildFromFindRow() dopo la lettura del record.
+	 */
 	private com.apirone.core.model.bean.QuotationItemSignageRow function build( required String quotationItemSignageRowId ){
 		var record = getDao().read( arguments.quotationItemSignageRowId );
 		if ( record.recordCount ) {
-			var bean = super.bean( "QuotationItemSignageRow" );
-			bean.setId( record.quotation_item_signage_row_id );
-			bean.setTextAlign( record.text_align );
-			bean.setContent( record.content );
-			bean.setCharCount( record.char_count );
-			bean.setOrderBy( record.orderby );
-			bean.setQuotationItemId( record.quotation_item_id );
-
-			return bean;
+			return buildFromFindRow( record );
 		}
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean QuotationItemSignageRow a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.QuotationItemSignageRow function buildFromFindRow( required any record ){
+		var bean = super.bean( "QuotationItemSignageRow" );
+
+		// Campi diretti dal record (QuotationItemSignageRow non ha sub-entity)
+		bean.setId( record.quotation_item_signage_row_id );
+		bean.setTextAlign( record.text_align );
+		bean.setContent( record.content );
+		bean.setCharCount( record.char_count );
+		bean.setOrderBy( record.orderby );
+		bean.setQuotationItemId( record.quotation_item_id );
+
+		return bean;
 	}
 
 }

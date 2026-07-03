@@ -6,21 +6,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="frameCellService" inject="FrameCellService";
 	property name="frameBlockService" inject="FrameBlockService";
 
-	property name="cacheScope" type="String" default="Frame.bean";
-
 	public com.apirone.core.model.bean.Frame function get( required String frameId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.frameId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.frameId );
-		cm.put( getCacheScope(), arguments.frameId, bean );
-
-		return bean;
+		return build( arguments.frameId );
 	}
 
 	public Array function list(){
@@ -42,10 +29,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( frameId = record.Frame_id ) );
+		// Raccoglie tutti gli ID e carica i record in blocco con una sola query
+		var ids     = [];
+		records.each( function( r ){
+			ids.append( r.frame_id ); // frame_id già castato a varchar dal find()
+		} );
+
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Ricostruisce le righe nell'ordine del find() originale
+		records.each( function( r ){
+			rows.add( beanMap[ r.frame_id ] );
 		} );
 
 		result.setData( rows );
@@ -57,7 +54,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function create( required com.apirone.core.model.bean.Frame frame ){
 
-		var newId = getDao().insert( arguments.Frame );
+		var newId = getDao().insert( arguments.frame );
 
 		if( ( !IsNull( arguments.frame.getCells() ) ) ) {
 
@@ -110,9 +107,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.Frame.getId() );
-
-		return arguments.Frame.getId();
+		return arguments.frame.getId();
 	}
 
 	public Any function getByCode( required String code ){
@@ -155,8 +150,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var result = getDao().delete( arguments.frameId );
 				outcome.setData( { "deletedCount" = result } )
 
-				getCacheManager().remove( getCacheScope(), arguments.frameId );
-
 				// super.logAction( type = "frame.DELETED", message = "frame [#arguments.frameId#] deleted" );
 			} catch ( any error ) {
 				outcome.setError( error );
@@ -174,28 +167,146 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
-	private com.apirone.core.model.bean.Frame function build( required String frameId ){
-		var record = getDao().read( arguments.frameId );
+	/**
+	 * Recupera in batch più Frame dato un array di ID.
+	 * Restituisce uno Struct chiave = frameId, valore = bean Frame.
+	 * Precarica FrameCell, orientation/cellOrientation e status in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di frameId
+	 * @return Struct mappato per frameId -> Frame
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-		if ( record.recordCount ) {
-			var bean = super.bean( "frame" );
+		// Cache locali per orientation (LookupService è in-memory)
+		var orientations = {};
 
-			bean.setId( record.Frame_id );
+		// Cache locale per status
+		var statuses = {};
+
+		// Precarica i FrameCell in batch: raccoglie tutti i frame_id
+		var frameIds = arguments.ids;
+		var cellMap  = {};
+		if ( ArrayLen( frameIds ) ) {
+			var cellRecords = getFrameCellService().getDao().readByFrameIds( frameIds = frameIds );
+			for ( var cr in cellRecords ) {
+				var frameId = cr.frame_id;
+				if ( !StructKeyExists( cellMap, frameId ) ) {
+					cellMap[ frameId ] = [];
+				}
+				var cellBean = super.bean( "FrameCell" );
+				cellBean.setId( cr.frame_cell_id );
+				cellBean.setRow( cr.row );
+				cellBean.setCol( cr.col );
+				cellBean.setWidth( cr.width );
+				cellBean.setHeight( cr.height );
+				cellBean.setFrameId( cr.frame_id );
+				cellBean.setCreatedAt( cr.created_at );
+				cellBean.setType( getLookupService().get( "frameCellType", cr.type_id ) );
+				cellBean.setOrientation( getLookupService().get( "orientation", cr.orientation_id ) );
+				ArrayAppend( cellMap[ frameId ], cellBean );
+			}
+		}
+
+		// Precarica i FrameBlock in batch
+		var blockMap = {};
+		if ( ArrayLen( frameIds ) ) {
+			var blockRecords = getFrameBlockService().getDao().readByFrameIds( frameIds = frameIds );
+			for ( var br in blockRecords ) {
+				var frameId = br.frame_id;
+				if ( !StructKeyExists( blockMap, frameId ) ) {
+					blockMap[ frameId ] = [];
+				}
+				var blockBean = super.bean( "FrameBlock" );
+				blockBean.setId( br.frame_block_id );
+				blockBean.setOrder( br.order );
+				blockBean.setSlotCount( br.slot_count );
+				blockBean.setMarginTopMm( br.margin_top_mm );
+				blockBean.setMarginLeftMm( br.margin_left_mm );
+				blockBean.setOrientationMode( br.orientation_mode );
+				blockBean.setRotatable( br.rotatable );
+				blockBean.setFrameId( br.frame_id );
+				blockBean.setCreatedAt( br.created_at );
+				ArrayAppend( blockMap[ frameId ], blockBean );
+			}
+		}
+
+		for ( var record in records ) {
+			var bean = super.bean( "Frame" );
+
+			// Campi diretti dal record
+			bean.setId( record.frame_id );
 			bean.setName( record.frame );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
 
-			bean.setOrientation( getLookupservice().get( "orientation",  record.orientation_id ) );
-			bean.setCellOrientation( getLookupservice().get( "orientation",  record.cell_orientation_id )  );
-			bean.setStatus( getStatusService().get( record.status_id ) );
+			// Orientation: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( orientations, record.orientation_id ) ) {
+				orientations[ record.orientation_id ] = getLookupService().get( "orientation", record.orientation_id );
+			}
+			bean.setOrientation( orientations[ record.orientation_id ] );
 
-			bean.setCells( getFrameCellService().list( record.frame_id ) );
-			bean.setBlocks( getFrameBlockService().list( record.frame_id ) );
+			// CellOrientation: LookupService in-memory, cached localmente
+			if ( !StructKeyExists( orientations, record.cell_orientation_id ) ) {
+				orientations[ record.cell_orientation_id ] = getLookupService().get( "orientation", record.cell_orientation_id );
+			}
+			bean.setCellOrientation( orientations[ record.cell_orientation_id ] );
 
-			return bean;
+			// Status: cached localmente
+			if ( !StructKeyExists( statuses, record.status_id ) ) {
+				statuses[ record.status_id ] = getStatusService().get( record.status_id );
+			}
+			bean.setStatus( statuses[ record.status_id ] );
+
+			// FrameCell: dalla mappa pre-caricata
+			if ( StructKeyExists( cellMap, record.frame_id ) && ArrayLen( cellMap[ record.frame_id ] ) ) {
+				bean.setCells( cellMap[ record.frame_id ] );
+			}
+
+			// FrameBlock: dalla mappa pre-caricata
+			if ( StructKeyExists( blockMap, record.frame_id ) && ArrayLen( blockMap[ record.frame_id ] ) ) {
+				bean.setBlocks( blockMap[ record.frame_id ] );
+			}
+
+			map[ record.frame_id ] = bean;
+		}
+
+		return map;
+	}
+
+	private com.apirone.core.model.bean.Frame function build( required String frameId ){
+		var record = getDao().read( arguments.frameId );
+
+		if ( record.recordCount ) {
+			return buildFromRow( record );
 		}
 
 		return NullValue();
+	}
+
+	/**
+	 * Costruisce un bean Frame a partire da una riga della query.
+	 * Utilizzato sia da build() (record singolo) che da search() (iterazione batch).
+	 * Le sub-entity (orientation, cellOrientation, status, cells) sono caricate con chiamate individuali.
+	 */
+	private com.apirone.core.model.bean.Frame function buildFromRow( required any record ){
+		var bean = super.bean( "Frame" );
+
+		// Campi diretti dal record
+		bean.setId( record.frame_id );
+		bean.setName( record.frame );
+		bean.setCode( record.code );
+		bean.setCreatedAt( record.created_at );
+
+		// Entity collegate (caricate singolarmente)
+		bean.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
+		bean.setCellOrientation( getLookupService().get( "orientation", record.cell_orientation_id ) );
+		bean.setStatus( getStatusService().get( record.status_id ) );
+
+		bean.setCells( getFrameCellService().list( record.frame_id ) );
+
+		return bean;
 	}
 
 }

@@ -4,31 +4,32 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lineService" inject="lineService";
 	property name="productCategoryService" inject="productCategoryService";
 
-	property name="cacheScope" type="String" default="ProductCategoryLine.bean";
-
 	public com.apirone.core.model.bean.ProductCategoryLine function get( required String ProductCategoryLineId ){
-		var cm = getCacheManager();
-
-		var cache = cm.get( getCacheScope(), arguments.ProductCategoryLineId );
-
-		if ( cache.status ) {
-			return cache.data;
-		}
-
-		var bean = build( arguments.ProductCategoryLineId );
-		cm.put(
-			getCacheScope(),
-			arguments.ProductCategoryLineId,
-			bean
-		);
-
-		return bean;
+		return build( arguments.ProductCategoryLineId );
 	}
 
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 
 		return search( argumentCollection = arguments ).getData();
+	}
+
+	/**
+	 * Recupera in batch tutte le ProductCategoryLine per una categoria.
+	 * Evita l'N+1 di list() chiamato in un loop per ogni lineId.
+	 *
+	 * @categoryId ID della categoria prodotto
+	 * @return Array di bean ProductCategoryLine
+	 */
+	public Array function listByCategoryId( required Numeric categoryId ){
+		var records = getDao().findByCategoryId( arguments.categoryId );
+		var rows    = [];
+
+		for ( var record in records ) {
+			rows.add( buildFromRow( record ) );
+		}
+
+		return rows;
 	}
 
 
@@ -46,9 +47,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 
-		records.each( function( record ){
-			rows.add( get( productCategoryLineId = record.product_category_line_id ) );
-		} );
+		// Raccoglie gli ID restituiti dalla find per un caricamento batch
+		var ids = [];
+		for ( var record in records ) {
+			ids.add( record.product_category_line_id );
+		}
+
+		// Costruisce tutti i bean in batch con getMany() ottimizzato (evita N+1)
+		var beanMap = ArrayLen( ids ) ? getMany( ids ) : {};
+
+		// Itera i record originali per preservare l'ordinamento della find
+		for ( var record in records ) {
+			rows.add( beanMap[ record.product_category_line_id ] );
+		}
 
 		result.setData( rows );
 		result.setCount( Val( records.recordcount ) );
@@ -66,15 +77,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var newId = getDao().insert( arguments.productCategoryLine );
 		}
 
-		super.getCacheManager().remove( getCacheScope(), arguments.productCategoryLine.getId() );
-
 		return newId;
 	}
 
 	public String function update( required com.apirone.core.model.bean.ProductCategoryLine productCategoryLine ){
 		getDao().update( arguments.productCategoryLine );
-
-		super.getCacheManager().remove( getCacheScope(), arguments.productCategoryLine.getId() );
 
 		return arguments.productCategoryLine.getId();
 	}
@@ -88,8 +95,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var result = getDao().delete( arguments.productCategoryLineId );
 				outcome.setData( { "deletedCount" = result } )
-
-				getCacheManager().remove( getCacheScope(), arguments.productCategoryLineId );
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
@@ -102,24 +107,86 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
-	/*
-    	private method
-	*/
+	/**
+	 * Recupera in batch più ProductCategoryLine dato un array di ID.
+	 * Restituisce uno Struct chiave = productCategoryLineId, valore = bean ProductCategoryLine.
+	 * Precarica linee e categorie in batch per evitare il problema N+1.
+	 *
+	 * @ids Array di productCategoryLineId
+	 * @return Struct mappato per productCategoryLineId -> ProductCategoryLine
+	 */
+	public Struct function getMany( required Array ids ){
+		var records = getDao().readByIds( ids = arguments.ids );
+		var map     = {};
 
-	private com.apirone.core.model.bean.ProductCategoryLine function build( required String productCategoryLineId ){
-		var record = getDao().read( arguments.productCategoryLineId );
+		// Raccoglie gli ID unici di linee e categorie da tutti i record
+		var lineIds     = [];
+		var categoryIds = [];
+		for ( var record in records ) {
+			if ( !IsNull( record.line_id ) ) {
+				lineIds.append( record.line_id );
+			}
+			if ( !IsNull( record.product_category_id ) ) {
+				categoryIds.append( record.product_category_id );
+			}
+		}
 
-		if ( record.recordCount ) {
+		// Precarica le linee in batch tramite LineService.getMany()
+		var lineMap = {};
+		if ( ArrayLen( lineIds ) ) {
+			lineMap = getLineService().getMany( lineIds );
+		}
+
+		// Precarica le categorie in batch tramite ProductCategoryService.getMany()
+		var categoryMap = {};
+		if ( ArrayLen( categoryIds ) ) {
+			categoryMap = getProductCategoryService().getMany( categoryIds );
+		}
+
+		for ( var record in records ) {
 			var bean = super.bean( "ProductCategoryLine" );
 
 			bean.setId( record.product_category_line_id );
 			bean.setCreatedAt( record.created_at );
 			bean.setMarkup( record.markup );
 
-			bean.setLine( getLineService().get( record.line_id ) );
-			bean.setProductCategory( getProductCategoryService().get( record.product_category_id ) );
+			// Line: dalla mappa pre-caricata
+			if ( StructKeyExists( lineMap, record.line_id ) ) {
+				bean.setLine( lineMap[ record.line_id ] );
+			}
 
-			return bean;
+			// ProductCategory: dalla mappa pre-caricata
+			if ( StructKeyExists( categoryMap, record.product_category_id ) ) {
+				bean.setProductCategory( categoryMap[ record.product_category_id ] );
+			}
+
+			map[ record.product_category_line_id ] = bean;
+		}
+
+		return map;
+	}
+
+	/**
+	 * Costruisce un bean ProductCategoryLine a partire da una riga della query.
+	 */
+	private com.apirone.core.model.bean.ProductCategoryLine function buildFromRow( required any record ){
+		var bean = super.bean( "ProductCategoryLine" );
+
+		bean.setId( record.product_category_line_id );
+		bean.setCreatedAt( record.created_at );
+		bean.setMarkup( record.markup );
+		// Entity collegate (Line e ProductCategory sono lookup leggeri)
+		bean.setLine( getLineService().get( record.line_id ) );
+		bean.setProductCategory( getProductCategoryService().get( record.product_category_id ) );
+
+		return bean;
+	}
+
+	private com.apirone.core.model.bean.ProductCategoryLine function build( required String productCategoryLineId ){
+		var record = getDao().read( arguments.productCategoryLineId );
+
+		if ( record.recordCount ) {
+			return buildFromRow( record );
 		}
 
 		return NullValue();
