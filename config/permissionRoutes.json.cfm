@@ -7,8 +7,8 @@
         required: []
     },
 
-    "LineController.*": { 
-        "roles": ["ADM"],
+    "LineController.*": {
+        "roles": ["ADM", "CMS"],
     },
 
 }
