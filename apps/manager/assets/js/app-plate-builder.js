@@ -40,6 +40,8 @@ AP.plateBuilder = ( function() {
             name: "",
             status: { id: "ACT" },
             orientation: { id: "HAV" },
+            marginRightMm: 0,
+            marginBottomMm: 0,
             blocks: [],
             legacy: false,
         };
@@ -68,9 +70,11 @@ AP.plateBuilder = ( function() {
      * @param {Array} blocks - blocchi del form ({slotCount, marginTopMm, marginLeftMm, orientationMode})
      * @param {string} frameOrientationId - orientamento della placca (HAV/HOR/VER)
      * @param {string} requestedOrientationId - orientamento da visualizzare (HOR/VER)
+     * @param {number} [marginRightMm=0] - margine finale destro della placca in mm
+     * @param {number} [marginBottomMm=0] - margine finale inferiore della placca in mm
      * @returns {{width: number, height: number, blocks: Array}}
      */
-    function computeLayout( blocks, frameOrientationId, requestedOrientationId ) {
+    function computeLayout( blocks, frameOrientationId, requestedOrientationId, marginRightMm, marginBottomMm ) {
         let requested = requestedOrientationId || ( frameOrientationId === "VER" ? "VER" : "HOR" );
         if ( frameOrientationId !== "HAV" ) {
             requested = frameOrientationId === "VER" ? "VER" : "HOR";
@@ -142,6 +146,9 @@ AP.plateBuilder = ( function() {
             } );
         }
 
+        plateWidth  += Number( marginRightMm )  || 0;
+        plateHeight += Number( marginBottomMm ) || 0;
+
         return { width: plateWidth, height: plateHeight, blocks: layoutBlocks };
     }
 
@@ -203,7 +210,9 @@ AP.plateBuilder = ( function() {
                 return computeLayout(
                     this.form.blocks,
                     this.form.orientation.id,
-                    this.previewOrientation
+                    this.previewOrientation,
+                    this.form.marginRightMm,
+                    this.form.marginBottomMm
                 );
             },
 
@@ -270,6 +279,8 @@ AP.plateBuilder = ( function() {
                             form.code = data.code;
                             form.name = data.name || "";
                             form.status = { id: data.status ? data.status.id : "ACT" };
+                            form.marginRightMm  = Number( data.marginRightMm )  || 0;
+                            form.marginBottomMm = Number( data.marginBottomMm ) || 0;
 
                             // l'orientamento della placca (HAV/HOR/VER): in risposta
                             // orientation è quello corrente, availableOrientations dice se è HAV
@@ -425,6 +436,8 @@ AP.plateBuilder = ( function() {
                     name: this.form.name,
                     status: { id: this.form.status.id },
                     orientation: { id: this.form.orientation.id },
+                    marginRightMm: this.form.marginRightMm || 0,
+                    marginBottomMm: this.form.marginBottomMm || 0,
                     blocks: this.form.blocks.map( ( block, index ) => {
                         return {
                             order: index,

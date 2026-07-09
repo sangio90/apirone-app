@@ -7,6 +7,8 @@
 	property name="status" type="com.apirone.core.model.bean.Status";
 	property name="cells" type="com.apirone.core.model.bean.FrameCell[]";
 	property name="blocks" type="com.apirone.core.model.bean.FrameBlock[]";
+	property name="marginRightMm" type="Numeric" default=0;
+	property name="marginBottomMm" type="Numeric" default=0;
 
 	public Frame function init(){
 		return this;

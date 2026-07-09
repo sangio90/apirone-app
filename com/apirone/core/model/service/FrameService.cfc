@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="lookupService" inject="LookupService";
 	property name="frameCellService" inject="FrameCellService";
 	property name="frameBlockService" inject="FrameBlockService";
+	property name="modelService" inject="ModelService";
 
 	public com.apirone.core.model.bean.Frame function get( required String frameId ){
 		return build( arguments.frameId );
@@ -72,6 +73,42 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getFrameBlockService().create( block );
 			}
 
+		}
+
+		// Auto-crea il modello corrispondente (type S, categoria Placche 22) se non esiste già
+		if ( !getModelService().codeExists( arguments.frame.getCode() ) ) {
+			try {
+				var totalSlots = 0;
+				if ( !IsNull( arguments.frame.getBlocks() ) ) {
+					for ( var b in arguments.frame.getBlocks() ) {
+						totalSlots += b.getSlotCount();
+					}
+				}
+
+				var model         = super.bean( "Model" );
+				var modelType     = super.bean( "ModelType" );
+				var modelStatus   = super.bean( "Status" );
+				var modelCategory = super.bean( "ProductCategory" );
+
+				var nameText = super.bean( "Text" );
+				nameText.setId( "" );
+				nameText.setName( arguments.frame.getCode() );
+				nameText.setLang( super.bean( "Lang" ).setId( "IT" ) );
+				nameText.setStatus( super.bean( "Status" ).setId( "TRA" ) );
+				nameText.setKind( super.bean( "TextKind" ).setId( "NAME" ) );
+
+				modelCategory.setId( 22 );
+				model.setCode( arguments.frame.getCode() );
+				model.setType( modelType.setId( "S" ) );
+				model.setStatus( modelStatus.setId( "ACT" ) );
+				model.setCategories( [ modelCategory ] );
+				model.setFruitsCount( totalSlots );
+				model.setTexts( [ nameText ] );
+
+				getModelService().create( model );
+			} catch ( any e ) {
+				// la creazione del modello è non bloccante: il frame è già salvato
+			}
 		}
 
 		return newId;
@@ -240,6 +277,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setName( record.frame );
 			bean.setCode( record.code );
 			bean.setCreatedAt( record.created_at );
+			if ( !IsNull( record.margin_right_mm ) )  bean.setMarginRightMm( record.margin_right_mm );
+			if ( !IsNull( record.margin_bottom_mm ) ) bean.setMarginBottomMm( record.margin_bottom_mm );
 
 			// Orientation: LookupService in-memory, cached localmente
 			if ( !StructKeyExists( orientations, record.orientation_id ) ) {
@@ -298,6 +337,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setName( record.frame );
 		bean.setCode( record.code );
 		bean.setCreatedAt( record.created_at );
+		if ( !IsNull( record.margin_right_mm ) )  bean.setMarginRightMm( record.margin_right_mm );
+		if ( !IsNull( record.margin_bottom_mm ) ) bean.setMarginBottomMm( record.margin_bottom_mm );
 
 		// Entity collegate (caricate singolarmente)
 		bean.setOrientation( getLookupService().get( "orientation", record.orientation_id ) );
@@ -305,6 +346,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setStatus( getStatusService().get( record.status_id ) );
 
 		bean.setCells( getFrameCellService().list( record.frame_id ) );
+		bean.setBlocks( getFrameBlockService().list( frameId = record.frame_id ) );
 
 		return bean;
 	}

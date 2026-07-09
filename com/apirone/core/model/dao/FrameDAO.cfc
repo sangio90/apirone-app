@@ -114,14 +114,18 @@
 				frame,
 				status_id,
 				orientation_id,
-				cell_orientation_id
+				cell_orientation_id,
+				margin_right_mm,
+				margin_bottom_mm
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="varchar" value="#arguments.frame.getCode()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getName()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getOrientation().getId()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">,
+				<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.frame.getMarginRightMm()#">,
+				<cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.frame.getMarginBottomMm()#">
 			) RETURNING frame_id
 		</cfquery>
 
@@ -139,7 +143,9 @@
 				frame = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getName()#">,
 				code = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCode()#">,
 				orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getOrientation().getId()#">,
-				cell_orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">
+				cell_orientation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getCellOrientation().getId()#">,
+				margin_right_mm = <cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.frame.getMarginRightMm()#">,
+				margin_bottom_mm = <cfqueryparam cfsqltype="CF_SQL_DECIMAL" value="#arguments.frame.getMarginBottomMm()#">
 			WHERE
 				frame_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.frame.getId()#">::uuid
 		</cfquery>

@@ -78,6 +78,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public array function bulkCreate( required com.apirone.core.model.bean.Text[] texts ){
 		// all translations of a same entity
 
+		if ( !ArrayLen( arguments.texts ) ) return [];
+
 		var langs = getLangService().list( statusId = "ACT" );
 		var kinds = [];
 		var ids   = [];

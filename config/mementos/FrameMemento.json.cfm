@@ -7,7 +7,9 @@
 		"orientation",
 		"cellOrientation",
 		"status",
-		"createdAt"
+		"createdAt",
+		"marginRightMm",
+		"marginBottomMm"
 	],
 	profiles = {
 		detail = {
@@ -20,6 +22,8 @@
 				"cellOrientation",
 				"status",
 				"createdAt",
+				"marginRightMm",
+				"marginBottomMm",
 				"cells",
 				"grid",
 				"blocks"

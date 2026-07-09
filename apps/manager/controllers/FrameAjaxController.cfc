@@ -185,9 +185,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		obj["cellOrientation"] = super.service( "Lookup" ).get( "orientation", thisOrientationId );
 		obj["availableOrientations"] = availableOrientations;
 
-		obj["blocks"] = blocks;
-		obj["width"]  = plateWidth;
-		obj["height"] = plateHeight;
+		obj["blocks"]         = blocks;
+		obj["marginRightMm"]  = bean.getMarginRightMm();
+		obj["marginBottomMm"] = bean.getMarginBottomMm();
+		obj["width"]          = plateWidth  + bean.getMarginRightMm();
+		obj["height"]         = plateHeight + bean.getMarginBottomMm();
 
 		obj["slotSize"] = {
 			"width"  = variables.SLOT_WIDTH_MM,
@@ -321,6 +323,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		frame.setCode( json.code );
 		frame.setName( json.name );
 		frame.setStatus( status.setId( json.status.id ) );
+		if ( !IsNull( json.marginRightMm )  && IsNumeric( json.marginRightMm ) )  frame.setMarginRightMm( json.marginRightMm );
+		if ( !IsNull( json.marginBottomMm ) && IsNumeric( json.marginBottomMm ) ) frame.setMarginBottomMm( json.marginBottomMm );
 		frame.setOrientation( orientation.setId( json.Orientation.id ) );
 
 		// cell_orientation_id: legacy, per il payload builder coincide con l'orientamento

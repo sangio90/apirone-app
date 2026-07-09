@@ -157,6 +157,21 @@
 
                         <hr>
 
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <label class="col-form-label">Margine finale RIGHT (mm)</label>
+                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginRightMm">
+                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo destro.</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-form-label">Margine finale BOTTOM (mm)</label>
+                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginBottomMm">
+                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo inferiore.</div>
+                            </div>
+                        </div>
+
+                        <hr>
+
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h4 class="mb-0">Blocchi di slot</h4>
                             <button type="button" class="btn btn-sm btn-outline-primary" @click="addBlock">
@@ -267,9 +282,10 @@
                             <small>
                                 I numeri identificano gli slot (mezzifrutti) e restano gli stessi in orizzontale e verticale.
                                 I blocchi con bordo tratteggiato hanno orientamento fisso e non ruotano con la placca.<br>
-                                Margini: con placca orizzontale il margine LEFT è riferito al blocco precedente (per il primo
+                                Margini blocco: con placca orizzontale il margine LEFT è riferito al blocco precedente (per il primo
                                 blocco al bordo della placca) e il TOP al bordo superiore; con placca verticale è il TOP a
-                                essere riferito al blocco precedente e il LEFT al bordo sinistro.
+                                essere riferito al blocco precedente e il LEFT al bordo sinistro.<br>
+                                Margini finali: RIGHT e BOTTOM aggiungono spazio dopo l'ultimo blocco verso i rispettivi bordi della placca.
                             </small>
                         </p>
 
