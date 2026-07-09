@@ -13,6 +13,9 @@
 
                     <div class="card-body">
 
+                        <cfset local.isPlaSeg = ( prc.category.getType().getId() EQ "PLA" || prc.category.getType().getId() EQ "SEG" )>
+                        <cfset local.unit = local.isPlaSeg ? "mm" : "cm">
+
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Larghezza</label>
                             <div class="col-sm-10">
@@ -23,7 +26,7 @@
                                         data-bind="value: modelConfigModal.data.width"
                                     >
                                     <div class="input-group-append">
-                                        <span class="input-group-text">mm</span>
+                                        <span class="input-group-text">#local.unit#</span>
                                     </div>
                                 </div>
                                 <span id="width-error"></span>
@@ -39,12 +42,29 @@
                                         maxlength="125"
                                         data-bind="value: modelConfigModal.data.height">
                                     <div class="input-group-append">
-                                        <span class="input-group-text">mm</span>
+                                        <span class="input-group-text">#local.unit#</span>
                                     </div>
                                 </div>
                                 <span id="height-error"></span>
                             </div>
                         </div>
+
+                        <cfif !local.isPlaSeg>
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Lunghezza</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" required class="form-control col-sm-4" name="length"
+                                        maxlength="10"
+                                        data-bind="value: modelConfigModal.data.length">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">#local.unit#</span>
+                                    </div>
+                                </div>
+                                <span id="length-error"></span>
+                            </div>
+                        </div>
+                        </cfif>
 
 					</div>
 

@@ -23,15 +23,16 @@
 				product_category_id,
 				line_id,
 				width,
-				height
+				height,
+				length
 			)
 			VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.modelConfig.getModel().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Integer" value="#arguments.modelConfig.getProductCategory().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.modelConfig.getLine().getId()#">::uuid,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getWidth()#">,
-				<cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getHeight()#">
-
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getHeight()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getLength()#" null="#IsNull( arguments.modelConfig.getLength() )#">
 			) RETURNING model_config_id
 		</cfquery>
 
@@ -49,7 +50,8 @@
 				product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.modelConfig.getProductCategory().getId()#">,
 				line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelConfig.getLine().getId()#">::uuid,
 				width = <cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getWidth()#">,
-				height = <cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getHeight()#">
+				height = <cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getHeight()#">,
+				length = <cfqueryparam cfsqltype="Numeric" value="#arguments.modelConfig.getLength()#" null="#IsNull( arguments.modelConfig.getLength() )#">
 			WHERE
 				model_config_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelConfig.getId()#">::uuid
 		</cfquery>

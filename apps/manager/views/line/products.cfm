@@ -37,31 +37,30 @@
 											#model.getCode()#
                                             <br>
                                             <br>
-											<cfif NOT IsNull(model.getType()) && model.getType().getId() EQ "S">
-												<cfif NOT isNull(model.modelConfig)>
-													<button class="btn btn-primary btn-xs" data-bind="click:showModelConfigModal"
-														data-product-category-id="#prc.category.getId()#"
-														data-line-id="#prc.line.getId()#"
-														data-model-id="#model.getId()#"
-														data-model-config-id="#model.modelConfig.getId()#"
-														data-width="#model.modelConfig.getWidth()#"
-														data-height="#model.modelConfig.getheight()#"
-													>
-														<i class="fa fa-ruler"></i>
-													</button>
-													<div class="model-size">
-														#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#
-													</div>
-												<cfelse>
-													<button class="btn btn-default btn-xs" data-bind="click:showModelConfigModal"
-														data-product-category-id="#prc.category.getId()#"
-														data-line-id="#prc.line.getId()#"
-														data-model-id="#model.getId()#"
-													>
+											<cfif NOT isNull(model.modelConfig)>
+												<button class="btn btn-primary btn-xs" data-bind="click:showModelConfigModal"
+													data-product-category-id="#prc.category.getId()#"
+													data-line-id="#prc.line.getId()#"
+													data-model-id="#model.getId()#"
+													data-model-config-id="#model.modelConfig.getId()#"
+													data-width="#model.modelConfig.getWidth()#"
+													data-height="#model.modelConfig.getHeight()#"
+													data-length="#(!isNull(model.modelConfig.getLength()) ? model.modelConfig.getLength() : '')#"
+												>
 													<i class="fa fa-ruler"></i>
-													</button>
-													<div style="height: 1.4em;">&nbsp;</div>
-												</cfif>
+												</button>
+												<div class="model-size">
+													#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#<cfif !isNull(model.modelConfig.getLength()) && model.modelConfig.getLength() GT 0> x #model.modelConfig.getLength()#</cfif>
+												</div>
+											<cfelse>
+												<button class="btn btn-default btn-xs" data-bind="click:showModelConfigModal"
+													data-product-category-id="#prc.category.getId()#"
+													data-line-id="#prc.line.getId()#"
+													data-model-id="#model.getId()#"
+												>
+													<i class="fa fa-ruler"></i>
+												</button>
+												<div style="height: 1.4em;">&nbsp;</div>
 											</cfif>
 										</th>
                                     </cfloop>

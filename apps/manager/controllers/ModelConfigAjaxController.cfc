@@ -9,6 +9,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var productCategoryId = Len( json.productCategoryId ) ? json.productCategoryId : "";
 		var height            = Len( json.height ) ? json.height : "";
 		var width             = Len( json.width ) ? json.width : "";
+		var length            = StructKeyExists( json, "length" ) && Len( json.length ) && IsNumeric( json.length ) ? json.length : "";
 
 
 		if ( modelConfigId != "" ) {
@@ -22,6 +23,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 			modelConfig.setHeight( height );
 			modelConfig.setWidth( width );
+			if ( Len( length ) ) modelConfig.setLength( length );
 			var updated = super.service( "ModelConfig" ).update( modelConfig );
 		} else {
 			// TODO create
@@ -31,6 +33,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			modelConfig.setProductCategory( super.service( "ProductCategory" ).get( productCategoryId ) );
 			modelConfig.setHeight( height );
 			modelConfig.setWidth( width );
+			if ( Len( length ) ) modelConfig.setLength( length );
 
 			var newId = super.service( "ModelConfig" ).create( modelConfig );
 		}

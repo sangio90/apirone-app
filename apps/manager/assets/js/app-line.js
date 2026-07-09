@@ -357,6 +357,7 @@ AP.line.products = ( function() {
         data: {
             height: "",
             width: "",
+            length: "",
         },
     };
 
@@ -481,6 +482,7 @@ AP.line.products = ( function() {
             const modelConfigId = $( event.currentTarget ).data( "model-config-id" );
             const width = $( event.currentTarget ).data( "width" );
             const height = $( event.currentTarget ).data( "height" );
+            const length = $( event.currentTarget ).data( "length" ) || "";
 
             viewModel.set( "modelConfigModal.data.modelId", modelId );
             viewModel.set(
@@ -491,6 +493,7 @@ AP.line.products = ( function() {
             viewModel.set( "modelConfigModal.data.lineId", lineId );
             viewModel.set( "modelConfigModal.data.width", width );
             viewModel.set( "modelConfigModal.data.height", height );
+            viewModel.set( "modelConfigModal.data.length", length );
 
             return false;
         },
@@ -547,27 +550,22 @@ AP.line.products = ( function() {
 
         var modelConfigForm = fields.modelConfigForm;
 
+        var validateRules = {
+            width:  { required: true, number: true },
+            height: { required: true, number: true },
+        };
+        var validateMessages = {
+            width:  { required: "Larghezza richiesta.", number: "Inserisci un numero valido." },
+            height: { required: "Altezza richiesta.",  number: "Inserisci un numero valido." },
+        };
+        if ( modelConfigForm.find( "[name='length']" ).length ) {
+            validateRules.length    = { required: true, number: true };
+            validateMessages.length = { required: "Lunghezza richiesta.", number: "Inserisci un numero valido." };
+        }
+
         modelConfigForm.validate( {
-            rules: {
-                width: {
-                    required: true,
-                    number: true,
-                },
-                height: {
-                    required: true,
-                    number: true,
-                },
-            },
-            messages: {
-                width: {
-                    required: "Larghezza richiesta.",
-                    number: "Please enter a valid number.",
-                },
-                height: {
-                    required: "Altezza richiesta.",
-                    number: "Please enter a valid number.",
-                },
-            },
+            rules:    validateRules,
+            messages: validateMessages,
         } );
     };
 

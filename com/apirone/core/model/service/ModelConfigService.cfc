@@ -119,6 +119,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setId( record.model_config_id );
 			bean.setHeight( record.height );
 			bean.setWidth( record.width );
+			if ( !IsNull( record.length ) ) bean.setLength( record.length );
 
 			// Entity collegate dalle mappe pre-caricate
 			if ( StructKeyExists( modelMap, record.model_id ) ) {
@@ -165,6 +166,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setId( record.model_config_id );
 		bean.setHeight( record.height );
 		bean.setWidth( record.width );
+		if ( !IsNull( record.length ) ) bean.setLength( record.length );
 
 		// Entity collegate (caricate singolarmente)
 		bean.setModel( getModelService().get( record.model_id ) );
