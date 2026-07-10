@@ -1,0 +1,1 @@
+cd /var/www/vhosts/apirone_it/html && box server stop && box server start --configFile=server.json --nobrowser
