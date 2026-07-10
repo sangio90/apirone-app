@@ -384,6 +384,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function saveAccessory( event, rc, prc ){
+		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
@@ -456,8 +457,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.update", [ bean ] )
 			}
 
-			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "accessory" );
-
 			var quotationItemProductItems = super.fire(
 				"quotationItemProductItem.list",
 				{ quotationItemId = thisId }
@@ -506,17 +505,19 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId", {
 				"quotationId" = json.quotationId,
-				"quotationItemId" = thisId, 
+				"quotationItemId" = thisId,
 				"productId" = json.quotationItem.product.id
-				} 
+				}
 			);
 		}
+
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "accessory" );
 
 		if ( !Len( id ) ) {
 			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
-		
+
 		var message = completeMessage( messageId );
 
 		result.setData( { "message" = message, "id" = thisId } );
@@ -525,6 +526,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function saveSignage( event, rc, prc ){
+		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
@@ -601,8 +603,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.update", [ bean ] )
 			}
 
-			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "signage" );
-
 			for ( var signageRow in json.quotationItem.signageRows._data ) {
 				var signageRowBean = super.fire(
 					"QuotationItemSignageRow.get",
@@ -678,18 +678,20 @@ component extends="com.apirone.core.controller.AbsController" {
 			message = completeMessage( messageId );
 		}
 
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "signage" );
+
 		if ( !Len( id ) ) {
 			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
 			super.fire('quotationItem.updateHash', { quotationItemId = thisId, hash = productHash });
 		}
-		
+
 		result.setData( { "message" = message, "id" = thisId } );
 
 		event.setValue( "result", result );
 	}
 
 	function savePlate( event, rc, prc ){
-		
+		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
 		var thisId    = "";
 		var messageId = "";
@@ -823,8 +825,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.update", [ bean ] )
 			}
 
-			saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
-
 			var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId });
 
 			quotationItemProductItems.each( function( quotationItemProductItem ){
@@ -871,6 +871,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			
 			message = completeMessage( messageId );
 		}
+
+		saveImage( imageBase64 = json.imageBase64, quotationItemId = thisId, typeId = "plate" );
 
 		if ( !Len( id ) OR json.isClone ) {
 			var productHash = super.fire('ProductHash.createHash', { quotationItemId = thisId });
