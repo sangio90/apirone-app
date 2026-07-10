@@ -1310,8 +1310,7 @@ AP.signage.modal = ( function() {
             }
             const imgElement = await snapdom.toPng( preview );
 
-            const dataUrl = imgElement.src;
-            const imgData = dataUrl.replace( /^data:image\/png;base64,/, "" );
+            const imgData = await scaleDataUrlToBase64( imgElement.src, 800 );
 
             parsedData.imageBase64 = imgData;
             parsedData.quotationItem.price = pricingApp().getData().data;

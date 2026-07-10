@@ -799,7 +799,7 @@ AP.accessory.modal = ( function() {
                 } );
             }
             html2canvas( preview, { useCORS: true } ).then( function( canvas ) {
-                const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+                const imgData = scaleCanvasToBase64( canvas, 800 );
 
                 parsedData.imageBase64 = imgData;
                 parsedData.quotationItem.price = pricingApp().getData().data;

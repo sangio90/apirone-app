@@ -2261,7 +2261,7 @@ AP.plate.modal = ( function() {
                     parsedData.positions = fruitPositions;
 
                     const canvas = await html2canvas( preview, { useCORS: true } );
-                    const imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+                    const imgData = scaleCanvasToBase64( canvas, 800 );
                     parsedData.imageBase64 = imgData;
 
                     await ajax( {

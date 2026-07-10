@@ -336,3 +336,34 @@ NM.form.showMessages = function( errors ) {
 /*
     // form utils
 */
+
+function scaleCanvasToBase64( canvas, maxWidth ) {
+    if ( canvas.width <= maxWidth ) {
+        return canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+    }
+    var scale   = maxWidth / canvas.width;
+    var scaled  = document.createElement( "canvas" );
+    scaled.width  = maxWidth;
+    scaled.height = Math.round( canvas.height * scale );
+    scaled.getContext( "2d" ).drawImage( canvas, 0, 0, scaled.width, scaled.height );
+    return scaled.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+}
+
+function scaleDataUrlToBase64( dataUrl, maxWidth ) {
+    return new Promise( function( resolve ) {
+        var img = new Image();
+        img.onload = function() {
+            if ( img.width <= maxWidth ) {
+                resolve( dataUrl.replace( /^data:image\/png;base64,/, "" ) );
+                return;
+            }
+            var scale   = maxWidth / img.width;
+            var canvas  = document.createElement( "canvas" );
+            canvas.width  = maxWidth;
+            canvas.height = Math.round( img.height * scale );
+            canvas.getContext( "2d" ).drawImage( img, 0, 0, canvas.width, canvas.height );
+            resolve( canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" ) );
+        };
+        img.src = dataUrl;
+    } );
+}

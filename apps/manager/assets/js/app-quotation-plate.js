@@ -1295,7 +1295,7 @@ AP.plate.modal = ( function() {
 			}
 
             html2canvas( preview, { useCORS: true } ).then( async function( canvas ) {
-                var imgData = canvas.toDataURL( "image/png" ).replace( /^data:image\/png;base64,/, "" );
+                var imgData = scaleCanvasToBase64( canvas, 800 );
                 parsedData.imageBase64 = imgData;
 
                 await NM.util.ajax( {
