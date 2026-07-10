@@ -35,10 +35,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var jsonFilePath = ExpandPath( "/config/data/plates/grid_#bean.getCode()#.json.cfm" );
 
-		if ( FileExists( jsonFilePath ) ) {
-			obj = buildLegacyFileResponse( bean, rc.orientationId );
-		} else if ( !IsNull( bean.getBlocks() ) && ArrayLen( bean.getBlocks() ) ) {
+		if ( !IsNull( bean.getBlocks() ) && ArrayLen( bean.getBlocks() ) ) {
 			obj = buildBlocksResponse( bean, rc.orientationId, rc.blockOrientations );
+		} else if ( FileExists( jsonFilePath ) ) {
+			obj = buildLegacyFileResponse( bean, rc.orientationId );
 		} else {
 			Throw( message = "Nessuna configurazione trovata per la placca #bean.getCode()#" );
 		}

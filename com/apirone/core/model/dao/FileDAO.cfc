@@ -198,6 +198,50 @@
 	</cffunction>
 
 	<!---
+		Query ottimizzata per il profilo treelight: recupera in una sola query i file
+		legati a una lista di productItemId E a una lista di attributeRawValueId.
+		Usata da ProductItemService.listForTreelight().
+	--->
+	<cffunction name="findByProductItemAndAttributeValueIds" returntype="Query" access="public">
+		<cfargument name="productItemIds"    type="Array" required="true">
+		<cfargument name="attributeValueIds" type="Array" required="true">
+
+		<cfset var piList = ArrayToList( arguments.productItemIds )>
+		<cfset var avList = ArrayToList( arguments.attributeValueIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				file_id::varchar AS file_id,
+				name,
+				type_id,
+				kind_id,
+				directory,
+				size,
+				width,
+				height,
+				product_item_id,
+				attribute_raw_value_id
+			FROM files
+			WHERE deleted_at IS NULL
+			AND (
+				<cfif ArrayLen( arguments.productItemIds )>
+					product_item_id IN ( <cfqueryparam value="#piList#" list="true" cfsqltype="integer"> )
+				<cfelse>
+					FALSE
+				</cfif>
+				OR
+				<cfif ArrayLen( arguments.attributeValueIds )>
+					attribute_raw_value_id IN ( <cfqueryparam value="#avList#" list="true" cfsqltype="integer"> )
+				<cfelse>
+					FALSE
+				</cfif>
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
 		Recupera in batch tutti i file collegati a una lista di valori entità.
 		Utilizzato da FileService.listByEntityIds() per pre-caricare file in blocco.
 		La colonna su cui filtrare è risolta dinamicamente tramite getDBField(entityKey).
@@ -214,9 +258,14 @@
 			SELECT file_id::varchar, *
 			FROM files
 			WHERE deleted_at IS NULL
-			AND #field.name#::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
-			)
+			AND
+			<cfif field.type EQ "Integer">
+				#field.name# IN (<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">)
+			<cfelseif field.type EQ "uuid">
+				#field.name# = ANY(ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[])
+			<cfelse>
+				#field.name# IN (<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">)
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

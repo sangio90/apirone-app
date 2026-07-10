@@ -85,23 +85,16 @@ component extends="com.apirone.core.controller.AbsController" {
     public function productItemsByProduct( event, rc, prc ) {
 
         var result = super.getResult();
-	    var memy = super.getMementify();
-        var transformer = super.transformer( "ProductItem" );
 
-		var productId = rc.productId;
-
-        var params = {
-            productId = productId,
-            originId = StructKeyExists(rc, "originId") ? rc.originId : null
+		var params = {
+            productId = rc.productId,
+            originId  = StructKeyExists( rc, "originId" ) ? rc.originId : NullValue()
         };
 
-		var items = super.fire( "ProductItem.list", params );
-	    var data = ( memy.convertList( items, "treelight" ) );
+		var data = super.fire( "ProductItem.listForTreelight", params );
 
-        // var data = transformer.convertList( items, "tree" );
-
-		result.setTotal( data.len() );
-		result.setCount( data.len() );
+		result.setTotal( ArrayLen( data ) );
+		result.setCount( ArrayLen( data ) );
 		result.setData( data );
 
 		event.setValue( "result", result );

@@ -39,13 +39,43 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Query piatta per il profilo treelight: join con attributes_raw_values per evitare
+		un secondo round-trip. Usata da ProductItemService.listForTreelight().
+	--->
+	<cffunction name="findForTreelight" returntype="Query" access="public">
+		<cfargument name="productId" type="String" required="true">
+		<cfargument name="originId" type="Numeric">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				pi.product_item_id,
+				pi.origin_id,
+				pi.important,
+				pi.orderby,
+				arv.attribute_raw_value_id,
+				arv.attribute_id::varchar AS attribute_id,
+				arv.allow_note,
+				arv.raw_value_id
+			FROM product_items pi
+			INNER JOIN attributes_raw_values arv USING ( attribute_raw_value_id )
+			WHERE pi.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+				<cfif !IsNull( arguments.originId )>
+					AND pi.origin_id = <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">
+				<cfelse>
+					AND pi.origin_id IS NULL
+				</cfif>
+			ORDER BY pi.orderby ASC
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="productId" type="String">
 		<cfargument name="originId" type="Numeric">
 		<cfargument name="attributeId" type="String">
 		<cfargument name="skipOriginId" type="Boolean" default="false">
-
-		<cffile action="APPEND" file="#ExpandPath('/productItemDAO-find-params.log')#" output="#now()# #SerializeJSON( arguments )#">
 
 		<cfquery name="local.q" datasource="apirone" result="local.result">
 			SELECT

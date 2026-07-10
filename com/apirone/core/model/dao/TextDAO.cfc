@@ -256,9 +256,14 @@
 				country_id::varchar,
 				*
 			FROM texts
-			WHERE #field.name#::varchar IN (
-				<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">
-			)
+			WHERE
+			<cfif field.type EQ "Integer">
+				#field.name# IN (<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">)
+			<cfelseif field.type EQ "uuid">
+				#field.name# = ANY(ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[])
+			<cfelse>
+				#field.name# IN (<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">)
+			</cfif>
 		</cfquery>
 
 		<cfreturn local.q>

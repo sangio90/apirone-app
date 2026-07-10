@@ -88,6 +88,149 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 
+	/**
+	 * Versione piatta per il profilo treelight: bypassa la costruzione di bean CF
+	 * e restituisce direttamente un array di struct pronti per la serializzazione JSON.
+	 * Riduce da ~1600 CreateObject() a ~1 per request (new Settings()).
+	 */
+	public Array function listForTreelight( String productId, Numeric originId ) {
+		var records = getDao().findForTreelight( argumentCollection = arguments );
+
+		if ( !records.recordCount ) {
+			return [];
+		}
+
+		// Raccoglie ID univoci per i batch load successivi
+		var productItemIds    = [];
+		var attributeValueIds = [];
+		var rawValueIds       = [];
+		var attributeIds      = [];
+		var seenRawIds        = {};
+		var seenAttrIds       = {};
+
+		for ( var r in records ) {
+			productItemIds.append( r.product_item_id );
+			attributeValueIds.append( r.attribute_raw_value_id );
+			if ( !IsNull( r.raw_value_id ) && !StructKeyExists( seenRawIds, r.raw_value_id ) ) {
+				rawValueIds.append( r.raw_value_id );
+				seenRawIds[ r.raw_value_id ] = 1;
+			}
+			if ( !StructKeyExists( seenAttrIds, r.attribute_id ) ) {
+				attributeIds.append( r.attribute_id );
+				seenAttrIds[ r.attribute_id ] = 1;
+			}
+		}
+
+		var langId = ( request.keyExists( "lang" ) ? request.lang.getId() : "IT" );
+
+		// Batch load testi per rawValue.name
+		var rvTextMap = {};
+		if ( ArrayLen( rawValueIds ) ) {
+			var rvTexts = getTextService().getDao().findByEntityIds( "rawValue.id", rawValueIds );
+			for ( var t in rvTexts ) {
+				if ( !IsNull( t.raw_value_id ) && t.lang_id == langId && t.text_kind_id == "NAME" ) {
+					rvTextMap[ t.raw_value_id ] = t.text;
+				}
+			}
+		}
+
+		// Batch load testi per attribute.name
+		var attrTextMap = {};
+		if ( ArrayLen( attributeIds ) ) {
+			var attrTexts = getTextService().getDao().findByEntityIds( "attribute.id", attributeIds );
+			for ( var t in attrTexts ) {
+				if ( !IsNull( t.attribute_id ) && t.lang_id == langId && t.text_kind_id == "NAME" ) {
+					attrTextMap[ t.attribute_id ] = t.text;
+				}
+			}
+		}
+
+		// Batch load file per productItem e attributeValue in una sola query
+		var itemFileMap = {};
+		var avFileMap   = {};
+		var repository  = new config.Settings().get( "site.repository", "" );
+		var kindPaths   = { "productItem" = "product-items", "attributeValue" = "attribute-values" };
+
+		var fileRecords = getFileService().getDao().findByProductItemAndAttributeValueIds(
+			productItemIds    = productItemIds,
+			attributeValueIds = attributeValueIds
+		);
+
+		for ( var f in fileRecords ) {
+			var kindPath = StructKeyExists( kindPaths, f.kind_id ) ? kindPaths[ f.kind_id ] : f.kind_id;
+			var fileStub = {
+				"id"        = f.file_id,
+				"shortId"   = Right( f.file_id, 6 ),
+				"name"      = f.name,
+				"directory" = f.directory,
+				"type"      = { "id" = f.type_id },
+				"uri"       = "#repository#/media/#kindPath#/_ori/#f.directory#/#f.name#",
+				"width"     = f.width,
+				"height"    = f.height,
+				"size"      = f.size
+			};
+
+			if ( !IsNull( f.product_item_id ) ) {
+				if ( !StructKeyExists( itemFileMap, f.product_item_id ) ) {
+					itemFileMap[ f.product_item_id ] = {};
+				}
+				if ( !StructKeyExists( itemFileMap[ f.product_item_id ], f.type_id ) ) {
+					itemFileMap[ f.product_item_id ][ f.type_id ] = fileStub;
+				}
+			}
+
+			if ( !IsNull( f.attribute_raw_value_id ) ) {
+				if ( !StructKeyExists( avFileMap, f.attribute_raw_value_id ) ) {
+					avFileMap[ f.attribute_raw_value_id ] = {};
+				}
+				if ( !StructKeyExists( avFileMap[ f.attribute_raw_value_id ], f.type_id ) ) {
+					avFileMap[ f.attribute_raw_value_id ][ f.type_id ] = fileStub;
+				}
+			}
+		}
+
+		// Assembla i struct risultato senza alcun CreateObject() di bean
+		var result = [];
+
+		for ( var r in records ) {
+			var piId    = r.product_item_id;
+			var avId    = r.attribute_raw_value_id;
+			var piFiles = StructKeyExists( itemFileMap, piId ) ? itemFileMap[ piId ] : {};
+			var avFiles = StructKeyExists( avFileMap, avId ) ? avFileMap[ avId ] : {};
+
+			var piImages = [];
+			for ( var _k in piFiles ) { piImages.append( piFiles[ _k ] ); }
+
+			result.append( {
+				"id"       = piId,
+				"shortId"  = Right( piId, 6 ),
+				"origin"   = ( IsNull( r.origin_id ) ? NullValue() : { "id" = r.origin_id } ),
+				"level"    = 0,
+				"important"= ( r.important ? true : false ),
+				"orderby"  = r.orderby,
+				"attribute" = {
+					"id"   = r.attribute_id,
+					"name" = ( StructKeyExists( attrTextMap, r.attribute_id ) ? attrTextMap[ r.attribute_id ] : "** Not found" )
+				},
+				"attributeValue" = {
+					"id"              = avId,
+					"allowNote"       = ( r.allow_note ? true : false ),
+					"rawValue"        = {
+						"id"   = ( IsNull( r.raw_value_id ) ? NullValue() : r.raw_value_id ),
+						"name" = ( !IsNull( r.raw_value_id ) && StructKeyExists( rvTextMap, r.raw_value_id ) ? rvTextMap[ r.raw_value_id ] : "" )
+					},
+					"horizontalImage" = ( StructKeyExists( avFiles, "horizontal" ) ? avFiles[ "horizontal" ] : NullValue() ),
+					"verticalImage"   = ( StructKeyExists( avFiles, "vertical" ) ? avFiles[ "vertical" ] : NullValue() )
+				},
+				"images"          = piImages,
+				"horizontalImage" = ( StructKeyExists( piFiles, "horizontal" ) ? piFiles[ "horizontal" ] : NullValue() ),
+				"verticalImage"   = ( StructKeyExists( piFiles, "vertical" ) ? piFiles[ "vertical" ] : NullValue() )
+			} );
+		}
+
+		return result;
+	}
+
 	public Array function listComponents( required Numeric productItemId ){
 		var result = getProductComponentService().list( productItemId = productItemId );
 
