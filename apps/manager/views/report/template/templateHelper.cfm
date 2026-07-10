@@ -107,7 +107,9 @@
 			"fruitList":      "Lista Frutti",
 			"offer":          "Offerta",
 			"technicalPrint": "Stampa Tecnica",
-			"photoPrint":     "Stampa Foto"
+			"photoPrint":     "Stampa Foto",
+			"dimLegend2":     "(Larg x Alt)",
+			"dimLegend3":     "(Lung x Larg x Alt)"
 		},
 		"EN": {
 			"quotation":      "Quotation",
@@ -139,7 +141,9 @@
 			"fruitList":      "Fruit list",
 			"offer":          "Offer",
 			"technicalPrint": "Technical Print",
-			"photoPrint":     "Photo Print"
+			"photoPrint":     "Photo Print",
+			"dimLegend2":     "(W x H)",
+			"dimLegend3":     "(L x W x H)"
 		},
 		"FR": {
 			"quotation":      "Devis",
@@ -171,7 +175,9 @@
 			"fruitList":      "Liste des fruits",
 			"offer":          "Offre",
 			"technicalPrint": "Impression Technique",
-			"photoPrint":     "Impression Photo"
+			"photoPrint":     "Impression Photo",
+			"dimLegend2":     "(Larg x Haut)",
+			"dimLegend3":     "(Long x Larg x Haut)"
 		},
 		"ES": {
 			"quotation":      "Presupuesto",
@@ -203,7 +209,9 @@
 			"fruitList":      "Lista de frutos",
 			"offer":          "Oferta",
 			"technicalPrint": "Impresión Técnica",
-			"photoPrint":     "Impresión Fotográfica"
+			"photoPrint":     "Impresión Fotográfica",
+			"dimLegend2":     "(Anch x Alt)",
+			"dimLegend3":     "(Long x Anch x Alt)"
 		},
 		"DE": {
 			"quotation":      "Angebot",
@@ -235,7 +243,9 @@
 			"fruitList":      "Fruchtliste",
 			"offer":          "Angebot",
 			"technicalPrint": "Technischer Druck",
-			"photoPrint":     "Fotodruck"
+			"photoPrint":     "Fotodruck",
+			"dimLegend2":     "(B x H)",
+			"dimLegend3":     "(L x B x H)"
 		}
 	}>
 	<cfif !structKeyExists(local.labels, local.lang)>

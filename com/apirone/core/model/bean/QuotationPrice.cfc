@@ -69,36 +69,33 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	public Numeric function getTotal(){
 		var total = getTaxable();
 
-		total = total + ( total * getVatCode().getValue() / 100 );
+		if ( !IsNull( getVatCode() ) ) {
+			total = total + ( total * getVatCode().getValue() / 100 );
+		}
 
 		return total;
 	}
 
 	public Struct function getCalculatedTotals() {
-		
-		// Dichiarazione della variabile locale di tipo Struct
-		var totals = {}; 
-		
-		// 1. Recupera i valori calcolati (richiama le funzioni che abbiamo definito)
-		var totalGoods = getTotalMultipliedByQuantity();
-		var taxable = getTaxable(); // Naming aggiornato
-		var total = getTotal();
 
-		// Nota: Il Vat Code, Discount, e Shipping cost sono proprietà,
-		// quindi li possiamo recuperare direttamente con i getter.
-		
-		// 2. Popola la struttura con tutte le informazioni rilevanti
-		totals["totalGoods"]         = totalGoods;               // Totale prima di sconti/spedizione
+		var totals = {};
+
+		var totalGoods = getTotalMultipliedByQuantity();
+		var taxable = getTaxable();
+		var total = getTotal();
+		var vatPct = !IsNull( getVatCode() ) ? getVatCode().getValue() : 0;
+
+		totals["totalGoods"]         = totalGoods;
 		totals["shippingCost"]       = getShippingCost();
 		totals["discount1"]          = getDiscount1();
 		totals["discount2"]          = getDiscount2();
 		totals["flatDiscount"]       = getFlatDiscount();
 		totals["subtotalBeforeFlat"] = getSubtotalBeforeFlat();
-		totals["taxable"]            = getTaxable();             // Base imponibile (il nostro getTaxable() rinominato)
-		totals["vatPercentage"]      = getVatCode().getValue();  // Percentuale IVA
-		totals["vatAmount"]          = total - taxable;          // Importo IVA calcolato
-		totals["total"]              = total;                    // Totale finale (imponibile + IVA)
-		totals["costs"]              = getCosts();               // Costo totale (aggiunto per mostrare i costi di produzione)
+		totals["taxable"]            = taxable;
+		totals["vatPercentage"]      = vatPct;
+		totals["vatAmount"]          = total - taxable;
+		totals["total"]              = total;
+		totals["costs"]              = getCosts();
 
 		return totals;
 	}	

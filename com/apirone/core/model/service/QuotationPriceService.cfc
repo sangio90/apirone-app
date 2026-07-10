@@ -167,6 +167,12 @@
 			itemsCache[ qid ] = getQuotationItemService().list( quotationId = qid );
 		}
 
+		// Precarica le Quotation in batch per ottenere vatCode e currency (non chiama QuotationPriceService)
+		var quotationMap = {};
+		if ( ArrayLen( quotationIds ) ) {
+			quotationMap = getQuotationService().getMany( quotationIds );
+		}
+
 		// Costruisce i bean con l'aggregazione dai QuotationItem pre-caricati
 		for ( var r in records ) {
 			var bean = super.bean( "QuotationPrice" );
@@ -193,6 +199,17 @@
 						( item.getPrice().getTotal() * item.getQuantity() * zoneQuantity )
 					);
 				} );
+			}
+
+			// VatCode e Currency dalla quotation caricata in batch
+			if ( StructKeyExists( quotationMap, r.quotation_id.toString() ) ) {
+				var q = quotationMap[ r.quotation_id.toString() ];
+				if ( !IsNull( q.getVatCode() ) ) {
+					bean.setVatCode( q.getVatCode() );
+				}
+				if ( !IsNull( q.getCurrency() ) ) {
+					bean.setCurrency( q.getCurrency() );
+				}
 			}
 
 			map[ r.quotation_price_id ] = bean;

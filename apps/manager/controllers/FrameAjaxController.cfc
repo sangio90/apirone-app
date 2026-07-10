@@ -33,11 +33,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var obj = "";
 
-		if ( !IsNull( bean.getBlocks() ) && ArrayLen( bean.getBlocks() ) ) {
+		var jsonFilePath = ExpandPath( "/config/data/plates/grid_#bean.getCode()#.json.cfm" );
+
+		if ( FileExists( jsonFilePath ) ) {
+			obj = buildLegacyFileResponse( bean, rc.orientationId );
+		} else if ( !IsNull( bean.getBlocks() ) && ArrayLen( bean.getBlocks() ) ) {
 			obj = buildBlocksResponse( bean, rc.orientationId, rc.blockOrientations );
 		} else {
-			// fallback transitorio: placche non ancora migrate, lette dal file JSON
-			obj = buildLegacyFileResponse( bean, rc.orientationId );
+			Throw( message = "Nessuna configurazione trovata per la placca #bean.getCode()#" );
 		}
 
 		obj["image"] = "";

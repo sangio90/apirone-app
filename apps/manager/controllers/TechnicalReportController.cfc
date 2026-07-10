@@ -167,6 +167,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.zones = sortedZones;
 		quoteObj.articleItems = articleItems;
 
+		var allItems = [];
+		for ( var z in sortedZones ) {
+			arrayAppend( allItems, z.zoneItems, true );
+		}
+		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
+
 		return quoteObj;
 	}
 
@@ -186,7 +192,33 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.items = items;
 		quoteObj.articleItems = articleItems;
 
+		var allItems = [];
+		for ( var hashKey in quoteObj.items ) {
+			arrayAppend( allItems, quoteObj.items[hashKey].item );
+		}
+		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
+
 		return quoteObj;
+	}
+
+	private Struct function buildModelConfigMap( required Array items ){
+		var map = {};
+		for ( var item in arguments.items ) {
+			if ( isNull( item.getProduct() ) ) continue;
+			var productId = item.getProduct().getId();
+			if ( StructKeyExists( map, productId ) ) continue;
+			var prod = item.getProduct();
+			if ( isNull( prod.getModel() ) || isNull( prod.getLine() ) || isNull( prod.getCategory() ) ) continue;
+			var configs = service( "ModelConfig" ).list(
+				modelId           = prod.getModel().getId(),
+				lineId            = prod.getLine().getId(),
+				productCategoryId = prod.getCategory().getId()
+			);
+			if ( ArrayLen( configs ) ) {
+				map[ productId ] = configs[1];
+			}
+		}
+		return map;
 	}
 
 	function sortByCategory(a, b) {

@@ -43,6 +43,9 @@
 					<cfset zones = oggetto.zones>
 					<cfset quantity = oggetto.quantity>
 					<cfset oggetto = oggetto.item>
+					<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
+					<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
+					<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
 					<div class="item" style="page-break-inside: avoid;">
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
@@ -71,6 +74,17 @@
 								</cfif>
 								<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
 									<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+									<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
+										<div style="font-size: 8pt; margin-top: 2px;">
+											<cfif !isNull(thisDimMC.getLength())>
+												<span style="white-space: nowrap;">#printLabel('dimLegend3', langId)#:</span>
+												<span style="white-space: nowrap;">#thisDimMC.getLength()# x #thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
+											<cfelse>
+												<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
+												<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
+											</cfif>
+										</div>
+									</cfif>
 									<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 										<cfloop from="1"  to="#itemsCount#" index="item">
@@ -86,6 +100,12 @@
 									</div>
 								</td>
 								<td style="vertical-align: top; padding-top: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; padding-left: 5pt; width: 9cm !important;">
+									<cfif hasDim && thisDimType EQ "PLA">
+										<div style="font-size: 8pt; margin-bottom: 4px;">
+											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
+											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
+										</div>
+									</cfif>
 									<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 										<div style="font-size: 8pt; line-height: 15px;">
 											#printLabel('fruitList', langId)#:
@@ -121,6 +141,12 @@
 													</cfloop>
 												</ul>
 											</cfif>
+										</div>
+									</cfif>
+									<cfif hasDim && thisDimType EQ "SEG">
+										<div style="font-size: 8pt; margin-bottom: 4px;">
+											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
+											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
 										</div>
 									</cfif>
 									<cfif structCount(zones) gt 0>
