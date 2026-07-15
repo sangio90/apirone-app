@@ -28,3 +28,4 @@ assets/main/img/fototestvertical.png
 extras/.env
 extras/*.sql
 server.json
+public/media/*
