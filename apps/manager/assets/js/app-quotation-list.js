@@ -147,6 +147,49 @@ AP.quotation.list = ( function() {
             } );
 		},
 
+		clone: function( e ) {
+			e.preventDefault();
+			const id = e.data.id;
+			const num = e.data.quotationNumber;
+			if ( !id || id == "" ) {
+				return false;
+			}
+
+			bootbox.confirm( {
+				title: "Duplica preventivo",
+				message: "Vuoi duplicare il preventivo <strong>" + num + "</strong>? Verrà creato un nuovo preventivo con tutti i prodotti e le zone.",
+				buttons: {
+					confirm: {
+						label: "Si, duplica",
+						className: "btn-primary",
+					},
+					cancel: {
+						label: "Annulla",
+						className: "btn-danger",
+					},
+				},
+				callback: function( result ) {
+					if ( result ) {
+						AP.loading.show();
+						NM.util.ajax( {
+							method: "POST",
+							url: "/manager/ajax/quotations/" + id + "/clone",
+							callback: {
+								done: function( xhr ) {
+									AP.loading.hide();
+									if ( xhr.status === "ERROR" ) {
+										AP.widget.notify( "error", xhr.data.message );
+										return;
+									}
+									window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+								}
+							}
+						} );
+					}
+				},
+			} );
+		},
+
         new: function( ) {
             window.location.href = "/manager/quotations/new";
         },

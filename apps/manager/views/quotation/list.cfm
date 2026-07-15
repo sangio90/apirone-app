@@ -62,8 +62,8 @@
                                         { 'field':'referentName', 'title':'Referente' },
                                         { 'field':'owner.email', 'title':'Account', width: '10%'},
                                         { 'field':'createdAt', 'title':'Creato il', width: '10%'},
-                                        { 'field':'status', 'title':'Stato', width: '15%'},
-                                        { 'field':'', 'title':'Modifica', width: '90px'},
+                                        { 'field':'status', 'title':'Stato', width: '8%'},
+                                        { 'field':'', 'title':'Azioni', width: '130px'},
                                         { 
                                             'field'           :'', 
                                             'title'           :'<input type=checkbox onclick=NM.util.checkAll(this) name=selectAll>', 

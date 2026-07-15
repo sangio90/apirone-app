@@ -27,8 +27,9 @@
             <td>
                 <span data-bind="text: statusHistory.status.name"></span>
             </td>
-            <td class="text-center">
+            <td class="text-center" style="white-space: nowrap">
                 #iconButton(bind="click:edit", icon="edit")#
+                #iconButton(bind="click:clone", icon="copy", title="Duplica preventivo")#
                 #iconButton(bind="click:destroy", icon="trash")#
             </td>
             <td class="text-center">

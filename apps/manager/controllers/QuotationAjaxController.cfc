@@ -344,6 +344,19 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function clone( event, rc, prc ) {
+		var result = super.getResult();
+		try {
+			var quotation = super.fire( 'quotation.get', [ rc.id ] );
+			var newId = super.fire( 'Quotation.clone', { 'quotation': quotation } );
+			result.setData( { "message" = "Preventivo duplicato.", "payload" = { "id" = newId }, "error" = {} } );
+		} catch (e) {
+			result.setData( { "message" = "Errore: " & e.Message, "error" = {} } );
+			result.setStatus( 'error' );
+		}
+		event.setValue( "result", result );
+	}
+
 	function setQuotationStatusHistory(json) {
 		var quotationStatusHistories = super.fire( "QuotationStatusHistory.list", [ "quotationId" = json.id ] );
 		//gli status history sono ordinati per data creazione decrescente, quindi cerco l'ultimo e verifico che lo status sia diverso. Se è diverso ne creo uno nuovo, altrimenti sono in modifica.

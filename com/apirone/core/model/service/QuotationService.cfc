@@ -1197,6 +1197,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
 		clonedQuotation.setId( "" );
+		clonedQuotation.setNote( "Copia di " & originalQuotation.getQuotationNumber() & "/" & originalQuotation.getVersionNumber() );
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), true );
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );

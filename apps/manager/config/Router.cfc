@@ -469,6 +469,7 @@
 		get( "/ajax/quotations_approve/:id" ).to( "QuotationAjaxController.approveQuotation" ).end();
 		post( "/ajax/quotations/:id/markasSent" ).to( "QuotationAjaxController.markAsSent" ).end();
 		post( "/ajax/quotations/:id/createrevision" ).to( "QuotationAjaxController.createRevision" ).end();
+		post( "/ajax/quotations/:id/clone" ).to( "QuotationAjaxController.clone" ).end();
 
 		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
