@@ -211,6 +211,30 @@
 
     #view( "quotation/header-modal" )#
 
+    <div class="modal fade" id="item-duplicate-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Duplica articolo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Come vuoi duplicare questo articolo?</p>
+                    <div class="d-grid gap-2">
+                        <button id="item-duplicate-copy-btn" class="btn btn-outline-primary">
+                            <i class="fas fa-copy me-2"></i>Copia
+                            <small class="d-block text-muted">Crea un articolo indipendente</small>
+                        </button>
+                        <button id="item-duplicate-instance-btn" class="btn btn-outline-secondary">
+                            <i class="fas fa-link me-2"></i>Istanza
+                            <small class="d-block text-muted">Crea una copia collegata (sincronizzata)</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/posizione-in-pianta-modal" )#

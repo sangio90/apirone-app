@@ -808,27 +808,28 @@ AP.quotation.detail = (function () {
 		},
 
 		clone: function (event) {
-
-			var typeId = viewModel.get("typeId");
-
-			if (typeId == "plate") {
-				plateApp().clone({id: event.data.id, clone: true});
-			}
-
-			if (typeId == "accessory") {
-				accessoryApp().edit({id: event.data.id, clone: true});
-			}
-
-			if (typeId == "signage") {
-				signageApp().edit({id: event.data.id, clone: true});
-			}
-
-			if (typeId == "article") {
-				articleApp().edit({id: event.data.id, clone: true});
-			}
-
 			event.preventDefault();
+			var itemId = event.data.id;
+			$("#item-duplicate-modal").data("itemId", itemId).modal("show");
+		},
 
+		_duplicateItem: function (itemId, asInstance) {
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/quotation-items/" + itemId + "/duplicate",
+				data: JSON.stringify({ asInstance: asInstance }),
+				callback: {
+					done: function (xhr) {
+						if (xhr.status === "ERROR") {
+							AP.widget.notify("error", (xhr.data && xhr.data.message) || "Errore durante la duplicazione.");
+							return;
+						}
+						$("#item-duplicate-modal").modal("hide");
+						AP.widget.notify("success", "Articolo duplicato correttamente.");
+						viewModel.loadItems();
+					}
+				}
+			});
 		},
 
 		/*
@@ -911,7 +912,12 @@ AP.quotation.detail = (function () {
 
 		openPlantPosition: function (e) {
 			e.preventDefault();
-			window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id;
+			var zoneId = viewModel.get("detailForm.data.zone.id") || "";
+			var url = "/manager/quotation-plant-positions/" + AP.page.quotation.id;
+			if (zoneId && zoneId !== "" && zoneId !== "0") {
+				url += "?selectedZoneId=" + zoneId;
+			}
+			window.location.href = url;
 		},
 	});
 
@@ -1142,6 +1148,16 @@ AP.quotation.detail = (function () {
 
 		$(document).on("click", "#toggle-costs-link", function () {
 			viewModel.set("showCosts", AP.getUserPref("showCosts"));
+		});
+
+		$("#item-duplicate-copy-btn").on("click", function () {
+			var itemId = $("#item-duplicate-modal").data("itemId");
+			viewModel._duplicateItem(itemId, false);
+		});
+
+		$("#item-duplicate-instance-btn").on("click", function () {
+			var itemId = $("#item-duplicate-modal").data("itemId");
+			viewModel._duplicateItem(itemId, true);
 		});
 	};
 
@@ -1394,6 +1410,7 @@ pub.init = function () {
 	$("#duplicateWithChildrenBtn").on("click", function () {
 		viewModel.duplicateZone(true, $("#duplicateNameInput").val());
 	});
+
 };
 
 return pub;

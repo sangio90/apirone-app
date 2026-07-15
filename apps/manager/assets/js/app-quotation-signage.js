@@ -91,7 +91,7 @@ AP.signage.modal = ( function() {
         fonts: new kendo.data.DataSource(),
         fontSizes: new kendo.data.DataSource(),
         signageImages: new kendo.data.DataSource(),
-        backgroundImage: {},
+        backgroundImage: { url: "" },
         fontFamilyName: "",
         maxRows: 0,
         // Mostra un warning nell'anteprima quando il SignageConfigItem selezionato
@@ -168,6 +168,12 @@ AP.signage.modal = ( function() {
 
         isSubzoneEnabled: function() {
             return viewModel.get( "quotationZone" ) && viewModel.get( "quotationZone.name" ) != "-- Tutte le zone";
+        },
+
+        openInPlant: function() {
+            var subzoneId = viewModel.get( "quotationSubzone.id" );
+            var zoneId = ( subzoneId && subzoneId !== "" ) ? subzoneId : viewModel.get( "quotationZone.id" );
+            window.open( "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + ( zoneId || "" ), "_blank" );
         },
 
         pictogramNames: [
@@ -1347,8 +1353,8 @@ AP.signage.modal = ( function() {
 
                         const modal = $( "#posizione-in-pianta-modal" );
                         function handlerSi() {
-                            // TODO aggiungere id zona
-                            window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + parsedData.quotationItem.quotationZone.id;
+                            var zoneId = parsedData.quotationItem.quotationZone?.id || "";
+                            window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + zoneId;
                         }
                         function handlerNo() {
                             window.location.reload();

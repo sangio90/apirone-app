@@ -5,6 +5,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="coordinateY" type="Numeric";
 	property name="angle" type="Numeric" default="0";
 	property name="visible" type="Boolean" default="false";
+	property name="sizeMultiplier" type="Numeric" default="100";
 
 	public QuotationItemPosition function init(){
 		return this;

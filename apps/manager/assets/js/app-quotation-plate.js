@@ -1318,15 +1318,14 @@ AP.plate.modal = ( function() {
 								data: JSON.stringify({ quotationItemId: xhr.data.id }),
 								contentType: "application/json"
 							}).always(function() {
-								window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + pd.quotationZone.id;
+								window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + (pd.quotationZone?.id || "");
 							});
 							return;
 						}
 
 						const modal = $( "#posizione-in-pianta-modal")
 						function handlerSi() {
-							//TODO aggiungere id zona
-							window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + pd.quotationZone.id;
+							window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + (pd.quotationZone?.id || "");
 						}
 						function handlerNo() {
 							window.location.reload();

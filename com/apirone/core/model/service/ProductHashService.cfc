@@ -185,7 +185,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	private function prepareQuotationItemSignageJson( required com.apirone.core.model.bean.QuotationItemSignage quotationItem, jsonData ){
 		jsonData['signageConfigItemId'] = quotationItem.getSignageConfigItem().getId()
-		var rows = quotationItem.getSignageRows();
+		var rows = quotationItem.getSignageRows() ?: [];
 
 		arraySort(rows, function(a, b) {
 			return compare(a.getOrderBy(), b.getOrderBy());

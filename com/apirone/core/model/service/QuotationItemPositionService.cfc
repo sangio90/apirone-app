@@ -91,6 +91,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setCoordinateY( record.coordinate_y );
 		bean.setVisible( record.visible );
 		bean.setAngle( record.angle );
+		if ( !IsNull( record.size_multiplier ) ) bean.setSizeMultiplier( record.size_multiplier );
 
 		return bean;
 	}

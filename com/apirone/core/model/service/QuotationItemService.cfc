@@ -265,6 +265,85 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
+	 * Clona un QuotationItem. Se asInstance=true genera un instance_group_id condiviso
+	 * tra l'originale e il clone, in modo da sincronizzarli ad ogni modifica futura.
+	 * Restituisce l'ID del nuovo item.
+	 */
+	public String function clone( required String quotationItemId, Boolean asInstance = false ){
+		var original = get( arguments.quotationItemId );
+
+		if ( IsNull( original ) ) {
+			throw( message = "QuotationItem non trovato: #arguments.quotationItemId#" );
+		}
+
+		// Prepara il clone cancellando l'ID e azzerando l'ordinamento (verrà ricalcolato)
+		var cloneBean = duplicate( original );
+		cloneBean.setId( "" );
+		cloneBean.setOrdinamento( 0 );
+
+		var newInstanceGroupId = "";
+		if ( arguments.asInstance ) {
+			newInstanceGroupId = lcase( createUUID() );
+			cloneBean.setInstanceGroupId( newInstanceGroupId );
+		} else {
+			cloneBean.setInstanceGroupId( "" );
+		}
+
+		// Azzera le posizioni: il clone parte senza posizioni pianta
+		cloneBean.setPositions( [] );
+
+		var newId = "";
+		transaction {
+			newId = create( cloneBean );
+
+			// Se istanza: aggiorna anche l'originale con lo stesso instance_group_id
+			if ( arguments.asInstance ) {
+				getDao().updateInstanceGroupId( arguments.quotationItemId, newInstanceGroupId );
+			}
+
+			// Copia le signage rows se presenti
+			if ( IsInstanceOf( cloneBean, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+				var originalRows = getQuotationItemSignageRowService().list( quotationItemId = arguments.quotationItemId );
+				for ( var row in originalRows ) {
+					var rowClone = duplicate( row );
+					rowClone.setId( "" );
+					rowClone.setQuotationItemId( newId );
+					getQuotationItemSignageRowService().create( rowClone );
+				}
+			}
+		}
+
+		return newId;
+	}
+
+	/**
+	 * Sincronizza tutti i QuotationItem con lo stesso instance_group_id di quello dato.
+	 * Copia i campi "configurazione articolo" (zona, prodotto, quantità, note, special, prezzo).
+	 * NON copia le posizioni pianta (sono specifiche per ogni istanza).
+	 */
+	public void function syncInstanceGroup( required String quotationItemId ){
+		var source = get( arguments.quotationItemId );
+		if ( IsNull( source ) || IsNull( source.getInstanceGroupId() ) || !Len( source.getInstanceGroupId() ) ) return;
+
+		var siblings = getDao().findByInstanceGroupId( source.getInstanceGroupId() );
+		for ( var row in siblings ) {
+			if ( row.quotation_item_id == arguments.quotationItemId ) continue;
+			var sibling = get( row.quotation_item_id );
+			if ( IsNull( sibling ) ) continue;
+
+			// Copia i campi di configurazione (NO posizioni, NO zona)
+			sibling.setQuantity( source.getQuantity() );
+			sibling.setNote( source.getNote() );
+			sibling.setSpecial( source.getSpecial() );
+			sibling.setCustomImage( source.getCustomImage() );
+			if ( !IsNull( source.getProduct() ) ) sibling.setProduct( source.getProduct() );
+			if ( !IsNull( source.getPrice() ) )   sibling.setPrice( source.getPrice() );
+
+			update( sibling );
+		}
+	}
+
+	/**
 	 * Ensure quotation item position is created and linked when needed.
 	 */
 	private com.apirone.core.model.bean.QuotationItem function ensurePosition( required com.apirone.core.model.bean.QuotationItem quotationItem ){
@@ -529,6 +608,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				posBean.setCoordinateY( por.coordinate_y );
 				posBean.setVisible( por.visible );
 				posBean.setAngle( por.angle );
+				if ( !IsNull( por.size_multiplier ) ) posBean.setSizeMultiplier( por.size_multiplier );
 				positionMap[ por.quotation_item_id ].append( posBean );
 			}
 		}
@@ -623,9 +703,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			// SignageRows: dalla mappa batch
-			if ( StructKeyExists( signageRowMap, r.quotation_item_id ) ) {
-				bean.setSignageRows( signageRowMap[ r.quotation_item_id ] );
+			// SignageRows: dalla mappa batch (solo per QuotationItemSignage)
+			if ( Len( r.signage_config_item_id ) ) {
+				bean.setSignageRows( StructKeyExists( signageRowMap, r.quotation_item_id ) ? signageRowMap[ r.quotation_item_id ] : [] );
 			}
 
 			// File/image: dalla mappa batch
@@ -650,6 +730,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// Positions: dalla mappa batch
 			if ( StructKeyExists( positionMap, r.quotation_item_id ) ) {
 				bean.setPositions( positionMap[ r.quotation_item_id ] );
+			}
+
+			// InstanceGroup
+			if ( !IsNull( r.instance_group_id ) && Len( r.instance_group_id ) ) {
+				bean.setInstanceGroupId( r.instance_group_id );
+				bean.setInstanceGroupCount( getDao().countByInstanceGroupId( r.instance_group_id ) );
 			}
 
 			map[ r.quotation_item_id ] = bean;
@@ -768,6 +854,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( Len( quotationItemPositions ) ) {
 			bean.setPositions( quotationItemPositions );
 		}
+
+		if ( !IsNull( arguments.record.instance_group_id ) && Len( arguments.record.instance_group_id ) ) {
+			bean.setInstanceGroupId( arguments.record.instance_group_id );
+			bean.setInstanceGroupCount( getDao().countByInstanceGroupId( arguments.record.instance_group_id ) );
+		}
+
 		return bean;
 	}
 

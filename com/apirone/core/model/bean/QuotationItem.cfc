@@ -14,6 +14,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="price" type="com.apirone.core.model.bean.QuotationItemPrice";
 	property name="status" type="com.apirone.core.model.bean.Status";
 
+	property name="instanceGroupId" type="String";
+	property name="instanceGroupCount" type="Numeric";
+
 	property name="items" type="com.apirone.core.model.bean.QuotationItemProductItem[]";
 	property name="positions" type="com.apirone.core.model.bean.QuotationItemPosition[]";
 	property name="product" type="com.apirone.core.model.bean.Product";

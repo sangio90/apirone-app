@@ -373,6 +373,11 @@
                                                             <!--- subzones: array di sottozone filtrato in base alla zona selezionata, popolato da loadSubZones. --->
                                                         </select>
                                                     </div>
+                                                    <div class="col-12 mb-1" v-if="detailForm.data.id">
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="openInPlant">
+                                                            <i class="fas fa-map-marker-alt"></i> Visualizza in pianta
+                                                        </button>
+                                                    </div>
                                                     <div class="col-4 mt-2">Posizione:</div>
                                                     <div class="col-8" style="position: relative;">
                                                     <!--- position: relative: necessario per posizionare il dropdown dei suggerimenti posizione in absolute. --->

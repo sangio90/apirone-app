@@ -101,7 +101,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			thisId    = super.fire( "quotationItem.create", [ bean ] )
 		} else {
 			messageId = "quotationItem.updated";
-			thisId    = super.fire( "quotationItem.update", [ bean ] )
+			thisId    = super.fire( "quotationItem.update", [ bean ] );
+			if ( !IsNull( bean.getInstanceGroupId() ) && Len( bean.getInstanceGroupId() ) ) {
+				super.fire( "QuotationItem.syncInstanceGroup", { quotationItemId = thisId } );
+			}
 		}
 
 		var message = completeMessage( messageId );
@@ -454,14 +457,17 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.create", [ bean ] )
 			} else {
 				messageId = "quotationItem.updated";
-				thisId    = super.fire( "quotationItem.update", [ bean ] )
+				thisId    = super.fire( "quotationItem.update", [ bean ] );
+				if ( !IsNull( bean.getInstanceGroupId() ) && Len( bean.getInstanceGroupId() ) ) {
+					super.fire( "QuotationItem.syncInstanceGroup", { quotationItemId = thisId } );
+				}
 			}
 
 			var quotationItemProductItems = super.fire(
 				"quotationItemProductItem.list",
 				{ quotationItemId = thisId }
 			);
-			
+
 			quotationItemProductItems.each( function( quotationItemProductItem ){
 				super.fire(
 					"quotationItemProductItem.delete",
@@ -600,7 +606,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.create", [ bean ] )
 			} else {
 				messageId = "quotationItem.updated";
-				thisId    = super.fire( "quotationItem.update", [ bean ] )
+				thisId    = super.fire( "quotationItem.update", [ bean ] );
+				if ( !IsNull( bean.getInstanceGroupId() ) && Len( bean.getInstanceGroupId() ) ) {
+					super.fire( "QuotationItem.syncInstanceGroup", { quotationItemId = thisId } );
+				}
 			}
 
 			for ( var signageRow in json.quotationItem.signageRows._data ) {
@@ -822,7 +831,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				thisId    = super.fire( "quotationItem.create", [ bean ] )
 			} else {
 				messageId = "quotationItem.updated";
-				thisId    = super.fire( "quotationItem.update", [ bean ] )
+				thisId    = super.fire( "quotationItem.update", [ bean ] );
+				if ( !IsNull( bean.getInstanceGroupId() ) && Len( bean.getInstanceGroupId() ) ) {
+					super.fire( "QuotationItem.syncInstanceGroup", { quotationItemId = thisId } );
+				}
 			}
 
 			var quotationItemProductItems = super.fire( "quotationItemProductItem.list", { quotationItemId = thisId });
@@ -880,6 +892,39 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		result.setData( { "message" = message, "id" = thisId } );
+
+		event.setValue( "result", result );
+	}
+
+	function duplicate( event, rc, prc ){
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		var id     = rc.id;
+		var asInstance = IsBoolean( json.asInstance ?: false ) ? json.asInstance : false;
+
+		try {
+			var newId = super.fire( "QuotationItem.clone", { quotationItemId = id, asInstance = asInstance } );
+
+			// Se viene passata la posizione originale, aggiorna la prima posizione del clone con le stesse coordinate e visibilità
+			if ( !IsNull( json.position ?: NullValue() ) ) {
+				var newItem = super.fire( "QuotationItem.get", [ newId ] );
+				var newPositions = newItem.getPositions();
+				if ( !IsNull( newPositions ) && newPositions.len() > 0 ) {
+					var firstPos = newPositions[ 1 ];
+					firstPos.setCoordinateX( Val( json.position.coordinateX ) );
+					firstPos.setCoordinateY( Val( json.position.coordinateY ) );
+					firstPos.setVisible( json.position.visible == true || json.position.visible == 1 );
+					firstPos.setAngle( Int( Val( json.position.angle ?: 0 ) ) );
+					firstPos.setSizeMultiplier( Int( Val( json.position.sizeMultiplier ?: 100 ) ) );
+					super.fire( "QuotationItemPosition.update", [ firstPos ] );
+				}
+			}
+
+			result.setData( { "id" = newId, "message" = "Articolo duplicato correttamente." } );
+		} catch ( any e ) {
+			result.setStatus( "ERROR" );
+			result.setData( { "message" = "Errore durante la duplicazione: #e.message#" } );
+		}
 
 		event.setValue( "result", result );
 	}

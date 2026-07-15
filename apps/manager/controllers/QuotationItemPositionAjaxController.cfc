@@ -16,6 +16,9 @@ component extends="com.apirone.core.controller.AbsController" {
 					position.setCoordinateY( pos.coordinateY );
 					position.setVisible( pos.visible );
 					position.setAngle( int(pos.angle) );
+					if ( !IsNull( pos.sizeMultiplier ) && IsNumeric( pos.sizeMultiplier ) ) {
+						position.setSizeMultiplier( max( 10, int( pos.sizeMultiplier ) ) );
+					}
 					super.fire( "QuotationItemPosition.update", [ position ] );
 				}
 					result.setData( { "message" = "Salvataggio massivo posizioni completato." } );

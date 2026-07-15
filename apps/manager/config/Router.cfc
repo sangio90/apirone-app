@@ -555,6 +555,7 @@
 		get( "/ajax/quotation-items/fruits/:id/product-items" ).to( "QuotationItemAjaxController.fruitProductItems" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
 		post( "/ajax/quotation-items/reorder" ).to( "QuotationItemAjaxController.reorder" ).end();
+		post( "/ajax/quotation-items/:id/duplicate" ).to( "QuotationItemAjaxController.duplicate" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();
 		//get( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.list" ).end();
 

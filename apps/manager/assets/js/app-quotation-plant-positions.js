@@ -53,6 +53,7 @@ AP.quotation.plantPositions = (function () {
 				isRotatingDraft: false,
 				rotatedDraft: null,
 				selectedDraftId: null,
+				multiplierPos: null,
             },
 
 			watch: {
@@ -210,10 +211,14 @@ AP.quotation.plantPositions = (function () {
                         quotationItem => quotationItem.id == pos.quotationItemId
                     );
                     let color = this.getColor(quotationItem);
+                    const scale = (pos.sizeMultiplier || 100) / 100;
+                    const size = Math.round(35 * scale);
                     return {
                         backgroundColor: color,
                         left: (pos.coordinateX * 100) + '%',
                         top: (pos.coordinateY * 100) + '%',
+                        width: size + 'px',
+                        height: size + 'px',
                         transform: 'translate(-50%, -50%) rotate(' + (Number(pos.angle) + 135 || 135) + 'deg)'
                     };
                 },
@@ -287,21 +292,24 @@ AP.quotation.plantPositions = (function () {
                     document.addEventListener('mouseup', this.stopDrag);
                 },
                 getColor(quotationItem) {
-                    let background = 'rgb(232, 93, 68)';
+                    if (!quotationItem) return 'rgb(232, 93, 68)';
 
-                    if (quotationItem) {
-                        const name = quotationItem?.product?.category?.type?.name;
-                        const firstChar = name ? name.charAt(0).toUpperCase() : '';
+                    const typeId = quotationItem?.product?.catalogBundle?.category?.type?.id;
+                    const catName = (quotationItem?.product?.catalogBundle?.category?.name || '').toUpperCase();
 
-                        if (firstChar === 'P') {
-                            background = 'rgb(68, 130, 232)';
-                        }
-                        if (firstChar === 'A') {
-                            background = 'rgb(3,166,54)';
-                        }
+                    if (typeId === 'PLA') {
+                        return 'rgb(68, 130, 232)';   // blu – placche
                     }
-
-                    return background;
+                    if (catName.includes('EMERGENZA')) {
+                        return 'rgb(220, 30, 30)';    // rosso – segnaletica emergenza
+                    }
+                    if (catName.includes('INTERNA')) {
+                        return 'rgb(34, 139, 34)';    // verde – segnaletica interna
+                    }
+                    if (catName.includes('ESTERNA')) {
+                        return 'rgb(139, 90, 43)';    // marrone – segnaletica esterna
+                    }
+                    return 'rgb(128, 0, 128)';         // viola – accessori altre linee
                 },
                 onDrag(event) {
                     if (!this.dragging || !this.draggedPosition) return;
@@ -485,6 +493,7 @@ AP.quotation.plantPositions = (function () {
                                     coordinateY: pos.coordinateY,
                                     visible: pos.visible == true ? 1 : 0,
                                     angle: pos.angle || 0,
+                                    sizeMultiplier: pos.sizeMultiplier || 100,
                                     quotationItemId: item.id,
                                     type: item.product ? item.product.category.type.name : null,
                                     position: item.position ? item.position.code : 'senza posizione'
@@ -666,6 +675,115 @@ AP.quotation.plantPositions = (function () {
 					}
 				},
 
+				getDuplicateBtnStyle(pos) {
+					return {
+						position: 'absolute',
+						left: (pos.coordinateX * 100) + '%',
+						top: (pos.coordinateY * 100) + '%',
+						transform: 'translate(+100%, +50%)',
+						backgroundColor: 'white',
+						border: '2px solid #0d6efd',
+						padding: '3px 6px',
+						borderRadius: '.9em',
+						cursor: 'pointer',
+						fontSize: '10px',
+						whiteSpace: 'nowrap',
+						pointerEvents: 'auto',
+						zIndex: 10
+					};
+				},
+				getMultiplierBtnStyle(pos) {
+					return {
+						position: 'absolute',
+						left: (pos.coordinateX * 100) + '%',
+						top: (pos.coordinateY * 100) + '%',
+						transform: 'translate(+220%, +50%)',
+						backgroundColor: 'white',
+						border: '2px solid #198754',
+						padding: '3px 6px',
+						borderRadius: '.9em',
+						cursor: 'pointer',
+						fontSize: '10px',
+						whiteSpace: 'nowrap',
+						pointerEvents: 'auto',
+						zIndex: 10
+					};
+				},
+				getMultiplierPanelStyle(pos) {
+					return {
+						position: 'absolute',
+						left: (pos.coordinateX * 100) + '%',
+						top: (pos.coordinateY * 100) + '%',
+						transform: 'translate(-50%, +110%)',
+						backgroundColor: 'white',
+						border: '1px solid #ccc',
+						padding: '4px 8px',
+						borderRadius: '.5em',
+						pointerEvents: 'auto',
+						zIndex: 20,
+						display: 'flex',
+						alignItems: 'center',
+						gap: '4px',
+						whiteSpace: 'nowrap',
+						boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+					};
+				},
+				toggleMultiplierPanel(pos) {
+					if (this.multiplierPos && this.multiplierPos.id === pos.id) {
+						this.multiplierPos = null;
+					} else {
+						this.multiplierPos = pos;
+					}
+				},
+				openDuplicateDialog(pos, quotationItem) {
+					this._pendingDuplicate = { pos, quotationItem };
+					$('#item-duplicate-modal').modal('show');
+				},
+				async executeDuplicate(asInstance) {
+					if (!this._pendingDuplicate) return;
+					var pos = this._pendingDuplicate.pos;
+					var quotationItem = this._pendingDuplicate.quotationItem;
+					this._pendingDuplicate = null;
+					$('#item-duplicate-modal').modal('hide');
+					try {
+						await $.ajax({
+							url: '/manager/ajax/quotation-items/' + quotationItem.id + '/duplicate',
+							method: 'POST',
+							contentType: 'application/json',
+							data: JSON.stringify({
+								asInstance: asInstance,
+								position: {
+									coordinateX: pos.coordinateX,
+									coordinateY: pos.coordinateY,
+									visible: pos.visible ? 1 : 0,
+									angle: pos.angle || 0,
+									sizeMultiplier: parseInt(pos.sizeMultiplier, 10) || 100
+								}
+							})
+						});
+						AP.widget.notify('success', 'Articolo duplicato correttamente.');
+						this.getItems();
+					} catch(e) {
+						AP.widget.notify('error', 'Errore durante la duplicazione.');
+					}
+				},
+				syncInstanceVisible(pos, quotationItem) {
+					if (!quotationItem.instanceGroupId) return;
+					var self = this;
+					var newVisible = pos.visible;
+					self.quotationItems.forEach(function(item) {
+						if (item.instanceGroupId === quotationItem.instanceGroupId && item.id !== quotationItem.id) {
+							item.positions.forEach(function(p) {
+								self.$set(p, 'visible', newVisible);
+							});
+						}
+					});
+				},
+				changeMultiplier(pos, delta) {
+					var newVal = Math.max(10, Math.min(500, (parseInt(pos.sizeMultiplier, 10) || 100) + delta));
+					this.$set(pos, 'sizeMultiplier', newVal);
+				},
+
 				openConfigureDraft(draft) {
 					AP.page.pendingDraftId = draft.id;
 					// Aggiorna lo shim detail.config con la zona corrente
@@ -688,6 +806,14 @@ AP.quotation.plantPositions = (function () {
 					this.selectedZoneId = zoneIdFromQuery;
 					this.getItems();
 				}
+
+				var self = this;
+				document.getElementById('item-duplicate-copy-btn').addEventListener('click', function() {
+					self.executeDuplicate(false);
+				});
+				document.getElementById('item-duplicate-instance-btn').addEventListener('click', function() {
+					self.executeDuplicate(true);
+				});
             }
         });
 

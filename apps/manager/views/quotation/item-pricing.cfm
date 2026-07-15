@@ -64,6 +64,11 @@
 					id="subzones-selector">
 				</select>
 			</div>
+			<div class="col-12 mb-1" data-bind="visible: detailForm.data.quotationItem.id">
+				<button type="button" class="btn btn-outline-secondary btn-sm" data-bind="click: openInPlant">
+					<i class="fas fa-map-marker-alt"></i> Visualizza in pianta
+				</button>
+			</div>
 			<div class="col-12">
 				<div class="row mb-2">
 					<div class="col-4 mt-2">Posizione:</div>

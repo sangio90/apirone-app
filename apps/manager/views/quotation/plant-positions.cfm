@@ -1,4 +1,4 @@
-<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+1<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <cfoutput>
     <div id="quotation-plant-positions-root">
 
@@ -78,7 +78,7 @@
                                                 <template v-for="p in quotationItem.positions">
                                                     <template v-if="p.visible && (showAccessori && quotationItem?.product?.category?.type?.id == 'ACC' || showSegnaletica && quotationItem?.product?.category?.type?.id == 'SEG' || showPlacche && quotationItem?.product?.category?.type?.id == 'PLA')">
                                                         <div
-															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length }"
+															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length, 'pin-instance': quotationItem.instanceGroupId }"
                                                             class="pin"
                                                             :style="getPinStyle(p)"
                                                             @click="selectPosition(p)"
@@ -119,6 +119,28 @@
                                                                 @click="deletePosition(p)"
                                                                 :key="`deletearrow-${p.id}`"
                                                             />
+                                                            <div
+                                                                class="plant-action-btn"
+                                                                :style="getDuplicateBtnStyle(p)"
+                                                                @click.stop="openDuplicateDialog(p, quotationItem)"
+                                                                :key="'dup-' + p.id"
+                                                            ><i class="fas fa-clone"></i></div>
+                                                            <div
+                                                                class="plant-action-btn"
+                                                                :style="getMultiplierBtnStyle(p)"
+                                                                @click.stop="toggleMultiplierPanel(p)"
+                                                                :key="'mul-' + p.id"
+                                                            ><i class="fas fa-expand-alt"></i></div>
+                                                            <div
+                                                                v-if="multiplierPos && multiplierPos.id === p.id"
+                                                                :style="getMultiplierPanelStyle(p)"
+                                                                :key="'mulpanel-' + p.id"
+                                                                @click.stop
+                                                            >
+                                                                <button class="btn btn-sm btn-outline-secondary" @click.stop="changeMultiplier(p, -10)">-</button>
+                                                                <span style="min-width:40px;text-align:center;">{{ p.sizeMultiplier || 100 }}%</span>
+                                                                <button class="btn btn-sm btn-outline-secondary" @click.stop="changeMultiplier(p, 10)">+</button>
+                                                            </div>
                                                         </div>
                                                     </template>
                                                 </template>
@@ -173,9 +195,11 @@
 												v-for="quotationItem in quotationItemByType"
 												:key="quotationItem.id"
 												class="quotation-item"
-												:style="{ border: '2px solid', borderColor: getBackgroundColor(index), backgroundColor: 'white'}"
+												:style="{ border: '2px solid', borderColor: getColor(quotationItem), backgroundColor: 'white'}"
 												>
-													<div>{{ quotationItem.type }}</div>
+													<div>
+											{{ quotationItem.type }}<span v-if="quotationItem.instanceGroupId" :title="'Istanza (' + quotationItem.instanceGroupCount + ')'" style="margin-left:.4em; color:##888; font-size:.8em;"><i class="fas fa-link"></i></span>
+										</div>
 													<!-- HEADER ITEM -->
 													<div class="quotation-item-header">
 														{{ quotationItem.product.category.name }}
@@ -200,7 +224,7 @@
 															@click="selectPosition(p)"
 														>
 															<div style="margin-top: .3em;">
-																<input type="checkbox" class="form-check-input" v-model="p.visible">
+																<input type="checkbox" class="form-check-input" v-model="p.visible" @change="syncInstanceVisible(p, quotationItem)">
 															</div>
 															<div class="position-title" style="margin-right: .3em;">
 																{{ quotationItem.position ? quotationItem.position.code : 'N/A' }}
@@ -374,12 +398,52 @@
     .draft-configure-btn:hover {
         background: ##0b5ed7;
     }
+    .pin-instance {
+        outline: 2px dashed rgba(255,255,255,0.9);
+        outline-offset: -5px;
+    }
+    .plant-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        pointer-events: auto;
+        cursor: pointer;
+        font-size: 11px;
+        z-index: 10;
+    }
     </style>
 
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/plate-modal-vue" )#
     #view( "quotation/posizione-in-pianta-modal" )#
+
+    <div class="modal fade" id="item-duplicate-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Duplica articolo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Come vuoi duplicare questo articolo?</p>
+                    <div class="d-grid gap-2">
+                        <button id="item-duplicate-copy-btn" class="btn btn-outline-primary">
+                            <i class="fas fa-copy me-2"></i>Copia
+                            <small class="d-block text-muted">Crea un articolo indipendente</small>
+                        </button>
+                        <button id="item-duplicate-instance-btn" class="btn btn-outline-secondary">
+                            <i class="fas fa-link me-2"></i>Istanza
+                            <small class="d-block text-muted">Crea una copia collegata (sincronizzata)</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     #template( view="jstemplate/quotation/quotation-pricing-totals-item-tmpl" )#
     #template( view="jstemplate/quotation/quotation-position-suggest-row-tmpl" )#
     #template( view="jstemplate/quotation/signage-line-row-tmpl" )#

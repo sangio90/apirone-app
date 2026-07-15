@@ -27,6 +27,7 @@
 				coordinate_y,
 				visible,
 				angle,
+				size_multiplier,
 				COUNT(quotation_item_position_id) OVER() AS total
 			FROM
 				quotation_item_positions
@@ -61,6 +62,7 @@
 				<cfif !IsNull( arguments.angle )>
 					,angle
 				</cfif>
+				,size_multiplier
 			) VALUES (
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.position.getQuotationItemId()#">::uuid
 				<cfif !IsNull( arguments.coordinate_x )>
@@ -75,6 +77,7 @@
 				<cfif !IsNull( arguments.angle )>
 					,<cfqueryparam cfsqltype="Numeric" value="#arguments.position.getAngle()#">
 				</cfif>
+				,<cfqueryparam cfsqltype="Integer" value="#arguments.position.getSizeMultiplier()#">
 			)
 			RETURNING quotation_item_position_id
 		</cfquery>
@@ -90,7 +93,8 @@
 				coordinate_x = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateX()#">,
 				coordinate_y = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getCoordinateY()#">,
 				visible = <cfqueryparam cfsqltype="Boolean" value="#arguments.position.getVisible()#">,
-				angle = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getAngle()#">
+				angle = <cfqueryparam cfsqltype="Numeric" value="#arguments.position.getAngle()#">,
+				size_multiplier = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getSizeMultiplier()#">
 			WHERE
 				quotation_item_position_id = <cfqueryparam cfsqltype="Integer" value="#arguments.position.getId()#">
 		</cfquery>
@@ -119,7 +123,14 @@
 		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
 
 		<cfquery name="local.q" datasource="apirone">
-			SELECT *
+			SELECT
+				quotation_item_position_id::varchar,
+				quotation_item_id::varchar,
+				coordinate_x,
+				coordinate_y,
+				visible,
+				angle,
+				size_multiplier
 			FROM quotation_item_positions
 			WHERE quotation_item_id = ANY(
 				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]

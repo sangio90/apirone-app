@@ -148,6 +148,12 @@ AP.accessory.modal = ( function() {
             return viewModel.get('quotationZone') && viewModel.get('quotationZone.name') != '-- Tutte le zone';
         },
 
+        openInPlant: function() {
+            var subzoneId = viewModel.get('quotationSubzone.id');
+            var zoneId = (subzoneId && subzoneId !== '') ? subzoneId : viewModel.get('quotationZone.id');
+            window.open("/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + (zoneId || ""), "_blank");
+        },
+
         checkCanSave: function() {
             var vm = viewModel;
             if (
@@ -261,7 +267,7 @@ AP.accessory.modal = ( function() {
                         "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
                     callback: {
                         done: async function( xhr ) {
-                            if ( xhr.data ) {
+                            if ( xhr.data && xhr.data.length > 0 ) {
                                 viewModel.set( "detailForm.data.quotationItem.product.id", xhr.data[0].id );
                                 viewModel.set( "detailForm.data.quotationItem.product.image", xhr.data[0].horizontalImage );
                                 //al caricamento del prodotto, se la riga di preventivo prevede custom image, carico l'immagine manualmente leggendo da file per quotationItemId
@@ -847,8 +853,9 @@ AP.accessory.modal = ( function() {
 
 								const modal = $( "#posizione-in-pianta-modal")
 								function handlerSi() {
-									//TODO aggiungere id zona
-									window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + parsedData.quotationItem.quotationZone.id;
+									var zoneId = parsedData.quotationItem.quotationZone?.id || "";
+									var quotationId = window.plantPositionsVm?.quotationId || AP.page.quotation?.id || AP.page.quotation?.ID;
+									window.location.href = "/manager/quotation-plant-positions/" + quotationId + "?selectedZoneId=" + zoneId;
 								}
 								function handlerNo() {
 									window.location.reload();

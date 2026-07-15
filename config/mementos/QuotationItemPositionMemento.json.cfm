@@ -5,6 +5,7 @@
         "coordinateX",
         "coordinateY",
         "visible",
-        "angle"
+        "angle",
+        "sizeMultiplier"
     ]
 }

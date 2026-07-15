@@ -109,7 +109,8 @@
 				quantity,
 				quotation_zone_position_id,
 				"hash",
-				ordinamento
+				ordinamento,
+				instance_group_id
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
 					orientation_id,
@@ -155,7 +156,12 @@
 				<cfelse>
 					NULL
 				</cfif>,
-				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getOrdinamento()#">
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotationItem.getOrdinamento()#">,
+				<cfif !IsNull( arguments.quotationItem.getInstanceGroupId() ) && Len( arguments.quotationItem.getInstanceGroupId() )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getInstanceGroupId()#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
 				<cfif IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" )>
 					,
 					<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getFrame().getOrientation().getId()#">,
@@ -215,6 +221,12 @@
 				"hash" =
 					<cfif NOT IsNull( arguments.quotationItem.getHash() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getHash()#">
+					<cfelse>
+						NULL
+					</cfif>,
+				instance_group_id =
+					<cfif !IsNull( arguments.quotationItem.getInstanceGroupId() ) && Len( arguments.quotationItem.getInstanceGroupId() )>
+						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getInstanceGroupId()#">::uuid
 					<cfelse>
 						NULL
 					</cfif>
@@ -384,6 +396,45 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
+
+	<cffunction name="updateInstanceGroupId" returntype="void">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="instanceGroupId" type="String" required="false">
+		<cfquery datasource="apirone">
+			UPDATE quotation_items
+			SET instance_group_id =
+				<cfif !IsNull( arguments.instanceGroupId ) && Len( arguments.instanceGroupId )>
+					<cfqueryparam cfsqltype="Varchar" value="#arguments.instanceGroupId#">::uuid
+				<cfelse>
+					NULL
+				</cfif>
+			WHERE quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+		</cfquery>
+	</cffunction>
+
+	<cffunction name="findByInstanceGroupId" returntype="Query">
+		<cfargument name="instanceGroupId" type="String" required="true">
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				quotation_item_id::varchar,
+				quotation_id::varchar,
+				quotation_zone_id::varchar,
+				*
+			FROM quotation_items
+			WHERE instance_group_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.instanceGroupId#">::uuid
+		</cfquery>
+		<cfreturn local.q>
+	</cffunction>
+
+	<cffunction name="countByInstanceGroupId" returntype="Numeric">
+		<cfargument name="instanceGroupId" type="String" required="true">
+		<cfquery name="local.q" datasource="apirone">
+			SELECT COUNT(*) AS cnt
+			FROM quotation_items
+			WHERE instance_group_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.instanceGroupId#">::uuid
+		</cfquery>
+		<cfreturn Val( local.q.cnt )>
 	</cffunction>
 
 </cfcomponent>

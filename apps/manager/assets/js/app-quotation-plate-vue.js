@@ -573,6 +573,11 @@ AP.plate.modal = ( function() {
                     }
                 },
 
+                openInPlant: function() {
+                    var zoneId = this.detailForm.data.quotationSubzoneId || this.detailForm.data.quotationZoneId || "";
+                    window.open( "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?selectedZoneId=" + zoneId, "_blank" );
+                },
+
                 // MARK: Product loading
                 /**
                  * Popola i campi del prodotto nel form di dettaglio a partire dai dati ricevuti.

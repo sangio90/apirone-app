@@ -24,6 +24,8 @@
         "image",
         "note",
         "ordinamento",
+        "instanceGroupId",
+        "instanceGroupCount",
     ],
     profiles = {
         editPlate = {
