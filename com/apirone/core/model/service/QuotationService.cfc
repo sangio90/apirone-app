@@ -1141,7 +1141,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
 			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",
-			"MMRIFSPE" = quotation.getReferenteSpedizione() ?: "",
+			"MMRIFSPE"  = quotation.getReferenteSpedizione() ?: "",
+			"MMNOTPOS"  = quotation.getNote() ?: "",
 			"CFTIPCLF" = (function(){
 				var crmToErp = {
 					"CAT" = "CA", "HOT" = "HO", "HO1" = "H1", "HO2" = "H2", "HO3" = "H3",

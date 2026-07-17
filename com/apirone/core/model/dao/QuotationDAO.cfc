@@ -680,7 +680,7 @@
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
-				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO
+				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -745,7 +745,8 @@
 				<cfqueryparam value="#left(arguments.data.MMRIFSPE,40)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFTIPCLF,50)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFCODDES ?: '',15)#" cfsqltype="varchar">,
-				<cfqueryparam value="#left(arguments.data.MMORDPRO ?: 'N',1)#" cfsqltype="varchar">
+				<cfqueryparam value="#left(arguments.data.MMORDPRO ?: 'N',1)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMNOTPOS ?: ''#" cfsqltype="varchar">
 			)
 		</cfquery>
 

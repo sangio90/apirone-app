@@ -158,7 +158,7 @@
 					</div>
 
 					<div class="row d-flex align-items-center mb-3">
-						<label class="text-end col-3">Nota</label>
+						<label class="text-end col-3">Post-it</label>
 						<div class="col-9">
 							<textarea name="note" class="form-control" rows="2"
 								data-bind="value: detailForm.data.note">
