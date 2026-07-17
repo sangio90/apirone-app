@@ -1,6 +1,25 @@
 <cfoutput>
 <h2>Dashboard</h2>
 
+<cfif prc.isCommAdmin>
+<div class="row" style="margin-bottom:50px">
+    <div class="col-md-12">
+        <section class="card">
+            <div class="card-body">
+                <h2 class="card-title">Preventivi da approvare</h2>
+                <p class="mt-3">
+                    <a href="/manager/quotations?statusId=PEN" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-clock"></i>
+                        #prc.pendingApprovalCount# preventivo/i in attesa di approvazione
+                    </a>
+                </p>
+            </div>
+        </section>
+    </div>
+</div>
+</cfif>
+
+<cfif !prc.isCommAdmin>
 <div class="row" style="margin-bottom:50px">
     <div class="col-md-12">
 
@@ -128,5 +147,6 @@
         </section>
     </div>
 </div>
+</cfif>
 
 </cfoutput>

@@ -25,10 +25,10 @@
 
                                         <input name="strSearch" placeholder="Cerca per numero, nome, referente, rif. libero" class="form-control me-2" type="text">
 
-										<select class="form-control me-2" name="statusId">
+										<select class="form-control me-2" name="statusId" id="quotation-status-filter">
 											<option value="">-- tutti gli stati</option>
 											<cfloop array="#prc.statuses#" item="item">
-												<option value="#item.getId()#">#item.getName()#</option>
+												<option value="#item.getId()#" <cfif prc.filterStatusId == item.getId()>selected</cfif>>#item.getName()#</option>
 											</cfloop>
 										</select>
 

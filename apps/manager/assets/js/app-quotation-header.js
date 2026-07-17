@@ -584,6 +584,11 @@ AP.quotation.header = ( function() {
 					if (lang) {
 						viewModel.set("detailForm.data.lang", lang);
 					}
+					var vatCodeId = lingua === "IT" ? 201 : 15;
+					var vatCode = AP.page.vatCodes.find(function(v) { return v.id == vatCodeId; });
+					if (vatCode) {
+						viewModel.set("detailForm.data.vatCode", vatCode);
+					}
 				}
 				var accountType = customer && typeof customer === "object" ? customer.accountType : null;
 				viewModel.set("detailForm.data.customerType", accountType || "");

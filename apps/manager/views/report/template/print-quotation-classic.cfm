@@ -342,6 +342,7 @@
 							<td style="width: 70%; border: 0"></td>
 							<td style="width: 30%; border: 0">
 								<table style="width: 4in; border-collapse: collapse;">
+									<cfif !args.params.hideTotal>
 									<tr>
 										<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
 										<td>
@@ -384,16 +385,19 @@
 										</cfif>
 										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], "9,999.99", "it_IT" )# €</td>
 									</tr>
+									</cfif>
 									<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
 										<tr>
 											<td>#printLabel('shipping', langId)#</td>
 											<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
 										</tr>
 									</cfif>
+									<cfif !args.params.hideTotal>
 									<tr>
 										<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
 										<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
 									</tr>
+									</cfif>
 								</table>
 							</td>
 						</tr>

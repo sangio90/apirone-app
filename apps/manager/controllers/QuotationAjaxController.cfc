@@ -237,6 +237,15 @@ component extends="com.apirone.core.controller.AbsController" {
 				var quotation = super.fire( 'quotation.get', [ quotationId ] );
 				var userRole = session.user.getRole().getId();
 
+				// Blocca se il preventivo è già in stato "In approvazione":
+				// evita la creazione di revisioni duplicate.
+				if ( !IsNull( quotation.getStatusHistory() ) && !IsNull( quotation.getStatusHistory().getStatus() ) && quotation.getStatusHistory().getStatus().getId() == 'PEN' ) {
+					result.setData( { "message" = "Questo preventivo è già in attesa di approvazione.", "error" = {} } );
+					result.setStatus( 'warning' );
+					event.setValue( "result", result );
+					return;
+				}
+
 				if (!ArrayContains(['ADM', 'CMA'], userRole)) {
 					var totals = getTotals(quotationId).pricing
 					var totalPrice = totals.total

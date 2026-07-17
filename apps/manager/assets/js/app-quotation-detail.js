@@ -826,6 +826,7 @@ AP.quotation.detail = (function () {
 						}
 						$("#item-duplicate-modal").modal("hide");
 						AP.widget.notify("success", "Articolo duplicato correttamente.");
+						AP.quotation.totalPricing.markDirty();
 						viewModel.loadItems();
 					}
 				}
@@ -1459,9 +1460,10 @@ AP.quotation.printModal = (function () {
 			const grouped = $("#qt-print-grouped-checkbox")[0].checked;
 			const note = $("#qt-print-note-checkbox")[0].checked;
 			const discounts = $("#qt-print-discounts-checkbox")[0].checked;
+			const hideTotal = $("#qt-print-hide-total-checkbox")[0].checked;
 
 			const url = `/manager/technical-reports/print?id=${AP.page.quotation.id}&report=${report}` +
-				`&images=${images}&grouped=${grouped}&note=${note}&discounts=${discounts}`;
+				`&images=${images}&grouped=${grouped}&note=${note}&discounts=${discounts}&hideTotal=${hideTotal}`;
 
 			window.open(url, "_blank");
 		},
@@ -1473,6 +1475,7 @@ AP.quotation.printModal = (function () {
 			const groupedCheckbox = $("#qt-print-grouped-checkbox");
 			const noteCheckbox = $("#qt-print-note-checkbox");
 			const discountsCheckbox = $("#qt-print-discounts-checkbox");
+			const hideTotalCheckbox = $("#qt-print-hide-total-checkbox");
 
 			const imagesDiv = $("#qt-print-images-cont");
 			const groupedDiv = $("#qt-print-grouped-cont");
@@ -1480,10 +1483,11 @@ AP.quotation.printModal = (function () {
 			const discountsDiv = $("#qt-print-discounts-cont");
 
 			// Reset tutto
-			imageCheckbox.checked = false;
-			groupedCheckbox.checked = false;
-			noteCheckbox.checked = false;
-			discountsCheckbox.checked = false;
+			imageCheckbox.prop("checked", false);
+			groupedCheckbox.prop("checked", false);
+			noteCheckbox.prop("checked", false);
+			discountsCheckbox.prop("checked", false);
+			hideTotalCheckbox.prop("checked", false);
 
 			// Configurazione per ogni tipo di report
 			const config = {

@@ -1180,6 +1180,8 @@ AP.signage.modal = ( function() {
                 const selectedOption = values.find( attrValue => attrValue.selected === true );
                 if ( selectedOption ) {
                     select.val( selectedOption.product_item_id );
+                } else if ( item.level === 0 && values.length > 0 ) {
+                    select.val( values[0].product_item_id ).trigger( "change" );
                 }
 
                 subContainer.append( select );

@@ -21,7 +21,7 @@
                         <cfelse>
                             <button type="button"
                                     id="qt-status-btn"
-                                    class="btn btn-primary btn-sm w-100 qt-draft-block"
+                                    class="btn btn-sm w-100 qt-draft-block #(prc.quotation.getStatusHistory().getStatus().getId() == 'PEN' ? 'btn-outline-primary' : 'btn-primary')#"
                                     data-role-list="ADM/CMA"
                                     data-bind="click: openStatusModal, roleEnable: this">
                                 <i class="fas fa-check-circle"></i>

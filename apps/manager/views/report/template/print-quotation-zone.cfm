@@ -305,13 +305,14 @@
 
 				<div style="width: 100%; text-align: right; position: relative;">
 					<table style="width: 4in; border-collapse: collapse; position: absolute; right: 0; top: .1in;">
+						<cfif !args.params.hideTotal>
 						<tr>
 							<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
 							<td>
 								<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
 									#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
 								<cfelse>
-									#LSNumberFormat( 
+									#LSNumberFormat(
 										args.data.quotationPrice.getCalculatedTotals()['totalGoods'] *
 										( 1 - args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ) *
 										( 1 - args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100 )
@@ -323,7 +324,7 @@
 							<tr>
 								<td><strong>#printLabel('discounts', langId)#</strong></td>
 								<td>
-									- #LSNumberFormat( 
+									- #LSNumberFormat(
 										args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
 										, "9,999.99", "it_IT" )
 									# €
@@ -332,7 +333,7 @@
 							<tr>
 								<td><strong></strong></td>
 								<td>
-									- #LSNumberFormat( 
+									- #LSNumberFormat(
 										(args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 )) * args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100
 										, "9,999.99", "it_IT" )
 									# €
@@ -347,16 +348,17 @@
 							</cfif>
 							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], "9,999.99", "it_IT" )# €</td>
 						</tr>
+						<tr>
+							<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
+							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
+						</tr>
+						</cfif>
 						<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
 							<tr>
 								<td>#printLabel('shipping', langId)#</td>
 								<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
 							</tr>
 						</cfif>
-						<tr>
-							<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
-							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
-						</tr>
 					</table>
 				</div>
 

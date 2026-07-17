@@ -54,6 +54,14 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="row mt-2">
+                            <div class="col-6" id="qt-print-hide-total-cont">
+                                <label class="form-check-label">
+                                    <input class="form-check-input ms-2 me-2" type="checkbox" id="qt-print-hide-total-checkbox" name="hideTotal">
+                                    Nascondi totale
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <footer class="card-footer">

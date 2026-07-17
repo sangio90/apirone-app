@@ -3,6 +3,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	function dashboard( event, rc, prc ){
 		prc.title = "Dashboard";
 
+		var user = prc.user;
+		prc.isCommAdmin = !isNull( user ) && !isNull( user.getRole() ) && user.getRole().getId() == 'CMA';
+
+		if ( prc.isCommAdmin ) {
+			var pendingResult = super.fire( "Quotation.search", { statusId: 'PEN', limit: 1 } );
+			prc.pendingApprovalCount = pendingResult.getTotal();
+		}
+
 		event.setView( "main/dashboard" );
 	}
 

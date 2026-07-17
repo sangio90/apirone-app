@@ -1226,9 +1226,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
 		}
 
-		originalQuotation.setVersionNumber( originalQuotation.getVersionNumber() + 1 );
-		quotationService.update( originalQuotation );
-
 		return clonedQuotationId;
 	}
 

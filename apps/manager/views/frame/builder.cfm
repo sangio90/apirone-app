@@ -157,21 +157,6 @@
 
                         <hr>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <label class="col-form-label">Margine finale RIGHT (mm)</label>
-                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginRightMm">
-                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo destro.</div>
-                            </div>
-                            <div class="col-sm-3">
-                                <label class="col-form-label">Margine finale BOTTOM (mm)</label>
-                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginBottomMm">
-                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo inferiore.</div>
-                            </div>
-                        </div>
-
-                        <hr>
-
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h4 class="mb-0">Blocchi di slot</h4>
                             <button type="button" class="btn btn-sm btn-outline-primary" @click="addBlock">
@@ -227,6 +212,19 @@
                             </tbody>
                         </table>
 
+                        <div class="row mt-3">
+                            <div class="col-sm-3">
+                                <label class="col-form-label">Margine finale RIGHT (mm)</label>
+                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginRightMm">
+                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo destro.</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-form-label">Margine finale BOTTOM (mm)</label>
+                                <input type="number" min="0" step="0.5" class="form-control" v-model.number="form.marginBottomMm">
+                                <div class="form-text">Spazio dopo l'ultimo blocco verso il bordo inferiore.</div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
 
@@ -242,8 +240,8 @@
                                 </small>
                             </h4>
                             <div class="btn-group" v-if="form.orientation.id === 'HAV'">
-                                <button type="button" class="btn btn-sm" :class="previewOrientation === 'HOR' ? 'btn-primary' : 'btn-outline-primary'" @click="previewOrientation = 'HOR'">Orizzontale</button>
-                                <button type="button" class="btn btn-sm" :class="previewOrientation === 'VER' ? 'btn-primary' : 'btn-outline-primary'" @click="previewOrientation = 'VER'">Verticale</button>
+                                <button type="button" class="btn btn-sm" :class="previewOrientation === 'HOR' ? 'btn-primary' : 'btn-outline-primary'" @click="setPreviewOrientation('HOR')">Orizzontale</button>
+                                <button type="button" class="btn btn-sm" :class="previewOrientation === 'VER' ? 'btn-primary' : 'btn-outline-primary'" @click="setPreviewOrientation('VER')">Verticale</button>
                             </div>
                         </div>
 

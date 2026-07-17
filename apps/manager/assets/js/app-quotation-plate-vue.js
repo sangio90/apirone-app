@@ -771,7 +771,30 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 this.plate.orientation = xhr.data.orientation;
                                 this.plate.cellOrientation = xhr.data.cellOrientation;
-                                this.plate.blocks = xhr.data.blocks || [];
+
+                                // Block plates: swap marginLeft↔marginTop when going to VER.
+                                // The server uses marginTop as VER flow gap, but blocks are
+                                // configured in the builder with HOR semantics (marginLeft = flow
+                                // gap between blocks). Rotating to VER must map marginLeft → VER
+                                // flow gap, matching the builder's setPreviewOrientation swap.
+                                const blocks = xhr.data.blocks || [];
+                                if ( blocks.length && orientationId === "VER" ) {
+                                    let flowCursor = 0;
+                                    let bboxWidth  = 0;
+                                    let bboxHeight = 0;
+                                    for ( const block of blocks ) {
+                                        block.top  = flowCursor + block.marginLeftMm;
+                                        block.left = block.marginTopMm;
+                                        flowCursor = block.top + block.height;
+                                        bboxWidth  = Math.max( bboxWidth,  block.left + block.width );
+                                        bboxHeight = Math.max( bboxHeight, block.top  + block.height );
+                                    }
+                                    // Swap plate-level trailing margins (right↔bottom) to match builder.
+                                    xhr.data.width  = bboxWidth  + ( xhr.data.marginBottomMm || 0 );
+                                    xhr.data.height = bboxHeight + ( xhr.data.marginRightMm  || 0 );
+                                }
+
+                                this.plate.blocks = blocks;
                                 this.plate.grid = xhr.data.grid || [];
                                 this.applyPlateCanvasSize( xhr.data );
                                 this.plate.image = xhr.data.image;

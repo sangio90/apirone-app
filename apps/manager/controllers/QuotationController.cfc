@@ -4,6 +4,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Preventivi";
 
 		prc.statuses = super.fire( "status.list", [ "QUOTATION" ] );
+		param rc.statusId = "";
+		prc.filterStatusId = rc.statusId;
 
 		prc.jsFiles.add( "app-quotation-list" );
 

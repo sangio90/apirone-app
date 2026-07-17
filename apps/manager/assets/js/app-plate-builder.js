@@ -258,6 +258,24 @@ AP.plateBuilder = ( function() {
                 } );
             },
 
+            setPreviewOrientation: function( orientation ) {
+                if ( orientation === this.previewOrientation ) return;
+                // Sostituisce l'array (non mutazione diretta) per garantire la reattività Vue 2.
+                // Swap marginTop <-> marginLeft: in HOR il gap di flusso è marginLeft,
+                // in VER diventa marginTop.
+                this.form.blocks = this.form.blocks.map( function( block ) {
+                    return Object.assign( {}, block, {
+                        marginTopMm:  block.marginLeftMm,
+                        marginLeftMm: block.marginTopMm,
+                    } );
+                } );
+                // Swap margini finali del frame
+                var tmpRight = this.form.marginRightMm;
+                this.form.marginRightMm  = this.form.marginBottomMm;
+                this.form.marginBottomMm = tmpRight;
+                this.previewOrientation = orientation;
+            },
+
             newFrame: function() {
                 this.form = emptyForm();
                 this.form.blocks.push( emptyBlock() );

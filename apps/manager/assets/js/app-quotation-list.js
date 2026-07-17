@@ -43,7 +43,7 @@ AP.quotation.list = ( function() {
 
             if ( params.statusId.length ) {
                 filters.push( {
-                    field: "status.id",
+                    field: "statusHistory.status.id",
                     operator: "equal",
                     value: params.statusId,
                 } );
@@ -203,6 +203,9 @@ AP.quotation.list = ( function() {
 
         viewModel.get( "rows" ).fetch( function() {
             AP.loading.hide();
+            if ( $( "#quotation-status-filter" ).val() ) {
+                viewModel.search();
+            }
         } );
         /* TODO: remove this extra code.
         // Formatting by mvvm

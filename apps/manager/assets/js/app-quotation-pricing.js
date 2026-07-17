@@ -194,6 +194,18 @@ AP.quotation.totalPricing = ( function() {
 
     };
 
+    var priceDirty = false;
+
+    var markDirty = function() {
+        priceDirty = true;
+        $( "#qt-concludi-btn" ).prop( "disabled", true );
+    };
+
+    var markClean = function() {
+        priceDirty = false;
+        $( "#qt-concludi-btn" ).prop( "disabled", false );
+    };
+
     var fetchTotals = function( payload, method ) {
 
         var status = $( "#quotation-totals-general-loading" );
@@ -210,6 +222,10 @@ AP.quotation.totalPricing = ( function() {
 
                     viewModel.set( "pricing.counters", xhr.data.counters );
                     viewModel.set( "pricing.data", xhr.data.pricing );
+
+                    if ( method === "POST" ) {
+                        markClean();
+                    }
                 }
             }
         } );
@@ -299,6 +315,9 @@ AP.quotation.totalPricing = ( function() {
     	return viewModel.getTotals();
     };
 
+    pub.markDirty = markDirty;
+    pub.markClean = markClean;
+
     pub.init = function() { // type: item, quotation
 
         kendo.bind( fields.boxTotalPricing, viewModel );
@@ -317,6 +336,18 @@ AP.quotation.totalPricing = ( function() {
         }
 
         fields.boxTotalPricing.show();
+
+        // Dirty quando l'utente cambia sconti, spedizione o sconto incondizionato
+        // senza aver ancora cliccato "Salva". Pulito solo dopo il POST riuscito.
+        fields.boxTotalPricing.on(
+            "input change",
+            "input[name='discount1'], input[name='discount2'], input[name='shippingCost'], input[name='flatDiscount']",
+            markDirty
+        );
+
+        // Disabilita "Concludi" al caricamento: l'utente deve cliccare "Salva"
+        // almeno una volta per confermare il totale corrente prima di concludere.
+        markDirty();
 
     };
 

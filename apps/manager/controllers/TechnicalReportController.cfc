@@ -9,6 +9,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			'note' = rc.note == 'true',
 			'grouped' = rc.grouped == 'true',
 			'discounts' = rc.discounts == 'true',
+			'hideTotal' = StructKeyExists( rc, 'hideTotal' ) && rc.hideTotal == 'true'
 		}
 
 		var templatePath = "report/template/print-quotation-#rc.report#";
