@@ -2340,7 +2340,10 @@ AP.plate.modal = ( function() {
                     const modal = $( "#posizione-in-pianta-modal" );
 
                     function handlerSi() {
-                        window.location.href = "/manager/quotation-plant-positions/" + AP.page.quotation.id + "?zoneId=" + ( pd.quotationZone ? pd.quotationZone.id : "" );
+                        var zoneId = ( pd.quotationZone ? pd.quotationZone.id : "" ) || viewModel.get( "detailForm.data.zone.id" ) || "";
+                        var url = "/manager/quotation-plant-positions/" + AP.page.quotation.id;
+                        if ( zoneId ) { url += "?selectedZoneId=" + zoneId; }
+                        window.location.href = url;
                     }
 
                     function handlerNo() {

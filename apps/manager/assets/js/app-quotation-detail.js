@@ -1094,7 +1094,15 @@ AP.quotation.detail = (function () {
 						? "C'è 1 articolo posizionato in pianta non ancora configurato."
 						: "Ci sono " + count + " articoli posizionati in pianta non ancora configurati.";
 					$("#plant-draft-warning-text").text(label);
-					$("#plant-draft-warning-link").attr("href", "/manager/quotation-plant-positions/" + AP.page.quotation.id);
+					$("#plant-draft-warning-link").attr("href", "#").off("click.plant").on("click.plant", function(e) {
+						e.preventDefault();
+						var zoneId = viewModel.get("detailForm.data.zone.id") || "";
+						var url = "/manager/quotation-plant-positions/" + AP.page.quotation.id;
+						if (zoneId && zoneId !== "" && zoneId !== "0") {
+							url += "?selectedZoneId=" + zoneId;
+						}
+						window.location.href = url;
+					});
 					$("#plant-draft-warning").show();
 					$(".qt-draft-block").prop("disabled", true);
 				}
