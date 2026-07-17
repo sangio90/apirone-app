@@ -267,7 +267,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( beanMap[ record.product_item_id ] );
+			if ( StructKeyExists( beanMap, record.product_item_id ) ) {
+				rows.add( beanMap[ record.product_item_id ] );
+			}
 		} );
 
 		result.setData( rows );
@@ -679,7 +681,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !StructKeyExists( map, productId ) ) {
 				map[ productId ] = [];
 			}
-			ArrayAppend( map[ productId ], beanMap[ record.product_item_id ] );
+			if ( StructKeyExists( beanMap, record.product_item_id ) ) {
+				ArrayAppend( map[ productId ], beanMap[ record.product_item_id ] );
+			}
 		}
 
 		return map;

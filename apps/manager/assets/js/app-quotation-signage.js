@@ -1329,6 +1329,11 @@ AP.signage.modal = ( function() {
                 data: JSON.stringify( parsedData ),
                 callback: {
                     done: function( xhr ) {
+                        if ( xhr.status === "INVALID" ) {
+                            AP.loading.hide();
+                            NM.form.showMessages( xhr.data );
+                            return;
+                        }
                         $( "#signage-modal" ).hide();
                         AP.loading.hide();
                         AP.widget.notify( "success", "Segnaletica salvata nel preventivo." );

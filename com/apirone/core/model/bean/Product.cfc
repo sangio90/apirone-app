@@ -43,7 +43,7 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	property name="serial" type="Numeric";
 
 	public Product function init(){
-		variables.prices = {};
+		variables.prices = [];
 		return this;
 	}
 
@@ -58,8 +58,14 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 	*/
 
 	public Struct function getPrice( required String typeId ){
-		for ( var price in getPrices() ) {
-			if ( price.getType().getId() EQ typeId ) {
+		var allPrices = getPrices();
+		if ( !IsArray( allPrices ) ) {
+			writeLog( type="Error", file="application",
+				text="Product.getPrice: prices is not an array for product [#( !IsNull( getId() ) ? getId() : 'null' )#]. Type: [#GetMetaData( allPrices ).name#]. Value: [#SerializeJSON( allPrices )#]" );
+			return;
+		}
+		for ( var price in allPrices ) {
+			if ( IsObject( price ) && price.getType().getId() EQ typeId ) {
 				return price;
 			}
 		}

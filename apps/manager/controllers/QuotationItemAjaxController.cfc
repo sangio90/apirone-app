@@ -556,7 +556,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !Len( id ) ) {
 			json.quotationItem.id = lcase(createUUID());
 		}
-		var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
+		try {
+			var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
+		} catch ( "ApirOne.NoPriceConfigured" e ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = e.message } ] } );
+			event.setValue( "result", result );
+			return;
+		}
 		bean.setPrice( price );
 
 		if( Len( json.quotationItem?.position?.code ) ) {

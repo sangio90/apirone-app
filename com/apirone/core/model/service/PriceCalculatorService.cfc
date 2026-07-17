@@ -112,6 +112,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			product = productSvc.get( productId );
 		}
 		var price = product.getPrice( "PRICE" );
+		if ( IsNull( price ) ) {
+			Throw(
+				type    = "ApirOne.NoPriceConfigured",
+				message = "Nessun prezzo configurato per il prodotto [#productId#]."
+			);
+		}
 
 		var quantity = arguments.quantity
 		if (!isNull(arguments.quotationItemZoneId)) {

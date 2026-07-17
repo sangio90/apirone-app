@@ -41,7 +41,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// Ricostruisce le righe nell'ordine del find() originale
 		records.each( function( record ){
-			rows.add( beanMap[ record.article_id ] );
+			if ( StructKeyExists( beanMap, record.article_id ) ) {
+				rows.add( beanMap[ record.article_id ] );
+			}
 		} );
 
 		result.setData( rows );
