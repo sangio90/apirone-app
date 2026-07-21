@@ -9,6 +9,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="FileService" inject="FileService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="ProductHashService" inject="ProductHashService";
 
 	public com.apirone.core.model.bean.QuotationZone function get( required String zoneId ){
 		return build( arguments.zoneId );
@@ -183,6 +184,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				quotationItemSignageRow.setId('')
 				quotationItemSignageRow.setQuotationItemId( newItemId )
 				getQuotationItemSignageRowService().create( quotationItemSignageRow )
+			}
+
+			// ricalcola l'hash ora che product items e signage rows sono stati copiati
+			if ( isNull( quotationItem.getArticle() ) ) {
+				var newHash = getProductHashService().createHash( newItemId );
+				if ( !isNull( newHash ) ) {
+					getQuotationItemService().updateHash( newItemId, newHash );
+				}
 			}
 		}
 
