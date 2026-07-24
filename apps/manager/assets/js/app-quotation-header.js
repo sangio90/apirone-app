@@ -41,7 +41,13 @@ AP.quotation.header = ( function() {
             },
             shippingProfile: {
                 id: "",
-                name: ""
+                name: "",
+                shortId: "",
+                street: "",
+                city: "",
+                postalCode: "",
+                state: "",
+                country: { id: "", isoCode: "" }
             },
             quotationNumber: "",
             versionNumber: 1,
@@ -183,6 +189,9 @@ AP.quotation.header = ( function() {
                 parse: function( xhr ) {
                     ( xhr.data || [] ).forEach( function( item ) {
                         item.displayLabel = buildCustomerDisplay( item );
+                        ( item.shippingProfiles || [] ).forEach( function( p ) {
+                            p.displayName = p.name + ( p.shortId ? " - " + p.shortId : "" );
+                        } );
                     } );
                     return xhr;
                 }
@@ -452,6 +461,24 @@ AP.quotation.header = ( function() {
 
     } );
 
+    function applyShippingProfile(p) {
+        p = p || {};
+        viewModel.set("detailForm.data.shippingProfile.id", p.id || "");
+        viewModel.set("detailForm.data.shippingProfile.name", p.name || "");
+        viewModel.set("detailForm.data.shippingProfile.shortId", p.shortId || "");
+        viewModel.set("detailForm.data.shippingProfile.street", p.street || "");
+        viewModel.set("detailForm.data.shippingProfile.city", p.city || "");
+        viewModel.set("detailForm.data.shippingProfile.postalCode", p.postalCode || "");
+        viewModel.set("detailForm.data.shippingProfile.state", p.state || "");
+        viewModel.set("detailForm.data.shippingProfile.country", p.country || { id: "", isoCode: "" });
+        // Direct jQuery for guaranteed display update (MVVM nested binding doesn't fire after bulk set)
+        $("#sp-street").val(p.street || "");
+        $("#sp-city").val(p.city || "");
+        $("#sp-postal-code").val(p.postalCode || "");
+        $("#sp-country-iso").val(p.country ? (p.country.isoCode || "") : "");
+        $("#sp-state").val(p.state || "");
+    }
+
     function clearAgentiFrom(n) {
         for (var i = n; i <= 5; i++) {
             viewModel.set("detailForm.data.agente" + i, null);
@@ -486,6 +513,7 @@ AP.quotation.header = ( function() {
             callback: {
                 done: function( xhr ) {
                     viewModel.set( "detailForm.data", xhr.data );
+                    applyShippingProfile( xhr.data.shippingProfile || {} );
 
                     // Native <input type="date"> requires exactly "YYYY-MM-DD".
                     // Mementify serializes Date beans as "YYYY-MM-DD HH:mm:ss" — reformat here.
@@ -518,6 +546,29 @@ AP.quotation.header = ( function() {
 
                     setTimeout( function() {
                         syncAgentiEnabled();
+
+                        // Fix DropDownList display in edit mode.
+                        // Items loaded from DB don't have displayName (only CRM schema.parse adds it).
+                        var savedSp = xhr.data.shippingProfile;
+                        var spDdl = $( "#qt-shipping-profile" ).data( "kendoDropDownList" );
+                        if ( spDdl && savedSp && savedSp.name ) {
+                            var spItems = spDdl.dataSource.data();
+                            if ( spItems.length > 0 ) {
+                                spItems.forEach( function( item ) {
+                                    if ( !item.displayName ) {
+                                        item.set( "displayName", item.name + ( item.shortId ? " - " + item.shortId : "" ) );
+                                    }
+                                } );
+                                if ( savedSp.shortId ) spDdl.value( savedSp.shortId );
+                                spDdl.refresh();
+                            } else {
+                                var spKey = savedSp.shortId || savedSp.id || "saved";
+                                var spDisplay = savedSp.name + ( savedSp.shortId ? " - " + savedSp.shortId : "" );
+                                spDdl.dataSource.add( { shortId: spKey, name: savedSp.name, displayName: spDisplay } );
+                                spDdl.value( spKey );
+                            }
+                        }
+
                         if ( !AP.page.canEdit ) {
                             var $form = $( '#quotation-header-form' );
                             $form.find( 'input:not([type=hidden]), textarea' ).prop( 'readonly', true );
@@ -541,6 +592,16 @@ AP.quotation.header = ( function() {
     pub.init = function() {
 
         kendo.bind( fields.headerRoot, viewModel );
+
+        setTimeout(function() {
+            var ddl = $("#qt-shipping-profile").data("kendoDropDownList");
+            if (ddl) {
+                ddl.bind("change", function() {
+                    var item = this.dataItem();
+                    if (item) applyShippingProfile(item.toJSON ? item.toJSON() : item);
+                });
+            }
+        }, 0);
 
         viewModel.get( "languages" ).data( AP.page.languages );
         viewModel.get( "statuses" ).data( AP.page.statuses );
@@ -612,6 +673,12 @@ AP.quotation.header = ( function() {
 				viewModel.set("detailForm.data.industryLabel", industry ? (industryMap[industry] || industry) : "");
 				var sdi = customer && typeof customer === "object" ? (customer.SDI || "") : "";
 				viewModel.set("detailForm.data.codiceSdi", sdi);
+				var profiles = customer && typeof customer === "object" ? (customer.shippingProfiles || []) : [];
+				applyShippingProfile(profiles.length > 0 ? profiles[0] : {});
+				setTimeout(function() {
+					var ddl = $("#qt-shipping-profile").data("kendoDropDownList");
+					if (ddl) ddl.value(profiles.length > 0 ? profiles[0].shortId : "");
+				}, 0);
 				if (customer && typeof customer === "object" && customer.id) {
 					var ac = $( "#qt-customer" ).data( "kendoAutoComplete" );
 					if (ac) ac.value( buildCustomerDisplay( customer ) );

@@ -86,6 +86,7 @@ AP.plate.modal = ( function() {
         image: { uri: "" },
         width: 1200,
         height: 500,
+        displayScale: 1,
         orientation: { id: "" },
         cellOrientation: { id: "" },
         blocks: [],
@@ -114,8 +115,9 @@ AP.plate.modal = ( function() {
         if ( !gm ) {
             return null;
         }
-        const fruitWidth = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].width * ( data.fruit.positionCount || 1 );
-        const fruitHeight = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].height;
+        const displayScale = pub.fruitsController?.plate?.displayScale ?? 1;
+        const fruitWidth  = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].width  * displayScale * ( data.fruit.positionCount || 1 );
+        const fruitHeight = gm.constants.GRID_CELL_DIMENSIONS[gm.CELL_TYPE.FREE].height * displayScale;
         return {
             id: data.id,
             fruitId: data.fruitId,
@@ -196,6 +198,19 @@ AP.plate.modal = ( function() {
             }
         }
 
+        // Per le placche a blocchi, scala le coordinate dal sistema mm (1mm=1px)
+        // al canvas del designer (TARGET_WIDTH=1000px). displayScale=1 per le legacy.
+        const displayScale = plate.displayScale || 1;
+        const scaledBlocks = isBlockPlate
+            ? ( plate.blocks || [] ).map( b => ( {
+                ...b,
+                top:    b.top    * displayScale,
+                left:   b.left   * displayScale,
+                width:  b.width  * displayScale,
+                height: b.height * displayScale,
+            } ) )
+            : null;
+
         const plateObj = new gm.Plate( {
             width: plate.width,
             height: plate.height,
@@ -204,9 +219,9 @@ AP.plate.modal = ( function() {
             id: plate.id,
             code: plate.code,
             image: plate.image.uri,
-            // placche a blocchi (configurazione su DB): la griglia
-            // viene costruita da drawBlocksWithin()
-            blocks: isBlockPlate ? plate.blocks : null,
+            // placche a blocchi: la griglia viene costruita da drawBlocksWithin()
+            blocks: scaledBlocks,
+            displayScale: displayScale,
             onRotateBlock: isBlockPlate ? function( blockOrder ) {
                 window.vm.rotateBlock( blockOrder );
             } : null,
@@ -604,17 +619,27 @@ AP.plate.modal = ( function() {
                     const isBlockPlate = ( data.blocks || [] ).length > 0;
 
                     if ( !isBlockPlate ) {
-                        this.plate.width = data?.width ?? 1200;
+                        this.plate.displayScale = 1;
+                        this.plate.width  = data?.width  ?? 1200;
                         this.plate.height = data?.height ?? 500;
                         return;
                     }
 
+                    // displayScale converte mm → px per blocchi e celle.
+                    // MAX_SCALE ≈ scala fisica CSS a 96dpi (allineata al builder con unità mm).
+                    // Il canvas del plate-designer-canvas è fisso 1200×500px: plate.width/height
+                    // riempie almeno quel contenitore; i blocchi vi si centrano via flex.
+                    const MAX_SCALE     = 4;
+                    const rawWidth  = data?.width  || 1;
+                    const rawHeight = data?.height || 1;
                     const isVertical = data.orientation && data.orientation.id === "VER";
-                    const canvasWidth = isVertical ? 500 : 1200;
-                    const canvasHeight = isVertical ? 1200 : 500;
+                    const canvasW = isVertical ? 500  : 1200;
+                    const canvasH = isVertical ? 1200 : 500;
+                    const displayScale = Math.min( canvasW / rawWidth, canvasH / rawHeight, MAX_SCALE );
+                    this.plate.displayScale = displayScale;
 
-                    this.plate.width = Math.max( canvasWidth, data?.width ?? 0 );
-                    this.plate.height = Math.max( canvasHeight, data?.height ?? 0 );
+                    this.plate.width  = Math.max( canvasW, rawWidth  * displayScale );
+                    this.plate.height = Math.max( canvasH, rawHeight * displayScale );
                 },
 
                 populateProduct: function( product ) {

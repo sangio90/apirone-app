@@ -1,8 +1,8 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	// Dimensioni fisiche di uno slot (mezzofrutto). Scala di disegno: 1mm = 1px.
-	variables.SLOT_WIDTH_MM  = 45;
-	variables.SLOT_HEIGHT_MM = 180;
+	// Dimensioni fisiche di un mezzofruito. Scala di disegno: 1mm = 1px.
+	variables.SLOT_WIDTH_MM  = 11.25;
+	variables.SLOT_HEIGHT_MM = 45;
 
 	function list( event, rc, prc ){
 		var data   = [];

@@ -5,7 +5,7 @@ AP.plate.grid = ( function() {
 
     // Removed AP.plate context dependency for definition, but using AP namespace for constants storage if needed.
     // Ideally constants should be here.
-    AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "height": 180, "width": 45 }, "0": { "height": 105, "width": 52 } } };
+    AP.plate.constants = { GRID_CELL_DIMENSIONS: { "_": { "height": 45, "width": 11.25 }, "0": { "height": 105, "width": 52 } } };
 
     var constants = AP.plate.constants;
     // var fields = AP.plate.fields; // Removed as unused in this scope
@@ -403,6 +403,10 @@ AP.plate.grid = ( function() {
             // callback (blockOrder) per la rotazione del singolo blocco dal preventivo
             this.onRotateBlock = args.onRotateBlock || null;
 
+            // Fattore di scala display: converte le coordinate mm in px per il canvas.
+            // Per le placche a blocchi viene calcolato in applyPlateCanvasSize (Vue).
+            this.displayScale = args.displayScale || 1;
+
             if ( this.isBlockPlate() ) {
                 // width/height sono le dimensioni del canvas (sfondo placca),
                 // già calcolate per l'orientamento corrente: annulla lo swap
@@ -608,11 +612,14 @@ AP.plate.grid = ( function() {
 
             const $plateLayers = $( "<div/>", {
                 id: "plate-layers",
+                // Per le placche a blocchi, plate-layers deve partire da (0,0)
+                // del plate-background (non centrato via flex), così i blocchi
+                // sono posizionati a partire dall'angolo in alto a sinistra fisico.
+                css: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
                 appendTo: $plateBackground,
             } );
 
-            // bounding box dei blocchi: la griglia occupa solo questo spazio,
-            // centrato nel canvas dalla flex di .plate-background (come legacy)
+            // bounding box dei blocchi
             let bboxWidth = 0;
             let bboxHeight = 0;
             for ( const block of this.blocks ) {
@@ -631,14 +638,33 @@ AP.plate.grid = ( function() {
                 appendTo: $plateLayers,
             } );
 
+            // Offset del fruits container: corrisponde ai margini TOP/LEFT del primo blocco
+            // (in mm, scala 1mm=1px). Il container copre solo l'area dei blocchi,
+            // escludendo i margini della placca su tutti e quattro i lati.
+            const fruitsOffsetTop  = this.blocks.length > 0 ? this.blocks[0].top  : 0;
+            const fruitsOffsetLeft = this.blocks.length > 0 ? this.blocks[0].left : 0;
+            this.fruitsOffsetTop  = fruitsOffsetTop;
+            this.fruitsOffsetLeft = fruitsOffsetLeft;
+
             const $fruits = $( "<div/>", {
                 id: "quotation-plate-fruits",
+                css: {
+                    position: "absolute",
+                    top:      `${fruitsOffsetTop}px`,
+                    left:     `${fruitsOffsetLeft}px`,
+                    width:    `${bboxWidth  - fruitsOffsetLeft}px`,
+                    height:   `${bboxHeight - fruitsOffsetTop}px`,
+                    overflow: "hidden",
+                },
                 appendTo: $plateLayers,
             } );
 
             this.grid = [];
 
             const slotDimensions = constants.GRID_CELL_DIMENSIONS[CELL_TYPE.FREE];
+            // Dimensioni cella in px: già scalate (i blocchi arrivano pre-scalati da configPlate)
+            const slotW = slotDimensions.width  * this.displayScale;
+            const slotH = slotDimensions.height * this.displayScale;
 
             for ( let blockIndex = 0; blockIndex < this.blocks.length; blockIndex++ ) {
                 const block = this.blocks[blockIndex];
@@ -706,8 +732,8 @@ AP.plate.grid = ( function() {
 
                     // Rectangle scambia width/height per i blocchi VER
                     const cell = new Cell(
-                        slotDimensions.width,
-                        slotDimensions.height,
+                        slotW,
+                        slotH,
                         block.cellOrientation,
                         CELL_TYPE.FREE,
                         slotData.id,
@@ -735,9 +761,10 @@ AP.plate.grid = ( function() {
 
                     cell.$element = $plateCell;
 
-                    // coordinate assolute rispetto all'origine della placca
-                    cell.top = block.top + offsetTop;
-                    cell.left = block.left + offsetLeft;
+                    // coordinate relative al #quotation-plate-fruits
+                    // (che parte dai margini TOP/LEFT del primo blocco)
+                    cell.top  = block.top  + offsetTop  - this.fruitsOffsetTop;
+                    cell.left = block.left + offsetLeft - this.fruitsOffsetLeft;
 
                     block.cells.push( cell );
 

@@ -236,7 +236,7 @@
                             <h4 class="mb-0">
                                 Anteprima
                                 <small class="text-muted">
-                                    ({{ previewLayout.width }} x {{ previewLayout.height }} mm, scala {{ previewScalePercent }}%)
+                                    ({{ previewLayout.width }} x {{ previewLayout.height }} mm)
                                 </small>
                             </h4>
                             <div class="btn-group" v-if="form.orientation.id === 'HAV'">
@@ -247,17 +247,17 @@
 
                         <div class="plate-builder-preview-wrapper">
                             <div class="plate-builder-preview"
-                                :style="{ width: ( previewLayout.width * previewScale ) + 'px', height: ( previewLayout.height * previewScale ) + 'px' }">
+                                :style="{ width: previewLayout.width + 'mm', height: previewLayout.height + 'mm' }">
 
                                 <div v-for="block in previewLayout.blocks"
                                     :key="'preview-' + block._key"
                                     class="plate-builder-block"
                                     :class="{ 'fixed-block': block.orientationMode !== 'HAV' }"
                                     :style="{
-                                        left: ( block.left * previewScale ) + 'px',
-                                        top: ( block.top * previewScale ) + 'px',
-                                        width: ( block.width * previewScale ) + 'px',
-                                        height: ( block.height * previewScale ) + 'px',
+                                        left: block.left + 'mm',
+                                        top: block.top + 'mm',
+                                        width: block.width + 'mm',
+                                        height: block.height + 'mm',
                                         flexDirection: block.cellOrientation === 'HOR' ? 'row' : 'column'
                                     }">
 
@@ -265,8 +265,8 @@
                                         :key="'slot-' + slot.id"
                                         class="plate-builder-slot"
                                         :style="{
-                                            width: ( slot.width * previewScale ) + 'px',
-                                            height: ( slot.height * previewScale ) + 'px'
+                                            width: slot.width + 'mm',
+                                            height: slot.height + 'mm'
                                         }">
                                         {{ slot.id }}
                                     </div>
@@ -336,7 +336,7 @@
         justify-content: center;
         border: 1px dotted ##999;
         box-sizing: border-box;
-        font-size: 11px;
+        font-size: 6mm;
         color: ##555;
         background: ##fdfdfd;
     }

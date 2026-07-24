@@ -13,23 +13,20 @@ AP.namespace( "plateBuilder" );
  * uguali in orizzontale e verticale: ruotando la placca i frutti
  * restano associati alle stesse posizioni.
  *
- * Scala di disegno: 1 mm = 1 px (slot 45x180).
+ * Scala di disegno: 1 mm = 1 px (mezzofruito 11.25 x 45 mm).
  */
 AP.plateBuilder = ( function() {
 
     const BASE = "/manager/ajax";
 
-    const SLOT_WIDTH_MM = 45;
-    const SLOT_HEIGHT_MM = 180;
+    const SLOT_WIDTH_MM  = 11.25;
+    const SLOT_HEIGHT_MM = 45;
 
     const ORIENTATION_MODES = [
         { id: "HAV", name: "Segue la placca" },
         { id: "HOR", name: "Fisso orizzontale" },
         { id: "VER", name: "Fisso verticale" },
     ];
-
-    /** Larghezza massima dell'anteprima in px, oltre la quale si riduce la scala. */
-    const PREVIEW_MAX_WIDTH = 1000;
 
     const pub = {};
 
@@ -216,16 +213,6 @@ AP.plateBuilder = ( function() {
                 );
             },
 
-            previewScale: function() {
-                if ( !this.previewLayout.width ) {
-                    return 1;
-                }
-                return Math.min( 1, PREVIEW_MAX_WIDTH / this.previewLayout.width );
-            },
-
-            previewScalePercent: function() {
-                return Math.round( this.previewScale * 100 );
-            },
         },
 
         mounted: function() {
