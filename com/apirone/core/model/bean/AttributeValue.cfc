@@ -15,6 +15,17 @@ component extends="com.apirone.core.model.bean.TranslatedBean" accessors="true" 
 		return this;
 	}
 
+	public String function getName( String langId = NullValue() ){
+		var textItem = getTextItem( arguments.langId, "NAME" );
+		if ( !isNull( textItem ) ) {
+			return textItem.getName();
+		}
+		if ( !isNull( getRawValue() ) ) {
+			return getRawValue().getName( arguments.langId );
+		}
+		return "** Not found";
+	}
+
 	public any function onMissingMethod( required string missingMethodName ){
 		return super.getImageBeanHelper().resolveGetImageMethod( missingMethodName, getImages() );
 	}

@@ -31,11 +31,14 @@
                     </div>
                 </div>
                 <div class="row g-2">
-                    <div class="col-3">#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open", class="w-100" )#</div>
-                    <div class="col-3">#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print", class="w-100" )#</div>
-                    <div class="col-3" style="position:relative;">
+                    <div class="col-2">#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open", class="w-100" )#</div>
+                    <div class="col-2">#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print", class="w-100" )#</div>
+                    <div class="col-2" style="position:relative;">
                         #button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map", class="w-100" )#
                         <span id="plant-draft-badge" class="badge bg-danger position-absolute top-0 end-0 mt-1 me-1" style="display:none;font-size:10px;"></span>
+                    </div>
+                    <div class="col-3">
+                        #button( bind="click:export3dPlates", size="sm", label="JSON 3D placche", icon="cube", class="w-100", variant="outline-secondary" )#
                     </div>
                     <div class="col-3">
                         <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bind="click:markAsSent, visible:canEdit">
@@ -247,6 +250,23 @@
     #view( "quotation/status-modal" )#
     #view( "quotation/documents-modal" )#
     #view( "quotation/export-products-result-modal" )#
+
+    <div class="modal fade" id="qt-export3d-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-cube me-1"></i> JSON 3D – Placche preventivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="qt-export3d-text" class="form-control" style="font-size:10px; font-family:monospace; height:400px;" readonly onclick="this.select()"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     #view( "quotation/totals" )#
 

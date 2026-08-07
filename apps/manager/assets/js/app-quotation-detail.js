@@ -345,6 +345,30 @@ AP.quotation.detail = (function () {
 			});
 		},
 
+		export3dPlates: function () {
+			AP.loading.show();
+			NM.util.ajax({
+				method: "GET",
+				url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/plates-export3d",
+				callback: {
+					done: function (xhr) {
+						AP.loading.hide();
+						if (xhr.status == "INVALID") {
+							NM.form.showMessages(xhr.data);
+							return;
+						}
+						var $modal = $("#qt-export3d-modal");
+						$("#qt-export3d-text", $modal).val(JSON.stringify(xhr.data, null, 2));
+						var modal = bootstrap.Modal.getOrCreateInstance($modal[0]);
+						modal.show();
+					},
+					fail: function () {
+						AP.loading.hide();
+					}
+				}
+			});
+		},
+
 		changeType: function (event) {
 
 			var target = $(event.currentTarget);

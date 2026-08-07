@@ -480,6 +480,7 @@
 		get( "/ajax/quotations/:id/updateallprices" ).to( "QuotationItemAjaxController.updateAllPrices" ).end();
 		get( "/ajax/quotations/:id/items/:typeId" ).to( "QuotationItemAjaxController.list" ).end();
 		get( "/ajax/quotations/:id/itemsbyzone/:zoneId" ).to( "QuotationItemAjaxController.listByZone" ).end();
+		get( "/ajax/quotations/:id/plates-export3d" ).to( "QuotationItemAjaxController.plates3dExport" ).end();
 
 		get( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.totals" ).end();
 		post( "/ajax/quotations/:id/totals" ).to( "QuotationAjaxController.updateTotals" ).end();
@@ -543,6 +544,7 @@
 		get( "/ajax/quotation-items/signage/:id/export" ).to( "QuotationItemAjaxController.signageExport" ).end();
 		get( "/ajax/quotation-items/signage/:id" ).to( "QuotationItemAjaxController.editSignage" ).end();
 		get( "/ajax/quotation-items/plate/:id/fruits" ).to( "QuotationItemAjaxController.listFruits" ).end();
+		get( "/ajax/quotation-items/plate/:id/export3d" ).to( "QuotationItemAjaxController.plate3dExport" ).end();
 		get( "/ajax/quotation-items/plate/:id/export" ).to( "QuotationItemAjaxController.plateExport" ).end();
 		get( "/ajax/quotation-items/plate/:id" ).to( "QuotationItemAjaxController.editPlate" ).end();
 		post( "/ajax/quotation-items/signage" ).to( "QuotationItemAjaxController.saveSignage" ).end();

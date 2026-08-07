@@ -471,6 +471,12 @@
                             </div>
                         </div>
 
+                        <div v-if="show3dPanel" class="row mx-0 border-top pt-2 pb-1">
+                            <div class="col-12">
+                                <textarea class="form-control form-control-sm" style="font-size:10px; font-family:monospace; height:220px;" :value="json3dText" readonly @click="$event.target.select()"></textarea>
+                            </div>
+                        </div>
+
                         <footer class="card-footer">
                         <!--- Footer del modale: informazioni sull'articolo (ID/data creazione) e pulsanti di azione. --->
                             <div class="row">
@@ -478,6 +484,10 @@
                                     <button v-if="detailForm.data.id" type="button" class="btn btn-outline-secondary btn-sm me-2" @click="toggleJsonExport" :disabled="jsonExportLoading">
                                         <i class="fas fa-code"></i> JSON
                                         <span v-if="jsonExportLoading" class="spinner-border spinner-border-sm ms-1"></span>
+                                    </button>
+                                    <button v-if="detailForm.data.id" type="button" class="btn btn-outline-secondary btn-sm me-2" @click="toggle3dExport" :disabled="json3dLoading">
+                                        <i class="fas fa-cube"></i> JSON 3D
+                                        <span v-if="json3dLoading" class="spinner-border spinner-border-sm ms-1"></span>
                                     </button>
                                     <div v-if="detailForm.data.id">
                                     <!--- Sezione visibile SOLO in modifica (quando l'articolo ha un ID). Mostra ID e data di creazione. --->

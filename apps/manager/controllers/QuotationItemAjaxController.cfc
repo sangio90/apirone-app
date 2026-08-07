@@ -257,6 +257,168 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function plate3dExport( event, rc, prc ){
+		var result = super.getResult();
+		var item = super.fire( "QuotationItem.get", { quotationItemId = rc.id } );
+		result.setData( build3dItemJson( item ) );
+		event.setValue( "result", result );
+	}
+
+	function plates3dExport( event, rc, prc ){
+		var result = super.getResult();
+		var plates = super.service( "QuotationItem" ).list( quotationId = rc.id, typeId = "PLA" );
+		var data = [];
+		for ( var plate in plates ) {
+			var fullItem = super.fire( "QuotationItem.get", { quotationItemId = plate.getId() } );
+			ArrayAppend( data, build3dItemJson( fullItem ) );
+		}
+		result.setData( data );
+		event.setValue( "result", result );
+	}
+
+	private Struct function build3dItemJson( required item, String langId = "IT" ){
+		var codiceArticolo = "";
+		var codiceVariante = "";
+		var codiceColore   = "";
+
+		if ( !isNull( arguments.item.getHash() ) && Len( Trim( arguments.item.getHash() ) ) ) {
+			var productHash = super.service( "ProductHash" ).getByHash( arguments.item.getHash() );
+			if ( !isNull( productHash ) ) {
+				var exportCodes = super.service( "ExportCode" ).list( productHashId = productHash.getId() );
+				if ( exportCodes.len() > 0 ) {
+					codiceArticolo = exportCodes[1].getName().left( 15 );
+					codiceVariante = exportCodes[1].getName().right( 10 );
+					codiceColore   = exportCodes[1].getCounter();
+				}
+			}
+		}
+
+		var quantita = arguments.item.getQuantity();
+		if ( !isNull( arguments.item.getQuotationZone() ) ) {
+			if ( !isNull( arguments.item.getQuotationZone().getOrigin() ) ) {
+				quantita *= arguments.item.getQuotationZone().getOrigin().getQuantity();
+			}
+			quantita *= arguments.item.getQuotationZone().getQuantity();
+		}
+
+		var product = arguments.item.getProduct();
+		var attributiPlacca = [];
+		for ( var qi in arguments.item.getItems() ) {
+			var pi = qi.getProductItem();
+			ArrayAppend( attributiPlacca, {
+				"attributo"      = pi.getAttribute().getName( arguments.langId ),
+				"attributo_code" = pi.getAttribute().getCode(),
+				"valore"         = pi.getAttributeValue().getName( arguments.langId ),
+				"valore_code"    = !isNull( pi.getAttributeValue().getRawValue() ) ? pi.getAttributeValue().getRawValue().getCode() : ""
+			});
+		}
+
+		var placca = {
+			"modello"   = !isNull( product.getModel() )  ? product.getModel().getCode()  & " – " & product.getModel().getName( arguments.langId )  : "",
+			"finitura"  = !isNull( product.getFinish() ) ? product.getFinish().getCode() & " – " & product.getFinish().getName( arguments.langId ) : "",
+			"attributi" = attributiPlacca
+		};
+
+		var placcaOrientationId = "";
+
+		// mappa slot (intero, 1..N) -> orientamento effettivo del blocco che lo contiene,
+		// stesso algoritmo di FrameAjaxController.buildBlocksResponse()
+		var slotOrientations = {};
+
+		if ( !isNull( arguments.item.getFrame() ) ) {
+			placcaOrientationId    = arguments.item.getFrame().getOrientation().getId();
+			placca["orientamento"] = placcaOrientationId;
+
+			// arguments.item.getFrame() è un bean "snapshot" con la sola orientation
+			// valorizzata (vedi QuotationItemService.buildFromRow/getMany): per i blocchi
+			// serve ricaricare il Frame vero e proprio dal suo code (== code del modello).
+			if ( !isNull( product.getModel() ) && Len( product.getModel().getCode() ) ) {
+				var frameBean = super.service( "Frame" ).getByCode( product.getModel().getCode() );
+
+				if ( !isNull( frameBean ) ) {
+					placca["frame"] = frameBean.getCode();
+
+					if ( !isNull( frameBean.getBlocks() ) && ArrayLen( frameBean.getBlocks() ) ) {
+						var blockOverrides = {};
+						if ( !isNull( arguments.item.getBlockOrientations() ) && IsJSON( arguments.item.getBlockOrientations() ) ) {
+							blockOverrides = DeserializeJSON( arguments.item.getBlockOrientations() );
+						}
+
+						var slotCounter = 0;
+						for ( var block in frameBean.getBlocks() ) {
+							var effectiveOri = ( block.getOrientationMode() == "HAV" ? placcaOrientationId : block.getOrientationMode() );
+
+							var orderKey = ToString( block.getOrder() );
+							if ( StructKeyExists( blockOverrides, orderKey ) && ListFindNoCase( "HOR,VER", blockOverrides[ orderKey ] ) ) {
+								effectiveOri = UCase( blockOverrides[ orderKey ] );
+							}
+
+							for ( var i = 1; i <= block.getSlotCount(); i++ ) {
+								slotCounter++;
+								slotOrientations[ slotCounter ] = effectiveOri;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		var frutti = [];
+		var fruitOrder = 1;
+		for ( var fruit in arguments.item.getFruits() ) {
+			var fruttoProdotto = fruit.getFruit();
+			if ( isNull( fruttoProdotto ) ) {
+				fruitOrder++;
+				continue;
+			}
+			var slots = [];
+			if ( !isNull( fruit.getPositions() ) ) {
+				for ( var pos in fruit.getPositions() ) {
+					ArrayAppend( slots, pos.position );
+				}
+			}
+
+			// orientamento del frutto = orientamento del blocco a cui appartiene il suo primo slot;
+			// se il blocco non è individuabile (placca legacy, slot non numerico) si usa quello della placca
+			var orientamentoFrutto = placcaOrientationId;
+			if ( slots.len() && IsNumeric( slots[1] ) && StructKeyExists( slotOrientations, slots[1] ) ) {
+				orientamentoFrutto = slotOrientations[ slots[1] ];
+			}
+
+			var attributiFrutto = [];
+			if ( !isNull( fruit.getItems() ) ) {
+				for ( var qif in fruit.getItems() ) {
+					var pif = qif.getProductItem();
+					ArrayAppend( attributiFrutto, {
+						"attributo"      = pif.getAttribute().getName( arguments.langId ),
+						"attributo_code" = pif.getAttribute().getCode(),
+						"valore"         = pif.getAttributeValue().getName( arguments.langId ),
+						"valore_code"    = !isNull( pif.getAttributeValue().getRawValue() ) ? pif.getAttributeValue().getRawValue().getCode() : ""
+					});
+				}
+			}
+			ArrayAppend( frutti, {
+				"ordine"       = fruitOrder,
+				"codice"       = fruttoProdotto.getCode(),
+				"modello"      = !isNull( fruttoProdotto.getModel() )  ? fruttoProdotto.getModel().getCode()  & " – " & fruttoProdotto.getModel().getName( arguments.langId )  : "",
+				"finitura"     = !isNull( fruttoProdotto.getFinish() ) ? fruttoProdotto.getFinish().getCode() & " – " & fruttoProdotto.getFinish().getName( arguments.langId ) : "",
+				"slots"        = slots,
+				"orientamento" = orientamentoFrutto,
+				"attributi"    = attributiFrutto
+			});
+			fruitOrder++;
+		}
+
+		return {
+			"codice_articolo" = codiceArticolo,
+			"codice_variante" = codiceVariante,
+			"codice_colore"   = codiceColore,
+			"quantita"        = quantita,
+			"placca"          = placca,
+			"frutti"          = frutti
+		};
+	}
+
 	function signageExport( event, rc, prc ){
 		var result = super.getResult();
 		var langId = "IT";

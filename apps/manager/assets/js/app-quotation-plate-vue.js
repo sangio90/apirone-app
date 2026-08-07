@@ -322,6 +322,9 @@ AP.plate.modal = ( function() {
                 showJsonPanel: false, /** Flag per mostrare il pannello JSON export (provvisorio). */
                 jsonExportText: "", /** Contenuto JSON dell'export placca. */
                 jsonExportLoading: false, /** Flag di caricamento per il JSON export. */
+                show3dPanel: false, /** Flag per mostrare il pannello JSON 3D. */
+                json3dText: "", /** Contenuto JSON 3D della placca. */
+                json3dLoading: false, /** Flag di caricamento per il JSON 3D. */
 
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
@@ -417,6 +420,8 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.product.items = [];
                     this.showJsonPanel = false;
                     this.jsonExportText = "";
+                    this.show3dPanel = false;
+                    this.json3dText = "";
                 },
 
                 // MARK: Custom Image
@@ -2474,6 +2479,29 @@ AP.plate.modal = ( function() {
                                 this.jsonExportLoading = false;
                             },
                         },
+                    } );
+                },
+
+                toggle3dExport: function() {
+                    if ( this.show3dPanel ) {
+                        this.show3dPanel = false;
+                        return;
+                    }
+                    const id = this.detailForm.data.id;
+                    if ( !id ) return;
+                    this.json3dLoading = true;
+                    ajax( {
+                        method: "GET",
+                        url: BASE + "/quotation-items/plate/" + id + "/export3d",
+                        callback: {
+                            done: ( xhr ) => {
+                                this.json3dText = JSON.stringify( xhr.data, null, 2 );
+                                this.show3dPanel = true;
+                                this.json3dLoading = false;
+                            },
+                        },
+                    } ).always( () => {
+                        this.json3dLoading = false;
                     } );
                 },
 
