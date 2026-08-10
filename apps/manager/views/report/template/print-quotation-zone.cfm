@@ -1,5 +1,9 @@
 ﻿<cfoutput>
 	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
+	<!--- proforma: stessa stampa del preventivo, con testata, pagamento e totali dedicati --->
+	<cfset isProforma      = (args.params.report ?: "") EQ "proforma">
+	<cfset proformaProg    = Trim( args.params.progressivo ?: "" )>
+	<cfset proformaPercent = Val( args.params.percentuale ?: 0 )>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -22,27 +26,25 @@
 								#getPrintFullHeader()#
 							</td>
 							<td style="border: 0; width: 9cm; padding-top: .4in;">
-								<h2 style="text-align: right; margin-right: .1in;">#printLabel('quotation', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
+								<h2 style="text-align: right; margin-right: .1in;"><cfif isProforma>#printLabel('proforma', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#<cfif Len( proformaProg )> #proformaProg#</cfif><cfelse>#printLabel('quotation', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</cfif></h2>
 								<table style="width: 100%; border: 0;">
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('date', langId)#</td>
 										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#DateFormat( args.data.quotation.getQuotationDate(), "dd/mm/yyyy" )#</td>
 									</tr>
-									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('offerValidity', langId)#</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#DateFormat( args.data.quotation.getValidityDate(), "dd/mm/yyyy" )#</td>
-									</tr>
+									<cfif !isProforma>
+										<tr>
+											<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('offerValidity', langId)#</td>
+											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#DateFormat( args.data.quotation.getValidityDate(), "dd/mm/yyyy" )#</td>
+										</tr>
+									</cfif>
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('paymentMethod', langId)#</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#args.data.quotation.getPaymentMethodName()#</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;"><cfif isProforma>#proformaPercent EQ Int( proformaPercent ) ? Int( proformaPercent ) : LSNumberFormat( proformaPercent, "9.99" )#% #printLabel('advancePayment', langId)#<cfelse>#args.data.quotation.getPaymentMethodName()#</cfif></td>
 									</tr>
 									<tr>
-										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('salesAgent', langId)#</td>
-										<cfif !isNull(args.data.quotation.getSalesAgent())>
-											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#args.data.quotation.getSalesAgent().getAccount().getName()#</td>
-										<cfelse>
-											<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;"></td>
-										</cfif>
+										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; vertical-align: top;">#printLabel('salesAgent', langId)#</td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;">#printSalesAgent(salesAgent = args.data.quotation.getSalesAgent(), langId = langId)#</td>
 									</tr>
 								</table>
 							</td>
@@ -81,7 +83,7 @@
 										</tr>
 										<tr style="border: 0">
 											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('email', langId)#: </td>
-											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
+											<td style="border: 0; padding-left: 0.05in;">#args.data.quotation.getCustomer().getEmail() ?: ""#</td>
 										</tr>
 										<tr style="border: 0">
 											<td style="border: 0; font-weight: bold; padding-left: 0.05in;">#printLabel('vatNumber', langId)#: </td>
@@ -164,31 +166,31 @@
 										<table class="hiddenTable">
 											<tr>
 												<cfif args.params.images>
-													<td style="vertical-align: middle; width: 6cm;" rowspan="2">
+													<td style="vertical-align: middle; width: 5cm;" rowspan="2">
 														<cfif IsNull( oggetto.getImage() )>
-															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
+															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 														<cfelse>
-															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
+															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 															<!--- Queste sono quelle che dovrebbero funionare --->
-																<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
-																<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 6cm !important; max-height: 6cm !important;">
+																<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
+																<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 															<!--- Fine  --->
 														</cfif>
 													</td>
 												</cfif>
 												<td>
-													<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+													<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 													<cfif !isNull(oggetto.getPosition())>
-														<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
+														<div style="font-size: 7pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
 													</cfif>
 													<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 														<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 														<cfloop from="1"  to="#itemsCount#" index="item">
 															<cfset item = oggetto.getItems()[item]>
-															<span style="font-size: 8pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+															<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 														</cfloop>
 														<cfif isNull(oggetto.getArticle()) && !isNull(oggetto.getNote()) && args.params.note>
-															<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
+															<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 														</cfif>
 													</cfif>
 												</td>
@@ -196,7 +198,7 @@
 											<tr>
 												<td style="vertical-align: bottom; padding: 3pt;">
 													<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
-														<div style="font-size: 8pt; line-height: 15px; margin-top: 0.1in;">
+														<div style="font-size: 7pt; line-height: 15px; margin-top: 0.1in;">
 															<b>#printLabel('fruitList', langId)#: </b>
 															<cfif NOT isNull(oggetto.getFruits())>
 																<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
@@ -211,17 +213,17 @@
 																					#fruitPosition.order + 1#<cfif fpi < fruitPositionsCount > - </cfif>
 																				</cfloop>
 																			</b> : Cod. 
-																			<span style="text-transform: lowercase; font-size: 8pt;">
+																			<span style="text-transform: lowercase; font-size: 7pt;">
 																				#fruit.getFruit().getCode()#<br>
 																				<cfif IsArray( fruit.getItems() )>
 																					<cfloop array="#fruit.getItems()#" index="fruitItem">
-																						<span style="font-size: 8pt; text-transform: lowecase">
+																						<span style="font-size: 7pt; text-transform: lowecase">
 																							#fruitItem.getProductItem().getAttribute().getName()#: #fruitItem.getProductItem().getAttributeValue().getRawValue().getName()#
 																						</span><br>
 																					</cfloop>
 																				</cfif>
 																				<cfif !isNull(fruit.getNote()) && args.params.note>
-																					<span style="font-size: 8pt; margin-top: 4pt;">
+																					<span style="font-size: 7pt; margin-top: 4pt;">
 																						<i>( Note: #fruit.getNote()# )</i>
 																					</span>
 																				</cfif>
@@ -283,8 +285,8 @@
 									<table class="hiddenTable">
 										<tr>
 											<td>
-												<span style="font-size: 8pt; text-transform: lowecase">#servizio.getArticle().getName()#</span><br>
-												<span style="font-size: 8pt; text-transform: lowecase">#servizio.getNote()#</span><br>
+												<span style="font-size: 7pt; text-transform: lowecase">#servizio.getArticle().getName()#</span><br>
+												<span style="font-size: 7pt; text-transform: lowecase">#servizio.getNote()#</span><br>
 											</td>
 										</tr>
 									</table>
@@ -350,8 +352,14 @@
 						</tr>
 						<tr>
 							<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
-							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</td>
+							<td><strong>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</strong></td>
 						</tr>
+						<cfif isProforma>
+							<tr>
+								<td><strong>#printLabel('amountToPay', langId)#</strong></td>
+								<td><strong>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'] * proformaPercent / 100, "9,999.99", "it_IT" )# €</strong></td>
+							</tr>
+						</cfif>
 						</cfif>
 						<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
 							<tr>
@@ -362,6 +370,9 @@
 					</table>
 				</div>
 
+				<cfif isProforma>
+					<div class="not-fiscal">#printLabel('notFiscalDocument', langId)#</div>
+				</cfif>
 				#getFinalForm(langId)#
 			</cfoutput>
 		</div>

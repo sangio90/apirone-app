@@ -221,6 +221,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var typeBean = super.bean( "ProductCategoryType" );
 				typeBean.setId( tr.product_category_type_id );
 				typeBean.setName( tr.product_category_type );
+				if ( !IsNull( tr.orderby ) ) typeBean.setOrderby( tr.orderby );
 				typeBean.setCreatedAt( tr.created_at );
 				typeBean.setStatus( getStatusService().get( tr.status_id ) );
 				typeMap[ tr.product_category_type_id ] = typeBean;

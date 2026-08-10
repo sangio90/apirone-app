@@ -53,8 +53,15 @@
 			customer.setShippingProfiles( addressesList );
 		}
 
+		// Email del cliente ("Indirizzo Email" primario nel CRM).
+		// ATTENZIONE: ad oggi l'endpoint /accounts non la espone in nessuna forma, quindi
+		// resta vuota; leggiamo tutte le chiavi standard SuiteCRM così si popola da sola
+		// non appena l'API inizierà a restituirla.
+		customer.setEmail( extractEmail( data ) );
+
+		// Email del referente: campo custom referente_email, distinto da quello del cliente.
 		customer.setContactPersonName(data.referente_nome ?: "");
-		customer.setContactPersonEmail(data.referente_email ?: "");
+		customer.setContactPersonEmail( Trim( data.referente_email ?: "" ) );
 		customer.setAccountType( data.account_type ?: "" );
 		customer.setIndustry( data.industry ?: "" );
 
@@ -114,6 +121,45 @@
 		//bean.setType( getLookupService().get( "profileType", "S" ) );
 
 		return bean;
+	}
+
+	/**
+	 * Indirizzo email del cliente dal payload CRM.
+	 *
+	 * Regge le due forme con cui SuiteCRM può esporlo:
+	 *   - chiave scalare ( email1, email_address, email )
+	 *   - relazione email_addresses come array di struct, da cui si prende
+	 *     l'indirizzo marcato primary_address, altrimenti il primo valorizzato
+	 */
+	private String function extractEmail( required Struct data ){
+		for ( var key in [ "email1", "email_address", "email" ] ) {
+			if ( StructKeyExists( arguments.data, key ) && !IsNull( arguments.data[ key ] ) && IsSimpleValue( arguments.data[ key ] ) ) {
+				var value = Trim( arguments.data[ key ] );
+				if ( Len( value ) ) return value;
+			}
+		}
+
+		for ( var key in [ "email_addresses", "email" ] ) {
+			if ( !StructKeyExists( arguments.data, key ) || IsNull( arguments.data[ key ] ) || !IsArray( arguments.data[ key ] ) ) {
+				continue;
+			}
+
+			var fallback = "";
+
+			for ( var entry in arguments.data[ key ] ) {
+				if ( !IsStruct( entry ) ) continue;
+
+				var address = Trim( entry.email_address ?: ( entry.email1 ?: "" ) );
+				if ( !Len( address ) ) continue;
+
+				if ( Val( entry.primary_address ?: 0 ) EQ 1 ) return address;
+				if ( !Len( fallback ) ) fallback = address;
+			}
+
+			if ( Len( fallback ) ) return fallback;
+		}
+
+		return "";
 	}
 
 }

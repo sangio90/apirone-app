@@ -7,7 +7,7 @@
 	<cfoutput>
 		<div style="width: 10cm">
 			<br>
-			<img src='https://apir.co.uk/wp-content/uploads/2024/10/APIR_since1918.png' alt='Apir' style='6cm; height: 40px;'>
+			<img src="#expandPath('/assets/main/img/logo_apir.png')#" alt="Apir" style="width: 3cm; height: 1.55cm;">
 			<br>
 			<strong style="font-size: 11pt;">APIR s.r.l. a socio unico</strong>
 			<div style="line-height: 8pt;">
@@ -32,6 +32,88 @@
 		</div>
 
 	</cfoutput>
+</cffunction>
+
+<!---
+	Commerciale di riferimento: nome (dall'Account) e, sotto, telefono (dall'User) ed email (dall'Account).
+	Le due righe di contatto compaiono solo se valorizzate.
+--->
+<cffunction name="printSalesAgent">
+	<cfargument name="salesAgent" required="false">
+	<cfargument name="langId" required="true" type="String">
+
+	<cfsavecontent variable="local.html">
+		<cfoutput>
+			<cfif !IsNull( arguments.salesAgent )>
+				<cfset local.account = arguments.salesAgent.getAccount()>
+				<cfset local.phone   = Trim( arguments.salesAgent.getPhone() ?: "" )>
+				<cfset local.email   = !IsNull( local.account ) ? Trim( local.account.getEmail() ?: "" ) : "">
+
+				<cfif !IsNull( local.account )>#local.account.getName()#</cfif>
+
+				<cfif Len( local.phone ) OR Len( local.email )>
+					<div style="font-size: 7pt; line-height: 9pt;">
+						<cfif Len( local.phone )>
+							#printLabel('phone', arguments.langId)#: #local.phone#<cfif Len( local.email )><br></cfif>
+						</cfif>
+						<cfif Len( local.email )>
+							#printLabel('email', arguments.langId)#: #local.email#
+						</cfif>
+					</div>
+				</cfif>
+			</cfif>
+		</cfoutput>
+	</cfsavecontent>
+
+	<cfreturn local.html>
+</cffunction>
+
+<!---
+	Pianta di una zona con i marker delle posizioni.
+	Il centraggio del marker è fatto con margini negativi e non con translate(-50%,-50%):
+	cfdocument ignora le trasformazioni CSS, così il pin resta comunque centrato sul punto
+	e la rotazione, se supportata, si somma senza spostarlo.
+--->
+<cffunction name="printPlant">
+	<cfargument name="plant" required="true">
+	<cfargument name="langId" default="IT">
+	<!--- se valorizzato, il titolo di categoria viaggia dentro questo stesso blocco
+	      non spezzabile, così non resta mai orfano in fondo a una pagina --->
+	<cfargument name="sectionTitle" default="">
+
+	<cfsavecontent variable="local.html">
+		<cfoutput>
+			<div class="plant">
+				<cfif Len( arguments.sectionTitle )>
+					<div class="category-section">#arguments.sectionTitle#</div>
+				</cfif>
+				<div class="plant-title">#printLabel('plant', arguments.langId)#: #arguments.plant.zoneName#</div>
+				<div class="plant-canvas" style="width: #arguments.plant.boxWidth#cm; height: #arguments.plant.boxHeight#cm;">
+					<img src="#arguments.plant.imagePath#" class="plant-image" style="width: #arguments.plant.boxWidth#cm; height: #arguments.plant.boxHeight#cm;">
+					<cfloop array="#arguments.plant.markers#" index="local.marker">
+						<cfset local.half = Int( local.marker.size / 2 )>
+						<div class="plant-pin" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.marker.size#px; height: #local.marker.size#px; margin-left: -#local.half#px; margin-top: -#local.half#px; background-color: #local.marker.color#; transform: rotate(#local.marker.angle#deg);"></div>
+						<div class="plant-pin-label" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.marker.size#px; margin-left: -#local.half#px; margin-top: -6px;">#local.marker.label#</div>
+					</cfloop>
+				</div>
+			</div>
+		</cfoutput>
+	</cfsavecontent>
+
+	<cfreturn local.html>
+</cffunction>
+
+<!--- Percentuale senza decimali inutili: 30% invece di 30,00%, ma 32,5% resta tale. --->
+<cffunction name="printPercent">
+	<cfargument name="value" required="true">
+
+	<cfset local.n = Val( arguments.value )>
+
+	<cfif local.n EQ Int( local.n )>
+		<cfreturn Int( local.n ) & "%">
+	</cfif>
+
+	<cfreturn LSNumberFormat( local.n, "9.99" ) & "%">
 </cffunction>
 
 <cffunction name="getPrintFooter">
@@ -93,7 +175,7 @@
 			"opportunity":    "Opportunità",
 			"shippingName":   "Nome",
 			"article":        "Articolo",
-			"qty":            "Qty.",
+			"qty":            "Qtà",
 			"price":          "Prezzo",
 			"total":          "Totale",
 			"service":        "Servizio",
@@ -102,6 +184,14 @@
 			"vat":            "Iva",
 			"shipping":       "Spedizione",
 			"invoiceTotal":   "Totale fattura",
+			"unitPrice":    "Prezzo unit.",
+			"discount":     "Sconto",
+			"netUnitPrice": "Prezzo scont.",
+			"proforma":     "Proforma",
+			"advancePayment": "anticipato",
+			"amountToPay":  "Totale a pagare",
+			"notFiscalDocument": "DOCUMENTO NON VALIDO AI FINI FISCALI",
+			"plant":        "Pianta",
 			"position":       "Posizione",
 			"positions":      "Posizioni",
 			"fruitList":      "Lista Frutti",
@@ -136,6 +226,14 @@
 			"vat":            "VAT",
 			"shipping":       "Shipping",
 			"invoiceTotal":   "Invoice total",
+			"unitPrice":    "Unit price",
+			"discount":     "Discount",
+			"netUnitPrice": "Net price",
+			"proforma":     "Proforma",
+			"advancePayment": "advance payment",
+			"amountToPay":  "Amount to pay",
+			"notFiscalDocument": "DOCUMENT NOT VALID FOR TAX PURPOSES",
+			"plant":        "Floor plan",
 			"position":       "Position",
 			"positions":      "Positions",
 			"fruitList":      "Fruit list",
@@ -170,6 +268,14 @@
 			"vat":            "TVA",
 			"shipping":       "Livraison",
 			"invoiceTotal":   "Total facture",
+			"unitPrice":    "Prix unit.",
+			"discount":     "Remise",
+			"netUnitPrice": "Prix net",
+			"proforma":     "Proforma",
+			"advancePayment": "d'acompte",
+			"amountToPay":  "Total à payer",
+			"notFiscalDocument": "DOCUMENT SANS VALEUR FISCALE",
+			"plant":        "Plan",
 			"position":       "Position",
 			"positions":      "Positions",
 			"fruitList":      "Liste des fruits",
@@ -204,6 +310,14 @@
 			"vat":            "IVA",
 			"shipping":       "Envío",
 			"invoiceTotal":   "Total factura",
+			"unitPrice":    "Precio unit.",
+			"discount":     "Descuento",
+			"netUnitPrice": "Precio neto",
+			"proforma":     "Proforma",
+			"advancePayment": "anticipado",
+			"amountToPay":  "Total a pagar",
+			"notFiscalDocument": "DOCUMENTO NO VÁLIDO A EFECTOS FISCALES",
+			"plant":        "Plano",
 			"position":       "Posición",
 			"positions":      "Posiciones",
 			"fruitList":      "Lista de frutos",
@@ -238,6 +352,14 @@
 			"vat":            "MwSt.",
 			"shipping":       "Versand",
 			"invoiceTotal":   "Rechnungsgesamt",
+			"unitPrice":    "Einzelpreis",
+			"discount":     "Rabatt",
+			"netUnitPrice": "Nettopreis",
+			"proforma":     "Proforma",
+			"advancePayment": "Anzahlung",
+			"amountToPay":  "Zu zahlender Betrag",
+			"notFiscalDocument": "DOKUMENT OHNE STEUERLICHE GÜLTIGKEIT",
+			"plant":        "Grundriss",
 			"position":       "Position",
 			"positions":      "Positionen",
 			"fruitList":      "Fruchtliste",
@@ -255,6 +377,36 @@
 		<cfreturn local.labels[local.lang][arguments.key]>
 	</cfif>
 	<cfreturn local.labels["IT"][arguments.key]>
+</cffunction>
+
+<!---
+	Titolo della sezione di raggruppamento per tipo di categoria prodotto.
+	Se il tipo non è fra quelli noti ripiega sul nome che arriva dal DB.
+--->
+<cffunction name="printCategoryType">
+	<cfargument name="typeId" required="true">
+	<cfargument name="fallback" default="">
+	<cfargument name="langId" default="IT">
+
+	<cfset local.lang = UCase(arguments.langId)>
+	<cfset local.names = {
+		"IT": { "PLA": "Placche",     "FRU": "Frutti",   "SEG": "Segnaletica",   "ACC": "Accessori" },
+		"EN": { "PLA": "Plates",      "FRU": "Fruits",   "SEG": "Signage",       "ACC": "Accessories" },
+		"FR": { "PLA": "Plaques",     "FRU": "Fruits",   "SEG": "Signalétique",  "ACC": "Accessoires" },
+		"ES": { "PLA": "Placas",      "FRU": "Frutos",   "SEG": "Señalética",    "ACC": "Accesorios" },
+		"DE": { "PLA": "Abdeckungen", "FRU": "Früchte",  "SEG": "Beschilderung", "ACC": "Zubehör" }
+	}>
+
+	<cfif !structKeyExists(local.names, local.lang)>
+		<cfset local.lang = "IT">
+	</cfif>
+
+	<cfset local.key = UCase(arguments.typeId)>
+	<cfif structKeyExists(local.names[local.lang], local.key)>
+		<cfreturn local.names[local.lang][local.key]>
+	</cfif>
+
+	<cfreturn arguments.fallback>
 </cffunction>
 
 <cffunction name="getFinalForm">
@@ -495,7 +647,7 @@
 
 <cffunction name="printStyle">
 	<style>	
-		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 13px }
+		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 11px }
 		
 		table {
 			border-collapse: collapse;
@@ -528,9 +680,70 @@
 		}
 		/* fine */
 
+		/* pianta con i marker delle posizioni */
+		.plant {
+			page-break-inside: avoid;
+			margin-bottom: 0.3in;
+			text-align: center;
+		}
+		.plant-title {
+			font-size: 10px;
+			font-weight: bold;
+			text-align: left;
+			margin-bottom: 0.06in;
+		}
+		.plant-canvas {
+			position: relative;
+			display: inline-block;
+		}
+		.plant-image {
+			display: block;
+		}
+		.plant-pin {
+			position: absolute;
+			border-radius: 50% 50% 50% 0;
+			transform-origin: center;
+		}
+		.plant-pin-label {
+			position: absolute;
+			font-size: 10px;
+			line-height: 1.2;
+			color: white;
+			text-align: center;
+		}
+		/* fine */
+
+		/* intestazione di sezione del raggruppamento per tipo categoria */
+		.category-section {
+			text-align: left;
+			margin-top: 0.18in;
+			margin-bottom: 0.04in;
+			padding-bottom: 2px;
+			border-bottom: 1px solid #000;
+			font-size: 12px;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+		/* fine */
+
+		/* avviso proforma, fra i totali e le coordinate bancarie */
+		.not-fiscal {
+			clear: both;
+			margin-top: 0.25in;
+			margin-bottom: 0.1in;
+			padding: 6px;
+			border: 2px solid #000;
+			text-align: center;
+			font-size: 14px;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+		/* fine */
+
 		/* form finale con iban banca e firme */
 		.top-note {
-			font-size: 10px;
+			font-size: 12px;
+			font-weight: bold;
 		}
 		.bank {
 			width: 4.5in;

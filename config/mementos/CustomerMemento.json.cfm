@@ -7,6 +7,7 @@
 		"company",
 		"description",
 		"phone",
+		"email",
 		"vatNumber",
 		"street",
 		"postalCode",

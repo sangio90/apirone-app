@@ -58,7 +58,7 @@
 									</tr>
 									<tr style="border: 0">
 										<td style="border: 0; font-weight: bold;">Email: </td>
-										<td style="border: 0">#args.data.quotation.getCustomer().getContactPersonEmail()#</td>
+										<td style="border: 0">#args.data.quotation.getCustomer().getEmail() ?: ""#</td>
 									</tr>
 									<tr style="border: 0">
 										<td style="border: 0; font-weight: bold;">Partita IVA: </td>

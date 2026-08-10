@@ -35,11 +35,18 @@
 			</cfdocumentitem>
 
 			<cfoutput>
-				<cfset itemsArray = []>
-				<cfloop collection="#args.data.items#" item="hashKey">
-					<cfset arrayAppend(itemsArray, args.data.items[hashKey])>
+				<cfloop array="#args.data.plants#" index="plant">
+					#printPlant(plant = plant, langId = langId)#
 				</cfloop>
-				<cfloop array="#itemsArray#" index="oggetto">
+				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
+					<cfset groupItemsCount = ArrayLen( categoryGroup.items )>
+					<cfset groupPlantsCount = ArrayLen( categoryGroup.plants )>
+					<cfset sectionTitle = Len( categoryGroup.id ) ? printCategoryType(categoryGroup.id, categoryGroup.name, langId) : "">
+					<cfloop from="1" to="#groupPlantsCount#" index="plantIndex">
+						#printPlant(plant = categoryGroup.plants[plantIndex], langId = langId, sectionTitle = plantIndex EQ 1 ? sectionTitle : "")#
+					</cfloop>
+					<cfloop from="1" to="#groupItemsCount#" index="groupItemIndex">
+					<cfset oggetto = categoryGroup.items[groupItemIndex]>
 					<cfset zones = oggetto.zones>
 					<cfset quantity = oggetto.quantity>
 					<cfset oggetto = oggetto.item>
@@ -47,6 +54,7 @@
 					<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
 					<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
 					<div class="item" style="page-break-inside: avoid;">
+						<cfif groupItemIndex EQ 1 AND Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
 								<cfif args.params.images>
@@ -73,9 +81,9 @@
 									<td style="padding: 0; margin: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 0.01cm !important;"></td>
 								</cfif>
 								<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
-									<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 									<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
-										<div style="font-size: 8pt; margin-top: 2px;">
+										<div style="font-size: 7pt; margin-top: 2px;">
 											<cfif !isNull(thisDimMC.getLength())>
 												<span style="white-space: nowrap;">#printLabel('dimLegend3', langId)#:</span>
 												<span style="white-space: nowrap;">#thisDimMC.getLength()# x #thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
@@ -89,25 +97,25 @@
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 										<cfloop from="1"  to="#itemsCount#" index="item">
 											<cfset item = oggetto.getItems()[item]>
-											<span style="font-size: 8pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+											<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 										</cfloop>
 										<cfif !isNull(oggetto.getNote()) && args.params.note>
-											<span style="font-size: 8pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
+											<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 										</cfif>
 									</cfif>
-									<div style="font-size: 8pt; line-height: 15px; margin-top: 3px;">
+									<div style="font-size: 7pt; line-height: 15px; margin-top: 3px;">
 										#printLabel('qty', langId)#: #quantity#
 									</div>
 								</td>
 								<td style="vertical-align: top; padding-top: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; padding-left: 5pt; width: 9cm !important;">
 									<cfif hasDim && thisDimType EQ "PLA">
-										<div style="font-size: 8pt; margin-bottom: 4px;">
+										<div style="font-size: 7pt; margin-bottom: 4px;">
 											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
 											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
 										</div>
 									</cfif>
 									<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
-										<div style="font-size: 8pt; line-height: 15px;">
+										<div style="font-size: 7pt; line-height: 15px;">
 											#printLabel('fruitList', langId)#:
 											<cfif NOT isNull(oggetto.getFruits())>
 												<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
@@ -122,17 +130,17 @@
 																	#fruitPosition.order + 1#<cfif fpi < fruitPositionsCount > - </cfif>
 																</cfloop>
 															</b> : Cod.
-															<span style="text-transform: lowercase; font-size: 8pt;">
+															<span style="text-transform: lowercase; font-size: 7pt;">
 																#fruit.getFruit().getCode()#<br>
 																<cfif IsArray( fruit.getItems() )>
 																	<cfloop array="#fruit.getItems()#" index="fruitItem">
-																		<span style="font-size: 8pt; text-transform: lowecase">
+																		<span style="font-size: 7pt; text-transform: lowecase">
 																			#fruitItem.getProductItem().getAttribute().getName()#: #fruitItem.getProductItem().getAttributeValue().getRawValue().getName()#
 																		</span><br>
 																	</cfloop>
 																</cfif>
 																<cfif !isNull(fruit.getNote()) && args.params.note>
-																	<span style="font-size: 8pt; margin-top: 4pt;">
+																	<span style="font-size: 7pt; margin-top: 4pt;">
 																		<i>( Note: #fruit.getNote()# )</i>
 																	</span>
 																</cfif>
@@ -144,18 +152,22 @@
 										</div>
 									</cfif>
 									<cfif hasDim && thisDimType EQ "SEG">
-										<div style="font-size: 8pt; margin-bottom: 4px;">
+										<div style="font-size: 7pt; margin-bottom: 4px;">
 											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
 											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
 										</div>
 									</cfif>
 									<cfif structCount(zones) gt 0>
-										<div style="font-size: 8pt; line-height: 15px">
+										<div style="font-size: 7pt; line-height: 15px">
 											#printLabel('positions', langId)#:
 											<cfloop collection="#zones#" item="zoneName">
-												<div style="font-size: 8pt; line-height: 15px; padding-left: 3px;">
+												<div style="font-size: 7pt; line-height: 15px; padding-left: 3px;">
 													#zoneName#: 
-													#arrayToList(zones[zoneName], ", ")#
+													<cfif ArrayLen( zones[zoneName].positions )>
+														#arrayToList( zones[zoneName].positions, ", " )#
+													<cfelse>
+														#printLabel('qty', langId)# #zones[zoneName].quantity#
+													</cfif>
 												</div>
 											</cfloop>
 										</div>
@@ -164,6 +176,7 @@
 							</tr>
 						</table>
 					</div>
+				</cfloop>
 				</cfloop>
 			</cfoutput>
 		</div>

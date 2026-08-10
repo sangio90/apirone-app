@@ -68,6 +68,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			// Campi diretti dal record
 			bean.setId( record.product_category_type_id );
 			bean.setName( record.product_category_type );
+			if ( !IsNull( record.orderby ) ) bean.setOrderby( record.orderby );
 			bean.setCreatedAt( record.created_at );
 
 			// Status: cached localmente
@@ -93,6 +94,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setStatus( getStatusService().get( record.status_id ) );
 		bean.setCreatedAt( record.created_at );
 		bean.setName( record.product_category_type );
+		if ( !IsNull( record.orderby ) ) bean.setOrderby( record.orderby );
 
 		return bean;
 	}

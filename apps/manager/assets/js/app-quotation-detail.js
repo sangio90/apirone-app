@@ -1455,114 +1455,141 @@ AP.quotation.printModal = (function () {
 	// REF: il nome è errato
 	var fields = AP.quotation.fields;
 
-	var defaultDetailForm = {
-		data: {
-			id: "",
-			report: {
-				"id": "classic",
-				"name": "Classica"
-			},
-			reports: [
-				{
-					"id": "classic",
-					"name": "Classica"
-				},
-				{
-					"id": "photo",
-					"name": "Foto"
-				},
-				{
-					"id": "zone",
-					"name": "Zone"
-				},
-				{
-					"id": "technical",
-					"name": "Tecnica"
-				}
-			]
+	const DEFAULT_REPORT = "classic";
+
+	// Terzo livello: mappa opzione -> elementi nel DOM.
+	const OPTION_FIELDS = {
+		images: {checkbox: "#qt-print-image-checkbox", container: "#qt-print-images-cont"},
+		note: {checkbox: "#qt-print-note-checkbox", container: "#qt-print-note-cont"},
+		discounts: {checkbox: "#qt-print-discounts-checkbox", container: "#qt-print-discounts-cont"},
+		plants: {checkbox: "#qt-print-plants-checkbox", container: "#qt-print-plants-cont"},
+		hideTotal: {checkbox: "#qt-print-hide-total-checkbox", container: "#qt-print-hide-total-cont"}
+	};
+
+	// Per ogni tipologia di stampa (primo livello):
+	//   grouping -> valore di default del secondo livello ("categories" | "none")
+	//   options  -> opzioni di terzo livello supportate dal template, con il loro default.
+	//               Le opzioni non elencate vengono nascoste e inviate a false.
+	const REPORT_CONFIG = {
+		classic: {
+			grouping: "categories",
+			options: {images: true, note: true, discounts: false, plants: false, hideTotal: false}
+		},
+		photo: {
+			grouping: "categories",
+			options: {note: false, plants: false}
+		},
+		technical: {
+			grouping: "categories",
+			options: {images: true, note: false, plants: false}
+		},
+		// La proforma riusa la stampa del preventivo ma non riporta mai le foto,
+		// e in più chiede progressivo e percentuale di anticipo.
+		proforma: {
+			grouping: "categories",
+			options: {note: true, discounts: false, plants: false, hideTotal: false},
+			needsProformaData: true
 		}
 	};
 
+	const PROFORMA_FIELDS = {
+		container: "#qt-print-proforma-cont",
+		progressivo: "#qt-print-proforma-progressivo",
+		percentuale: "#qt-print-proforma-percentuale",
+		error: "#qt-print-proforma-error"
+	};
+
+	function selectedReport() {
+		return $("input[name='report']:checked").val() || DEFAULT_REPORT;
+	}
+
+	function reportConfig() {
+		return REPORT_CONFIG[selectedReport()] || REPORT_CONFIG[DEFAULT_REPORT];
+	}
+
+	function showProformaError(message) {
+		$(PROFORMA_FIELDS.error).text(message || "").toggleClass("d-none", !message);
+	}
+
+	// Restituisce { progressivo, percentuale } se validi, altrimenti null (con errore a video).
+	function readProformaData() {
+		const progressivo = $.trim($(PROFORMA_FIELDS.progressivo).val() || "");
+		const rawPercent = $.trim($(PROFORMA_FIELDS.percentuale).val() || "");
+		const percentuale = parseFloat(rawPercent);
+
+		if (!progressivo) {
+			showProformaError("Indica il progressivo proforma.");
+			$(PROFORMA_FIELDS.progressivo).trigger("focus");
+			return null;
+		}
+
+		if (!rawPercent || isNaN(percentuale) || percentuale <= 0 || percentuale > 100) {
+			showProformaError("Indica una percentuale di anticipo fra 0 e 100.");
+			$(PROFORMA_FIELDS.percentuale).trigger("focus");
+			return null;
+		}
+
+		showProformaError("");
+		return {progressivo: progressivo, percentuale: percentuale};
+	}
+
 	var viewModel = kendo.observable({
-		detailForm: defaultDetailForm,
 
 		print: function () {
-			const report = viewModel.get("detailForm.data.report.id");
-			const images = $("#qt-print-image-checkbox")[0].checked;
-			const grouped = $("#qt-print-grouped-checkbox")[0].checked;
-			const note = $("#qt-print-note-checkbox")[0].checked;
-			const discounts = $("#qt-print-discounts-checkbox")[0].checked;
-			const hideTotal = $("#qt-print-hide-total-checkbox")[0].checked;
+			const config = reportConfig();
 
-			const url = `/manager/technical-reports/print?id=${AP.page.quotation.id}&report=${report}` +
-				`&images=${images}&grouped=${grouped}&note=${note}&discounts=${discounts}&hideTotal=${hideTotal}`;
-
-			window.open(url, "_blank");
-		},
-
-		toggleOptions: function () {
-			const report = viewModel.get("detailForm.data.report.id");
-
-			const imageCheckbox = $("#qt-print-image-checkbox");
-			const groupedCheckbox = $("#qt-print-grouped-checkbox");
-			const noteCheckbox = $("#qt-print-note-checkbox");
-			const discountsCheckbox = $("#qt-print-discounts-checkbox");
-			const hideTotalCheckbox = $("#qt-print-hide-total-checkbox");
-
-			const imagesDiv = $("#qt-print-images-cont");
-			const groupedDiv = $("#qt-print-grouped-cont");
-			const noteDiv = $("#qt-print-note-cont");
-			const discountsDiv = $("#qt-print-discounts-cont");
-
-			// Reset tutto
-			imageCheckbox.prop("checked", false);
-			groupedCheckbox.prop("checked", false);
-			noteCheckbox.prop("checked", false);
-			discountsCheckbox.prop("checked", false);
-			hideTotalCheckbox.prop("checked", false);
-
-			// Configurazione per ogni tipo di report
-			const config = {
-				classic: {
-					checkboxes: {image: true, grouped: false, note: false, discounts: false},
-					divs: {images: "block", grouped: "none", note: "block", discounts: "block"}
-				},
-				photo: {
-					checkboxes: {image: false, grouped: false, note: false, discounts: false},
-					divs: {images: "none", grouped: "block", note: "none", discounts: "none"}
-				},
-				zone: {
-					checkboxes: {image: true, grouped: false, note: true, discounts: false},
-					divs: {images: "block", grouped: "none", note: "block", discounts: "block"}
-				},
-				technical: {
-					checkboxes: {image: false, grouped: false, note: false, discounts: false},
-					divs: {images: "block", grouped: "block", note: "block", discounts: "none"}
-				}
+			const params = {
+				id: AP.page.quotation.id,
+				report: selectedReport(),
+				groupByCategory: $("input[name='grouping']:checked").val() === "categories"
 			};
 
-			const reportConfig = config[report];
+			if (config.needsProformaData) {
+				const proforma = readProformaData();
+				if (!proforma) return;
 
-			if (reportConfig) {
-				imageCheckbox.checked = reportConfig.checkboxes.image;
-				groupedCheckbox.checked = reportConfig.checkboxes.grouped;
-				noteCheckbox.checked = reportConfig.checkboxes.note;
-				discountsCheckbox.checked = reportConfig.checkboxes.discounts;
-
-				imagesDiv.css("display", reportConfig.divs.images);
-				groupedDiv.css("display", reportConfig.divs.grouped);
-				noteDiv.css("display", reportConfig.divs.note);
-				discountsDiv.css("display", reportConfig.divs.discounts);
+				params.progressivo = proforma.progressivo;
+				params.percentuale = proforma.percentuale;
 			}
+
+			$.each(OPTION_FIELDS, function (name, field) {
+				params[name] = $(field.checkbox).is(":checked");
+			});
+
+			window.open("/manager/technical-reports/print?" + $.param(params), "_blank");
+		},
+
+		// Riallinea secondo e terzo livello ai default della tipologia selezionata.
+		toggleOptions: function () {
+			const config = reportConfig();
+
+			$("input[name='grouping'][value='" + config.grouping + "']").prop("checked", true);
+
+			$.each(OPTION_FIELDS, function (name, field) {
+				const available = Object.prototype.hasOwnProperty.call(config.options, name);
+				$(field.container).toggle(available);
+				$(field.checkbox).prop("checked", available && config.options[name]);
+			});
+
+			$(PROFORMA_FIELDS.container).toggle(!!config.needsProformaData);
+			showProformaError("");
 		},
 
 		resetForm: function () {
-			viewModel.set("detailForm", defaultDetailForm);
+			$("input[name='report'][value='" + DEFAULT_REPORT + "']").prop("checked", true);
+			$(PROFORMA_FIELDS.progressivo).val("");
+			$(PROFORMA_FIELDS.percentuale).val("");
+			viewModel.toggleOptions();
 		}
 	});
 
 	pub.init = function () {
 		kendo.bind(fields.printModalRoot, viewModel);
+
+		fields.printModalRoot
+			.off("change.apPrintModal")
+			.on("change.apPrintModal", "input[name='report']", viewModel.toggleOptions);
+
 		viewModel.toggleOptions();
 	};
 
