@@ -246,16 +246,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var attributePrice = product.getPrice( "PROD_ITEM_GEN" );
 
 		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
-		producItemtIds = productItemIds.filter(function (item) { return !isNull(item)});
 
-		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
-		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
-
+		// Valida gli item prima di eseguire qualsiasi query batch: se un attributo
+		// non è stato compilato (itemId nullo) lancia l'errore previsto.
 		for ( var itemId in productItemIds ) {
 			if ( IsNull( itemId ) ) {
 				throw ("Compilare tutti gli attributi!");
 			}
-			var itemComponents = componentSvc.priceCalculatorSearch( productItemId = itemId, includeBaseAttributeComponents = true );
+		}
+
+		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
+		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
+
+		// Precarica in batch tutti i componenti (own + base attribute) di ogni item
+		// per evitare una query per item (N+1) in priceCalculatorSearch()
+		var itemComponentsMap = ArrayLen( productItemIds )
+			? componentSvc.priceCalculatorSearchByProductItemIds( productItemIds )
+			: {};
+
+		for ( var itemId in productItemIds ) {
+			var itemComponents = StructKeyExists( itemComponentsMap, itemId )
+				? itemComponentsMap[ itemId ]
+				: [];
 
 			var itemCost = 0;
 			var compCost = 0;

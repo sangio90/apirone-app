@@ -18,6 +18,7 @@
 		<cfargument name="componentId" type="numeric" required="false">
 		<cfargument name="productItemId" type="numeric" required="false">
 
+		<!--- Le espressioni CASE isDeleted/totalQuantity sono replicate in priceCalculatorReadByProductItemIds(): tenere sincronizzate. --->
 		<cfquery name="componentQuery" datasource="apirone">
 			SELECT
 				c.component_id as id,
@@ -58,39 +59,71 @@
 		</cfif>
 
 		<cfset component = componentQuery.getRow(1)>
-		<cfset component["costAmount"] = 0>
+		<cfset component["costAmount"] = getComponentCost(
+			rawProductId = component.raw_product_id,
+			variantId    = component.variant_id,
+			colorId      = component.color_id
+		)>
+
+		<cfset var rawProduct = getRawProductData( component.raw_product_id )>
+		<cfset component["raw_product_name"] = rawProduct.raw_product_name>
+		<cfset component["raw_product_processiong_type"] = rawProduct.raw_product_processiong_type>
+
+		<cfreturn component>
+	</cffunction>
+
+	<!---
+		Recupera il costo (lispre) della materia prima dal gestionale verticale.
+		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch
+		(priceCalculatorSearchByProductItemIds in ComponentService).
+	--->
+	<cffunction name="getComponentCost" returntype="any" access="public">
+		<cfargument name="rawProductId" required="true">
+		<cfargument name="variantId" required="true">
+		<cfargument name="colorId" required="true">
+
 		<cfquery name="verticalCost" datasource="verticale">
 			SELECT TOP 1 lispre
 			FROM azapi_listin
-			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(component.raw_product_id)#" cfsqltype="varchar">
+			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(arguments.rawProductId)#" cfsqltype="varchar">
 			AND (
 				(
-					TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> AND 
-					TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+					TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> AND 
+					TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 				) 
-				OR TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
-				OR TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+				OR TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
+				OR TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 				OR 1=1
 			)
 			ORDER BY
 				CASE
 					WHEN 
-						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
-						AND TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
+						AND TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
 						THEN 1
 					WHEN 
-						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> 
 						THEN 2
 					WHEN 
-						TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
 						THEN 3
 					ELSE 4
 				END
 		</cfquery>
 
 		<cfif verticalCost.recordCount GT 0>
-			<cfset component["costAmount"] = verticalCost.lispre[1]>
+			<cfreturn verticalCost.lispre[1]>
 		</cfif>
+
+		<cfreturn 0>
+	</cffunction>
+
+	<!---
+		Recupera nome e tipo di lavorazione della materia prima dal gestionale verticale.
+		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch.
+	--->
+	<cffunction name="getRawProductData" returntype="Struct" access="public">
+		<cfargument name="rawProductId" required="true">
 
 		<cfquery name="rawProductData" datasource="verticale">
 			SELECT
@@ -99,18 +132,17 @@
 			FROM
 				azapi_artico a
 			WHERE
-				arcodart = <cfqueryparam cfsqltype="varchar" value="#component.raw_product_id#">
+				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
 
 		<cfif rawProductData.recordCount GT 0>
-			<cfset component["raw_product_name"] = rawProductData.getRow(1).raw_product_name>
-			<cfset component["raw_product_processiong_type"] = rawProductData.getRow(1).raw_product_processiong_type>
-		<cfelse>
-			<cfset component["raw_product_name"] = "">
-			<cfset component["raw_product_processiong_type"] = "">
+			<cfreturn {
+				"raw_product_name"              = rawProductData.getRow(1).raw_product_name,
+				"raw_product_processiong_type"  = rawProductData.getRow(1).raw_product_processiong_type
+			}>
 		</cfif>
 
-		<cfreturn component>
+		<cfreturn { "raw_product_name" = "", "raw_product_processiong_type" = "" }>
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
@@ -471,6 +503,88 @@
 				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
 			)
 			ORDER BY created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i componenti "own" (product_item_id) con override correlato
+		per il calcolo prezzo. Sostituisce N chiamate a priceCalculatorRead() con una
+		sola query apirone. L'override è scoped sul product_item_id del componente
+		(equivalente al singolo priceCalculatorRead(componentId, productItemId)).
+	--->
+	<cffunction name="priceCalculatorReadByProductItemIds" returntype="Query" access="public">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfif !ArrayLen( arguments.productItemIds )>
+			<cfreturn QueryNew( "" )>
+		</cfif>
+
+		<cfset var idsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				c.component_id as id,
+
+				CASE 
+					WHEN co.deleted = true THEN true
+					ELSE false
+				END AS isDeleted,
+
+				CASE
+					WHEN co.deleted = true THEN 0
+					WHEN co.quantity IS NOT NULL THEN c.quantity + co.quantity
+					ELSE c.quantity
+				END AS totalQuantity,
+
+				c.raw_product_id,
+				c.variant_id,
+				c.color_id,
+				c.product_item_id
+
+			FROM components c
+
+			LEFT JOIN component_overrides co 
+				ON c.component_id = co.component_id 
+				AND co.product_item_id = c.product_item_id
+			WHERE c.product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY c.created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch gli override per una lista di (component_id, product_item_id)
+		di componenti "base attribute".
+	--->
+	<cffunction name="readOverridesByComponentIdsAndProductItemIds" returntype="Query" access="public">
+		<cfargument name="componentIds" type="Array" required="true">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfif !ArrayLen( arguments.componentIds ) OR !ArrayLen( arguments.productItemIds )>
+			<cfreturn QueryNew( "" )>
+		</cfif>
+
+		<cfset var componentIdsList   = ArrayToList( arguments.componentIds )>
+		<cfset var productItemIdsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				component_id,
+				product_item_id,
+				quantity,
+				deleted
+			FROM component_overrides
+			WHERE component_id IN (
+				<cfqueryparam value="#componentIdsList#" list="true" cfsqltype="integer">
+			)
+			AND product_item_id IN (
+				<cfqueryparam value="#productItemIdsList#" list="true" cfsqltype="integer">
+			)
 		</cfquery>
 
 		<cfreturn local.q>
