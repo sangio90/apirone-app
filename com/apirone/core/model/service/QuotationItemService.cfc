@@ -22,6 +22,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="PriceService" inject="PriceService";
 	property name="ProductItemService" inject="ProductItemService";
 
+	// Costanti prodotto dei tappi: "tappo" = tappo intero, "mezzotappo" = mezzo tappo.
+	variables.plugProductIds = {
+		"tappo"      = "5f4ec169-c445-40a0-8c94-1dc22c21be79",
+		"mezzotappo" = "452e03e4-ddf4-4042-ac87-b0f17489c4e1"
+	};
+	variables.plugProductIdList = [ variables.plugProductIds.tappo, variables.plugProductIds.mezzotappo ];
+
 	public com.apirone.core.model.bean.QuotationItem function get( required String quotationItemId ){
 		return build( arguments.quotationItemId );
 	}
@@ -920,6 +927,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				: null;
 		}
 
+		// Precarica in batch tutti i prodotti coinvolti (placca, frutti, tappi)
+		// per evitare il rebuild completo del prodotto per ogni calcolo (N+1).
+		var productIdsToPreload = [ product.id ];
+
+		for ( var fruit in json.item.fruits._data ) {
+			ArrayAppend( productIdsToPreload, fruit.fruit.id );
+		}
+
+		if ( isVitiAVistaNo( json ) ) {
+			ArrayAppend( productIdsToPreload, variables.plugProductIdList, true );
+		}
+
+		var productMap = getProductService().getMany( productIdsToPreload );
+
 		var platePrice = calculator.calculate(
 			product.id,
 			json.item.quantity,
@@ -928,7 +949,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			0,
 			0,
 			quotation,
-			quotationItem
+			quotationItem,
+			StructKeyExists( productMap, product.id ) ? productMap[ product.id ] : NullValue()
 		);
 
 		var line = super.bean( "QuotationItemPriceLine" );
@@ -964,7 +986,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				0,
 				0,
 				quotation,
-				quotationItem
+				quotationItem,
+				StructKeyExists( productMap, fruit.fruit.id ) ? productMap[ fruit.fruit.id ] : NullValue()
 			);
 
 			line.setName( "#fruit.fruit?.name#" );
@@ -975,13 +998,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( isVitiAVistaNo( json ) ) {
 			for ( var plug in computePlugRuns( json ) ) {
-				var plugProductId = ( plug.type == "tappo" )
-					? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
-					: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
-				var plugProduct = super.service( "Product" ).get( plugProductId );
+				var plugProductId = variables.plugProductIds[ plug.type ];
+				var plugProduct = StructKeyExists( productMap, plugProductId )
+					? productMap[ plugProductId ]
+					: NullValue();
 				if ( IsNull( plugProduct ) ) continue;
 				var plugPrice = calculator.calculate(
-					plugProductId, 1, json.item.quotationZone.id, [], 0, 0, quotation, quotationItem
+					plugProductId,
+					1,
+					json.item.quotationZone.id,
+					[],
+					0,
+					0,
+					quotation,
+					quotationItem,
+					plugProduct
 				);
 				var plugLine = super.bean( "QuotationItemPriceLine" );
 				plugLine.setName( plug.type == "tappo" ? "Tappo" : "Mezzo tappo" );
@@ -1018,7 +1049,38 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return false;
 	}
 
+	/**
+	 * Wrapper con memoization request-scoped di computePlugRunsInternal().
+	 * Evita di ricalcolare due volte la lista dei tappi durante aggiornaPrezzo()
+	 * (che chiama buildPlugFruitBeans() e poi getPlatePricing() con lo stesso json).
+	 */
 	private Array function computePlugRuns( required Struct json ) {
+		// Chiave di memoization: id del quotation item + fingerprint degli input
+		// (positions, frame, orientation) così che lo stesso item con dati diversi
+		// non restituisca un risultato stale nella stessa request.
+		var memoKey = "";
+		if ( StructKeyExists( json, "item" ) && StructKeyExists( json.item, "id" ) && Len( json.item.id ) ) {
+			var fingerprintInput = {
+				"positions"   = StructKeyExists( json, "positions" ) ? json.positions : {},
+				"frame"       = StructKeyExists( json.item, "product" ) && StructKeyExists( json.item.product, "frame" ) ? json.item.product.frame : {},
+				"orientation" = StructKeyExists( json.item, "product" ) && StructKeyExists( json.item.product, "orientation" ) ? json.item.product.orientation : {}
+			};
+			memoKey = "_plugRuns_" & json.item.id & "_" & Hash( SerializeJSON( fingerprintInput ) );
+			if ( StructKeyExists( request, memoKey ) ) {
+				return request[ memoKey ];
+			}
+		}
+
+		var result = computePlugRunsInternal( json );
+
+		if ( Len( memoKey ) ) {
+			request[ memoKey ] = result;
+		}
+
+		return result;
+	}
+
+	private Array function computePlugRunsInternal( required Struct json ) {
 		var result = [];
 		if ( !StructKeyExists( json, "positions" )
 			|| !StructKeyExists( json, "item" )
@@ -1110,11 +1172,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var json = arguments.data;
 		var result = [];
 		if ( !isVitiAVistaNo( json ) ) return result;
+
+		// Precarica in batch i due prodotti tappo per evitare get() singolo per ogni plug
+		var plugProductMap = getProductService().getMany( variables.plugProductIdList );
+
 		for ( var plug in computePlugRuns( json ) ) {
-			var plugProductId = ( plug.type == "tappo" )
-				? "5f4ec169-c445-40a0-8c94-1dc22c21be79"
-				: "452e03e4-ddf4-4042-ac87-b0f17489c4e1";
-			var plugProduct = super.service( "Product" ).get( plugProductId );
+			var plugProductId = variables.plugProductIds[ plug.type ];
+			var plugProduct = StructKeyExists( plugProductMap, plugProductId )
+				? plugProductMap[ plugProductId ]
+				: NullValue();
 			if ( IsNull( plugProduct ) ) continue;
 			var fruitBean = super.bean( "QuotationItemFruit" );
 			fruitBean.setFruit( plugProduct );
@@ -1438,7 +1504,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					]
 				});
 			}
-			var PLUG_IDS = [ "5f4ec169-c445-40a0-8c94-1dc22c21be79", "452e03e4-ddf4-4042-ac87-b0f17489c4e1" ];
+			var PLUG_IDS = variables.plugProductIdList;
 			var realFruits = [];
 			var positions = {};
 			var fruits = quotationItem.getFruits();
