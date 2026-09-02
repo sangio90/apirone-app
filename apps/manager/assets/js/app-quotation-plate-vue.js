@@ -87,6 +87,9 @@ AP.plate.modal = ( function() {
         width: 1200,
         height: 500,
         displayScale: 1,
+        // Ingombro dell'armatura in px (già scalato): serve a centrarla nel canvas.
+        frameWidth: 1200,
+        frameHeight: 500,
         orientation: { id: "" },
         cellOrientation: { id: "" },
         blocks: [],
@@ -214,6 +217,8 @@ AP.plate.modal = ( function() {
         const plateObj = new gm.Plate( {
             width: plate.width,
             height: plate.height,
+            frameWidth: plate.frameWidth,
+            frameHeight: plate.frameHeight,
             orientation: plate.orientation.id,
             cellOrientation: plate.cellOrientation.id,
             id: plate.id,
@@ -614,10 +619,12 @@ AP.plate.modal = ( function() {
                  * Imposta le dimensioni del canvas della placca (sfondo + immagine).
                  * Placche legacy: width/height dal server o default 1200x500 (con swap
                  * gestito da Rectangle in base all'orientamento).
-                 * Placche a blocchi: il server restituisce il bounding box dei blocchi,
-                 * ma il canvas resta quello fisso legacy (1200x500, invertito se la
-                 * placca è verticale) così l'immagine mantiene la dimensione di prima;
-                 * il bounding box prevale solo se più grande del canvas.
+                 * Placche a blocchi: il canvas è fisso 1200x500 (500x1200 se la placca
+                 * è verticale) e l'armatura ci viene centrata dentro da drawBlocksWithin.
+                 * plate.frameWidth/frameHeight sono l'ingombro dell'armatura già scalato,
+                 * cioè il bounding box dei blocchi più i margini finali destro e
+                 * inferiore: è il rettangolo da centrare, e arriva da data.width/height
+                 * che il server calcola già comprensivi di quei margini.
                  * @param {Object} data - Risposta del server (frame).
                  */
                 applyPlateCanvasSize: function( data ) {
@@ -627,13 +634,13 @@ AP.plate.modal = ( function() {
                         this.plate.displayScale = 1;
                         this.plate.width  = data?.width  ?? 1200;
                         this.plate.height = data?.height ?? 500;
+                        this.plate.frameWidth  = this.plate.width;
+                        this.plate.frameHeight = this.plate.height;
                         return;
                     }
 
                     // displayScale converte mm → px per blocchi e celle.
                     // MAX_SCALE ≈ scala fisica CSS a 96dpi (allineata al builder con unità mm).
-                    // Il canvas del plate-designer-canvas è fisso 1200×500px: plate.width/height
-                    // riempie almeno quel contenitore; i blocchi vi si centrano via flex.
                     const MAX_SCALE     = 4;
                     const rawWidth  = data?.width  || 1;
                     const rawHeight = data?.height || 1;
@@ -645,6 +652,9 @@ AP.plate.modal = ( function() {
 
                     this.plate.width  = Math.max( canvasW, rawWidth  * displayScale );
                     this.plate.height = Math.max( canvasH, rawHeight * displayScale );
+
+                    this.plate.frameWidth  = rawWidth  * displayScale;
+                    this.plate.frameHeight = rawHeight * displayScale;
                 },
 
                 populateProduct: function( product ) {

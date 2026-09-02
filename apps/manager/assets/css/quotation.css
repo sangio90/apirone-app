@@ -93,11 +93,32 @@
 	position: relative;
 }
 
+/*
+	Impilamento dentro il designer placca.
+
+	Le immagini degli attributi vengono inserite in .attributes con
+	z-index calcolato (orderby + 1040, vedi app-quotation-plate.js): servono
+	a sovrapporsi fra loro nell'ordine giusto. Ma .attributes non aveva un
+	proprio z-index, quindi non creava un contesto di impilamento e quei
+	1040+ finivano nel contesto della pagina, sopra a qualunque dropdown.
+	Dare a .attributes uno z-index li richiude al suo interno: da fuori il
+	blocco vale 1 e basta, e l'ordine relativo delle immagini resta quello.
+
+	Di conseguenza a #plate-layers basta 2 per stare sopra le immagini: prima
+	era 2147483647 proprio per scavalcare quei 1040+, e con quel valore
+	catturava i click destinati alle tendine che gli passavano sopra.
+	Da tenere sotto ai 1000 della tendina di ricerca frutti.
+*/
+
+.plate-background .attributes {
+	z-index: 1;
+}
+
 #plate-layers {
 	position: relative;
 	overflow: hidden;
 	display: grid;
-	z-index: 2147483647;
+	z-index: 2;
 }
 
 #plate-grid {

@@ -407,6 +407,12 @@ AP.plate.grid = ( function() {
             // Per le placche a blocchi viene calcolato in applyPlateCanvasSize (Vue).
             this.displayScale = args.displayScale || 1;
 
+            // Ingombro dell'armatura in px (bounding box dei blocchi più i margini
+            // finali destro e inferiore). Il canvas è più grande: la differenza è
+            // lo spazio in cui l'armatura viene centrata da drawBlocksWithin.
+            this.frameWidth = args.frameWidth || args.width;
+            this.frameHeight = args.frameHeight || args.height;
+
             if ( this.isBlockPlate() ) {
                 // width/height sono le dimensioni del canvas (sfondo placca),
                 // già calcolate per l'orientamento corrente: annulla lo swap
@@ -612,9 +618,9 @@ AP.plate.grid = ( function() {
 
             const $plateLayers = $( "<div/>", {
                 id: "plate-layers",
-                // Per le placche a blocchi, plate-layers deve partire da (0,0)
-                // del plate-background (non centrato via flex), così i blocchi
-                // sono posizionati a partire dall'angolo in alto a sinistra fisico.
+                // plate-layers copre tutto il canvas: è il sistema di riferimento
+                // su cui vengono posizionati in assoluto sia la griglia dei blocchi
+                // sia il contenitore dei frutti.
                 css: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
                 appendTo: $plateBackground,
             } );
@@ -627,11 +633,30 @@ AP.plate.grid = ( function() {
                 bboxHeight = Math.max( bboxHeight, block.top + block.height );
             }
 
+            // Centratura dell'armatura nel canvas.
+            //
+            // I margini restano quello che sono — offset interni dei blocchi
+            // rispetto al bordo della placca — ma l'armatura nel suo insieme non
+            // sta più appesa all'angolo in alto a sinistra: viene centrata nel
+            // canvas (1200x500, oppure 500x1200 se la placca è verticale).
+            //
+            // Il rettangolo da centrare è l'ingombro fisico dell'armatura, cioè il
+            // bounding box dei blocchi più i margini finali destro e inferiore, non
+            // il solo bounding box: altrimenti con margini finali asimmetrici la
+            // placca risulterebbe visivamente spostata.
+            const frameWidth  = Math.max( bboxWidth,  this.frameWidth  || 0 );
+            const frameHeight = Math.max( bboxHeight, this.frameHeight || 0 );
+
+            const centerLeft = Math.max( 0, Math.round( ( this.width  - frameWidth  ) / 2 ) );
+            const centerTop  = Math.max( 0, Math.round( ( this.height - frameHeight ) / 2 ) );
+
             const $plateGrid = $( "<div/>", {
                 id: "plate-grid",
                 css: {
                     display: "block",
-                    position: "relative",
+                    position: "absolute",
+                    top: `${centerTop}px`,
+                    left: `${centerLeft}px`,
                     width: `${bboxWidth}px`,
                     height: `${bboxHeight}px`,
                 },
@@ -646,12 +671,16 @@ AP.plate.grid = ( function() {
             this.fruitsOffsetTop  = fruitsOffsetTop;
             this.fruitsOffsetLeft = fruitsOffsetLeft;
 
+            // Il contenitore dei frutti va traslato della stessa centratura della
+            // griglia: le coordinate delle celle (cell.top/left) sono relative a
+            // questo contenitore, quindi restano invariate e lo snap del drag&drop
+            // continua a cadere sugli stessi slot.
             const $fruits = $( "<div/>", {
                 id: "quotation-plate-fruits",
                 css: {
                     position: "absolute",
-                    top:      `${fruitsOffsetTop}px`,
-                    left:     `${fruitsOffsetLeft}px`,
+                    top:      `${centerTop  + fruitsOffsetTop}px`,
+                    left:     `${centerLeft + fruitsOffsetLeft}px`,
                     width:    `${bboxWidth  - fruitsOffsetLeft}px`,
                     height:   `${bboxHeight - fruitsOffsetTop}px`,
                     overflow: "hidden",
