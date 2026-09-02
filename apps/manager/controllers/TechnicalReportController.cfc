@@ -12,6 +12,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		'proforma'  = 'print-quotation-classic'
 	};
 
+	// Tipologie generabili anche su un preventivo non ancora calcolato, perché il
+	// loro template non riporta prezzi né totali e quindi non legge quotationPrice.
+	// Tenere allineato REPORTS_WITHOUT_PRICE in app-quotation-detail.js.
+	variables.REPORTS_WITHOUT_PRICE = [ 'photo' ];
+
 	function print(event, rc, prc) {
 
 		var idPreventivo = rc.id;
@@ -24,12 +29,34 @@ component extends="com.apirone.core.controller.AbsController" {
 			'plants' = printFlag( rc, 'plants' ),
 			'hideTotal' = printFlag( rc, 'hideTotal' ),
 			'progressivo' = StructKeyExists( rc, 'progressivo' ) ? Trim( rc.progressivo ) : '',
-			'percentuale' = StructKeyExists( rc, 'percentuale' ) && IsNumeric( rc.percentuale ) ? Val( rc.percentuale ) : 0
+			'percentuale' = StructKeyExists( rc, 'percentuale' ) && IsNumeric( rc.percentuale ) ? Val( rc.percentuale ) : 0,
+			// Alternativo alla percentuale: se valorizzato, l'anticipo è questo
+			// importo e la percentuale viene ignorata.
+			'importo' = StructKeyExists( rc, 'importo' ) && IsNumeric( rc.importo ) ? Val( rc.importo ) : 0
 		}
 
 		// La proforma non riporta mai le foto degli articoli.
 		if ( printParams.report == 'proforma' ) {
 			printParams.images = false;
+
+			// Il progressivo identifica la proforma dentro al preventivo: se è già
+			// stato usato la stampa va rifiutata, non deve sovrascrivere quella
+			// precedente. Il controllo sta qui, prima di generare il PDF, così non
+			// si lascia un file orfano su disco. Il vincolo unico sul DB resta come
+			// ultima difesa contro due richieste in parallelo.
+			var giaUsato = super.fire(
+				"QuotationProforma.existsProgressivo",
+				[ rc.id, printParams.progressivo ]
+			);
+
+			if ( giaUsato ) {
+				Throw(
+					message = "Progressivo proforma già utilizzato",
+					detail  = "Per questo preventivo esiste già una proforma con progressivo "
+						& printParams.progressivo
+						& ". Indicane uno diverso: le proforma già emesse restano scaricabili dallo storico."
+				);
+			}
 		}
 
 		if ( !StructKeyExists( variables.REPORT_TEMPLATES, printParams.report ) ) {
@@ -49,7 +76,13 @@ component extends="com.apirone.core.controller.AbsController" {
 			quotationItems = []
 		};
 
-		if (IsNull( quotationPrice) ) {
+		// Prima del calcolo il preventivo non ha un QuotationPrice. Le stampe che
+		// riportano prezzi e totali non hanno i dati per esistere, la foto sì:
+		// il suo template non legge mai quotationPrice.
+		// Il modale già propone la sola foto in questo stato (vedi
+		// app-quotation-detail.js), ma il controllo va tenuto anche qui perché
+		// la stampa si apre con una GET e l'URL è manipolabile a mano.
+		if ( IsNull( quotationPrice ) && !ArrayFindNoCase( variables.REPORTS_WITHOUT_PRICE, printParams.report ) ) {
 			Throw(
 				message = "
 				Preventivo non calcolato"
@@ -100,7 +133,77 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
+		// La proforma viene archiviata: è un documento che il cliente riceve e che
+		// deve restare riscaricabile dallo storico (vedi quotation_proformas).
+		// Le altre stampe restano volatili, si rigenerano quando servono.
+		if ( printParams.report == 'proforma' ) {
+			archiveProforma( event, templatePath, params, idPreventivo, printParams );
+			return;
+		}
+
 		event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
+	}
+
+	/**
+	 * Genera la proforma su file, ne registra la riga di storico e serve il PDF.
+	 *
+	 * cfdocument con "filename" scrive su disco e non produce output, quindi il
+	 * documento va poi riletto e restituito: è il prezzo da pagare per averne una
+	 * copia archiviata invece di un flusso che si perde.
+	 */
+	private void function archiveProforma(
+		required Any event,
+		required String templatePath,
+		required Struct params,
+		required String quotationId,
+		required Struct printParams
+	){
+		var directory  = DateFormat( Now(), "yyyy/mm" );
+		var destDir    = ExpandPath( "/../repository/public/media/quotation-proformas/#directory#" );
+		var storedName = "proforma_#CreateUUID()#.pdf";
+		var fullPath   = "#destDir#/#storedName#";
+
+		DirectoryCreate( destDir, true, true );
+
+		arguments.params.pdfArgs.filename = fullPath;
+
+		// scrive il file; l'output della view è vuoto perché c'è filename
+		view( view = arguments.templatePath, args = arguments.params );
+
+		var proforma = super.bean( "QuotationProforma" );
+		proforma.setQuotationId( arguments.quotationId );
+		proforma.setProgressivo( arguments.printParams.progressivo );
+		proforma.setStoredName( storedName );
+		proforma.setDirectory( directory );
+
+		// percentuale e importo sono alternativi: si registra solo quello indicato
+		if ( Val( arguments.printParams.importo ) GT 0 ) {
+			proforma.setImporto( arguments.printParams.importo );
+		} else {
+			proforma.setPercentuale( arguments.printParams.percentuale );
+		}
+
+		if ( !IsNull( session.user ) ) {
+			proforma.setCreatedBy( session.user.getId() );
+		}
+
+		super.fire( "QuotationProforma.create", [ proforma ] );
+
+		// Il PDF esiste già su disco: va servito così com'è.
+		//
+		// Non si usa renderData(): "pdf" convertirebbe l'HTML in PDF, e qui la
+		// conversione è già stata fatta da cfdocument, mentre "binary" non è un
+		// tipo valido in questa versione di ColdBox (JSON, JSONP, JSONT, XML,
+		// WDDX, TEXT, PLAIN, PDF). Si scrive il file nella risposta e si dice a
+		// ColdBox di non aggiungerci una view sopra.
+		arguments.event.noRender();
+
+		cfheader(
+			name  = "Content-Disposition",
+			value = 'inline; filename="#arguments.params.pdfArgs.saveAsName#"'
+		);
+
+		cfcontent( type = "application/pdf", file = fullPath, reset = true );
 	}
 
 	// NON PIÙ INVOCATA. Costruisce i dati per zona ( quoteObj.zones ) per i template

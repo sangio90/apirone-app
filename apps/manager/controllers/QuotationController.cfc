@@ -82,6 +82,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "quotation" ]["exported"] = quotation.getExported();
 		prc.page[ "quotation" ]["sentToClient"] = quotation.getSentToClient() ?: false;
 
+		// Finché il preventivo non è stato calcolato non esiste un QuotationPrice:
+		// le stampe che riportano prezzi e totali non hanno i dati per esistere.
+		// Il modale di stampa usa questo flag per lasciare disponibile la sola
+		// stampa foto (vedi app-quotation-detail.js).
+		prc.page[ "quotation" ]["priceCalculated"] = !IsNull(
+			super.fire( "QuotationPrice.getByQuotationId", [ quotation.getId() ] )
+		);
+
 		var baseCanEdit = (
 			ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) ||
 			(

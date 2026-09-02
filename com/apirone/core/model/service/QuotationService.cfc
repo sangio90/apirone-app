@@ -88,7 +88,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Il nome del referente non è su quotations: sta sul CRM. Si chiede al
 		// CRM quali referenti corrispondono al testo e si passano gli id al DAO,
 		// che li mette in OR con la ricerca sulle colonne locali.
-		StructAppend( arguments, findReferentIds( arguments?.str ?: "" ), true );
+		var searchTerm = StructKeyExists( arguments, "str" ) ? arguments.str : "";
+		StructAppend( arguments, findReferentIds( searchTerm ), true );
 
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
@@ -144,14 +145,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			try {
 				var found = Invoke( getCrmApiService(), lookup.method, { str = term } );
 				var list  = [];
+				var rows  = [];
 
-				for ( var row in ( found?.data ?: [] ) ) {
+				// Niente operatori ?. e ?: qui dentro: su questo Lucee, dentro a un
+				// ciclo, fanno fallire la compilazione dell'intero CFC con
+				// "VerifyError: Expecting a stackmap frame" — e un CFC che non
+				// compila viene saltato da mapDirectory, quindi il service sparisce
+				// da WireBox e con lui l'elenco preventivi.
+				if ( IsStruct( found ) && StructKeyExists( found, "data" ) && IsArray( found.data ) ) {
+					rows = found.data;
+				}
+
+				for ( var row in rows ) {
 					// Scarta id malformati: finiscono in un cast ::uuid[] lato
 					// Postgres, dove un valore storto fa fallire tutta la query.
 					// Il tipo va verificato come "guid" (8-4-4-4-12, il formato
 					// del CRM e di Postgres): "uuid" in CFML è un formato diverso
 					// (8-4-4-16) e scarterebbe ogni id.
-					if ( !IsNull( row?.id ) && IsValid( "guid", row.id ) ) {
+					if ( StructKeyExists( row, "id" ) && IsValid( "guid", row.id ) ) {
 						list.add( row.id );
 					}
 				}

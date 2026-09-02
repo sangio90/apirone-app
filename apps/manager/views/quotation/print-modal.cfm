@@ -30,29 +30,68 @@
                                 <input type="radio" class="btn-check" name="report" id="qt-print-type-proforma" value="proforma" autocomplete="off">
                                 <label class="btn btn-outline-primary btn-sm" for="qt-print-type-proforma">Proforma</label>
                             </div>
+                            <!--- Mostrato finché il preventivo non è calcolato: le altre
+                                  tipologie riportano prezzi e restano disabilitate. --->
+                            <div class="form-text small mt-1 d-none" id="qt-print-price-warning">
+                                Il preventivo non è ancora stato calcolato: puoi stampare solo la versione <strong>Foto</strong>.
+                            </div>
                         </div>
 
                         <!--- Dati proforma: visibili solo per la tipologia Proforma --->
                         <div class="mb-4" id="qt-print-proforma-cont">
                             <label class="col-form-label text-start fw-bold pt-0">Dati proforma</label>
                             <div class="row">
-                                <div class="col-6">
+                                <div class="col-4">
                                     <label class="form-label small mb-1" for="qt-print-proforma-progressivo">Progressivo proforma</label>
                                     <input type="text" class="form-control form-control-sm"
                                         id="qt-print-proforma-progressivo" name="progressivo"
                                         maxlength="10" placeholder="es. 01" autocomplete="off">
                                 </div>
-                                <div class="col-6">
+                                <div class="col-4">
                                     <label class="form-label small mb-1" for="qt-print-proforma-percentuale">Percentuale anticipo</label>
                                     <div class="input-group input-group-sm">
-                                        <input type="number" class="form-control"
+                                        <!--- form-control-sm esplicito: il tema Porto sovrascrive
+                                              il dimensionamento che input-group-sm darebbe da solo --->
+                                        <input type="number" class="form-control form-control-sm"
                                             id="qt-print-proforma-percentuale" name="percentuale"
                                             min="0" max="100" step="0.01" placeholder="es. 30" autocomplete="off">
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
+                                <div class="col-4">
+                                    <label class="form-label small mb-1" for="qt-print-proforma-importo">Importo anticipo</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" class="form-control form-control-sm"
+                                            id="qt-print-proforma-importo" name="importo"
+                                            min="0" step="0.01" placeholder="es. 500" autocomplete="off">
+                                        <span class="input-group-text">&euro;</span>
+                                    </div>
+                                </div>
                             </div>
+                            <!--- Percentuale e importo sono alternativi: compilandone uno
+                                  l'altro viene svuotato (vedi app-quotation-detail.js). --->
+                            <div class="form-text small mt-1">Indica la percentuale <strong>oppure</strong> l'importo dell'anticipo.</div>
                             <div class="text-danger small mt-2 d-none" id="qt-print-proforma-error"></div>
+
+                            <!--- Storico delle proforma già stampate per questo preventivo.
+                                  Popolato via AJAX all'apertura della dialog; ogni riga
+                                  riscarica il PDF archiviato al momento della stampa. --->
+                            <div class="mt-3 d-none" id="qt-print-proforma-history-cont">
+                                <label class="form-label small mb-1">Proforma già stampate</label>
+                                <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                                    <table class="table table-sm mb-0" id="qt-print-proforma-history">
+                                        <thead>
+                                            <tr>
+                                                <th class="small">Progr.</th>
+                                                <th class="small">Anticipo</th>
+                                                <th class="small">Data</th>
+                                                <th class="small"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
                         <!--- 2. Raggruppamento --->

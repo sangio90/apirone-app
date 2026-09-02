@@ -1470,6 +1470,10 @@ AP.quotation.printModal = (function () {
 	//   grouping -> valore di default del secondo livello ("categories" | "none")
 	//   options  -> opzioni di terzo livello supportate dal template, con il loro default.
 	//               Le opzioni non elencate vengono nascoste e inviate a false.
+	//   locked   -> opzioni elencate in "options" che restano visibili ma non
+	//               modificabili: mantengono il valore di default. Serve a dire
+	//               "questa stampa non lo prevede" lasciandolo comunque a video,
+	//               invece di far sparire la voce.
 	const REPORT_CONFIG = {
 		classic: {
 			grouping: "categories",
@@ -1488,6 +1492,8 @@ AP.quotation.printModal = (function () {
 		proforma: {
 			grouping: "categories",
 			options: {note: true, discounts: false, plants: false, hideTotal: false},
+			// la proforma non riporta mai le piante e mostra sempre il totale
+			locked: ["plants", "hideTotal"],
 			needsProformaData: true
 		}
 	};
@@ -1496,8 +1502,89 @@ AP.quotation.printModal = (function () {
 		container: "#qt-print-proforma-cont",
 		progressivo: "#qt-print-proforma-progressivo",
 		percentuale: "#qt-print-proforma-percentuale",
-		error: "#qt-print-proforma-error"
+		importo: "#qt-print-proforma-importo",
+		error: "#qt-print-proforma-error",
+		historyCont: "#qt-print-proforma-history-cont",
+		historyBody: "#qt-print-proforma-history tbody"
 	};
+
+	// Progressivi già usati per questo preventivo, dallo storico caricato.
+	// Servono a bloccare il riuso prima di lanciare la stampa: il server lo
+	// rifiuta comunque, ma lì l'utente si troverebbe una pagina di errore.
+	var progressiviUsati = [];
+
+	// Storico delle proforma già stampate: elencate dalla più recente, con il
+	// link al PDF archiviato al momento della stampa.
+	function loadProformaHistory() {
+		const $body = $(PROFORMA_FIELDS.historyBody);
+
+		NM.util.ajax({
+			method: "GET",
+			url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/proformas",
+			callback: {
+				done: function (xhr) {
+					const righe = (xhr.data || []);
+
+					progressiviUsati = $.map(righe, function (r) {
+						return $.trim(r.progressivo || "").toUpperCase();
+					});
+
+					// niente storico, niente riquadro: alla prima stampa non c'è
+					// nulla da mostrare e una tabella vuota sarebbe solo rumore
+					$(PROFORMA_FIELDS.historyCont).toggleClass("d-none", !righe.length);
+					$body.empty();
+
+					$.each(righe, function (i, r) {
+						$("<tr>").append(
+							$("<td>").addClass("small").text(r.progressivo || ""),
+							$("<td>").addClass("small").text(r.anticipo || ""),
+							$("<td>").addClass("small").text(NM.kendo.formatISODate(r.createdAt) || ""),
+							$("<td>").addClass("text-end").append(
+								// si passa dall'endpoint dell'app e non dal link statico:
+								// il PDF resta dietro autenticazione e arriva con un nome
+								// leggibile. Si apre in una nuova scheda, lasciando il
+								// preventivo dov'è.
+								$("<a>")
+									.attr({
+										href: "/manager/ajax/quotations/" + AP.page.quotation.id +
+											"/proformas/" + r.id + "/download",
+										target: "_blank",
+										title: "Apri il PDF"
+									})
+									.addClass("btn btn-default btn-sm")
+									.html('<i class="fas fa-file-pdf"></i>')
+							)
+						).appendTo($body);
+					});
+				}
+			}
+		});
+	}
+
+	// Tipologie generabili anche prima del calcolo del preventivo: il loro
+	// template non riporta prezzi. Tenere allineato REPORTS_WITHOUT_PRICE in
+	// TechnicalReportController.cfc, che rifiuta comunque le altre.
+	const REPORTS_WITHOUT_PRICE = ["photo"];
+
+	// Finché il preventivo non è calcolato non esiste un QuotationPrice, quindi le
+	// stampe con prezzi e totali non possono essere generate: qui vengono
+	// disabilitate invece di lasciarle scegliere e far comparire un errore dopo.
+	function applyPriceRestriction() {
+		const priceReady = !!(AP.page.quotation && AP.page.quotation.priceCalculated);
+
+		$("input[name='report']").each(function () {
+			const consentita = priceReady || REPORTS_WITHOUT_PRICE.indexOf(this.value) !== -1;
+
+			// disabled sempre assegnato, anche a false: dopo un calcolo il modale
+			// viene riaperto e le voci devono tornare disponibili
+			$(this).prop("disabled", !consentita);
+			$("label[for='" + this.id + "']").toggleClass("disabled", !consentita);
+		});
+
+		$("#qt-print-price-warning").toggleClass("d-none", priceReady);
+
+		return priceReady;
+	}
 
 	function selectedReport() {
 		return $("input[name='report']:checked").val() || DEFAULT_REPORT;
@@ -1511,11 +1598,36 @@ AP.quotation.printModal = (function () {
 		$(PROFORMA_FIELDS.error).text(message || "").toggleClass("d-none", !message);
 	}
 
-	// Restituisce { progressivo, percentuale } se validi, altrimenti null (con errore a video).
+	// Percentuale e importo dell'anticipo sono alternativi: si compila l'uno o
+	// l'altro. Compilandone uno l'altro viene svuotato, così non resta a video un
+	// valore che poi non viene usato.
+	function bindProformaExclusivity() {
+		const coppie = [
+			{scrive: PROFORMA_FIELDS.percentuale, pulisce: PROFORMA_FIELDS.importo},
+			{scrive: PROFORMA_FIELDS.importo, pulisce: PROFORMA_FIELDS.percentuale}
+		];
+
+		$.each(coppie, function (i, coppia) {
+			// off prima di on: init() viene rieseguito a ogni apertura della dialog,
+			// e ora che si chiude dopo ogni proforma le riaperture sono la norma —
+			// senza questo gli handler si accumulerebbero a ogni giro.
+			$(coppia.scrive).off("input.apProforma").on("input.apProforma", function () {
+				if ($.trim($(this).val() || "") !== "") {
+					$(coppia.pulisce).val("");
+				}
+				showProformaError("");
+			});
+		});
+	}
+
+	// Restituisce { progressivo, percentuale, importo } se validi, altrimenti null
+	// (con errore a video). Uno solo fra percentuale e importo è valorizzato.
 	function readProformaData() {
 		const progressivo = $.trim($(PROFORMA_FIELDS.progressivo).val() || "");
 		const rawPercent = $.trim($(PROFORMA_FIELDS.percentuale).val() || "");
+		const rawImporto = $.trim($(PROFORMA_FIELDS.importo).val() || "");
 		const percentuale = parseFloat(rawPercent);
+		const importo = parseFloat(rawImporto);
 
 		if (!progressivo) {
 			showProformaError("Indica il progressivo proforma.");
@@ -1523,14 +1635,42 @@ AP.quotation.printModal = (function () {
 			return null;
 		}
 
-		if (!rawPercent || isNaN(percentuale) || percentuale <= 0 || percentuale > 100) {
+		if (progressiviUsati.indexOf(progressivo.toUpperCase()) !== -1) {
+			showProformaError(
+				"Progressivo " + progressivo + " già utilizzato per questo preventivo. " +
+				"Indicane uno diverso: quella già emessa resta scaricabile qui sotto."
+			);
+			$(PROFORMA_FIELDS.progressivo).trigger("focus");
+			return null;
+		}
+
+		if (!rawPercent && !rawImporto) {
+			showProformaError("Indica la percentuale oppure l'importo dell'anticipo.");
+			$(PROFORMA_FIELDS.percentuale).trigger("focus");
+			return null;
+		}
+
+		if (rawPercent && (isNaN(percentuale) || percentuale <= 0 || percentuale > 100)) {
 			showProformaError("Indica una percentuale di anticipo fra 0 e 100.");
 			$(PROFORMA_FIELDS.percentuale).trigger("focus");
 			return null;
 		}
 
+		if (rawImporto && (isNaN(importo) || importo <= 0)) {
+			showProformaError("Indica un importo di anticipo maggiore di zero.");
+			$(PROFORMA_FIELDS.importo).trigger("focus");
+			return null;
+		}
+
 		showProformaError("");
-		return {progressivo: progressivo, percentuale: percentuale};
+
+		// il campo non compilato viaggia a 0: la stampa usa l'importo se presente,
+		// altrimenti ricade sulla percentuale
+		return {
+			progressivo: progressivo,
+			percentuale: rawPercent ? percentuale : 0,
+			importo: rawImporto ? importo : 0
+		};
 	}
 
 	var viewModel = kendo.observable({
@@ -1550,6 +1690,7 @@ AP.quotation.printModal = (function () {
 
 				params.progressivo = proforma.progressivo;
 				params.percentuale = proforma.percentuale;
+				params.importo = proforma.importo;
 			}
 
 			$.each(OPTION_FIELDS, function (name, field) {
@@ -1557,6 +1698,15 @@ AP.quotation.printModal = (function () {
 			});
 
 			window.open("/manager/technical-reports/print?" + $.param(params), "_blank");
+
+			// La proforma consuma il progressivo, ma lo storico in questa dialog
+			// è quello caricato all'apertura e non lo sa ancora: restando aperta,
+			// l'utente potrebbe rilanciare lo stesso progressivo e prendersi
+			// l'errore del server. Chiudendola, la riapertura ricarica l'elenco
+			// aggiornato e il controllo in readProformaData() lo intercetta.
+			if (config.needsProformaData) {
+				fields.printModalRoot.modal("hide");
+			}
 		},
 
 		// Riallinea secondo e terzo livello ai default della tipologia selezionata.
@@ -1567,8 +1717,15 @@ AP.quotation.printModal = (function () {
 
 			$.each(OPTION_FIELDS, function (name, field) {
 				const available = Object.prototype.hasOwnProperty.call(config.options, name);
-				$(field.container).toggle(available);
-				$(field.checkbox).prop("checked", available && config.options[name]);
+				const locked = available && (config.locked || []).indexOf(name) !== -1;
+
+				$(field.container).toggle(available).toggleClass("print-option-locked", locked);
+
+				// disabled va sempre assegnato, anche a false: altrimenti tornando
+				// a una tipologia che l'opzione la prevede resterebbe bloccata.
+				$(field.checkbox)
+					.prop("checked", available && config.options[name])
+					.prop("disabled", locked);
 			});
 
 			$(PROFORMA_FIELDS.container).toggle(!!config.needsProformaData);
@@ -1576,10 +1733,18 @@ AP.quotation.printModal = (function () {
 		},
 
 		resetForm: function () {
-			$("input[name='report'][value='" + DEFAULT_REPORT + "']").prop("checked", true);
+			const priceReady = applyPriceRestriction();
+
+			$("input[name='report'][value='" + (priceReady ? DEFAULT_REPORT : REPORTS_WITHOUT_PRICE[0]) + "']")
+				.prop("checked", true);
+
 			$(PROFORMA_FIELDS.progressivo).val("");
 			$(PROFORMA_FIELDS.percentuale).val("");
+			$(PROFORMA_FIELDS.importo).val("");
 			viewModel.toggleOptions();
+
+			// ricaricato a ogni apertura: dopo una stampa lo storico ha una riga in più
+			loadProformaHistory();
 		}
 	});
 
@@ -1589,6 +1754,8 @@ AP.quotation.printModal = (function () {
 		fields.printModalRoot
 			.off("change.apPrintModal")
 			.on("change.apPrintModal", "input[name='report']", viewModel.toggleOptions);
+
+		bindProformaExclusivity();
 
 		viewModel.toggleOptions();
 	};

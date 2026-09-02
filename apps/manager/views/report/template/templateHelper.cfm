@@ -411,6 +411,12 @@
 
 <cffunction name="getFinalForm">
 	<cfargument name="langId" default="IT">
+	<!--- compact: usato dalla proforma, che non è un modulo d'ordine.
+	      Omette la nota in testa, il riquadro "Leggere e compilare" e le
+	      condizioni generali di vendita, lasciando solo coordinate bancarie
+	      e riga di firma: essendo poche righe, il page-break-inside: avoid
+	      le fa risalire sulla pagina precedente quando c'è spazio. --->
+	<cfargument name="compact" type="boolean" default="false">
 	<cfset local.lang = UCase(arguments.langId)>
 	<cfset local.tx = {
 		"IT": {
@@ -535,7 +541,7 @@
 	<cfset local.t = local.tx[local.lang]>
 	<cfoutput>
 		<div style="page-break-inside: avoid !important;">
-			<div class="top-note">#local.t.topNote#</div>
+			<cfif !arguments.compact><div class="top-note">#local.t.topNote#</div></cfif>
 
 			<div class="bank" aria-label="#local.t.bankTitle#">
 				<table role="table" summary="#local.t.bankTitle#">
@@ -548,6 +554,7 @@
 				</table>
 			</div>
 
+			<cfif !arguments.compact>
 			<h2 class="section-title">#local.t.readAndFill#</h2>
 
 			<div class="important-box" role="region" aria-label="#local.t.important#">
@@ -609,6 +616,7 @@
 				</ol>
 			</div>
 
+
 			<div class="sign-rows">
 				<table class="sign-rows-table">
 					<tr>
@@ -641,6 +649,12 @@
 					</tr>
 				</table>
 			</div>
+			</cfif>
+
+			<!--- Le coordinate bancarie sono float: right. In compact non c'è più
+			     nessun blocco dopo di loro a fare da clear, e senza questo il
+			     contenitore collasserebbe lasciando lo specchietto fuori. --->
+			<div style="clear: both;"></div>
 		</div>
 	</cfoutput>
 </cffunction>
@@ -796,6 +810,14 @@
 			line-height:1.05;
 		}
 		.sign-rows {
+			/*
+				Le coordinate bancarie sono float: right. Il clear stava solo su
+				.small-print, che nella proforma non viene emesso (getFinalForm
+				compact): senza, questo blocco risaliva accanto allo specchietto
+				e ci finiva sopra. Va tenuto qui, così non dipende da quale
+				blocco lo precede.
+			*/
+			clear: both;
 			margin-top: 0.4in;
 		}
 		.sign-rows-table {

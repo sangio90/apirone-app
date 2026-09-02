@@ -4,6 +4,12 @@
 	<cfset isProforma      = (args.params.report ?: "") EQ "proforma">
 	<cfset proformaProg    = Trim( args.params.progressivo ?: "" )>
 	<cfset proformaPercent = Val( args.params.percentuale ?: 0 )>
+	<!--- L'importo, se indicato, sostituisce la percentuale: l'anticipo e' quella cifra. --->
+	<cfset proformaAmount  = Val( args.params.importo ?: 0 )>
+	<cfset proformaByAmount = proformaAmount GT 0>
+	<cfset proformaAdvanceLabel = proformaByAmount
+			? LSNumberFormat( proformaAmount, "9,999.99", "it_IT" ) & " &euro; " & printLabel( 'advancePayment', langId )
+			: ( proformaPercent EQ Int( proformaPercent ) ? Int( proformaPercent ) : LSNumberFormat( proformaPercent, "9.99" ) ) & "% " & printLabel( 'advancePayment', langId )>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
@@ -26,7 +32,7 @@
 								#getPrintFullHeader()#
 							</td>
 							<td style="border: 0; width: 9cm; padding-top: .4in;">
-								<h2 style="text-align: right; margin-right: .1in;"><cfif isProforma>#printLabel('proforma', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#<cfif Len( proformaProg )> #proformaProg#</cfif><cfelse>#printLabel('quotation', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</cfif></h2>
+								<h2 style="text-align: right; margin-right: .1in;"><cfif isProforma>#printLabel('proforma', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#<cfif Len( proformaProg )>/#proformaProg#</cfif><cfelse>#printLabel('quotation', langId)# N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</cfif></h2>
 								<table style="width: 100%; border: 0;">
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('date', langId)#</td>
@@ -40,7 +46,7 @@
 									</cfif>
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#printLabel('paymentMethod', langId)#</td>
-										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;"><cfif isProforma>#proformaPercent EQ Int( proformaPercent ) ? Int( proformaPercent ) : LSNumberFormat( proformaPercent, "9.99" )#% #printLabel('advancePayment', langId)#<cfelse>#args.data.quotation.getPaymentMethodName()#</cfif></td>
+										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; padding-left: 5px;"><cfif isProforma>#proformaAdvanceLabel#<cfelse>#args.data.quotation.getPaymentMethodName()#</cfif></td>
 									</tr>
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black; vertical-align: top;">#printLabel('salesAgent', langId)#</td>
@@ -357,7 +363,7 @@
 						<cfif isProforma>
 							<tr>
 								<td><strong>#printLabel('amountToPay', langId)#</strong></td>
-								<td><strong>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'] * proformaPercent / 100, "9,999.99", "it_IT" )# €</strong></td>
+								<td><strong>#LSNumberFormat( proformaByAmount ? proformaAmount : args.data.quotationPrice.getCalculatedTotals()['total'] * proformaPercent / 100, "9,999.99", "it_IT" )# €</strong></td>
 							</tr>
 						</cfif>
 						</cfif>

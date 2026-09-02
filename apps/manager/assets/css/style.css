@@ -10,6 +10,40 @@
     border-color: #cccccc !important;
 }
 
+/*
+	Addon di un input-group piccolo (es. il "%" accanto alla percentuale di
+	anticipo nella stampa proforma).
+
+	Il tema Porto sovrascrive .input-group-text lasciandolo a 14px/21px anche
+	dentro un .input-group-sm, mentre l'input accanto scende a 12px/15.6px.
+	Siccome il gruppo è alto quanto il suo elemento più alto, è l'addon a
+	decidere: il campo risultava 38,4px contro i 28px di un form-control-sm
+	affiancato. Riportando l'addon alla stessa tipografia, il flex lo allunga
+	fino all'input invece del contrario.
+*/
+
+.input-group-sm > .input-group-text {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+/*
+	Opzione di stampa bloccata dalla tipologia selezionata (vedi "locked" in
+	REPORT_CONFIG, app-quotation-detail.js). La checkbox è dentro alla label,
+	non sua sorella, quindi il selettore di Bootstrap
+	.form-check-input:disabled ~ .form-check-label non la aggancia: la classe
+	viene messa sul contenitore dal JS.
+*/
+
+.print-option-locked {
+    opacity: .55;
+}
+
+.print-option-locked .form-check-label,
+.print-option-locked .form-check-input {
+    cursor: not-allowed;
+}
+
 *:required {
     border-bottom: 2px solid #c10000 !important;
 }

@@ -493,6 +493,8 @@
 		post( "/ajax/quotations/:quotationId/documents/reorder" ).to( "QuotationDocumentAjaxController.reorder" ).end();
 		post( "/ajax/quotations/:quotationId/documents/delete" ).to( "QuotationDocumentAjaxController.deleteDoc" ).end();
 		get( "/ajax/quotations/:quotationId/documents/:id/download" ).to( "QuotationDocumentAjaxController.download" ).end();
+		get( "/ajax/quotations/:quotationId/proformas/:id/download" ).to( "QuotationProformaAjaxController.download" ).end();
+		get( "/ajax/quotations/:quotationId/proformas" ).to( "QuotationProformaAjaxController.list" ).end();
 		get( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.list" ).end();
 		post( "/ajax/quotations/:quotationId/documents" ).to( "QuotationDocumentAjaxController.upload" ).end();
 
