@@ -566,7 +566,9 @@ AP.quotation.plantPositions = (function () {
 						left: 'calc(' + (draft.coordinateX * 100) + '% + ' + offset + 'px)',
 						top:  'calc(' + (draft.coordinateY * 100) + '% - ' + offset + 'px)',
 						pointerEvents: 'auto',
-						cursor: 'move'
+						// come .rotation-arrow nel CSS: freccia curva di rotazione.
+						// Va ripetuto qui perché lo stile inline vince sulla classe.
+						cursor: 'alias'
 					};
 				},
 

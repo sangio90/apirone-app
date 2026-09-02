@@ -331,7 +331,12 @@
         box-sizing: content-box;
         opacity: 1;
         pointer-events: auto;
-        cursor: move;
+        /*
+            "alias" è la keyword che rende la freccia curva (su macOS il
+            cursore makealias): dice che si ruota, non che si sposta.
+            Era "move", cioè lo stesso cursore del trascinamento del pin.
+        */
+        cursor: alias;
         transform-origin: center;
         object-fit: contain;
     }
