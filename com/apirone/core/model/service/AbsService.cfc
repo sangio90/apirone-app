@@ -133,11 +133,13 @@ component output="false" accessors="true" {
 		var categories = DeserializeJSON( arguments.categories );
 
 		if ( !IsNull( categories ) AND Len( categories ) ) {
-			for ( var thisCategory in categories ) {
-				var beanCategory = this.service( "ProductCategory" ).get( thisCategory );
+			// Precarica tutte le categorie in una sola getMany() invece di una get() per id (evita N+1).
+			var categoryMap = this.service( "ProductCategory" ).getMany( categories );
 
-				if ( !IsNull( beanCategory ) ) {
-					result.add( beanCategory );
+			for ( var thisCategory in categories ) {
+				// Mantiene l'ordine originale e salta gli id non trovati (come il vecchio get() -> NullValue).
+				if ( StructKeyExists( categoryMap, thisCategory ) ) {
+					result.add( categoryMap[ thisCategory ] );
 				}
 			}
 		}
