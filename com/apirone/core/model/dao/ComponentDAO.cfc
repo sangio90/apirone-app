@@ -73,14 +73,46 @@
 	</cffunction>
 
 	<!---
+		Helper: restituisce lo struct di memoizzazione verticale della richiesta corrente,
+		creandolo al primo utilizzo. Il DAO è un singleton WireBox: lo stato per-richiesta non deve
+		essere conservato nel variables scope dell'istanza (condiviso tra tutte le richieste), bensì
+		nel request scope, il cui ciclo di vita coincide con la singola richiesta HTTP. Si tratta
+		di memoizzazione effimera per richiesta, NON di una cache.
+
+		@param cacheKey  Nome dello struct da creare/leggere nel request scope
+		@return          Lo struct di memo richiesto (vuoto al primo accesso della richiesta)
+	--->
+	<cffunction name="getVerticaleMemo" returntype="Struct" access="private">
+		<cfargument name="cacheKey" type="String" required="true">
+
+		<cfif !StructKeyExists( request, arguments.cacheKey )>
+			<cfset request[ arguments.cacheKey ] = {}>
+		</cfif>
+
+		<cfreturn request[ arguments.cacheKey ]>
+	</cffunction>
+
+	<!---
 		Recupera il costo (lispre) della materia prima dal gestionale verticale.
 		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch
 		(priceCalculatorSearchByProductItemIds in ComponentService).
+		Memoizza il risultato nel request scope (_componentCostCache): la stessa terna
+		raw_product_id | variant_id | color_id viene interrogata una sola volta per richiesta,
+		le chiamate successive restituiscono il costo già letto senza toccare il DB ERP.
 	--->
 	<cffunction name="getComponentCost" returntype="any" access="public">
 		<cfargument name="rawProductId" required="true">
 		<cfargument name="variantId" required="true">
 		<cfargument name="colorId" required="true">
+
+		<!--- Le query trimmano gli input: la chiave di memo usa i valori già trimmati, così input diversi ma equivalenti condividono la stessa voce. --->
+		<cfset var memoKey  = Trim( arguments.rawProductId ) & "|" & Trim( arguments.variantId ) & "|" & Trim( arguments.colorId )>
+		<cfset var costMemo = getVerticaleMemo( "_componentCostCache" )>
+
+		<!--- Riuso: costo già letto dall'ERP in questa stessa richiesta. --->
+		<cfif StructKeyExists( costMemo, memoKey )>
+			<cfreturn costMemo[ memoKey ]>
+		</cfif>
 
 		<cfquery name="verticalCost" datasource="verticale">
 			SELECT TOP 1 lispre
@@ -111,19 +143,37 @@
 				END
 		</cfquery>
 
-		<cfif verticalCost.recordCount GT 0>
-			<cfreturn verticalCost.lispre[1]>
+		<!--- Memorizza il costo per i successivi riusi nella stessa richiesta, normalizzando i casi vuoti.
+			Con la configurazione Lucee di default un NULL del DB arriva come stringa vuota; se mai venisse
+			attivato il full null support, assegnare un null cancellerebbe la chiave dello struct rompendo
+			la memo: per questo i casi vuoti diventano 0 (stesso fallback del caso nessuna riga trovata). --->
+		<cfset var componentCost = 0>
+
+		<cfif verticalCost.recordCount GT 0 AND Len( verticalCost.lispre[1] )>
+			<cfset componentCost = verticalCost.lispre[1]>
 		</cfif>
 
-		<cfreturn 0>
+		<cfset costMemo[ memoKey ] = componentCost>
+
+		<cfreturn costMemo[ memoKey ]>
 	</cffunction>
 
 	<!---
 		Recupera nome e tipo di lavorazione della materia prima dal gestionale verticale.
 		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch.
+		Memoizza il risultato nel request scope (_rawProductCache): lo stesso raw_product_id
+		viene interrogato una sola volta per richiesta, le chiamate successive restituiscono
+		i dati già letti senza toccare il DB ERP.
 	--->
 	<cffunction name="getRawProductData" returntype="Struct" access="public">
 		<cfargument name="rawProductId" required="true">
+
+		<cfset var dataMemo = getVerticaleMemo( "_rawProductCache" )>
+
+		<!--- Riuso: dati già letti dall'ERP in questa stessa richiesta. --->
+		<cfif StructKeyExists( dataMemo, arguments.rawProductId )>
+			<cfreturn dataMemo[ arguments.rawProductId ]>
+		</cfif>
 
 		<cfquery name="rawProductData" datasource="verticale">
 			SELECT
@@ -135,14 +185,17 @@
 				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
 
+		<!--- Memorizza i dati letti (o il fallback con stringhe vuote) per i successivi riusi nella stessa richiesta. --->
 		<cfif rawProductData.recordCount GT 0>
-			<cfreturn {
+			<cfset dataMemo[ arguments.rawProductId ] = {
 				"raw_product_name"              = rawProductData.getRow(1).raw_product_name,
 				"raw_product_processiong_type"  = rawProductData.getRow(1).raw_product_processiong_type
 			}>
+		<cfelse>
+			<cfset dataMemo[ arguments.rawProductId ] = { "raw_product_name" = "", "raw_product_processiong_type" = "" }>
 		</cfif>
 
-		<cfreturn { "raw_product_name" = "", "raw_product_processiong_type" = "" }>
+		<cfreturn dataMemo[ arguments.rawProductId ]>
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
