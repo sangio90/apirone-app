@@ -6,7 +6,13 @@
 component output="false" accessors="true" {
 
 	public Struct function getDBField( required String field ){
-		var fields = DeserializeJSON( FileRead( ExpandPath( "/config/DBFields.json.cfm" ) ) );
+		// Effettua il parse della config statica dei campi DB una sola volta per richiesta HTTP
+		// (request scope) invece di FileRead + DeserializeJSON a ogni chiamata.
+		if ( !StructKeyExists( request, "_dbFieldsCache" ) ) {
+			request[ "_dbFieldsCache" ] = DeserializeJSON( FileRead( ExpandPath( "/config/DBFields.json.cfm" ) ) );
+		}
+
+		var fields = request[ "_dbFieldsCache" ];
 
 		if ( !StructKeyExists( fields, arguments.field ) ) {
 			Throw(
@@ -36,10 +42,10 @@ component output="false" accessors="true" {
 		var sql = "CREATE TABLE #arguments.toTable# AS SELECT * FROM #arguments.fromTable#";
 
 		var q = QueryExecute(
-			sql = sql, 
+			sql = sql,
 			options = { datasource = arguments.datasource }
 		);
-		
+
 		return q.recordCount;
 	}
 

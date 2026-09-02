@@ -18,6 +18,7 @@
 		<cfargument name="componentId" type="numeric" required="false">
 		<cfargument name="productItemId" type="numeric" required="false">
 
+		<!--- Le espressioni CASE isDeleted/totalQuantity sono replicate in priceCalculatorReadByProductItemIds(): tenere sincronizzate. --->
 		<cfquery name="componentQuery" datasource="apirone">
 			SELECT
 				c.component_id as id,
@@ -58,38 +59,120 @@
 		</cfif>
 
 		<cfset component = componentQuery.getRow(1)>
-		<cfset component["costAmount"] = 0>
+		<cfset component["costAmount"] = getComponentCost(
+			rawProductId = component.raw_product_id,
+			variantId    = component.variant_id,
+			colorId      = component.color_id
+		)>
+
+		<cfset var rawProduct = getRawProductData( component.raw_product_id )>
+		<cfset component["raw_product_name"] = rawProduct.raw_product_name>
+		<cfset component["raw_product_processiong_type"] = rawProduct.raw_product_processiong_type>
+
+		<cfreturn component>
+	</cffunction>
+
+	<!---
+		Helper: restituisce lo struct di memoizzazione verticale della richiesta corrente,
+		creandolo al primo utilizzo. Il DAO è un singleton WireBox: lo stato per-richiesta non deve
+		essere conservato nel variables scope dell'istanza (condiviso tra tutte le richieste), bensì
+		nel request scope, il cui ciclo di vita coincide con la singola richiesta HTTP. Si tratta
+		di memoizzazione effimera per richiesta, NON di una cache.
+
+		@param cacheKey  Nome dello struct da creare/leggere nel request scope
+		@return          Lo struct di memo richiesto (vuoto al primo accesso della richiesta)
+	--->
+	<cffunction name="getVerticaleMemo" returntype="Struct" access="private">
+		<cfargument name="cacheKey" type="String" required="true">
+
+		<cfif !StructKeyExists( request, arguments.cacheKey )>
+			<cfset request[ arguments.cacheKey ] = {}>
+		</cfif>
+
+		<cfreturn request[ arguments.cacheKey ]>
+	</cffunction>
+
+	<!---
+		Recupera il costo (lispre) della materia prima dal gestionale verticale.
+		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch
+		(priceCalculatorSearchByProductItemIds in ComponentService).
+		Memoizza il risultato nel request scope (_componentCostCache): la stessa terna
+		raw_product_id | variant_id | color_id viene interrogata una sola volta per richiesta,
+		le chiamate successive restituiscono il costo già letto senza toccare il DB ERP.
+	--->
+	<cffunction name="getComponentCost" returntype="any" access="public">
+		<cfargument name="rawProductId" required="true">
+		<cfargument name="variantId" required="true">
+		<cfargument name="colorId" required="true">
+
+		<!--- Le query trimmano gli input: la chiave di memo usa i valori già trimmati, così input diversi ma equivalenti condividono la stessa voce. --->
+		<cfset var memoKey  = Trim( arguments.rawProductId ) & "|" & Trim( arguments.variantId ) & "|" & Trim( arguments.colorId )>
+		<cfset var costMemo = getVerticaleMemo( "_componentCostCache" )>
+
+		<!--- Riuso: costo già letto dall'ERP in questa stessa richiesta. --->
+		<cfif StructKeyExists( costMemo, memoKey )>
+			<cfreturn costMemo[ memoKey ]>
+		</cfif>
+
 		<cfquery name="verticalCost" datasource="verticale">
 			SELECT TOP 1 lispre
 			FROM azapi_listin
-			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(component.raw_product_id)#" cfsqltype="varchar">
+			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(arguments.rawProductId)#" cfsqltype="varchar">
 			AND (
 				(
-					TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> AND 
-					TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+					TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> AND 
+					TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 				) 
-				OR TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
-				OR TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar">
+				OR TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
+				OR TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 				OR 1=1
 			)
 			ORDER BY
 				CASE
 					WHEN 
-						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar">
-						AND TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
+						AND TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
 						THEN 1
 					WHEN 
-						TRIM(liscvr) = <cfqueryparam value="#Trim(component.variant_id)#" cfsqltype="varchar"> 
+						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> 
 						THEN 2
 					WHEN 
-						TRIM(liscol) = <cfqueryparam value="#Trim(component.color_id)#" cfsqltype="varchar"> 
+						TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
 						THEN 3
 					ELSE 4
 				END
 		</cfquery>
 
-		<cfif verticalCost.recordCount GT 0>
-			<cfset component["costAmount"] = verticalCost.lispre[1]>
+		<!--- Memorizza il costo per i successivi riusi nella stessa richiesta, normalizzando i casi vuoti.
+			Con la configurazione Lucee di default un NULL del DB arriva come stringa vuota; se mai venisse
+			attivato il full null support, assegnare un null cancellerebbe la chiave dello struct rompendo
+			la memo: per questo i casi vuoti diventano 0 (stesso fallback del caso nessuna riga trovata). --->
+		<cfset var componentCost = 0>
+
+		<cfif verticalCost.recordCount GT 0 AND Len( verticalCost.lispre[1] )>
+			<cfset componentCost = verticalCost.lispre[1]>
+		</cfif>
+
+		<cfset costMemo[ memoKey ] = componentCost>
+
+		<cfreturn costMemo[ memoKey ]>
+	</cffunction>
+
+	<!---
+		Recupera nome e tipo di lavorazione della materia prima dal gestionale verticale.
+		Estratto da priceCalculatorRead() per essere riutilizzato dal path batch.
+		Memoizza il risultato nel request scope (_rawProductCache): lo stesso raw_product_id
+		viene interrogato una sola volta per richiesta, le chiamate successive restituiscono
+		i dati già letti senza toccare il DB ERP.
+	--->
+	<cffunction name="getRawProductData" returntype="Struct" access="public">
+		<cfargument name="rawProductId" required="true">
+
+		<cfset var dataMemo = getVerticaleMemo( "_rawProductCache" )>
+
+		<!--- Riuso: dati già letti dall'ERP in questa stessa richiesta. --->
+		<cfif StructKeyExists( dataMemo, arguments.rawProductId )>
+			<cfreturn dataMemo[ arguments.rawProductId ]>
 		</cfif>
 
 		<cfquery name="rawProductData" datasource="verticale">
@@ -99,18 +182,20 @@
 			FROM
 				azapi_artico a
 			WHERE
-				arcodart = <cfqueryparam cfsqltype="varchar" value="#component.raw_product_id#">
+				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
 
+		<!--- Memorizza i dati letti (o il fallback con stringhe vuote) per i successivi riusi nella stessa richiesta. --->
 		<cfif rawProductData.recordCount GT 0>
-			<cfset component["raw_product_name"] = rawProductData.getRow(1).raw_product_name>
-			<cfset component["raw_product_processiong_type"] = rawProductData.getRow(1).raw_product_processiong_type>
+			<cfset dataMemo[ arguments.rawProductId ] = {
+				"raw_product_name"              = rawProductData.getRow(1).raw_product_name,
+				"raw_product_processiong_type"  = rawProductData.getRow(1).raw_product_processiong_type
+			}>
 		<cfelse>
-			<cfset component["raw_product_name"] = "">
-			<cfset component["raw_product_processiong_type"] = "">
+			<cfset dataMemo[ arguments.rawProductId ] = { "raw_product_name" = "", "raw_product_processiong_type" = "" }>
 		</cfif>
 
-		<cfreturn component>
+		<cfreturn dataMemo[ arguments.rawProductId ]>
 	</cffunction>
 
 	<cffunction returntype="Query" name="find">
@@ -471,6 +556,88 @@
 				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
 			)
 			ORDER BY created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch i componenti "own" (product_item_id) con override correlato
+		per il calcolo prezzo. Sostituisce N chiamate a priceCalculatorRead() con una
+		sola query apirone. L'override è scoped sul product_item_id del componente
+		(equivalente al singolo priceCalculatorRead(componentId, productItemId)).
+	--->
+	<cffunction name="priceCalculatorReadByProductItemIds" returntype="Query" access="public">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfif !ArrayLen( arguments.productItemIds )>
+			<cfreturn QueryNew( "" )>
+		</cfif>
+
+		<cfset var idsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				c.component_id as id,
+
+				CASE 
+					WHEN co.deleted = true THEN true
+					ELSE false
+				END AS isDeleted,
+
+				CASE
+					WHEN co.deleted = true THEN 0
+					WHEN co.quantity IS NOT NULL THEN c.quantity + co.quantity
+					ELSE c.quantity
+				END AS totalQuantity,
+
+				c.raw_product_id,
+				c.variant_id,
+				c.color_id,
+				c.product_item_id
+
+			FROM components c
+
+			LEFT JOIN component_overrides co 
+				ON c.component_id = co.component_id 
+				AND co.product_item_id = c.product_item_id
+			WHERE c.product_item_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+			ORDER BY c.created_at desc
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Recupera in batch gli override per una lista di (component_id, product_item_id)
+		di componenti "base attribute".
+	--->
+	<cffunction name="readOverridesByComponentIdsAndProductItemIds" returntype="Query" access="public">
+		<cfargument name="componentIds" type="Array" required="true">
+		<cfargument name="productItemIds" type="Array" required="true">
+
+		<cfif !ArrayLen( arguments.componentIds ) OR !ArrayLen( arguments.productItemIds )>
+			<cfreturn QueryNew( "" )>
+		</cfif>
+
+		<cfset var componentIdsList   = ArrayToList( arguments.componentIds )>
+		<cfset var productItemIdsList = ArrayToList( arguments.productItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				component_id,
+				product_item_id,
+				quantity,
+				deleted
+			FROM component_overrides
+			WHERE component_id IN (
+				<cfqueryparam value="#componentIdsList#" list="true" cfsqltype="integer">
+			)
+			AND product_item_id IN (
+				<cfqueryparam value="#productItemIdsList#" list="true" cfsqltype="integer">
+			)
 		</cfquery>
 
 		<cfreturn local.q>

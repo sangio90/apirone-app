@@ -35,7 +35,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "quotationId" ] = rc.id;
 		params[ "quotationZoneId" ] = Len( rc.zoneId ) ? rc.zoneId : null;
-		params[ "useCache" ] = false;
 
 		var rows = super.fire( "QuotationItem.search", params );
 
@@ -930,6 +929,55 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setProduct( product );
 
+		// --- Preload batch dei bean necessari al salvataggio (evita l'N+1 su product.get, QuotationItemFruit.get e productItem.get) ---
+
+		// 1) Precarica i Product dei frutti in una sola getMany() (evita un product.get per frutto).
+		var fruitProductIds = [];
+		for ( var f in json.item.fruits._data ) {
+			fruitProductIds.append( f.fruit.id );
+		}
+		var fruitProductMap = ArrayLen( fruitProductIds )
+			? super.service( "Product" ).getMany( fruitProductIds )
+			: {};
+
+		// 2) Precarica i QuotationItemFruit già salvati (id numerico) in una sola getMany().
+		var existingFruitIds = [];
+		for ( var f in json.item.fruits._data ) {
+			if ( IsNumeric( f.id ) && !json.isClone ) {
+				existingFruitIds.append( f.id );
+			}
+		}
+
+		var existingFruitMap = ArrayLen( existingFruitIds )
+			? super.service( "QuotationItemFruit" ).getMany( existingFruitIds )
+			: {};
+
+		// 3) Precarica i ProductItem selezionati (frutti + righe placca) in una sola getMany().
+		// ATTENZIONE: il filtro di selezione qui sotto deve restare allineato a quello dei due loop
+		// di salvataggio (frutti e righe placca): se cambia in un punto, va cambiato ovunque.
+		var selectedProductItemIds = [];
+		for ( var f in json.item.fruits._data ) {
+			var fruitItemsSource = f.items ?: [];
+			var fruitItemsData   = isArray( fruitItemsSource ) ? fruitItemsSource : ( structKeyExists( fruitItemsSource, "_data" ) ? fruitItemsSource._data : [] );
+			for ( var fruitItemRow in fruitItemsData ) {
+				var fruitSel = ArrayFilter( fruitItemRow.values, function( value ) { return value.selected; } );
+				if ( Len( fruitSel ) > 0 && !ArrayContains( selectedProductItemIds, fruitSel[ 1 ].productItemId ) ) {
+					selectedProductItemIds.append( fruitSel[ 1 ].productItemId );
+				}
+			}
+		}
+		var plateItemsSource = json.item.product.items ?: [];
+		var plateItemsData   = isArray( plateItemsSource ) ? plateItemsSource : ( structKeyExists( plateItemsSource, "_data" ) ? plateItemsSource._data : [] );
+		for ( var plateItemRow in plateItemsData ) {
+			var plateSel = ArrayFilter( plateItemRow.values, function( value ) { return value.selected; } );
+			if ( Len( plateSel ) > 0 && !ArrayContains( selectedProductItemIds, plateSel[ 1 ].productItemId ) ) {
+				selectedProductItemIds.append( plateSel[ 1 ].productItemId );
+			}
+		}
+		var productItemMap = ArrayLen( selectedProductItemIds )
+			? super.service( "ProductItem" ).getMany( selectedProductItemIds )
+			: {};
+
 		for ( var thisFruit in json.item.fruits._data ) {
 
 			var positions = json.positions[ thisFruit.id ];
@@ -940,14 +988,15 @@ component extends="com.apirone.core.controller.AbsController" {
 				se id è stringa: è stato agenerato da js per il dnd, record nuovo
 			*/
 			if ( IsNumeric( thisFruit.id ) && !json.isClone ) {
-				// update
-				var fruitBean = super.fire( "QuotationItemFruit.get", [ thisFruit.id ] );
+				// update: bean già precaricato in existingFruitMap
+				var fruitBean = existingFruitMap[ thisFruit.id ];
 			} else {
 				// create
 				var fruitBean = super.bean( "QuotationItemFruit" );
 			}
 
-			var product = super.fire( "product.get", [ thisFruit.fruit.id ] );
+			// Product già precaricato in fruitProductMap (evita un product.get per frutto)
+			var product = fruitProductMap[ thisFruit.fruit.id ];
 
 			fruitBean.setFruit( product );
 			fruitBean.setPositions( positions );
@@ -966,7 +1015,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					selectedValue = selectedValue[ 1 ];
 
 					var productItemBean = super.bean( "QuotationItemProductItem" );
-					var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+					var productItem     = productItemMap[ selectedValue.productItemId ];
 
 					//productItemBean.setQuotationItemFruitId( fruitBean.getId() );
 					productItemBean.setProductItem( productItem );
@@ -1024,7 +1073,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					selectedValue = selectedValue[ 1 ];
 
 					var productItemBean = super.bean( "QuotationItemProductItem" );
-					var productItem     = super.fire( "productItem.get", { "productItemId" = selectedValue.productItemId } );
+					var productItem     = productItemMap[ selectedValue.productItemId ];
 
 					productItemBean.setQuotationItemId( thisId );
 					productItemBean.setProductItem( productItem );
@@ -1155,7 +1204,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var id = rc.id;
 
 		if (!IsNull(id)) {
-			var quotationItems = super.fire( "quotationItem.list", { quotationId = id, useCache = false } )
+			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } );
 
 			transaction {
 				for (var quotationItem in quotationItems) {

@@ -136,6 +136,161 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return rows
 	}
 
+	/**
+	 * Recupera in batch i componenti (own + base attribute) per il calcolo prezzo
+	 * di una lista di product_item_id. Sostituisce N chiamate a
+	 * searchByProductItemIdForPriceCalculator() con poche query batch, evitando
+	 * il problema N+1 nel loop di PriceCalculatorService.simulate().
+	 *
+	 * @productItemIds Array di productItemId
+	 * @return Struct mappato per productItemId -> Array di struct componente
+	 */
+	public Struct function priceCalculatorSearchByProductItemIds( required Array productItemIds ){
+		// Nessun item da processare: evita di generare una query con IN () vuoto.
+		if ( !ArrayLen( arguments.productItemIds ) ) {
+			return {};
+		}
+
+		var result = {};
+
+		// Inizializza una voce vuota per ogni item (preserva l'ordine e gli item senza componenti)
+		for ( var pid in arguments.productItemIds ) {
+			result[ pid ] = [];
+		}
+
+		// 1) Componenti "own" (product_item_id = pid) con override correlato in una sola query
+		var ownRecords = getDao().priceCalculatorReadByProductItemIds( arguments.productItemIds );
+		for ( var r in ownRecords ) {
+			var component = buildPriceCalculatorComponent(
+				id            = r.id,
+				isDeleted     = r.isDeleted,
+				totalQuantity = r.totalQuantity,
+				rawProductId  = r.raw_product_id,
+				variantId     = r.variant_id,
+				colorId       = r.color_id
+			);
+
+			if ( StructKeyExists( result, r.product_item_id ) ) {
+				ArrayAppend( result[ r.product_item_id ], component );
+			}
+		}
+
+		// 2) Componenti "base attribute" (attribute_raw_value_id) con override scoped per item
+		var piRecords = getProductItemDAO().readByIds( arguments.productItemIds );
+
+		// Mappe: attribute_raw_value_id -> [productItemId] e lista degli attribute value unici
+		var attrValueToPids = {};
+		var attrValueIds    = [];
+		var attrValueSeen   = {};
+		for ( var pi in piRecords ) {
+			if ( !IsNull( pi.attribute_raw_value_id ) ) {
+				var attrValueId = pi.attribute_raw_value_id;
+
+				if ( !StructKeyExists( attrValueToPids, attrValueId ) ) {
+					attrValueToPids[ attrValueId ] = [];
+				}
+				ArrayAppend( attrValueToPids[ attrValueId ], pi.product_item_id );
+
+				if ( !StructKeyExists( attrValueSeen, attrValueId ) ) {
+					attrValueSeen[ attrValueId ] = true;
+					ArrayAppend( attrValueIds, attrValueId );
+				}
+			}
+		}
+
+		if ( ArrayLen( attrValueIds ) ) {
+			var attrRecords = getDao().readByAttributeValueIds( attrValueIds );
+
+			// Raccoglie gli id dei componenti attributo e legge gli override in batch
+			var attrComponentIds = [];
+			for ( var ar in attrRecords ) {
+				ArrayAppend( attrComponentIds, ar.component_id );
+			}
+
+			var overrideMap = {};
+			if ( ArrayLen( attrComponentIds ) ) {
+				var overrideRecords = getDao().readOverridesByComponentIdsAndProductItemIds(
+					componentIds   = attrComponentIds,
+					productItemIds = arguments.productItemIds
+				);
+				for ( var ov in overrideRecords ) {
+					overrideMap[ ov.component_id & "_" & ov.product_item_id ] = ov;
+				}
+			}
+
+			// Costruisce i componenti attributo per ogni product item (override scoped per item)
+			for ( var ar in attrRecords ) {
+				var pids = StructKeyExists( attrValueToPids, ar.attribute_raw_value_id )
+					? attrValueToPids[ ar.attribute_raw_value_id ]
+					: [];
+
+				for ( var pid in pids ) {
+					var overrideKey = ar.component_id & "_" & pid;
+					var overrideRow = StructKeyExists( overrideMap, overrideKey ) ? overrideMap[ overrideKey ] : NullValue();
+
+					var isDeleted = false;
+					var totalQuantity = ar.quantity;
+					if ( !IsNull( overrideRow ) ) {
+						isDeleted = !IsNull( overrideRow.deleted ) && BooleanFormat( overrideRow.deleted );
+						if ( isDeleted ) {
+							totalQuantity = 0;
+						} else if ( !IsNull( overrideRow.quantity ) ) {
+							totalQuantity = ar.quantity + overrideRow.quantity;
+						}
+					}
+
+					var component = buildPriceCalculatorComponent(
+						id            = ar.component_id,
+						isDeleted     = isDeleted,
+						totalQuantity = totalQuantity,
+						rawProductId  = ar.raw_product_id,
+						variantId     = ar.variant_id,
+						colorId       = ar.color_id
+					);
+
+					if ( StructKeyExists( result, pid ) ) {
+						ArrayAppend( result[ pid ], component );
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Costruisce lo struct componente usato dal calcolo prezzo (stessa forma di
+	 * ComponentDAO.priceCalculatorRead()) e risolve il costo verticale.
+	 */
+	private Struct function buildPriceCalculatorComponent(
+		required id,
+		required isDeleted,
+		required totalQuantity,
+		required rawProductId,
+		required variantId,
+		required colorId
+	){
+		var component = {
+			"id"             = arguments.id,
+			"isDeleted"      = arguments.isDeleted,
+			"totalQuantity"  = arguments.totalQuantity,
+			"raw_product_id" = arguments.rawProductId,
+			"variant_id"     = arguments.variantId,
+			"color_id"       = arguments.colorId,
+			"costAmount"     = getDao().getComponentCost(
+				rawProductId = arguments.rawProductId,
+				variantId    = arguments.variantId,
+				colorId      = arguments.colorId
+			)
+		};
+
+		var rawProductData = getDao().getRawProductData( arguments.rawProductId );
+		component[ "raw_product_name" ] = rawProductData.raw_product_name;
+		component[ "raw_product_processiong_type" ] = rawProductData.raw_product_processiong_type;
+
+		return component;
+	}
+
 	public com.apirone.core.model.bean.Result function search(
 		// TODO: add category
 		String lineId,
@@ -406,30 +561,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	private Array function searchByProductItemIdForPriceCalculator( required String productItemId ){
-		var data   = [];
-		var result = getResult();
-
-		// components of productItem
-		var componentItems = getDao().find( "productItemId" = arguments.productItemId )
-
-		for ( var item in componentItems ) {
-			var componentItem = getDao().priceCalculatorRead( componentId = item.component_id, productItemId = arguments.productItemId );
-			data.add(componentItem)
-		}
-
-		// components of attribute of productItem
-		var productItem = getProductItemDAO().read( arguments.productItemId );
-
-		if ( Len( productItem.attribute_raw_value_id ) ) {
-			var attributeValueId = productItem.attribute_raw_value_id[1]
-			var attributeComponents = priceCalculatorSearch( attributeValueId = attributeValueId )
-			if (Len(attributeComponents))
-			for (var attributeComponent in attributeComponents) {
-				data.add(attributeComponent)
-			}
-		}
-		
-		return data;
+		// Delega al nuovo path batch (override correttamente scoped per item) per non
+		// mantenere due implementazioni del calcolo componenti di un singolo product item.
+		var map = priceCalculatorSearchByProductItemIds( [ arguments.productItemId ] );
+		return StructKeyExists( map, arguments.productItemId )
+			? map[ arguments.productItemId ]
+			: [];
 	}
 
 	/*

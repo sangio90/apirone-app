@@ -45,7 +45,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
 
         var cacheKey = arguments.toString();
 
-	   	var cache = cm.get( getCasceScope(), arguments.toString() ) ;
+	   	var cache = cm.get( getCacheScope(), arguments.toString() ) ;
 
         if ( cache.status ) {
 
@@ -75,7 +75,7 @@ component extends="com.apirone.core.model.service.AbsService" name="i18nService"
 
             result = convert( result );
 
-            cm.put( getCasceScope() , arguments.toString(), result ) ;
+            cm.put( getCacheScope() , arguments.toString(), result ) ;
 
         }
 

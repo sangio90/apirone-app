@@ -49,7 +49,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric lettersQuantity = 0,
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
-		QuotationItem quotationItem = javacast("null", "")
+		QuotationItem quotationItem = javacast("null", ""),
+		Product preloadedProduct = javacast("null", "")
 		){
 		var price = simulate( argumentCollection = arguments );
 		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
@@ -64,7 +65,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric lettersQuantity = 0,
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
-		QuotationItem quotationItem = javacast("null", "")
+		QuotationItem quotationItem = javacast("null", ""),
+		Product preloadedProduct = javacast("null", "")
 	){
 		if ( arguments.quantity LTE 0 ) {
 			Throw(
@@ -102,14 +104,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productId      = arguments.productId;
 		var productItemIds = arguments.producItemtIds;
 
-		// Carica il prodotto via batch getMany() per evitare la cascata N+1
+		// Carica il prodotto: se il chiamante ha già precaricato il bean (batch),
+		// lo riusa; altrimenti carica via batch getMany() per evitare la cascata N+1
 		// di buildFromRow() (CatalogBundle, Line, Model, Category, Finish, etc.)
-		var productMap = getProductService().getMany( [ productId ] );
-		var product   = StructKeyExists( productMap, productId )
-			? productMap[ productId ]
-			: NullValue();
-		if ( IsNull( product ) ) {
-			product = productSvc.get( productId );
+		var product = NullValue();
+		if ( !IsNull( arguments.preloadedProduct ) ) {
+			product = arguments.preloadedProduct;
+		} else {
+			var productMap = getProductService().getMany( [ productId ] );
+			product = StructKeyExists( productMap, productId )
+				? productMap[ productId ]
+				: NullValue();
+			if ( IsNull( product ) ) {
+				product = productSvc.get( productId );
+			}
 		}
 		var price = product.getPrice( "PRICE" );
 		if ( IsNull( price ) ) {
@@ -246,16 +254,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var attributePrice = product.getPrice( "PROD_ITEM_GEN" );
 
 		appendLog( "** Inizio del calcolo del prezzo degli attributi: #ArrayToList(productItemIds)#" );
-		producItemtIds = productItemIds.filter(function (item) { return !isNull(item)});
 
-		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
-		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
-
+		// Valida gli item prima di eseguire qualsiasi query batch: se un attributo
+		// non è stato compilato (itemId nullo) lancia l'errore previsto.
 		for ( var itemId in productItemIds ) {
 			if ( IsNull( itemId ) ) {
 				throw ("Compilare tutti gli attributi!");
 			}
-			var itemComponents = componentSvc.priceCalculatorSearch( productItemId = itemId, includeBaseAttributeComponents = true );
+		}
+
+		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
+		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
+
+		// Precarica in batch tutti i componenti (own + base attribute) di ogni item
+		// per evitare una query per item (N+1) in priceCalculatorSearch()
+		var itemComponentsMap = ArrayLen( productItemIds )
+			? componentSvc.priceCalculatorSearchByProductItemIds( productItemIds )
+			: {};
+
+		for ( var itemId in productItemIds ) {
+			var itemComponents = StructKeyExists( itemComponentsMap, itemId )
+				? itemComponentsMap[ itemId ]
+				: [];
 
 			var itemCost = 0;
 			var compCost = 0;
