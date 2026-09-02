@@ -1,4 +1,4 @@
-1<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <cfoutput>
     <div id="quotation-plant-positions-root">
 
