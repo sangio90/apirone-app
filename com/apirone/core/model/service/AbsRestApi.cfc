@@ -78,10 +78,18 @@
 		);
 
 		// Fai la chiamata
+		//
+		// Il result va sempre dichiarato ed è var-scoped: senza "result" la
+		// risposta finisce in una variabile "cfhttp" fuori dallo scope local,
+		// e questi servizi sono singleton WireBox — due richieste in parallelo
+		// si sovrascriverebbero la risposta a vicenda.
+		var httpResult = "";
+
 		cfhttp(
 			url     = apiUrl,
 			method  = method,
-			timeout = getTimeout()
+			timeout = getTimeout(),
+			result  = "httpResult"
 		) {
 			for ( var key in requestHeaders ) {
 				cfhttpparam(
@@ -95,12 +103,39 @@
 			}
 		}
 
+		// Quando la chiamata fallisce a livello di connessione (DNS, firewall,
+		// TLS, timeout) non c'è nessuna risposta HTTP e quindi nessuno
+		// statusCode: Lucee valorizza solo errorDetail. Leggere statusCode
+		// senza guardia produce "key [STATUSCODE] doesn't exist", che nasconde
+		// la causa vera dietro un errore di espressione.
+		var statusCode  = httpResult.statusCode ?: "";
+		var errorDetail = httpResult.errorDetail ?: "";
+
+		if ( !Len( Trim( statusCode ) ) ) {
+			WriteLog(
+				type = "error",
+				text = "API Connection Failure: #method# #apiUrl# | #errorDetail#"
+			);
+
+			Throw(
+				type    = "RestApiError",
+				message = "API non raggiungibile: #method# #apiUrl#",
+				detail  = Len( errorDetail ) ? errorDetail : "Nessuna risposta HTTP dal server."
+			);
+		}
+
 		// Gestisci risposta
 		var response = {
-			statusCode = cfhttp.statusCode,
-			headers    = cfhttp.responseHeader,
-			body       = cfhttp.fileContent
+			statusCode = statusCode,
+			headers    = httpResult.responseHeader ?: {},
+			body       = httpResult.fileContent ?: ""
 		};
+
+		// fileContent può non essere una stringa (binario, oggetto di errore):
+		// il log più sotto e DeserializeJSON assumono testo.
+		if ( !IsSimpleValue( response.body ) ) {
+			response.body = "";
+		}
 
 		// Log risposta
 		WriteLog(
