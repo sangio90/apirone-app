@@ -35,7 +35,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "quotationId" ] = rc.id;
 		params[ "quotationZoneId" ] = Len( rc.zoneId ) ? rc.zoneId : null;
-		params[ "useCache" ] = false;
 
 		var rows = super.fire( "QuotationItem.search", params );
 
@@ -1155,7 +1154,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var id = rc.id;
 
 		if (!IsNull(id)) {
-			var quotationItems = super.fire( "quotationItem.list", { quotationId = id, useCache = false } )
+			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } );
 
 			transaction {
 				for (var quotationItem in quotationItems) {
