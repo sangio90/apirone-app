@@ -32,7 +32,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	 */
 	public String function getAnticipo(){
 		if ( !IsNull( getImporto() ) ) {
-			return LSNumberFormat( getImporto(), "9,999.99", "it_IT" ) & " €";
+			// Trim: la maschera "9,999.99" allinea a destra riempiendo di spazi,
+			// che a video diventerebbero un rientro davanti alla cifra.
+			return Trim( LSNumberFormat( getImporto(), "9,999.99", "it_IT" ) ) & " €";
 		}
 
 		if ( !IsNull( getPercentuale() ) ) {

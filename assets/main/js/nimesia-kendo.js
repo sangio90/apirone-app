@@ -130,13 +130,31 @@ NM.kendo.formatDate = function( date, type="normal" ) {
 };
 
 // for Mementify dates (ISO 8601)
+/*
+    Date che arrivano dal server via Mementify, nel formato "yyyy-MM-dd HH:mm:ss".
+
+    Si formatta direttamente dalla data, senza passare da una stringa intermedia
+    con il nome del mese: quel giro rendeva la funzione dipendente dalla cultura
+    attiva. kendo.toString( ..., "MMMM, ..." ) scrive il mese nella lingua
+    corrente, mentre NM.kendo.formatDate lo rilegge forzando "en-US" — così su
+    ogni pagina che chiama kendo.culture("it-IT") la data diventava "settembre",
+    non veniva riconosciuta e il campo restava vuoto.
+*/
 NM.kendo.formatISODate = function( date, type = "normal" ) {
 
-    var parsed = kendo.toString( kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss" ), "MMMM, dd yyyy HH:mm:ss" );
+    var parsed = kendo.parseDate( date, "yyyy-MM-dd HH:mm:ss" );
 
-    var ret = NM.kendo.formatDate( parsed, type );
+    if ( !parsed ) {
+        return "";
+    }
 
-    return ret;
+    var masks = {
+        "normal": "dd/MM/yyyy HH:mm",
+        "date-only": "dd/MM/yyyy",
+        "short": "dd/MM"
+    };
+
+    return kendo.toString( parsed, masks[ type ] || masks[ "normal" ] );
 };
 
 // for Mementify dates (ISO 8601)
