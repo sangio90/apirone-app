@@ -36,6 +36,21 @@
 		<cfargument name="graphicTechnicianId" type="String" required="false">
 		<cfargument name="ownerId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
+
+		<!---
+			Ricerca per referente: il nome non è su questa tabella, vive sul CRM
+			(vedi Quotation.getReferentName). QuotationService interroga il CRM
+			per nome e passa qui gli id trovati, che entrano in OR con la
+			ricerca testuale sulle colonne locali.
+		--->
+		<cfargument name="referentCustomerIds" type="Array" required="false">
+		<cfargument name="referentLeadIds" type="Array" required="false">
+		<cfargument name="referentOpportunityIds" type="Array" required="false">
+
+		<cfargument name="fromDate" type="String" required="false">
+		<cfargument name="toDate" type="String" required="false">
+		<cfargument name="active" type="String" required="false">
+
 		<cfargument
 			name    ="orderBy"
 			type    ="String"
@@ -81,7 +96,45 @@
 				AND (
 					quotation ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
 					OR quotation_number ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
+					OR rif_libero ILIKE <cfqueryparam cfsqltype="VARCHAR" value="%#arguments.str#%">
+
+					<!---
+						Referenti che sul CRM corrispondono al testo cercato.
+						Le colonne sono uuid: si passa un solo parametro come
+						array literal Postgres e si casta, invece di un IN con
+						N placeholder varchar (che non farebbero il cast e che
+						su una ricerca generica sarebbero migliaia).
+					--->
+					<cfif !IsNull( arguments.referentCustomerIds ) AND ArrayLen( arguments.referentCustomerIds )>
+						OR customer_id = ANY(
+							<cfqueryparam cfsqltype="VARCHAR" value="{#ArrayToList( arguments.referentCustomerIds )#}">::uuid[]
+						)
+					</cfif>
+
+					<cfif !IsNull( arguments.referentLeadIds ) AND ArrayLen( arguments.referentLeadIds )>
+						OR lead_id = ANY(
+							<cfqueryparam cfsqltype="VARCHAR" value="{#ArrayToList( arguments.referentLeadIds )#}">::uuid[]
+						)
+					</cfif>
+
+					<cfif !IsNull( arguments.referentOpportunityIds ) AND ArrayLen( arguments.referentOpportunityIds )>
+						OR opportunity_id = ANY(
+							<cfqueryparam cfsqltype="VARCHAR" value="{#ArrayToList( arguments.referentOpportunityIds )#}">::uuid[]
+						)
+					</cfif>
 				)
+			</cfif>
+
+			<cfif !IsNull( arguments.fromDate ) AND IsDate( arguments.fromDate )>
+				AND quotations.quotation_date >= <cfqueryparam cfsqltype="DATE" value="#arguments.fromDate#">
+			</cfif>
+
+			<cfif !IsNull( arguments.toDate ) AND IsDate( arguments.toDate )>
+				AND quotations.quotation_date <= <cfqueryparam cfsqltype="DATE" value="#arguments.toDate#">
+			</cfif>
+
+			<cfif !IsNull( arguments.active ) AND IsNumeric( arguments.active )>
+				AND quotations.active = <cfqueryparam cfsqltype="INTEGER" value="#arguments.active#">
 			</cfif>
 
 			<cfif !IsNull( arguments.statusId )>

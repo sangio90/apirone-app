@@ -4,6 +4,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	variables.verticalePwd = "Gs16072001!";
 	variables.verticaleSecret = ToBase64('#variables.verticaleUser#:#variables.verticalePwd#');
 
+	// Sotto questa lunghezza la ricerca preventivi non interroga il CRM per il
+	// nome del referente: vedi findReferentIds().
+	variables.REFERENT_SEARCH_MIN_LENGTH = 3;
+
 	property name="dao" inject="QuotationDAO";
 
 	//Ho ordinato i DAO in ordine di cancellazione, se elimino in questo ordine non dovrei avere problemi con la cancellazione a cascata
@@ -40,6 +44,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="customerService" inject="CustomerService";
 	property name="opportunityService" inject="OpportunityService";
 	property name="leadService" inject="LeadService";
+	property name="CrmApiService" inject="CrmApiService";
 	property name="productService" inject="ProductService";
 	property name="productCategoryService" inject="ProductCategoryService";
 	property name="lineService" inject="LineService";
@@ -80,6 +85,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		arguments[ "orderby" ] = super.createOrderBy( arguments[ "orderby" ] );
 
+		// Il nome del referente non è su quotations: sta sul CRM. Si chiede al
+		// CRM quali referenti corrispondono al testo e si passano gli id al DAO,
+		// che li mette in OR con la ricerca sulle colonne locali.
+		StructAppend( arguments, findReferentIds( arguments?.str ?: "" ), true );
+
 		// Primo passaggio: il find() restituisce solo gli ID (più il totale per paginazione)
 		var records = getDao().find( argumentCollection = arguments );
 
@@ -102,6 +112,62 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		result.setTotal( Val( records.total ) );
 
 		return result;
+	}
+
+	/**
+	 * Cerca sul CRM i referenti il cui nome corrisponde al testo e ne restituisce
+	 * gli id, pronti per i filtri del DAO.
+	 *
+	 * Sotto la soglia di caratteri non interroga il CRM: l'endpoint /accounts
+	 * ignora il parametro limit e restituisce l'intero insieme corrispondente
+	 * (una ricerca di una lettera sola torna migliaia di record completi), quindi
+	 * su stringhe cortissime il costo non è giustificato dal risultato.
+	 *
+	 * Un CRM irraggiungibile non deve far fallire l'elenco preventivi: in quel
+	 * caso la ricerca degrada alle sole colonne locali e lo si annota nel log.
+	 */
+	private Struct function findReferentIds( required String str ){
+		var ids = {};
+		var term = Trim( arguments.str );
+
+		if ( Len( term ) < variables.REFERENT_SEARCH_MIN_LENGTH ) {
+			return ids;
+		}
+
+		var lookups = [
+			{ key = "referentCustomerIds",    method = "searchCustomers" },
+			{ key = "referentLeadIds",        method = "searchLeads" },
+			{ key = "referentOpportunityIds", method = "searchOpportunities" }
+		];
+
+		for ( var lookup in lookups ) {
+			try {
+				var found = Invoke( getCrmApiService(), lookup.method, { str = term } );
+				var list  = [];
+
+				for ( var row in ( found?.data ?: [] ) ) {
+					// Scarta id malformati: finiscono in un cast ::uuid[] lato
+					// Postgres, dove un valore storto fa fallire tutta la query.
+					// Il tipo va verificato come "guid" (8-4-4-4-12, il formato
+					// del CRM e di Postgres): "uuid" in CFML è un formato diverso
+					// (8-4-4-16) e scarterebbe ogni id.
+					if ( !IsNull( row?.id ) && IsValid( "guid", row.id ) ) {
+						list.add( row.id );
+					}
+				}
+
+				if ( list.len() ) {
+					ids[ lookup.key ] = list;
+				}
+			} catch ( any e ) {
+				getLogger().warn(
+					"QuotationService.findReferentIds: #lookup.method# fallita per [#term#], "
+					& "la ricerca prosegue senza referenti. #e.message#"
+				);
+			}
+		}
+
+		return ids;
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required String quotationId ){

@@ -15,8 +15,21 @@ $( document ).ready( function() {
 AP.quotation.list = ( function() {
     var pub = {};
 
+    /*
+        Filtri della ricerca, inviati al server a ogni read.
+
+        NM.kendo.dataSource cattura questo oggetto nella closure del suo
+        parameterMap e lo fonde nei parametri della chiamata: mutandolo qui, la
+        pagina successiva e ogni ricarica partono con gli stessi filtri. Va
+        quindi svuotato e ripopolato, mai riassegnato.
+    */
+    var searchParams = {};
+
     var dataSources = {
-        items: NM.kendo.dataSource( { url: "/manager/ajax/quotations" } ),
+        items: NM.kendo.dataSource( {
+            url: "/manager/ajax/quotations",
+            params: searchParams,
+        } ),
     };
 
     var fields = AP.quotation.fields;
@@ -29,69 +42,52 @@ AP.quotation.list = ( function() {
             return NM.kendo.formatISODate( event.createdAt );
         },
 
+        /*
+            La ricerca va fatta dal server.
+
+            La griglia è paginata lato server (serverPaging, 15 righe per
+            pagina), quindi dataSource.data() contiene solo la pagina corrente:
+            filtrare quello significherebbe cercare dentro 15 record invece che
+            dentro tutti i preventivi. Qui si impostano i parametri e si rilegge
+            dalla prima pagina, così il totale e il pager restano quelli veri.
+        */
         search: function( event ) {
-            var thisForm = fields.searchForm;
-            var params = thisForm.serializeJSON();
-
-            var filters = [];
-
+            var params = fields.searchForm.serializeJSON();
             var dataSource = viewModel.get( "rows" );
 
-            var filterDataSource = new kendo.data.DataSource( {
-                data: dataSource.data().toJSON(),
+            /*
+                Ogni filtro va assegnato sempre, anche quando è vuoto.
+
+                Il parameterMap di NM.kendo.dataSource conserva i parametri sul
+                transport (`transport.read.data = params`) e a ogni lettura ci
+                fonde sopra config.params con Object.assign, che aggiunge ma non
+                rimuove: cancellare qui una chiave lascerebbe in vita il valore
+                della ricerca precedente, e svuotando il campo si continuerebbe
+                a vedere il risultato filtrato. Sovrascriverla con stringa vuota
+                la annulla davvero, e paramsFromUrl lato server ignora già i
+                parametri vuoti.
+            */
+            searchParams.str      = params.strSearch || "";
+            searchParams.statusId = params.statusId || "";
+            searchParams.fromDate = params.fromDate || "";
+            searchParams.toDate   = params.toDate || "";
+
+            // "Mostra non attivi" spento: solo i preventivi attivi
+            searchParams.active = params.showActive ? "" : 1;
+
+            AP.loading.show();
+
+            dataSource.one( "requestEnd", function() {
+                AP.loading.hide();
             } );
 
-            if ( params.statusId.length ) {
-                filters.push( {
-                    field: "statusHistory.status.id",
-                    operator: "equal",
-                    value: params.statusId,
-                } );
-            }
-
-            if ( params.strSearch && params.strSearch.length ) {
-                filters.push( {
-                    logic: "or",
-                    filters: [
-                        { field: "quotationNumber", operator: "contains", value: params.strSearch },
-                        { field: "name",            operator: "contains", value: params.strSearch },
-                        { field: "referentName",    operator: "contains", value: params.strSearch },
-                        { field: "rifLibero",       operator: "contains", value: params.strSearch },
-                    ]
-                } );
-            }
-
-            if ( params.fromDate.length ) {
-                var fromDateObject = new Date( params.fromDate );
-                filters.push( {
-                    field: "quotationDate",
-                    operator: "gte",
-                    value: fromDateObject,
-                } );
-            }
-
-            if ( params.toDate.length ) {
-                var toDateObject = new Date( params.toDate );
-                filters.push( {
-                    field: "quotationDate",
-                    operator: "lte",
-                    value: toDateObject,
-                } );
-            }
-
-            if ( !params.showActive ) {
-                filters.push( {
-                    field: "active",
-                    operator: "equal",
-                    value: 1,
-                } );
-            }
-
-            filterDataSource.filter( filters );
-
-            viewModel.set( "rows", filterDataSource );
-
-            AP.loading.hide()
+            // query() invece di read(): riporta il pager alla prima pagina,
+            // altrimenti restando su una pagina alta la ricerca sembrerebbe
+            // non dare risultati
+            dataSource.query( {
+                page: 1,
+                pageSize: dataSource.pageSize(),
+            } );
 
             return false;
         },
@@ -133,12 +129,13 @@ AP.quotation.list = ( function() {
                             method: "DELETE",
                             url: "/manager/ajax/quotations/" + id,
                             callback: {
-                                done: async function (xhr) {
+                                done: function (xhr) {
                                     AP.widget.notify( "success", "Preventivo eliminato con successo." );
-                                    await viewModel.dataSource.items.read();
-                                    viewModel.rows = viewModel.dataSource.items;
+                                    // search() rilegge già dal server con i filtri correnti:
+                                    // la read() esplicita qui sarebbe una chiamata doppia, e
+                                    // il riaggancio di viewModel.rows non serve più da quando
+                                    // il dataSource non viene sostituito.
                                     viewModel.search();
-                                    AP.loading.hide();
                                 }
                             }
                         });
