@@ -342,16 +342,17 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-6 mb-2">
-                                                <div class="mb-1">Stato:</div>
-                                                <div>
-                                                    <select name="status" class="form-control form-control-sm" id="input-price-status" v-model="detailForm.data.status.id">
-                                                    <!--- detailForm.data.status.id: ID dello stato dell'articolo nel preventivo (es. "ACT" = attivo, "BOZ" = bozza). --->
-                                                        <option v-for="s in detailForm.itemStatuses" :value="s.id" :key="s.id">{{ s.name }}</option>
-                                                        <!--- detailForm.itemStatuses: array di stati disponibili per gli articoli di preventivo, popolato da Vue. --->
-                                                    </select>
-                                                </div>
-                                            </div>
+                                            <!---
+                                                Tendina "Stato" (Attivo / Bloccato / Ignora) rimossa: era l'unico
+                                                punto in cui si potevano scegliere BLK e IGN, ma nessuna logica
+                                                applicativa li legge — non filtrano gli articoli, non incidono su
+                                                prezzi, esportazione o stampe. Restava un comando senza effetto.
+
+                                                Il campo NON è stato tolto dal modello: detailForm.data.status.id
+                                                resta e vale "ACT" di default, quindi quotation_items.status_id
+                                                continua a essere valorizzato come prima e gli articoli già
+                                                esistenti mantengono il valore che hanno.
+                                            --->
 
                                             <div class="col-12">
                                                 <div class="row mb-2">
