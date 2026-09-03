@@ -157,6 +157,160 @@
 	<cfreturn local.html>
 </cffunction>
 
+<!---
+	Immagine di una voce inscritta in un box fisso, uguale per tutte le immagini
+	della stessa stampa.
+
+	Perche' non basta imporre la larghezza, com'era prima: lo snapshot della placca
+	e' un canvas di dimensione fissa che cambia con l'orientamento ( 1200x500 px se
+	la placca e' orizzontale, 500x1200 se verticale: applyPlateCanvasSize in
+	app-quotation-plate-vue.js ) e l'armatura ci viene disegnata dentro a 4 px/mm.
+	Quel canvas copre quindi 300 mm di placca in orizzontale contro 125 in verticale:
+	dando a entrambi la stessa larghezza di stampa la stessa placca usciva a due
+	scale diverse ( 2,4 volte ), e le verticali venivano alte 26 cm.
+
+	Inscrivendo invece ogni immagine nello stesso box si normalizza il lato lungo
+	del canvas, che e' 1200 px in tutti e due gli orientamenti: HOR e VER tornano
+	alla stessa scala fisica, e fra placche diverse le proporzioni restano giuste
+	perche' a canvas e scala di disegno fissi l'ingombro nel PNG e' proporzionale
+	ai millimetri veri.
+
+	width e height vengono scritte esplicite in cm: max-width/max-height non sono
+	affidabili in cfdocument, e il rapporto lo calcoliamo comunque noi dai pixel
+	dell'immagine ( colonne width/height di files, valorizzate al salvataggio in
+	FileService ).
+--->
+<!---
+	Fattore di stampa delle placche ritagliate: quanti cm di carta vale un mm di
+	prodotto, uguale per tutto il documento.
+
+	Si sceglie perche' la piu' grande riempia il box: le altre le restano
+	proporzionate, mentre adattando ogni immagine al suo box una placca da 2 moduli
+	uscirebbe grande come una da 8.
+
+	Torna 0 se nel documento non c'e' nessun ritaglio ( placche legacy, immagini
+	caricate a mano, armature non ritrovate ): printItemImage allora inscrive nel
+	box, che e' il massimo che si puo' fare senza sapere quanto misura il soggetto.
+--->
+<cffunction name="printImageScale" output="false" returntype="numeric">
+	<cfargument name="data" required="true">
+	<cfargument name="boxWidthCm" type="numeric" required="true">
+	<cfargument name="boxHeightCm" type="numeric" required="true">
+
+	<cfif !StructKeyExists( arguments.data, "plateImages" )>
+		<cfreturn 0>
+	</cfif>
+
+	<cfset local.maxWidthMm  = Val( arguments.data.plateImages.maxWidthMm )>
+	<cfset local.maxHeightMm = Val( arguments.data.plateImages.maxHeightMm )>
+
+	<cfif local.maxWidthMm LTE 0 OR local.maxHeightMm LTE 0>
+		<cfreturn 0>
+	</cfif>
+
+	<cfreturn Min( arguments.boxWidthCm / local.maxWidthMm, arguments.boxHeightCm / local.maxHeightMm )>
+</cffunction>
+
+<!---
+	Immagine centrata nella sua cella.
+
+	Il centraggio e' doppio perche' i due casi convivono: fuori da .hiddenTable
+	l'immagine resta inline e la centra il text-align del contenitore, dentro
+	.hiddenTable il foglio di stile la rende display: block ( printStyle ) e allora
+	la centrano i margini automatici. Una sola delle due regole lascerebbe meta'
+	stampe con le immagini attaccate a sinistra, cosa che si vede da quando i
+	ritagli sono piu' stretti della colonna.
+--->
+<cffunction name="printImageTag" output="false" returntype="string">
+	<cfargument name="src" required="true">
+	<cfargument name="widthCm" type="numeric" required="true">
+	<!--- l'altezza manca solo quando non si riesce a leggere l'immagine --->
+	<cfargument name="heightCm" type="numeric" required="false" default="0">
+
+	<cfset local.size = "width: #arguments.widthCm#cm !important;">
+
+	<cfif arguments.heightCm GT 0>
+		<cfset local.size &= " height: #arguments.heightCm#cm !important;">
+	</cfif>
+
+	<cfsavecontent variable="local.html"><cfoutput><div style="text-align: center;"><img src="#arguments.src#" style="#local.size# margin-left: auto; margin-right: auto;"></div></cfoutput></cfsavecontent>
+
+	<cfreturn local.html>
+</cffunction>
+
+<cffunction name="printItemImage" output="false">
+	<cfargument name="item" required="true">
+	<cfargument name="boxWidthCm" type="numeric" required="true">
+	<cfargument name="boxHeightCm" type="numeric" required="true">
+	<!--- args.data: ci sta dentro il ritaglio della placca, quando si e' potuto fare --->
+	<cfargument name="data" required="false">
+	<!--- cm di carta per mm di prodotto, da printImageScale: vale solo per i ritagli --->
+	<cfargument name="cmPerMm" type="numeric" required="false" default="0">
+
+	<!---
+		Placca ritagliata sull'armatura ( buildPlateCrops nel controller ): l'immagine
+		e' il prodotto e basta, e di quel prodotto si conoscono i millimetri, quindi
+		si stampa in scala invece di adattarla al box.
+	--->
+	<cfset local.crop = platePrintCrop( arguments.item, arguments.data )>
+
+	<cfif !IsNull( local.crop )>
+		<cfif arguments.cmPerMm GT 0>
+			<cfset local.cropWidth  = Round( local.crop.widthMm  * arguments.cmPerMm * 100 ) / 100>
+			<cfset local.cropHeight = Round( local.crop.heightMm * arguments.cmPerMm * 100 ) / 100>
+		<cfelse>
+			<!--- senza fattore si ripiega sul box, ma con le proporzioni vere --->
+			<cfset local.cropScale  = Min( arguments.boxWidthCm / local.crop.widthMm, arguments.boxHeightCm / local.crop.heightMm )>
+			<cfset local.cropWidth  = Round( local.crop.widthMm  * local.cropScale * 100 ) / 100>
+			<cfset local.cropHeight = Round( local.crop.heightMm * local.cropScale * 100 ) / 100>
+		</cfif>
+
+		<cfreturn printImageTag( local.crop.path, local.cropWidth, local.cropHeight )>
+	</cfif>
+
+	<cfset local.src = ExpandPath( '/assets/main/img/img-not-found.png' )>
+	<cfset local.w   = 0>
+	<cfset local.h   = 0>
+
+	<cfif !IsNull( arguments.item.getImage() )>
+		<!---
+			getPath() e non getUri(): cfdocument legge l'immagine dal file system,
+			non via HTTP. getUri() punta al repository pubblico ( altro host ) e
+			getRelativePath() e' solo un frammento, quindi nessuno dei due si
+			risolve nel PDF.
+		--->
+		<cfset local.image = arguments.item.getImage()>
+		<cfset local.src   = local.image.getPath()>
+		<cfset local.w     = IsNull( local.image.getWidth() )  ? 0 : Val( local.image.getWidth() )>
+		<cfset local.h     = IsNull( local.image.getHeight() ) ? 0 : Val( local.image.getHeight() )>
+	</cfif>
+
+	<!--- misure non registrate ( immagini caricate prima che si salvassero ):
+	      si leggono dal file --->
+	<cfif local.w LTE 0 OR local.h LTE 0>
+		<cftry>
+			<cfset local.info = ImageInfo( local.src )>
+			<cfset local.w    = local.info.width>
+			<cfset local.h    = local.info.height>
+			<cfcatch type="any">
+				<cfset local.w = 0>
+				<cfset local.h = 0>
+			</cfcatch>
+		</cftry>
+	</cfif>
+
+	<!--- file illeggibile: si ripiega sul comportamento di prima, larghezza del box --->
+	<cfif local.w LTE 0 OR local.h LTE 0>
+		<cfreturn printImageTag( local.src, arguments.boxWidthCm )>
+	</cfif>
+
+	<cfset local.scale       = Min( arguments.boxWidthCm / local.w, arguments.boxHeightCm / local.h )>
+	<cfset local.printWidth  = Round( local.w * local.scale * 100 ) / 100>
+	<cfset local.printHeight = Round( local.h * local.scale * 100 ) / 100>
+
+	<cfreturn printImageTag( local.src, local.printWidth, local.printHeight )>
+</cffunction>
+
 <cffunction name="getPrintFooter">
     <cfsavecontent variable="local.html">
         <cfoutput>
@@ -888,4 +1042,27 @@
 		}
 		/* fine */
 	</style>
+</cffunction>
+
+<!---
+	Ritaglio della placca per questa voce, se il controller e' riuscito a farlo.
+	Torna null quando la voce non e' una placca a blocchi, quando l'immagine e'
+	caricata a mano, quando l'armatura non si e' ritrovata dal codice modello o
+	quando la stampa e' costruita da un controller che non prepara i ritagli.
+--->
+<cffunction name="platePrintCrop" output="false">
+	<cfargument name="item" required="true">
+	<cfargument name="data" required="false">
+
+	<cfif IsNull( arguments.data ) OR !IsStruct( arguments.data ) OR !StructKeyExists( arguments.data, "plateImages" )>
+		<cfreturn>
+	</cfif>
+
+	<cfset local.itemId = arguments.item.getId()>
+
+	<cfif IsNull( local.itemId ) OR !StructKeyExists( arguments.data.plateImages.byItem, local.itemId )>
+		<cfreturn>
+	</cfif>
+
+	<cfreturn arguments.data.plateImages.byItem[ local.itemId ]>
 </cffunction>

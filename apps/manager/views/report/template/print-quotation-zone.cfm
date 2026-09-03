@@ -148,6 +148,9 @@
 				<!--- il cambio zona e' una rottura: ogni zona parte da pagina nuova.
 				      Si conta solo quello che si stampa davvero, le zone vuote sono
 				      saltate e non devono lasciare una pagina bianca dietro di se'. --->
+				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
+				      le altre le restano proporzionate --->
+				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 5, boxHeightCm = 5 )>
 				<cfset zoneStampate = 0>
 				<cfloop array="#args.data.zones#" index="stanza">
 					<cfif stanza.zoneItems.len() EQ 0>
@@ -181,17 +184,9 @@
 											<tr>
 												<cfif args.params.images>
 													<td style="vertical-align: middle; width: 5cm;" rowspan="2">
-														<cfif IsNull( oggetto.getImage() )>
-															<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-														<cfelse>
-															<!---
-																getPath() e non getUri(): cfdocument legge l'immagine dal
-																file system, non via HTTP. getUri() punta al repository
-																pubblico (altro host) e getRelativePath() è solo un
-																frammento, quindi nessuno dei due si risolve nel PDF.
-															--->
-															<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-														</cfif>
+														<!--- box uguale per tutte le immagini: e' quello che rimette
+														      alla stessa scala placche orizzontali e verticali --->
+														#printItemImage( item = oggetto, data = args.data, boxWidthCm = 5, boxHeightCm = 5, cmPerMm = imgScale )#
 													</td>
 												</cfif>
 												<!---

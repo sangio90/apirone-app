@@ -11,6 +11,150 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return build( arguments.frameId );
 	}
 
+	// Dimensioni fisiche di un mezzofruito. Scala di disegno: 1mm = 1px.
+	variables.SLOT_WIDTH_MM  = 11.25;
+	variables.SLOT_HEIGHT_MM = 45;
+
+	/**
+	 * Disposizione dei blocchi di un'armatura e suo ingombro in millimetri.
+	 *
+	 * - Gli slot sono numerati con interi progressivi per placca (1..N), uguali in HOR e VER.
+	 * - I blocchi scorrono lungo l'asse della placca (orizzontale in HOR, verticale in VER).
+	 * - Margini: lungo l'asse di flusso il margine è riferito al blocco precedente
+	 *   (LEFT con placca orizzontale, TOP con placca verticale; per il primo blocco
+	 *   è riferito al bordo della placca); l'altro margine è sempre riferito al
+	 *   bordo della placca.
+	 * - I blocchi con orientation_mode fisso (HOR/VER) mantengono il proprio
+	 *   orientamento celle in entrambe le viste.
+	 * - blockOrientations (JSON {"<order>":"HOR|VER"}): override per singolo
+	 *   blocco, usato dai preventivi per ruotare un blocco alla volta.
+	 *
+	 * Sta qui e non nel controller perché la usano in due: il designer, per
+	 * disegnare la placca, e la stampa, che dall'ingombro ricava dove sta la placca
+	 * dentro all'anteprima salvata. Due copie di queste regole divergerebbero.
+	 *
+	 * width/height sono l'ingombro fisico in mm, margini finali destro e inferiore
+	 * compresi. Sono 0 per le armature senza blocchi (le legacy su file JSON).
+	 */
+	public Struct function layout(
+		required com.apirone.core.model.bean.Frame frame,
+		String orientationId    = "",
+		String blockOrientations = ""
+	){
+		var overrides = {};
+		if ( Len( arguments.blockOrientations ) && IsJSON( arguments.blockOrientations ) ) {
+			overrides = DeserializeJSON( arguments.blockOrientations );
+		}
+
+		var frameOrientationId = arguments.frame.getOrientation().getId();
+
+		var orientationIds = [];
+		if ( frameOrientationId == "HAV" ) {
+			orientationIds = [ "HOR", "VER" ];
+		} else {
+			orientationIds = [ frameOrientationId ];
+		}
+
+		var thisOrientationId = ( frameOrientationId == "VER" ? "VER" : "HOR" );
+		if ( Len( arguments.orientationId ) && ArrayFind( orientationIds, arguments.orientationId ) ) {
+			thisOrientationId = arguments.orientationId;
+		}
+
+		var blocks = [];
+		var slotCounter = 0;
+		var flowCursor  = 0; // bordo finale (destro o inferiore) del blocco precedente
+		var plateWidth  = 0;
+		var plateHeight = 0;
+
+		var frameBlocks = arguments.frame.getBlocks();
+
+		if ( IsNull( frameBlocks ) ) {
+			frameBlocks = [];
+		}
+
+		for ( var block in frameBlocks ) {
+
+			var mode = block.getOrientationMode();
+			var effectiveOri = ( mode == "HAV" ? thisOrientationId : mode );
+
+			// override per singolo blocco (rotazione dal preventivo)
+			var orderKey = ToString( block.getOrder() );
+			if ( StructKeyExists( overrides, orderKey ) && ListFindNoCase( "HOR,VER", overrides[ orderKey ] ) ) {
+				effectiveOri = UCase( overrides[ orderKey ] );
+			}
+
+			var blockWidth  = 0;
+			var blockHeight = 0;
+
+			if ( effectiveOri == "HOR" ) {
+				blockWidth  = block.getSlotCount() * variables.SLOT_WIDTH_MM;
+				blockHeight = variables.SLOT_HEIGHT_MM;
+			} else {
+				blockWidth  = variables.SLOT_HEIGHT_MM;
+				blockHeight = block.getSlotCount() * variables.SLOT_WIDTH_MM;
+			}
+
+			var blockLeft = 0;
+			var blockTop  = 0;
+
+			if ( thisOrientationId == "HOR" ) {
+				blockLeft  = flowCursor + block.getMarginLeftMm();
+				blockTop   = block.getMarginTopMm();
+				flowCursor = blockLeft + blockWidth;
+			} else {
+				blockTop   = flowCursor + block.getMarginTopMm();
+				blockLeft  = block.getMarginLeftMm();
+				flowCursor = blockTop + blockHeight;
+			}
+
+			var slots = [];
+			for ( var i = 1; i <= block.getSlotCount(); i++ ) {
+				slotCounter++;
+				slots.add( {
+					"id"    = slotCounter,
+					"order" = slotCounter - 1,
+					"type"  = "_"
+				} );
+			}
+
+			blocks.add( {
+				"id"              = block.getId(),
+				"order"           = block.getOrder(),
+				"orientationMode" = mode,
+				"rotatable"       = block.getRotatable(),
+				"slotCount"       = block.getSlotCount(),
+				"marginTopMm"     = block.getMarginTopMm(),
+				"marginLeftMm"    = block.getMarginLeftMm(),
+				"left"            = blockLeft,
+				"top"             = blockTop,
+				"width"           = blockWidth,
+				"height"          = blockHeight,
+				"cellOrientation" = effectiveOri,
+				"slots"           = slots
+			} );
+
+			plateWidth  = Max( plateWidth, blockLeft + blockWidth );
+			plateHeight = Max( plateHeight, blockTop + blockHeight );
+		}
+
+		if ( ArrayLen( blocks ) ) {
+			plateWidth  = plateWidth  + arguments.frame.getMarginRightMm();
+			plateHeight = plateHeight + arguments.frame.getMarginBottomMm();
+		}
+
+		return {
+			"orientationId"  = thisOrientationId,
+			"orientationIds" = orientationIds,
+			"blocks"         = blocks,
+			"width"          = plateWidth,
+			"height"         = plateHeight,
+			"slotSize"       = {
+				"width"  = variables.SLOT_WIDTH_MM,
+				"height" = variables.SLOT_HEIGHT_MM
+			}
+		};
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 

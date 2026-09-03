@@ -1,9 +1,5 @@
 component extends="com.apirone.core.controller.AbsController" {
 
-	// Dimensioni fisiche di un mezzofruito. Scala di disegno: 1mm = 1px.
-	variables.SLOT_WIDTH_MM  = 11.25;
-	variables.SLOT_HEIGHT_MM = 45;
-
 	function list( event, rc, prc ){
 		var data   = [];
 		var result = super.getResult();
@@ -84,120 +80,35 @@ component extends="com.apirone.core.controller.AbsController" {
 	 */
 	private Struct function buildBlocksResponse( required Any bean, String orientationId = "", String blockOrientations = "" ){
 
-		var overrides = {};
-		if ( Len( arguments.blockOrientations ) && IsJSON( arguments.blockOrientations ) ) {
-			overrides = DeserializeJSON( arguments.blockOrientations );
-		}
-
-		var frameOrientationId = bean.getOrientation().getId();
-
-		var orientationIds = [];
-		if ( frameOrientationId == "HAV" ) {
-			orientationIds = [ "HOR", "VER" ];
-		} else {
-			orientationIds = [ frameOrientationId ];
-		}
-
-		var thisOrientationId = ( frameOrientationId == "VER" ? "VER" : "HOR" );
-		if ( Len( arguments.orientationId ) && ArrayFind( orientationIds, arguments.orientationId ) ) {
-			thisOrientationId = arguments.orientationId;
-		}
-
-		var blocks = [];
-		var slotCounter = 0;
-		var flowCursor  = 0; // bordo finale (destro o inferiore) del blocco precedente
-		var plateWidth  = 0;
-		var plateHeight = 0;
-
-		for ( var block in bean.getBlocks() ) {
-
-			var mode = block.getOrientationMode();
-			var effectiveOri = ( mode == "HAV" ? thisOrientationId : mode );
-
-			// override per singolo blocco (rotazione dal preventivo)
-			var orderKey = ToString( block.getOrder() );
-			if ( StructKeyExists( overrides, orderKey ) && ListFindNoCase( "HOR,VER", overrides[ orderKey ] ) ) {
-				effectiveOri = UCase( overrides[ orderKey ] );
-			}
-
-			var blockWidth  = 0;
-			var blockHeight = 0;
-
-			if ( effectiveOri == "HOR" ) {
-				blockWidth  = block.getSlotCount() * variables.SLOT_WIDTH_MM;
-				blockHeight = variables.SLOT_HEIGHT_MM;
-			} else {
-				blockWidth  = variables.SLOT_HEIGHT_MM;
-				blockHeight = block.getSlotCount() * variables.SLOT_WIDTH_MM;
-			}
-
-			var blockLeft = 0;
-			var blockTop  = 0;
-
-			if ( thisOrientationId == "HOR" ) {
-				blockLeft  = flowCursor + block.getMarginLeftMm();
-				blockTop   = block.getMarginTopMm();
-				flowCursor = blockLeft + blockWidth;
-			} else {
-				blockTop   = flowCursor + block.getMarginTopMm();
-				blockLeft  = block.getMarginLeftMm();
-				flowCursor = blockTop + blockHeight;
-			}
-
-			var slots = [];
-			for ( var i = 1; i <= block.getSlotCount(); i++ ) {
-				slotCounter++;
-				slots.add( {
-					"id"    = slotCounter,
-					"order" = slotCounter - 1,
-					"type"  = "_"
-				} );
-			}
-
-			blocks.add( {
-				"id"              = block.getId(),
-				"order"           = block.getOrder(),
-				"orientationMode" = mode,
-				"rotatable"       = block.getRotatable(),
-				"slotCount"       = block.getSlotCount(),
-				"marginTopMm"     = block.getMarginTopMm(),
-				"marginLeftMm"    = block.getMarginLeftMm(),
-				"left"            = blockLeft,
-				"top"             = blockTop,
-				"width"           = blockWidth,
-				"height"          = blockHeight,
-				"cellOrientation" = effectiveOri,
-				"slots"           = slots
-			} );
-
-			plateWidth  = Max( plateWidth, blockLeft + blockWidth );
-			plateHeight = Max( plateHeight, blockTop + blockHeight );
-		}
+		// Il calcolo sta in FrameService.layout(): lo usa anche la stampa, che
+		// dall'ingombro ricava dove sta la placca dentro all'anteprima salvata.
+		var layout = super.service( "Frame" ).layout(
+			frame             = arguments.bean,
+			orientationId     = arguments.orientationId,
+			blockOrientations = arguments.blockOrientations
+		);
 
 		var availableOrientations = [];
-		for ( var thisOri in orientationIds ) {
+		for ( var thisOri in layout.orientationIds ) {
 			availableOrientations.add( super.service( "Lookup" ).get( "orientation", thisOri ) );
 		}
 
-		var obj = super.getMementify().convert( bean, "detail" );
+		var obj = super.getMementify().convert( arguments.bean, "detail" );
 
 		obj.remove( "cells" );
 		obj.remove( "grid" );
 
-		obj["orientation"]     = super.service( "Lookup" ).get( "orientation", thisOrientationId );
-		obj["cellOrientation"] = super.service( "Lookup" ).get( "orientation", thisOrientationId );
+		obj["orientation"]     = super.service( "Lookup" ).get( "orientation", layout.orientationId );
+		obj["cellOrientation"] = super.service( "Lookup" ).get( "orientation", layout.orientationId );
 		obj["availableOrientations"] = availableOrientations;
 
-		obj["blocks"]         = blocks;
-		obj["marginRightMm"]  = bean.getMarginRightMm();
-		obj["marginBottomMm"] = bean.getMarginBottomMm();
-		obj["width"]          = plateWidth  + bean.getMarginRightMm();
-		obj["height"]         = plateHeight + bean.getMarginBottomMm();
+		obj["blocks"]         = layout.blocks;
+		obj["marginRightMm"]  = arguments.bean.getMarginRightMm();
+		obj["marginBottomMm"] = arguments.bean.getMarginBottomMm();
+		obj["width"]          = layout.width;
+		obj["height"]         = layout.height;
 
-		obj["slotSize"] = {
-			"width"  = variables.SLOT_WIDTH_MM,
-			"height" = variables.SLOT_HEIGHT_MM
-		};
+		obj["slotSize"] = layout.slotSize;
 
 		return obj;
 	}

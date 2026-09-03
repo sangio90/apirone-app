@@ -43,6 +43,9 @@
 				      rottura e' il cambio gruppo: ogni gruppo parte da pagina nuova.
 				      Si contano solo i gruppi che stampano qualcosa, altrimenti un gruppo
 				      vuoto lascerebbe dietro di se' una pagina bianca. --->
+				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
+				      le altre le restano proporzionate --->
+				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 12.5, boxHeightCm = 12.5 )>
 				<cfset gruppiStampati = 0>
 				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
 					<cfset groupItemsCount = ArrayLen( categoryGroup.items )>
@@ -66,20 +69,17 @@
 						<cfif groupItemIndex EQ 1 AND Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
 						<table style="border-collapse: collapse; width: 100%;">
 							<tr>
-								<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; width: 11cm !important;">
-									<cfif IsNull( oggetto.getImage() )>
-										<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 11cm !important;">
-									<cfelse>
-										<!---
-											getPath() e non getUri(): cfdocument legge l'immagine dal
-											file system, non via HTTP. getUri() punta al repository
-											pubblico (altro host) e getRelativePath() è solo un
-											frammento, quindi nessuno dei due si risolve nel PDF.
-										--->
-										<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 11cm !important;">
-									</cfif>
+								<!--- colonna immagine allargata con il box: senza, le foto sborderebbero dalla cella.
+								     Riga di chiusura sotto ogni voce, come nelle altre stampe: qui le voci
+								     non hanno cornice e senza una linea si confondono fra loro --->
+								<td style="margin: 0 !important; padding: 3px 3px 6px 3px; align-items: center; border-right: 0; border-bottom: 1px solid black; width: 12.5cm !important;">
+									<!--- box uguale per tutte le immagini: e' quello che rimette
+									      alla stessa scala placche orizzontali e verticali --->
+									#printItemImage( item = oggetto, data = args.data, boxWidthCm = 12.5, boxHeightCm = 12.5, cmPerMm = imgScale )#
 								</td>
-								<td style="padding-right: 0; border-left: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
+								<!--- descrizione appesa in alto: senza, con le foto alte finiva a meta' cella,
+								     staccata dal titolo della voce --->
+								<td style="vertical-align: top; padding-right: 0; padding-bottom: 6px; border-left: 0; border-bottom: 1px solid black; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
 									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 									<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>

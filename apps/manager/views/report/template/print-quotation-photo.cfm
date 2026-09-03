@@ -40,6 +40,9 @@
 				      saltate e non devono lasciare una pagina bianca dietro di se'.
 				      Il salto sta sul wrapper della prima voce perche' il titolo zona
 				      e' dentro quel blocco. --->
+				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
+				      le altre le restano proporzionate --->
+				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 11, boxHeightCm = 11 )>
 				<cfset zoneStampate = 0>
 				<cfloop array="#args.data.zones#" index="stanza">
 					<cfif stanza.zoneItems.len() EQ 0>
@@ -58,19 +61,13 @@
 							<table style="border-collapse: collapse; width: 100%;">
 								<tr>
 									<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 11cm !important;">
-										<cfif IsNull( oggetto.getImage() )>
-											<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 11cm !important;">
-										<cfelse>
-											<!---
-												getPath() e non getUri(): cfdocument legge l'immagine dal
-												file system, non via HTTP. getUri() punta al repository
-												pubblico (altro host) e getRelativePath() è solo un
-												frammento, quindi nessuno dei due si risolve nel PDF.
-											--->
-											<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 11cm !important;">
-										</cfif>
+										<!--- box uguale per tutte le immagini: e' quello che rimette
+										      alla stessa scala placche orizzontali e verticali --->
+										#printItemImage( item = oggetto, data = args.data, boxWidthCm = 11, boxHeightCm = 11, cmPerMm = imgScale )#
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 9cm !important;">
+									<!--- descrizione appesa in alto: senza cade sul middle di default e, con la
+									     colonna accanto gia' allineata in alto, la riga esce sfalsata --->
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 9cm !important;">
 										<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 										<cfif !isNull(oggetto.getPosition())>
 											<div style="font-size: 7pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>

@@ -102,6 +102,9 @@
 			</cfoutput>
 
 			<cfoutput>
+				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
+				      le altre le restano proporzionate --->
+				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 2.54, boxHeightCm = 2.54 )>
 				<cfset i = 1>
 				<!--- LOOP sulle stanze --->
 				<cfloop array="#args.data.zones#" index="stanza">
@@ -152,18 +155,13 @@
 											<tr>
 												<cfif args.params.images>
 													<td style="width: 1.1in;">
-														<cfif IsNull( oggetto.getImage() )>
-															<!--- expandPath e non l'URL di test.apirone.cc: il segnaposto va
-															      letto dal file system locale, non scaricato da un altro ambiente --->
-															<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
-														<cfelse>
-															<!---
-																getPath() e non getUri(): cfdocument legge l'immagine dal
-																file system, non via HTTP. getUri() punta al repository
-																pubblico (altro host) e non si risolve nel PDF.
-															--->
-															<img src="#oggetto.getImage().getPath()#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
-														</cfif>
+														<!---
+															Box di 1in ( 2,54 cm ) uguale per tutte le immagini: oltre a
+															rimettere alla stessa scala placche orizzontali e verticali
+															toglie lo schiacciamento, perche' prima 1in x 1in era imposto
+															a qualsiasi proporzione.
+														--->
+														#printItemImage( item = oggetto, data = args.data, boxWidthCm = 2.54, boxHeightCm = 2.54, cmPerMm = imgScale )#
 													</td>
 													<td style="width: 2.9in; padding-left: 2pt; padding-right: 0">
 														<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>

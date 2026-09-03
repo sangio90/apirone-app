@@ -40,6 +40,9 @@
 				      saltate e non devono lasciare una pagina bianca dietro di se'.
 				      Il salto sta sul wrapper della prima voce perche' il titolo zona
 				      e' dentro quel blocco. --->
+				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
+				      le altre le restano proporzionate --->
+				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 6, boxHeightCm = 6 )>
 				<cfset zoneStampate = 0>
 				<cfloop array="#args.data.zones#" index="stanza">
 					<cfif stanza.zoneItems.len() EQ 0>
@@ -73,22 +76,16 @@
 								<tr>
 									<cfif args.params.images>
 										<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 6cm !important;">
-											<cfif IsNull( oggetto.getImage() )>
-												<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 6cm !important;">
-											<cfelse>
-												<!---
-													getPath() e non getUri(): cfdocument legge l'immagine dal
-													file system, non via HTTP. getUri() punta al repository
-													pubblico (altro host) e getRelativePath() è solo un
-													frammento, quindi nessuno dei due si risolve nel PDF.
-												--->
-												<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 6cm !important;">
-											</cfif>
+											<!--- box uguale per tutte le immagini: e' quello che rimette
+											      alla stessa scala placche orizzontali e verticali --->
+											#printItemImage( item = oggetto, data = args.data, boxWidthCm = 6, boxHeightCm = 6, cmPerMm = imgScale )#
 										</td>
 									<cfelse>
 										<td style="padding: 0; margin: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 0.1cm !important;"></td>
 									</cfif>
-									<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.9cm </cfif> !important;">
+									<!--- descrizione appesa in alto: senza cade sul middle di default e, con la
+									     colonna accanto gia' allineata in alto, la riga esce sfalsata --->
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.9cm </cfif> !important;">
 										<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 										<!--- dimensioni sempre sotto al nome, placche e segnaletica comprese --->
 										<cfif hasDim>
@@ -114,7 +111,7 @@
 											</cfif>
 										</cfif>
 									</td>
-									<td style="vertical-align: top; padding: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; width: 9cm !important;">
+									<td style="vertical-align: top; padding: 0 5pt 5pt 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; width: 9cm !important;">
 										<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 											<div style="font-size: 7pt; line-height: 15px;">
 												#printLabel('fruitList', langId)#:

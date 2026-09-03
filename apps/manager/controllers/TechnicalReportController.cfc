@@ -13,6 +13,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		'proforma'  = 'print-quotation-classic'
 	};
 
+	// Tela su cui il designer disegna l'anteprima della placca, in px: fissa, e
+	// scambiata quando la placca è verticale. L'armatura ci sta dentro centrata, a
+	// non più di PLATE_CANVAS_MAX_SCALE px per mm.
+	// Sono le stesse di applyPlateCanvasSize in app-quotation-plate-vue.js: qui
+	// servono per ritrovare la placca dentro all'anteprima già salvata, quindi se
+	// cambiano di là vanno cambiate anche qui, o le stampe ritagliano storto.
+	variables.PLATE_CANVAS_LONG_PX   = 1200;
+	variables.PLATE_CANVAS_SHORT_PX  = 500;
+	variables.PLATE_CANVAS_MAX_SCALE = 4;
+
 	// Tipologie generabili anche su un preventivo non ancora calcolato, perché il
 	// loro template non riporta prezzi né totali e quindi non legge quotationPrice.
 	// Tenere allineato REPORTS_WITHOUT_PRICE in app-quotation-detail.js.
@@ -295,6 +305,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			arrayAppend( allItems, z.zoneItems, true );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
+		quoteObj.plateImages    = buildPlateCrops( allItems );
 
 		return quoteObj;
 	}
@@ -368,12 +379,182 @@ component extends="com.apirone.core.controller.AbsController" {
 			arrayAppend( allItems, quoteObj.items[hashKey].item );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
+		quoteObj.plateImages    = buildPlateCrops( allItems );
 
 		return quoteObj;
 	}
 
 	private Boolean function printFlag( required Struct rc, required String key ){
 		return StructKeyExists( arguments.rc, arguments.key ) && arguments.rc[ arguments.key ] == 'true';
+	}
+
+	/**
+	 * Anteprime delle placche ritagliate sull'armatura, con il loro ingombro reale.
+	 *
+	 * L'anteprima salvata dal designer è una tela fissa ( 1200x500 px, scambiata se
+	 * la placca è verticale ) con l'armatura disegnata al centro: il contorno è
+	 * fondo, non prodotto. Stamparla intera spreca foglio, e siccome la tela cambia
+	 * forma con l'orientamento mentre la placca no, la stessa placca girata usciva
+	 * a una scala diversa.
+	 *
+	 * Qui si ricostruisce quel calcolo per ritagliare via il contorno e sapere
+	 * quanti millimetri misura davvero il ritaglio. L'armatura si ritrova dal
+	 * codice del modello, come fa il designer ( loadFrame in
+	 * app-quotation-plate-vue.js ): non esiste una chiave esterna che la leghi alla
+	 * voce di preventivo.
+	 *
+	 * Restituisce le voci ritagliate indicizzate per id, più l'ingombro della più
+	 * grande: serve alla stampa per scegliere un unico fattore mm -> cm. Le voci
+	 * che non si riescono a ritagliare non ci sono, e la stampa le adatta al box
+	 * com'è sempre stato.
+	 */
+	private Struct function buildPlateCrops( required Array items ){
+		var crops  = { "byItem" = {}, "maxWidthMm" = 0, "maxHeightMm" = 0 };
+		var frames = {};
+
+		for ( var item in arguments.items ) {
+			if ( !IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemPlate" ) ) continue;
+			if ( IsNull( item.getImage() ) ) continue;
+
+			// immagine caricata a mano al posto del disegno: non è in scala
+			if ( !IsNull( item.getCustomImage() ) && item.getCustomImage() ) continue;
+
+			if ( IsNull( item.getProduct() ) || IsNull( item.getProduct().getModel() ) ) continue;
+
+			var modelCode = item.getProduct().getModel().getCode();
+
+			if ( !StructKeyExists( frames, modelCode ) ) {
+				// il wrapper serve perché una chiave a null in Lucee non si crea,
+				// e senza si riproverebbe la stessa lettura per ogni voce
+				var found = service( "Frame" ).getByCode( modelCode );
+				frames[ modelCode ] = IsNull( found ) ? { "ok" = false } : { "ok" = true, "frame" = found };
+			}
+
+			if ( !frames[ modelCode ].ok ) continue;
+
+			var orientationId = "";
+			if ( !IsNull( item.getFrame() ) && !IsNull( item.getFrame().getOrientation() ) ) {
+				orientationId = item.getFrame().getOrientation().getId();
+			}
+
+			var overrides = IsNull( item.getBlockOrientations() ) ? "" : item.getBlockOrientations();
+
+			var geometry = service( "Frame" ).layout(
+				frame             = frames[ modelCode ].frame,
+				orientationId     = orientationId,
+				blockOrientations = overrides
+			);
+
+			// armatura senza blocchi ( le legacy su file JSON ): non se ne conosce
+			// l'ingombro in millimetri, quindi niente ritaglio
+			if ( geometry.width LTE 0 || geometry.height LTE 0 ) continue;
+
+			var path = cropPlateImage( item.getImage(), geometry );
+
+			if ( !Len( path ) ) continue;
+
+			crops.byItem[ item.getId() ] = {
+				"path"     = path,
+				"widthMm"  = geometry.width,
+				"heightMm" = geometry.height
+			};
+
+			crops.maxWidthMm  = Max( crops.maxWidthMm,  geometry.width );
+			crops.maxHeightMm = Max( crops.maxHeightMm, geometry.height );
+		}
+
+		return crops;
+	}
+
+	/**
+	 * Ritaglia l'anteprima sull'armatura e restituisce il percorso del PNG.
+	 *
+	 * Il file prende il nome dal ritaglio e viene riusato: la stessa placca ricorre
+	 * più volte nello stesso documento e fra una stampa e l'altra.
+	 *
+	 * Niente ImageWrite sul file temporaneo: il formato lo decide dall'estensione e
+	 * un ".tmp" non lo saprebbe scrivere, quindi si passa da ImageIO come per i
+	 * marker delle piante.
+	 *
+	 * @return percorso del PNG ritagliato, stringa vuota se non si riesce ( in quel
+	 *         caso la stampa ripiega sull'immagine intera )
+	 */
+	private String function cropPlateImage( required any image, required Struct geometry ){
+		try {
+			var isVertical = arguments.geometry.orientationId EQ "VER";
+			var canvasW    = isVertical ? variables.PLATE_CANVAS_SHORT_PX : variables.PLATE_CANVAS_LONG_PX;
+			var canvasH    = isVertical ? variables.PLATE_CANVAS_LONG_PX  : variables.PLATE_CANVAS_SHORT_PX;
+
+			// stessa scala di disegno del designer: la placca entra nella tela, e
+			// comunque non oltre il tetto di px per mm
+			var displayScale = Min(
+				Min( canvasW / arguments.geometry.width, canvasH / arguments.geometry.height ),
+				variables.PLATE_CANVAS_MAX_SCALE
+			);
+
+			var frameW = arguments.geometry.width  * displayScale;
+			var frameH = arguments.geometry.height * displayScale;
+
+			var storedW = IsNull( arguments.image.getWidth() )  ? 0 : Val( arguments.image.getWidth() );
+			var storedH = IsNull( arguments.image.getHeight() ) ? 0 : Val( arguments.image.getHeight() );
+
+			if ( storedW LTE 0 || storedH LTE 0 ) return "";
+
+			// L'immagine deve essere quella tela, riconoscibile dalle proporzioni: fra
+			// le anteprime salvate ce ne sono di vecchie, fatte quando la tela si
+			// prendeva le misure dal server ( es. 952x656 invece di 1200x500 ), e su
+			// quelle il ritaglio cadrebbe nel punto sbagliato tagliando la placca.
+			// Meglio lasciarle intere: la stampa le inscrive nel box come sempre.
+			if ( Abs( ( storedW / storedH ) - ( canvasW / canvasH ) ) GT ( canvasW / canvasH ) * 0.02 ) {
+				return "";
+			}
+
+			// il PNG salvato non è grande quanto la tela: il salvataggio lo riduce a
+			// 800px di larghezza. Il rapporto riporta le coordinate sui pixel veri.
+			var ratio = storedW / canvasW;
+
+			var x = Round( Max( 0, ( canvasW - frameW ) / 2 ) * ratio );
+			var y = Round( Max( 0, ( canvasH - frameH ) / 2 ) * ratio );
+			var w = Min( Round( frameW * ratio ), storedW - x );
+			var h = Min( Round( frameH * ratio ), storedH - y );
+
+			if ( w LTE 0 || h LTE 0 ) return "";
+
+			var source = arguments.image.getPath();
+
+			if ( !FileExists( source ) ) return "";
+
+			var dir  = GetTempDirectory() & "apirone-plate-crops";
+			var path = dir & "/" & arguments.image.getId() & "_" & x & "-" & y & "-" & w & "x" & h & ".png";
+
+			if ( FileExists( path ) ) return path;
+
+			if ( !DirectoryExists( dir ) ) {
+				DirectoryCreate( dir, true );
+			}
+
+			var cropped = ImageRead( source );
+			ImageCrop( cropped, x, y, w, h );
+
+			// scrittura su nome temporaneo e rinomina: due stampe in parallelo
+			// possono chiedere lo stesso ritaglio
+			var tmpPath = path & "." & CreateUUID() & ".tmp";
+
+			CreateObject( "java", "javax.imageio.ImageIO" ).write(
+				cropped.getBufferedImage(), "png", CreateObject( "java", "java.io.File" ).init( tmpPath )
+			);
+
+			if ( FileExists( path ) ) {
+				FileDelete( tmpPath );
+			} else {
+				FileMove( tmpPath, path );
+			}
+
+			return path;
+		} catch ( any error ) {
+			// l'immagine intera è meglio di una stampa che non esce
+			return "";
+		}
 	}
 
 	private Struct function buildModelConfigMap( required Array items ){
