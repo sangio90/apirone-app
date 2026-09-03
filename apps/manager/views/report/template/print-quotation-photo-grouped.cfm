@@ -58,11 +58,13 @@
 									<cfif IsNull( oggetto.getImage() )>
 										<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 11cm !important;">
 									<cfelse>
-										<img src="#expandPath('/assets/main/img/fototesthorizontal.png')#" style="object-fit: contain; width: 11cm !important;">
-										<!--- Queste sono quelle che dovrebbero funionare --->
-											<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 11cm !important;">
-											<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 11cm !important;">
-										<!--- Fine  --->
+										<!---
+											getPath() e non getUri(): cfdocument legge l'immagine dal
+											file system, non via HTTP. getUri() punta al repository
+											pubblico (altro host) e getRelativePath() è solo un
+											frammento, quindi nessuno dei due si risolve nel PDF.
+										--->
+										<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 11cm !important;">
 									</cfif>
 								</td>
 								<td style="padding-right: 0; border-left: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">

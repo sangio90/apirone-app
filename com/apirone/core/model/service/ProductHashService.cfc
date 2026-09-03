@@ -20,6 +20,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
+	/**
+	 * Mappa hash -> json_data per un elenco di hash, con una sola query.
+	 * Serve alle stampe, che devono ricomporre il codice export di tutte le
+	 * voci del documento senza una lettura per riga.
+	 */
+	public Struct function mapJsonDataByHashes( required Array hashes ){
+		var map = {};
+
+		if ( !ArrayLen( arguments.hashes ) ) {
+			return map;
+		}
+
+		var records = getDao().findByHashes( arguments.hashes );
+
+		for ( var record in records ) {
+			map[ record.hash ] = record.json_data;
+		}
+
+		return map;
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 

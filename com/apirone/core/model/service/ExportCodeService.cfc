@@ -6,6 +6,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return build( arguments.exportCodeId );
 	}
 
+	/**
+	 * Mappa hash della voce di preventivo -> codice export, per le stampe.
+	 * Gli hash senza codice non compaiono nella mappa: chi stampa decide cosa
+	 * fare (di norma non scrive nulla).
+	 */
+	public Struct function mapByHashes( required Array hashes ){
+		var map = {};
+
+		if ( !ArrayLen( arguments.hashes ) ) {
+			return map;
+		}
+
+		var records = getDao().findByHashes( arguments.hashes );
+
+		for ( var record in records ) {
+			map[ record.hash ] = record.export_code;
+		}
+
+		return map;
+	}
+
 	public Numeric function max(
 		String exportCode
 	){

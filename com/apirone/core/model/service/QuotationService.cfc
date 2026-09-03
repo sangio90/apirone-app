@@ -324,6 +324,235 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.quotation.getId();
 	}
 
+	/**
+	 * Codice export di una voce di preventivo, calcolato senza scrivere nulla.
+	 *
+	 * Il codice è composto da 15 caratteri di articolo (categoria + linea +
+	 * modello + finitura) e 10 di variante: per la segnaletica font e corpo,
+	 * altrimenti i codici degli attributi "importanti" del prodotto, riempiti
+	 * di zeri fino a 10. È esattamente il valore che finisce in
+	 * export_codes.export_code; il contatore (colCode) non c'entra ed è l'unica
+	 * parte che richiede una scrittura, quindi resta fuori da qui.
+	 *
+	 * La usano sia exportProducts() sia le stampe: così il codice mostrato in
+	 * stampa prima dell'esportazione è lo stesso che verrà poi scritto.
+	 *
+	 * Insieme al codice restituisce quello che l'esportazione ricava dalla
+	 * stessa passata sugli attributi (id dei productItem, note descrittive,
+	 * font) per non doverli rileggere una seconda volta.
+	 *
+	 * @quotationItemData  struct deserializzato da product_hashes.json_data
+	 * @maps               mappe già caricate in batch dall'esportazione; se
+	 *                     assenti si ricade sulle letture individuali
+	 */
+	public Struct function composeExportCode(
+		required Struct quotationItemData,
+		Struct maps = {}
+	){
+		var outcome = {
+			"success"        = false,
+			"error"          = "",
+			"name"           = "",
+			"articleCode"    = "",
+			"variantCode"    = "",
+			"productItemIds" = [],
+			"attributeNotes" = [],
+			"fontName"       = "",
+			"fontSize"       = ""
+		};
+
+		var data = arguments.quotationItemData;
+
+		var product  = exportEntity( arguments.maps, "productMap", data.productId );
+		var category = exportEntity( arguments.maps, "categoryMap", data.categoryId );
+		if ( IsNull( product ) || IsNull( category ) ) {
+			outcome.error = "Prodotto o Categoria Prodotto non trovata.";
+			return outcome;
+		}
+
+		var code = Trim( category.getCode() );
+
+		var line = exportEntity( arguments.maps, "lineMap", data.lineId );
+		if ( IsNull( line ) ) {
+			outcome.error = "Linea prodotto non trovata.";
+			return outcome;
+		}
+		code &= Trim( line.getCode() );
+
+		var model = exportEntity( arguments.maps, "modelMap", data.modelId );
+		if ( IsNull( model ) ) {
+			outcome.error = "Modello prodotto non trovato.";
+			return outcome;
+		}
+		code &= Trim( model.getCode() );
+
+		var finish = exportEntity( arguments.maps, "finishMap", data.finishId );
+		if ( IsNull( finish ) ) {
+			outcome.error = "Finitura prodotto non trovata.";
+			return outcome;
+		}
+		code &= Trim( finish.getCode() );
+
+		var varCode = "";
+
+		// Segnaletica: la variante è font (5) + corpo (5) e satura da sola i 10
+		// caratteri, quindi nessun attributo importante può aggiungersi.
+		if ( StructKeyExists( data, "signageRows" ) ) {
+			if ( !StructKeyExists( data, "signageConfigItemId" ) ) {
+				outcome.error = "Configurazione segnaletica non trovata.";
+				return outcome;
+			}
+
+			var signageConfigItem = exportEntity( arguments.maps, "signConfigItemMap", data.signageConfigItemId );
+			if ( IsNull( signageConfigItem ) ) {
+				outcome.error = "Configurazione segnaletica non trovata.";
+				return outcome;
+			}
+
+			var signageConfig = exportEntity( arguments.maps, "signConfigMap", signageConfigItem.getSignageConfigId() );
+			if ( IsNull( signageConfig ) ) {
+				outcome.error = "Configurazione segnaletica non trovata.";
+				return outcome;
+			}
+
+			outcome.fontSize = signageConfigItem.getSize().getName();
+			outcome.fontName = signageConfig.getFont().getName();
+
+			varCode = Right( "00000" & signageConfig.getFont().getCode(), 5 )
+				& Right( "00000" & outcome.fontSize, 5 );
+		}
+
+		var importantAttributes = product.getImportantAttributes();
+
+		if ( StructKeyExists( data, "productItems" ) ) {
+			for ( var entry in data.productItems ) {
+				var productItem = exportEntity( arguments.maps, "productItemMap", entry.productItemId );
+				if ( IsNull( productItem ) ) {
+					continue;
+				}
+
+				var attributeValue = productItem.getAttributeValue();
+				// Lettura individuale: l'attributeId arriva dal ProductItem già
+				// caricato, non è pre-raccoglibile in batch.
+				var attribute = getAttributeService().get( attributeId = attributeValue.getAttributeId() );
+				if ( IsNull( attribute ) ) {
+					outcome.error = "Attributo Prodotto non trovato.";
+					return outcome;
+				}
+
+				var rawValue = attributeValue.getRawValue();
+
+				ArrayAppend( outcome.productItemIds, productItem.getId() );
+				ArrayAppend( outcome.attributeNotes, attribute.getName() & ": " & rawValue.getName() & "; " );
+
+				var isImportant = false;
+				if ( !IsNull( importantAttributes ) ) {
+					for ( var importantAttribute in importantAttributes ) {
+						if ( importantAttribute.getId() == attribute.getId() ) {
+							isImportant = true;
+						}
+					}
+				}
+
+				if ( !isImportant ) {
+					continue;
+				}
+
+				var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
+				if ( Len( varCode ) + Len( slotCode ) > 10 ) {
+					outcome.error = 'Il codice variante supera i 10 caratteri: attributo "'
+						& Trim( attribute.getCode() )
+						& '" (valore "'
+						& Trim( rawValue.getCode() )
+						& '") non entra nel codice variante (già '
+						& Len( varCode )
+						& ' su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
+					return outcome;
+				}
+
+				varCode &= slotCode;
+			}
+		}
+
+		varCode &= RepeatString( "0", 10 - Len( varCode ) );
+
+		outcome.success     = true;
+		outcome.articleCode = code;
+		outcome.variantCode = varCode;
+		outcome.name        = code & varCode;
+
+		return outcome;
+	}
+
+	/**
+	 * Mappa hash della voce di preventivo -> codice export calcolato al volo,
+	 * per le stampe di preventivi non ancora esportati. Non scrive nulla.
+	 * Gli hash che non si riescono a comporre (configurazione incompleta)
+	 * restano fuori dalla mappa: in stampa semplicemente non si vede il codice.
+	 */
+	public Struct function mapComputedExportCodesByHashes( required Array hashes ){
+		var map = {};
+
+		if ( !ArrayLen( arguments.hashes ) ) {
+			return map;
+		}
+
+		var jsonDataMap = getProductHashService().mapJsonDataByHashes( arguments.hashes );
+
+		for ( var hash in jsonDataMap ) {
+			try {
+				var data    = DeserializeJson( jsonDataMap[ hash ] );
+				var outcome = composeExportCode( quotationItemData = data );
+
+				if ( outcome.success ) {
+					map[ hash ] = outcome.name;
+				}
+			} catch ( any error ) {
+				// Voce non componibile: la stampa prosegue senza codice.
+			}
+		}
+
+		return map;
+	}
+
+	/**
+	 * Lettura di un'entità usata nella composizione del codice export: prima
+	 * dalla mappa batch dell'esportazione, altrimenti con la lettura singola.
+	 */
+	private any function exportEntity(
+		required Struct maps,
+		required String mapName,
+		required any id
+	){
+		if ( StructKeyExists( arguments.maps, arguments.mapName ) ) {
+			var map = arguments.maps[ arguments.mapName ];
+			if ( StructKeyExists( map, arguments.id ) ) {
+				return map[ arguments.id ];
+			}
+		}
+
+		switch ( arguments.mapName ) {
+			case "productMap":
+				return getProductService().get( arguments.id );
+			case "categoryMap":
+				return getProductCategoryService().get( arguments.id );
+			case "lineMap":
+				return getLineService().get( arguments.id );
+			case "modelMap":
+				return getModelService().get( arguments.id );
+			case "finishMap":
+				return getFinishService().get( arguments.id );
+			case "productItemMap":
+				return getProductItemService().get( arguments.id );
+			case "signConfigItemMap":
+				return getSignageConfigItemService().get( arguments.id );
+			case "signConfigMap":
+				return getSignageConfigService().get( arguments.id );
+		}
+
+		return NullValue();
+	}
+
 	public Struct function exportProducts( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 
 		var result = {
@@ -534,78 +763,48 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					} catch ( any e ) {
 					}
 
-					var code = "";
+					// Composizione del codice export: unica fonte, condivisa con le
+					// stampe (composeExportCode()). Qui serve anche la parte
+					// descrittiva (note, attributi risolti) che la funzione
+					// restituisce insieme al codice per non rileggere gli attributi.
+					var codeOutcome = composeExportCode(
+						quotationItemData = quotationItemData,
+						maps              = {
+							"productMap"        = productMap,
+							"categoryMap"       = categoryMap,
+							"lineMap"           = lineMap,
+							"modelMap"          = modelMap,
+							"finishMap"         = finishMap,
+							"productItemMap"    = productItemMap,
+							"signConfigItemMap" = signConfigItemMap,
+							"signConfigMap"     = signConfigMap
+						}
+					);
 
-					// Recupera il prodotto e la categoria dalla mappa batch (con fallback individuale difensivo)
+					if ( !codeOutcome.success ) {
+						result.success = false;
+						result.error   = codeOutcome.error;
+						return result;
+					}
+
+					var code    = codeOutcome.articleCode;
+					var varCode = codeOutcome.variantCode;
+
 					var product = StructKeyExists( productMap, quotationItemData.productId )
 						? productMap[ quotationItemData.productId ]
 						: getProductService().get( quotationItemData.productId );
-					var category = StructKeyExists( categoryMap, quotationItemData.categoryId )
-						? categoryMap[ quotationItemData.categoryId ]
-						: getProductCategoryService().get( quotationItemData.categoryId );
-					if ( IsNull( product ) || IsNull( category ) ) {
-						result.success = false;
-						result.error   = 'Prodotto o Categoria Prodotto non trovata.';
-						return result;
-					}
-
-					var categoryCode = Trim( category.getCode() );
-					code &= categoryCode;
-					var note = "";
-
-					var line = StructKeyExists( lineMap, quotationItemData.lineId )
-						? lineMap[ quotationItemData.lineId ]
-						: getLineService().get( quotationItemData.lineId );
-					if ( IsNull( line ) ) {
-						result.success = false;
-						result.error   = "Linea prodotto non trovata.";
-						return result;
-					}
-					var lineCode = Trim( line.getCode() );
-					code &= lineCode;
-
-					var model = StructKeyExists( modelMap, quotationItemData.modelId )
-						? modelMap[ quotationItemData.modelId ]
-						: getModelService().get( quotationItemData.modelId );
-					if ( IsNull( model ) ) {
-						result.success = false;
-						result.error   = "Modello prodotto non trovato.";
-						return result;
-					}
-					code &= Trim( model.getCode() );
-
-					var finish = StructKeyExists( finishMap, quotationItemData.finishId )
-						? finishMap[ quotationItemData.finishId ]
-						: getFinishService().get( quotationItemData.finishId );
-					if ( IsNull( finish ) ) {
-						result.success = false;
-						result.error   = "Finitura prodotto non trovata.";
-						return result;
-					}
-					var finishCode = Trim( finish.getCode() );
-					code &= finishCode;
 
 					var description = product.getDescription().left( 35 );
 
 					var arKey           = code;
 					var colCode         = "000000";
-					var varCode         = "";
+					var note            = "";
 					var noteSegnaletica = '';
 
-					// Segnaletica: recupera SignageConfigItem e SignageConfig dalle mappe batch
+					// Segnaletica: font e corpo finiscono nella nota, le righe di
+					// testo nella nota variante.
 					if ( StructKeyExists( quotationItemData, "signageRows" ) ) {
-						var signageConfigItem = StructKeyExists( signConfigItemMap, quotationItemData.signageConfigItemId )
-							? signConfigItemMap[ quotationItemData.signageConfigItemId ]
-							: getSignageConfigItemService().get( quotationItemData.signageConfigItemId );
-						var fontSize     = signageConfigItem.getSize().getName();
-						var signageConfigId = signageConfigItem.getSignageConfigId();
-						var signageConfig = StructKeyExists( signConfigMap, signageConfigId )
-							? signConfigMap[ signageConfigId ]
-							: getSignageConfigService().get( signageConfigId );
-						var fontCode     = signageConfig.getFont().getCode();
-						var fontName     = signageConfig.getFont().getName();
-						note &= "Font: " & fontName & "; Font Size: " & fontSize & "; ";
-						varCode = right( "00000" & fontCode, 5 ) & right( "00000" & fontSize, 5 );
+						note &= "Font: " & codeOutcome.fontName & "; Font Size: " & codeOutcome.fontSize & "; ";
 						var signageRowsCounter = 1;
 						for ( var signageRow in quotationItemData.signageRows ) {
 							noteSegnaletica &= 'riga ' & signageRowsCounter & ': Allineamento: ' & signageRow[ 'text-align' ] & ': Testo: "' & signageRow.content & '"";';
@@ -613,68 +812,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						}
 					}
 
-					var productItemIds     = [];
-					var productItems       = [];
-					var importantAttributes = product.getImportantAttributes();
-					for ( var quotationItemProductItem in quotationItemData.productItems ) {
-						var productItem = StructKeyExists( productItemMap, quotationItemProductItem.productItemId )
-							? productItemMap[ quotationItemProductItem.productItemId ]
-							: getProductItemService().get( quotationItemProductItem.productItemId );
-						if ( !IsNull( productItem ) ) {
-							var attributeValue = productItem.getAttributeValue();
-							// attributeService.get() è mantenuto come chiamata individuale:
-							// l'attributeId proviene dal ProductItem già caricato, non è pre-raccoglibile.
-							var attribute = attributeService.get( attributeId = attributeValue.getAttributeId() );
+					var productItemIds = codeOutcome.productItemIds;
 
-							if ( IsNull( attribute ) ) {
-								result.success = false;
-								result.error   = 'Attributo Prodotto non trovato.';
-								return result;
-							}
-							var rawValue = attributeValue.getRawValue();
-
-							var isImportant = false;
-							if ( !IsNull( importantAttributes ) ) {
-								isImportant = importantAttributes.some( function( item ){
-									return item.getId() == attribute.getId();
-								} );
-							}
-
-							if ( isImportant ) {
-								var slotCode = Trim( attribute.getCode() ) & Trim( rawValue.getCode() );
-								if ( varCode.len() + slotCode.len() > 10 ) {
-									result.success = false;
-									result.error = 'Il codice variante supera i 10 caratteri: attributo "'
-										& Trim( attribute.getCode() )
-										& '" (valore "'
-										& Trim( rawValue.getCode() )
-										& '") non entra nel codice variante (già '
-										& varCode.len()
-										& ' su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
-									return result;
-								}
-
-								varCode &= slotCode;
-								arrayAppend( productItems, {
-									"important"   = true,
-									"rawValueId"  = rawValue.getId(),
-									"attributeId" = attributeValue.getAttributeId()
-								} );
-							} else {
-								arrayAppend( productItems, {
-									"important"   = false,
-									"rawValueId"  = rawValue.getId(),
-									"attributeId" = attributeValue.getAttributeId()
-								} );
-							}
-							arrayAppend( productItemIds, productItem.getId() );
-						}
-
-						note &= attribute.getName() & ": " & rawValue.getName() & "; ";
+					for ( var attributeNote in codeOutcome.attributeNotes ) {
+						note &= attributeNote;
 					}
 
 					var productComponents = getComponents( product.getId(), quotationItem, productItemIds );
-					varCode &= RepeatString( "0", 10 - Len( varCode ) );
 
 					// Placca: recupera i fruit product e i productItem dalle mappe batch
 					var fruitsComponents     = [];

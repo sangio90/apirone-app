@@ -73,14 +73,33 @@
 										<cfif IsNull( oggetto.getImage() )>
 											<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 6cm !important;">
 										<cfelse>
-											<img src="#expandPath('/assets/main/img/fototesthorizontal.png')#" style="object-fit: contain; width: 6cm !important;">
-											<!--- <img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 6cm !important;"> --->
+											<!---
+												getPath() e non getUri(): cfdocument legge l'immagine dal
+												file system, non via HTTP. getUri() punta al repository
+												pubblico (altro host) e getRelativePath() è solo un
+												frammento, quindi nessuno dei due si risolve nel PDF.
+											--->
+											<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 6cm !important;">
 										</cfif>
 									</td>
 								<cfelse>
 									<td style="padding: 0; margin: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 0.01cm !important;"></td>
 								</cfif>
 								<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
+									<!---
+										Codice export della voce, sopra la descrizione. Arriva già
+										risolto dal controller (mappa hash -> codice) per non fare una
+										lettura per riga. Se la voce non ne ha uno non si stampa nulla,
+										senza etichetta a vuoto.
+									--->
+									<cfset thisHash = oggetto.getHash()>
+									<cfset thisExportCode = "">
+									<cfif !IsNull( thisHash ) AND StructKeyExists( args.data.exportCodes, thisHash )>
+										<cfset thisExportCode = args.data.exportCodes[ thisHash ]>
+									</cfif>
+									<cfif Len( thisExportCode )>
+										<span style="font-size: 7pt; font-weight: bold;">#thisExportCode#</span><br>
+									</cfif>
 									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 									<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
 										<div style="font-size: 7pt; margin-top: 2px;">

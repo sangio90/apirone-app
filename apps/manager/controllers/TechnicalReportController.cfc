@@ -300,6 +300,37 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.itemGroups = groupByCategoryType( items, printParams.groupByCategory ?: false );
 		quoteObj.articleItems = articleItems;
 
+		// Codici export delle voci, risolti qui in una sola query: i template ne
+		// hanno bisogno riga per riga e non devono interrogare il database.
+		// Chiave = hash della voce; le voci senza codice semplicemente non ci sono.
+		// Niente operatori ?: qui dentro: dentro a un ciclo fanno fallire la
+		// compilazione dell'intero componente su questo Lucee.
+		var hashes = [];
+		for ( var thisItem in productItems ) {
+			var thisHash = thisItem.getHash();
+			if ( !IsNull( thisHash ) && Len( thisHash ) ) {
+				hashes.add( thisHash );
+			}
+		}
+		quoteObj.exportCodes = super.fire( "ExportCode.mapByHashes", [ hashes ] );
+
+		// Preventivo non ancora esportato: il codice si ricompone al volo con la
+		// stessa logica dell'esportazione (Quotation.composeExportCode), senza
+		// scrivere nulla in export_codes. Il codice salvato resta prioritario.
+		var missingHashes = [];
+		for ( var thisHash in hashes ) {
+			if ( !StructKeyExists( quoteObj.exportCodes, thisHash ) ) {
+				missingHashes.add( thisHash );
+			}
+		}
+
+		if ( ArrayLen( missingHashes ) ) {
+			var computedCodes = super.fire( "Quotation.mapComputedExportCodesByHashes", [ missingHashes ] );
+			for ( var thisHash in computedCodes ) {
+				quoteObj.exportCodes[ thisHash ] = computedCodes[ thisHash ];
+			}
+		}
+
 		// Piante: in testa al documento quando le voci sono in elenco unico,
 		// dentro ogni sezione quando sono separate per categoria.
 		quoteObj.plants = [];

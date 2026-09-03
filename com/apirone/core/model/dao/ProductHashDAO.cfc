@@ -55,6 +55,27 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		json_data delle voci indicate, in una sola query. Le stampe la usano per
+		ricomporre il codice export dei preventivi non ancora esportati.
+	--->
+	<cffunction name="findByHashes" returntype="Query">
+		<cfargument name="hashes" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				hash,
+				json_data
+			FROM
+				product_hashes
+			WHERE hash IN (
+				<cfqueryparam cfsqltype="Varchar" value="#ArrayToList( arguments.hashes )#" list="true">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="insert" returntype="Numeric" output="false">
 		<cfargument name="ProductHash" type="com.apirone.core.model.bean.ProductHash" required="true">
 

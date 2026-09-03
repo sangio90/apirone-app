@@ -153,10 +153,16 @@
 												<cfif args.params.images>
 													<td style="width: 1.1in;">
 														<cfif IsNull( oggetto.getImage() )>
-															<img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
+															<!--- expandPath e non l'URL di test.apirone.cc: il segnaposto va
+															      letto dal file system locale, non scaricato da un altro ambiente --->
+															<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
 														<cfelse>
-															<!--- <img src="https://test.apirone.cc/assets/main/img/img-not-found.png" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;"> --->
-															<img src="#oggetto.getImage().getUri()#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
+															<!---
+																getPath() e non getUri(): cfdocument legge l'immagine dal
+																file system, non via HTTP. getUri() punta al repository
+																pubblico (altro host) e non si risolve nel PDF.
+															--->
+															<img src="#oggetto.getImage().getPath()#" style="text-align: left; width: 100%; object-fit: contain; width: 1in !important; height: 1in !important;">
 														</cfif>
 													</td>
 													<td style="width: 2.9in; padding-left: 2pt; padding-right: 0">

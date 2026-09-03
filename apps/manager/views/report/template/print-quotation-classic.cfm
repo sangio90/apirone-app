@@ -191,17 +191,27 @@
 											<cfif args.params.images>
 												<td style="vertical-align: middle; width: 5cm;" rowspan="2">
 													<cfif IsNull( oggetto.getImage() )>
-														<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
+														<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 													<cfelse>
-														<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-														<!--- Queste sono quelle che dovrebbero funionare --->
-															<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-															<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-														<!--- Fine  --->
+														<!---
+															getPath() e non getUri(): cfdocument legge l'immagine dal
+															file system, non via HTTP. getUri() punta al repository
+															pubblico (altro host) e getRelativePath() è solo un
+															frammento, quindi nessuno dei due si risolve nel PDF.
+														--->
+														<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 													</cfif>
 												</td>
 											</cfif>
-											<td>
+											<!---
+												Lo stacco dall'immagine sta qui e non sulla cella
+												dell'immagine: hiddenTable è table-layout: fixed con
+												box-sizing: border-box, quindi un padding a sinistra
+												ridurrebbe lo spazio utile dei 5cm e l'immagine, forzata
+												a 5cm, sborderebbe riprendendosi il margine.
+												Condizionato perché senza immagine non serve rientro.
+											--->
+											<td style="<cfif args.params.images>padding-left: 0.25cm;</cfif>">
 												<span style="font-size: 7pt; text-transform: lowecase">#!isNull(oggetto.getArticle()) ? oggetto.getArticle().getName() : oggetto.getProduct().getDescription()#</span><br>
 											<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
 												<div style="font-size: 7pt; margin-top: 2px;">
@@ -230,7 +240,10 @@
 											</td>
 										</tr>
 										<tr>
-											<td style="vertical-align: bottom; padding: 3pt 0 3px 0;">
+											<!--- seconda riga del rowspan dell'immagine: stesso stacco
+											      applicato alla descrizione, altrimenti "Posizioni" e
+											      la lista frutti restano incollate all'immagine --->
+											<td style="vertical-align: bottom; padding: 3pt 0 3px <cfif args.params.images>0.25cm<cfelse>0</cfif>;">
 											<cfif hasDim && thisDimType EQ "PLA">
 												<div style="font-size: 7pt; margin-bottom: 4px;">
 													<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
@@ -280,21 +293,34 @@
 														<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
 													</div>
 												</cfif>
-												<cfif structCount(zones) gt 0>
+												<!---
+													Righe posizione da stampare. La quantità non si riporta
+													più: è già nella sua colonna, qui era una ripetizione.
+													Si costruisce prima l'elenco per non stampare
+													l'intestazione "Posizioni:" quando poi sotto non
+													resterebbe nulla — caso tipico dell'articolo in
+													"Non assegnato" senza codici posizione.
+												--->
+												<cfset positionLines = []>
+												<cfloop collection="#zones#" item="zoneName">
+													<cfset thisPositions = zones[ zoneName ].positions>
+													<cfset isUnassigned  = zoneName EQ 'Non assegnato'>
+
+													<cfif ArrayLen( thisPositions ) AND isUnassigned>
+														<cfset positionLines.add( ArrayToList( thisPositions, ", " ) )>
+													<cfelseif ArrayLen( thisPositions )>
+														<cfset positionLines.add( zoneName & ": " & ArrayToList( thisPositions, ", " ) )>
+													<cfelseif !isUnassigned>
+														<!--- zona nota ma senza codici: resta il nome, senza due punti a vuoto --->
+														<cfset positionLines.add( zoneName )>
+													</cfif>
+												</cfloop>
+
+												<cfif ArrayLen( positionLines )>
 													<div style="font-size: 7pt; line-height: 15px;">
 														#printLabel('positions', langId)#:
-														<cfloop collection="#zones#" item="zoneName">
-															<div style="font-size: 7pt; line-height: 15px; padding-left: 3px;">
-																<cfif zoneName != 'Non assegnato'>
-																	#zoneName#:
-																</cfif>
-																<cfif ArrayLen( zones[zoneName].positions )>
-																	#arrayToList( zones[zoneName].positions, ", " )#
-																<cfelse>
-																	<!--- senza codice posizione si riporta comunque la quantità della zona --->
-																	#printLabel('qty', langId)# #zones[zoneName].quantity#
-																</cfif>
-															</div>
+														<cfloop array="#positionLines#" index="positionLine">
+															<div style="font-size: 7pt; line-height: 15px; padding-left: 3px;">#positionLine#</div>
 														</cfloop>
 													</div>
 												</cfif>

@@ -174,17 +174,27 @@
 												<cfif args.params.images>
 													<td style="vertical-align: middle; width: 5cm;" rowspan="2">
 														<cfif IsNull( oggetto.getImage() )>
-															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
+															<img src="#expandPath('/assets/main/img/img-not-found.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 														<cfelse>
-															<img src="#expandPath('/assets/main/img/fototestvertical.png')#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-															<!--- Queste sono quelle che dovrebbero funionare --->
-																<img src="#oggetto.getImage().getRelativePath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-																<img src="#oggetto.getImage().getUri()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
-															<!--- Fine  --->
+															<!---
+																getPath() e non getUri(): cfdocument legge l'immagine dal
+																file system, non via HTTP. getUri() punta al repository
+																pubblico (altro host) e getRelativePath() è solo un
+																frammento, quindi nessuno dei due si risolve nel PDF.
+															--->
+															<img src="#oggetto.getImage().getPath()#" style="object-fit: contain; width: 5cm !important; max-height: 5cm !important;">
 														</cfif>
 													</td>
 												</cfif>
-												<td>
+												<!---
+													Lo stacco dall'immagine sta qui e non sulla cella
+													dell'immagine: hiddenTable è table-layout: fixed con
+													box-sizing: border-box, quindi un padding a sinistra
+													ridurrebbe lo spazio utile dei 5cm e l'immagine, forzata
+													a 5cm, sborderebbe riprendendosi il margine.
+													Condizionato perché senza immagine non serve rientro.
+												--->
+												<td style="<cfif args.params.images>padding-left: 0.25cm;</cfif>">
 													<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 													<cfif !isNull(oggetto.getPosition())>
 														<div style="font-size: 7pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
@@ -202,7 +212,9 @@
 												</td>
 											</tr>
 											<tr>
-												<td style="vertical-align: bottom; padding: 3pt;">
+												<!--- seconda riga del rowspan dell'immagine: stesso stacco
+												      applicato alla descrizione --->
+												<td style="vertical-align: bottom; padding: 3pt 3pt 3pt <cfif args.params.images>0.25cm<cfelse>3pt</cfif>;">
 													<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 														<div style="font-size: 7pt; line-height: 15px; margin-top: 0.1in;">
 															<b>#printLabel('fruitList', langId)#: </b>

@@ -14,6 +14,29 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Codici export delle voci di preventivo, a partire dai loro hash.
+		Serve alle stampe: una sola query per tutto il documento invece di una
+		lettura per riga. La catena è quotation_items.hash -> product_hashes.hash
+		-> export_codes.product_hash_id.
+	--->
+	<cffunction name="findByHashes" returntype="Query">
+		<cfargument name="hashes" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_hashes.hash,
+				export_codes.export_code
+			FROM export_codes
+				INNER JOIN product_hashes ON product_hashes.product_hash_id = export_codes.product_hash_id
+			WHERE product_hashes.hash IN (
+				<cfqueryparam cfsqltype="Varchar" value="#ArrayToList( arguments.hashes )#" list="true">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="max" returntype="Numeric">
 		<cfargument name="exportCode" type="String">
 
