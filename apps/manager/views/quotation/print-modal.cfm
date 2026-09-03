@@ -21,6 +21,9 @@
                                 <input type="radio" class="btn-check" name="report" id="qt-print-type-classic" value="classic" autocomplete="off" checked>
                                 <label class="btn btn-outline-primary btn-sm" for="qt-print-type-classic">Classica</label>
 
+                                <input type="radio" class="btn-check" name="report" id="qt-print-type-zone" value="zone" autocomplete="off">
+                                <label class="btn btn-outline-primary btn-sm" for="qt-print-type-zone">Zone</label>
+
                                 <input type="radio" class="btn-check" name="report" id="qt-print-type-photo" value="photo" autocomplete="off">
                                 <label class="btn btn-outline-primary btn-sm" for="qt-print-type-photo">Foto</label>
 

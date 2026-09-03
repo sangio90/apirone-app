@@ -38,36 +38,56 @@
 				<cfloop array="#args.data.plants#" index="plant">
 					#printPlant(plant = plant, langId = langId)#
 				</cfloop>
+				<!--- qui le voci non sono in ordine di zona ma raggruppate per categoria
+				      ( ogni voce porta dentro di se' l'elenco delle sue zone ), quindi la
+				      rottura e' il cambio gruppo: ogni gruppo parte da pagina nuova.
+				      Si contano solo i gruppi che stampano qualcosa, altrimenti un gruppo
+				      vuoto lascerebbe dietro di se' una pagina bianca. --->
+				<cfset gruppiStampati = 0>
 				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
 					<cfset groupItemsCount = ArrayLen( categoryGroup.items )>
 					<cfset groupPlantsCount = ArrayLen( categoryGroup.plants )>
 					<cfset sectionTitle = Len( categoryGroup.id ) ? printCategoryType(categoryGroup.id, categoryGroup.name, langId) : "">
+					<cfif groupItemsCount GT 0 OR groupPlantsCount GT 0>
+						<cfset gruppiStampati = gruppiStampati + 1>
+						<cfif gruppiStampati GT 1>
+							<div style="page-break-before: always;"></div>
+						</cfif>
+					</cfif>
 					<cfloop from="1" to="#groupPlantsCount#" index="plantIndex">
 						#printPlant(plant = categoryGroup.plants[plantIndex], langId = langId, sectionTitle = plantIndex EQ 1 ? sectionTitle : "")#
 					</cfloop>
-					<cfloop from="1" to="#groupItemsCount#" index="groupItemIndex">
-					<cfset oggetto = categoryGroup.items[groupItemIndex]>
-					<cfset zones = oggetto.zones>
-					<cfset quantity = oggetto.quantity>
-					<cfset oggetto = oggetto.item>
-					<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
-					<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
-					<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
-					<div class="item" style="page-break-inside: avoid;">
-						<cfif groupItemIndex EQ 1 AND Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
-						<table style="border-collapse: collapse; width: 100%;">
-							<tr>
-								<cfif args.params.images>
+					<cfif groupItemsCount GT 0>
+						<cfif Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
+						<!---
+							Una sola tabella per gruppo con la barra "Articolo" nel <thead>:
+							prima ogni voce era una tabella a se' e la barra si ripeteva sopra
+							ognuna. -fs-table-paginate la fa ripetere dopo un salto pagina.
+						--->
+						<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
+							<thead>
+								<tr>
+									<cfif args.params.images>
 									<td style="width: 6cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; text-align: left; padding-left: 0.1in"><strong>#printLabel('article', langId)#</strong></td>
 									<td style="width: 5cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 0;"></td>
 									<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
-								<cfelse>
+									<cfelse>
 									<td style="width: 0.1cm; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
 									<td style="width: 10.90cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-left: 0.1in;"><strong>#printLabel('article', langId)#</strong></td>
 									<td style="width: 9cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right;"></td>
-								</cfif>
-							</tr>
-							<tr>
+									</cfif>
+								</tr>
+							</thead>
+							<tbody>
+							<cfloop from="1" to="#groupItemsCount#" index="groupItemIndex">
+								<cfset oggetto = categoryGroup.items[groupItemIndex]>
+								<cfset zones = oggetto.zones>
+								<cfset quantity = oggetto.quantity>
+								<cfset oggetto = oggetto.item>
+								<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
+								<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
+								<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
+								<tr style="page-break-inside: avoid;">
 								<cfif args.params.images>
 									<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 6cm !important;">
 										<cfif IsNull( oggetto.getImage() )>
@@ -101,16 +121,13 @@
 										<span style="font-size: 7pt; font-weight: bold;">#thisExportCode#</span><br>
 									</cfif>
 									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
-									<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
-										<div style="font-size: 7pt; margin-top: 2px;">
-											<cfif !isNull(thisDimMC.getLength())>
-												<span style="white-space: nowrap;">#printLabel('dimLegend3', langId)#:</span>
-												<span style="white-space: nowrap;">#thisDimMC.getLength()# x #thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
-											<cfelse>
-												<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-												<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
-											</cfif>
-										</div>
+									<!---
+										Dimensioni sempre qui sotto al nome, anche per placche e
+										segnaletica: prima finivano nella colonna di destra.
+										L'unità la decide il tipo di articolo.
+									--->
+									<cfif hasDim>
+										#printDimensions( thisDimMC, langId, ( thisDimType EQ "PLA" OR thisDimType EQ "SEG" ) ? "mm" : "cm" )#
 									</cfif>
 									<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>
@@ -118,7 +135,7 @@
 											<cfset item = oggetto.getItems()[item]>
 											<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 										</cfloop>
-										<cfif !isNull(oggetto.getNote()) && args.params.note>
+										<cfif !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
 											<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 										</cfif>
 									</cfif>
@@ -127,12 +144,6 @@
 									</div>
 								</td>
 								<td style="vertical-align: top; padding-top: 5pt; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; border-left: 0; padding-left: 5pt; width: 9cm !important;">
-									<cfif hasDim && thisDimType EQ "PLA">
-										<div style="font-size: 7pt; margin-bottom: 4px;">
-											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
-										</div>
-									</cfif>
 									<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 										<div style="font-size: 7pt; line-height: 15px;">
 											#printLabel('fruitList', langId)#:
@@ -170,12 +181,6 @@
 											</cfif>
 										</div>
 									</cfif>
-									<cfif hasDim && thisDimType EQ "SEG">
-										<div style="font-size: 7pt; margin-bottom: 4px;">
-											<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-											<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
-										</div>
-									</cfif>
 									<cfif structCount(zones) gt 0>
 										<div style="font-size: 7pt; line-height: 15px">
 											#printLabel('positions', langId)#:
@@ -192,10 +197,11 @@
 										</div>
 									</cfif>
 								</td>
-							</tr>
+								</tr>
+							</cfloop>
+							</tbody>
 						</table>
-					</div>
-				</cfloop>
+					</cfif>
 				</cfloop>
 			</cfoutput>
 		</div>

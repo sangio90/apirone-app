@@ -38,10 +38,22 @@
 				<cfloop array="#args.data.plants#" index="plant">
 					#printPlant(plant = plant, langId = langId)#
 				</cfloop>
+				<!--- qui le voci non sono in ordine di zona ma raggruppate per categoria
+				      ( ogni voce porta dentro di se' l'elenco delle sue zone ), quindi la
+				      rottura e' il cambio gruppo: ogni gruppo parte da pagina nuova.
+				      Si contano solo i gruppi che stampano qualcosa, altrimenti un gruppo
+				      vuoto lascerebbe dietro di se' una pagina bianca. --->
+				<cfset gruppiStampati = 0>
 				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
 					<cfset groupItemsCount = ArrayLen( categoryGroup.items )>
 					<cfset groupPlantsCount = ArrayLen( categoryGroup.plants )>
 					<cfset sectionTitle = Len( categoryGroup.id ) ? printCategoryType(categoryGroup.id, categoryGroup.name, langId) : "">
+					<cfif groupItemsCount GT 0 OR groupPlantsCount GT 0>
+						<cfset gruppiStampati = gruppiStampati + 1>
+						<cfif gruppiStampati GT 1>
+							<div style="page-break-before: always;"></div>
+						</cfif>
+					</cfif>
 					<cfloop from="1" to="#groupPlantsCount#" index="plantIndex">
 						#printPlant(plant = categoryGroup.plants[plantIndex], langId = langId, sectionTitle = plantIndex EQ 1 ? sectionTitle : "")#
 					</cfloop>
@@ -75,7 +87,7 @@
 											<cfset item = oggetto.getItems()[item]>
 											<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 										</cfloop>
-										<cfif !isNull(oggetto.getNote()) && args.params.note>
+										<cfif !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
 											<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 										</cfif>
 									</cfif>

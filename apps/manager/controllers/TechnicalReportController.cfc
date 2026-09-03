@@ -7,6 +7,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	// pagamento, totale a pagare, avviso non fiscale ) sono condizionate lì su params.report.
 	variables.REPORT_TEMPLATES = {
 		'classic'   = 'print-quotation-classic',
+		'zone'      = 'print-quotation-zone',
 		'photo'     = 'print-quotation-photo-grouped',
 		'technical' = 'print-quotation-technical-grouped',
 		'proforma'  = 'print-quotation-classic'
@@ -28,6 +29,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			'discounts' = printFlag( rc, 'discounts' ),
 			'plants' = printFlag( rc, 'plants' ),
 			'hideTotal' = printFlag( rc, 'hideTotal' ),
+			// solo per la stampa per zona: accorpa le sottozone alla zona padre
+			// invece di elencarle separate
+			'grouped' = printFlag( rc, 'grouped' ),
 			'progressivo' = StructKeyExists( rc, 'progressivo' ) ? Trim( rc.progressivo ) : '',
 			'percentuale' = StructKeyExists( rc, 'percentuale' ) && IsNumeric( rc.percentuale ) ? Val( rc.percentuale ) : 0,
 			// Alternativo alla percentuale: se valorizzato, l'anticipo è questo
@@ -90,7 +94,13 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		quoteObj = printClassic( quoteObj, printParams );
+		// La stampa per zona organizza le voci per ambiente e non per categoria,
+		// quindi si prepara i dati per conto suo.
+		if ( printParams.report == 'zone' ) {
+			quoteObj = printZone( quoteObj, printParams );
+		} else {
+			quoteObj = printClassic( quoteObj, printParams );
+		}
 
 		var customerShippingProfile = {
 			'name' = '',
@@ -206,10 +216,12 @@ component extends="com.apirone.core.controller.AbsController" {
 		cfcontent( type = "application/pdf", file = fullPath, reset = true );
 	}
 
-	// NON PIÙ INVOCATA. Costruisce i dati per zona ( quoteObj.zones ) per i template
-	// print-quotation-zone / -photo / -technical, anch'essi non più raggiungibili da
-	// quando il secondo livello della dialog decide solo le sezioni per categoria.
-	// Conservata per poter ripristinare la stampa per zona senza riscriverla.
+	/**
+	 * Dati della stampa per zona: le voci raggruppate per ambiente invece che per
+	 * categoria. Le zone padre precedono le proprie sottozone; con printParams.grouped
+	 * le sottozone non compaiono da sole e le loro voci confluiscono nella zona padre.
+	 * Le righe articolo ( servizi ) vengono estratte dalla zona "Non assegnato".
+	 */
 	function printZone( quoteObj, printParams ) {
 		var quotation = quoteObj.quotation;
 		var idPreventivo = quotation.getId();
@@ -232,7 +244,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			}
 		}
-		sortedZones.add(unassignedZone);
+		// "Non assegnato" puo' non esserci: in quel caso non si aggiunge nulla
+		if ( !IsNull( unassignedZone ) ) {
+			sortedZones.add( unassignedZone );
+		}
 		var articleItems = [];
 		for ( var i = 1; i LTE ArrayLen( sortedZones ); i++ ) {
 			var zone = sortedZones[i];
@@ -479,14 +494,19 @@ component extends="com.apirone.core.controller.AbsController" {
 				for ( var pos in item.getPositions() ) {
 					if ( IsNull( pos.getVisible() ) || !pos.getVisible() ) continue;
 
-					var size = Round( 35 * ( Val( pos.getSizeMultiplier() ?: 100 ) / 100 ) );
+					var size  = Round( 35 * ( Val( pos.getSizeMultiplier() ?: 100 ) / 100 ) );
+					// +135 come a schermo: porta lo zero dell'angolo salvato a
+					// coincidere con l'orientamento di riferimento della goccia
+					var angle = Val( pos.getAngle() ?: 0 ) + 135;
+					var color = markerColor( item );
 
 					ArrayAppend( markers, {
 						'x'     = Val( pos.getCoordinateX() ) * 100,
 						'y'     = Val( pos.getCoordinateY() ) * 100,
 						'size'  = size,
-						'angle' = Val( pos.getAngle() ?: 0 ) + 135,
-						'color' = markerColor( item ),
+						'angle' = angle,
+						'color' = color,
+						'pin'   = pinImagePath( size, angle, color ),
 						'label' = markerLabel( item )
 					} );
 				}
@@ -541,6 +561,114 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		return arguments.file.getUri();
+	}
+
+	/**
+	 * Marker della pianta come PNG già ruotato, da stampare al posto del div.
+	 *
+	 * cfdocument ignora "transform: rotate()": provando quattro pin a 0, 45, 90 e
+	 * 180 gradi escono tutti con la punta nella stessa direzione, quindi la
+	 * rotazione impostata in "Posizioni in pianta" andava persa in stampa mentre
+	 * dimensione, colore e posizione arrivavano corrette. La goccia si disegna
+	 * quindi con Graphics2D già orientata.
+	 *
+	 * Niente ImageRotate: su questo JDK la rotazione JAI di Lucee fallisce con
+	 * IllegalAccessError su sun.awt.image.
+	 *
+	 * Il file prende il nome dai suoi parametri e viene riusato: gli stessi marker
+	 * ricorrono più volte nello stesso documento e fra una stampa e l'altra.
+	 *
+	 * @return percorso del PNG, stringa vuota se non si riesce a generarlo ( in
+	 *         quel caso la stampa ripiega sul marker non ruotato )
+	 */
+	private String function pinImagePath(
+		required Numeric size,
+		required Numeric angle,
+		required String color
+	){
+		try {
+			var pinSize = Max( 4, Round( arguments.size ) );
+			// la punta della goccia sta su un angolo del quadrato, quindi ruotando
+			// esce dal quadrato stesso: la tela va allargata o si taglierebbe
+			var canvas  = Ceiling( pinSize * 1.6 );
+			var deg     = ( ( Round( arguments.angle ) % 360 ) + 360 ) % 360;
+			var rgb     = ReMatch( "\d+", arguments.color );
+
+			if ( ArrayLen( rgb ) LT 3 ) {
+				return "";
+			}
+
+			var dir  = GetTempDirectory() & "apirone-plant-pins";
+			var name = "pin_" & pinSize & "_" & deg & "_" & rgb[ 1 ] & "-" & rgb[ 2 ] & "-" & rgb[ 3 ] & ".png";
+			var path = dir & "/" & name;
+
+			if ( FileExists( path ) ) {
+				return path;
+			}
+
+			if ( !DirectoryExists( dir ) ) {
+				DirectoryCreate( dir, true );
+			}
+
+			var off    = Int( ( canvas - pinSize ) / 2 );
+			var half   = Int( pinSize / 2 );
+			var center = canvas / 2;
+
+			var image = CreateObject( "java", "java.awt.image.BufferedImage" ).init(
+				JavaCast( "int", canvas ),
+				JavaCast( "int", canvas ),
+				JavaCast( "int", 2 )   // TYPE_INT_ARGB: fondo trasparente
+			);
+
+			var gfx   = image.createGraphics();
+			var hints = CreateObject( "java", "java.awt.RenderingHints" );
+
+			gfx.setRenderingHint( hints.KEY_ANTIALIASING, hints.VALUE_ANTIALIAS_ON );
+			gfx.setColor( CreateObject( "java", "java.awt.Color" ).init(
+				JavaCast( "int", Val( rgb[ 1 ] ) ),
+				JavaCast( "int", Val( rgb[ 2 ] ) ),
+				JavaCast( "int", Val( rgb[ 3 ] ) )
+			) );
+
+			// senso orario come la rotate() del CSS, così l'angolo salvato vale
+			// identico a schermo e in stampa
+			gfx.rotate(
+				JavaCast( "double", deg * Pi() / 180 ),
+				JavaCast( "double", center ),
+				JavaCast( "double", center )
+			);
+
+			// border-radius: 50% 50% 50% 0 = cerchio pieno più il quadrante in
+			// basso a sinistra, che resta a spigolo e fa la punta
+			gfx.fillOval(
+				JavaCast( "int", off ), JavaCast( "int", off ),
+				JavaCast( "int", pinSize ), JavaCast( "int", pinSize )
+			);
+			gfx.fillRect(
+				JavaCast( "int", off ), JavaCast( "int", off + half ),
+				JavaCast( "int", half ), JavaCast( "int", half )
+			);
+			gfx.dispose();
+
+			// scrittura su nome temporaneo e rinomina: due stampe in parallelo
+			// possono chiedere lo stesso marker
+			var tmpPath = path & "." & CreateUUID() & ".tmp";
+
+			CreateObject( "java", "javax.imageio.ImageIO" ).write(
+				image, "png", CreateObject( "java", "java.io.File" ).init( tmpPath )
+			);
+
+			if ( FileExists( path ) ) {
+				FileDelete( tmpPath );
+			} else {
+				FileMove( tmpPath, path );
+			}
+
+			return path;
+		} catch ( any error ) {
+			// il marker non ruotato è meglio di una stampa che non esce
+			return "";
+		}
 	}
 
 	// Stessa scala colori di getColor() in app-quotation-plant-positions.js.

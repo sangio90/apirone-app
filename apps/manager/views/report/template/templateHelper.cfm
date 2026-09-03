@@ -70,9 +70,14 @@
 
 <!---
 	Pianta di una zona con i marker delle posizioni.
+
 	Il centraggio del marker è fatto con margini negativi e non con translate(-50%,-50%):
-	cfdocument ignora le trasformazioni CSS, così il pin resta comunque centrato sul punto
-	e la rotazione, se supportata, si somma senza spostarlo.
+	cfdocument ignora le trasformazioni CSS, così il pin resta comunque centrato sul punto.
+
+	Per lo stesso motivo il marker è un PNG già ruotato lato server ( vedi
+	pinImagePath() nel controller ) e non un div con transform: rotate(), che in
+	stampa usciva sempre con la punta nella stessa direzione. Se il PNG non c'è si
+	ripiega sul div colorato, che perde l'orientamento ma non fa saltare la stampa.
 --->
 <cffunction name="printPlant">
 	<cfargument name="plant" required="true">
@@ -91,8 +96,18 @@
 				<div class="plant-canvas" style="width: #arguments.plant.boxWidth#cm; height: #arguments.plant.boxHeight#cm;">
 					<img src="#arguments.plant.imagePath#" class="plant-image" style="width: #arguments.plant.boxWidth#cm; height: #arguments.plant.boxHeight#cm;">
 					<cfloop array="#arguments.plant.markers#" index="local.marker">
-						<cfset local.half = Int( local.marker.size / 2 )>
-						<div class="plant-pin" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.marker.size#px; height: #local.marker.size#px; margin-left: -#local.half#px; margin-top: -#local.half#px; background-color: #local.marker.color#; transform: rotate(#local.marker.angle#deg);"></div>
+						<cfset local.half   = Int( local.marker.size / 2 )>
+						<cfset local.pinPath = StructKeyExists( local.marker, "pin" ) ? local.marker.pin : "">
+						<cfif Len( local.pinPath )>
+							<!--- la tela del PNG è più larga del marker per non tagliare la
+							      punta ruotata: si centra sulla sua misura, non su quella
+							      del marker --->
+							<cfset local.box     = Ceiling( local.marker.size * 1.6 )>
+							<cfset local.boxHalf = Int( local.box / 2 )>
+							<img src="#local.pinPath#" class="plant-pin" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.box#px; height: #local.box#px; margin-left: -#local.boxHalf#px; margin-top: -#local.boxHalf#px;">
+						<cfelse>
+							<div class="plant-pin plant-pin-flat" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.marker.size#px; height: #local.marker.size#px; margin-left: -#local.half#px; margin-top: -#local.half#px; background-color: #local.marker.color#;"></div>
+						</cfif>
 						<div class="plant-pin-label" style="left: #local.marker.x#%; top: #local.marker.y#%; width: #local.marker.size#px; margin-left: -#local.half#px; margin-top: -6px;">#local.marker.label#</div>
 					</cfloop>
 				</div>
@@ -114,6 +129,32 @@
 	</cfif>
 
 	<cfreturn LSNumberFormat( local.n, "9.99" ) & "%">
+</cffunction>
+
+<!---
+	Riga dimensioni dell'articolo, sempre sotto al nome: legenda tutta
+	maiuscola e senza parentesi, seguita dalle misure ( es. "LUNG X LARG X ALT
+	100x20x30 cm" ). Con la lunghezza valorizzata stampa le tre quote, altrimenti
+	solo larghezza e altezza.
+	L'unità cambia col tipo di articolo: mm per placche e segnaletica, cm per
+	tutto il resto.
+--->
+<cffunction name="printDimensions" output="false">
+	<cfargument name="modelConfig" required="true">
+	<cfargument name="langId" required="true">
+	<cfargument name="unit" required="false" default="cm">
+
+	<cfset local.hasLength = !IsNull( arguments.modelConfig.getLength() )>
+	<cfset local.legend = local.hasLength
+		? printLabel( 'dimLegend3', arguments.langId )
+		: printLabel( 'dimLegend2', arguments.langId )>
+	<cfset local.sizes = local.hasLength
+		? arguments.modelConfig.getLength() & " x " & arguments.modelConfig.getWidth() & " x " & arguments.modelConfig.getHeight()
+		: arguments.modelConfig.getWidth() & " x " & arguments.modelConfig.getHeight()>
+
+	<cfsavecontent variable="local.html"><cfoutput><div style="font-size: 7pt; margin-top: 2px;"><span style="white-space: nowrap;">#local.legend#</span> <span style="white-space: nowrap;">#local.sizes# #arguments.unit#</span></div></cfoutput></cfsavecontent>
+
+	<cfreturn local.html>
 </cffunction>
 
 <cffunction name="getPrintFooter">
@@ -181,6 +222,7 @@
 			"service":        "Servizio",
 			"goodsTotal":     "Totale merce",
 			"discounts":      "Sconti",
+			"flatDiscount":   "Sconto incondizionato",
 			"vat":            "Iva",
 			"shipping":       "Spedizione",
 			"invoiceTotal":   "Totale fattura",
@@ -198,8 +240,8 @@
 			"offer":          "Offerta",
 			"technicalPrint": "Stampa Tecnica",
 			"photoPrint":     "Stampa Foto",
-			"dimLegend2":     "(Larg x Alt)",
-			"dimLegend3":     "(Lung x Larg x Alt)"
+			"dimLegend2":     "LARG X ALT",
+			"dimLegend3":     "LUNG X LARG X ALT"
 		},
 		"EN": {
 			"quotation":      "Quotation",
@@ -223,6 +265,7 @@
 			"service":        "Service",
 			"goodsTotal":     "Goods total",
 			"discounts":      "Discounts",
+			"flatDiscount":   "Unconditional discount",
 			"vat":            "VAT",
 			"shipping":       "Shipping",
 			"invoiceTotal":   "Invoice total",
@@ -240,8 +283,8 @@
 			"offer":          "Offer",
 			"technicalPrint": "Technical Print",
 			"photoPrint":     "Photo Print",
-			"dimLegend2":     "(W x H)",
-			"dimLegend3":     "(L x W x H)"
+			"dimLegend2":     "W X H",
+			"dimLegend3":     "L X W X H"
 		},
 		"FR": {
 			"quotation":      "Devis",
@@ -265,6 +308,7 @@
 			"service":        "Service",
 			"goodsTotal":     "Total marchandises",
 			"discounts":      "Remises",
+			"flatDiscount":   "Remise inconditionnelle",
 			"vat":            "TVA",
 			"shipping":       "Livraison",
 			"invoiceTotal":   "Total facture",
@@ -282,8 +326,8 @@
 			"offer":          "Offre",
 			"technicalPrint": "Impression Technique",
 			"photoPrint":     "Impression Photo",
-			"dimLegend2":     "(Larg x Haut)",
-			"dimLegend3":     "(Long x Larg x Haut)"
+			"dimLegend2":     "LARG X HAUT",
+			"dimLegend3":     "LONG X LARG X HAUT"
 		},
 		"ES": {
 			"quotation":      "Presupuesto",
@@ -307,6 +351,7 @@
 			"service":        "Servicio",
 			"goodsTotal":     "Total mercancías",
 			"discounts":      "Descuentos",
+			"flatDiscount":   "Descuento incondicional",
 			"vat":            "IVA",
 			"shipping":       "Envío",
 			"invoiceTotal":   "Total factura",
@@ -324,8 +369,8 @@
 			"offer":          "Oferta",
 			"technicalPrint": "Impresión Técnica",
 			"photoPrint":     "Impresión Fotográfica",
-			"dimLegend2":     "(Anch x Alt)",
-			"dimLegend3":     "(Long x Anch x Alt)"
+			"dimLegend2":     "ANCH X ALT",
+			"dimLegend3":     "LONG X ANCH X ALT"
 		},
 		"DE": {
 			"quotation":      "Angebot",
@@ -349,6 +394,7 @@
 			"service":        "Service",
 			"goodsTotal":     "Warengesamt",
 			"discounts":      "Rabatte",
+			"flatDiscount":   "Bedingungsloser Rabatt",
 			"vat":            "MwSt.",
 			"shipping":       "Versand",
 			"invoiceTotal":   "Rechnungsgesamt",
@@ -366,8 +412,8 @@
 			"offer":          "Angebot",
 			"technicalPrint": "Technischer Druck",
 			"photoPrint":     "Fotodruck",
-			"dimLegend2":     "(B x H)",
-			"dimLegend3":     "(L x B x H)"
+			"dimLegend2":     "B X H",
+			"dimLegend3":     "L X B X H"
 		}
 	}>
 	<cfif !structKeyExists(local.labels, local.lang)>
@@ -661,7 +707,17 @@
 
 <cffunction name="printStyle">
 	<style>	
-		body, td, th, span, div, p { font-family: 'Poppins'; font-size: 11px }
+		/*
+			Il font-size di base sta solo sugli elementi che fanno da contenitore.
+			Elencando anche span e div, la regola vinceva sull'ereditarietà: uno
+			span senza dimensione esplicita dentro a un blocco a 7pt tornava a
+			11px. Si vedeva sulla riga delle dimensioni, più grande del codice
+			articolo e degli attributi accanto. Ora span e div ereditano dal loro
+			contenitore, mentre il font-family resta su tutti perché lì
+			l'ereditarietà da sola non basta.
+		*/
+		body, td, th, p { font-family: 'Poppins'; font-size: 11px }
+		span, div { font-family: 'Poppins' }
 		
 		table {
 			border-collapse: collapse;
@@ -715,8 +771,10 @@
 		}
 		.plant-pin {
 			position: absolute;
+		}
+		/* ripiego quando il PNG ruotato non è disponibile: stessa goccia, ferma */
+		.plant-pin-flat {
 			border-radius: 50% 50% 50% 0;
-			transform-origin: center;
 		}
 		.plant-pin-label {
 			position: absolute;

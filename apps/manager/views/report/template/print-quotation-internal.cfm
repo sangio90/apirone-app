@@ -166,29 +166,29 @@
 														</cfif>
 													</td>
 													<td style="width: 2.9in; padding-left: 2pt; padding-right: 0">
-														<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+														<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 														<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 															<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
 															<cfloop from="1"  to="#itemsCount#" index="item">
 																<cfset item = oggetto.getItems()[item]>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+																<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 															</cfloop>
-															<cfif !isNull(oggetto.getNote()) && args.params.note>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
+															<cfif !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
+																<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 															</cfif>
 														</cfif>
 													</td>
 												<cfelse>
 													<td style="width: 4in; padding-left: 2pt; padding-right: 0">
-														<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+														<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 														<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 															<cfset itemsCount = ArrayLen( oggetto.getItems() ) GTE 9 ? 9 : ArrayLen( oggetto.getItems() )>
 															<cfloop from="1"  to="#itemsCount#" index="item">
 																<cfset item = oggetto.getItems()[item]>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+																<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 															</cfloop>
-															<cfif !isNull(oggetto.getNote()) && args.params.note>
-																<span style="word-break: break-all; font-size: 8pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
+															<cfif !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
+																<span style="word-break: break-all; font-size: 7pt; overflow: hidden; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 															</cfif>
 														</cfif>
 													</td>
@@ -196,16 +196,16 @@
 											</tr>
 											<tr>
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
-													<td colspan="2" style="font-size: 8pt; line-height: 20px; padding-top: 2pt !important; padding-left: 2pt;">
+													<td colspan="2" style="font-size: 7pt; line-height: 20px; padding-top: 2pt !important; padding-left: 2pt;">
 														<b>Lista Frutti: </b>
 														<cfif NOT isNull(oggetto.getFruits())>
 															<cfset fruitsCount = ArrayLen( oggetto.getFruits() )>
 															<cfloop from="1" to="#fruitsCount#" index="fi">
 																<cfset fruit = oggetto.getFruits()[fi]>
-																Cod. <span style="text-transform: lowercase; font-size: 8pt;">
+																Cod. <span style="text-transform: lowercase; font-size: 7pt;">
 																	#fruit.getFruit().getCode()#<cfif fi LT fruitsCount>, </cfif>
 																	<cfif !isNull(fruit.getNote()) && args.params.note>
-																		<span style="font-size: 8pt; margin-top: 4pt;">
+																		<span style="font-size: 7pt; margin-top: 4pt;">
 																			<i>(Note: #fruit.getNote()#)</i>
 																		</span>
 																	</cfif>
@@ -217,9 +217,9 @@
 											</tr>
 										</table>
 									</td>
-									<td style="width: 0.4in; text-align: right; font-size: 8pt;">#oggetto.getQuantity()#</td>
-									<td style="width: 1.2in; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €</td>
-									<td style="width: 1.2in; text-align: right; font-size: 8pt;">#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €</td>
+									<td style="width: 0.4in; text-align: right; font-size: 7pt;">#oggetto.getQuantity()#</td>
+									<td style="width: 1.2in; text-align: right; font-size: 7pt;">#LSNumberFormat( oggetto.getPrice(), ".99", "it_IT" )# €</td>
+									<td style="width: 1.2in; text-align: right; font-size: 7pt;">#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice(), ".99", "it_IT" )# €</td>
 								</tr>
 							</table>
 						</div>

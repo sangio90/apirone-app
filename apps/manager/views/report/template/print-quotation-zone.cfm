@@ -145,29 +145,37 @@
 			</cfoutput>
 
 			<cfoutput>
+				<!--- il cambio zona e' una rottura: ogni zona parte da pagina nuova.
+				      Si conta solo quello che si stampa davvero, le zone vuote sono
+				      saltate e non devono lasciare una pagina bianca dietro di se'. --->
+				<cfset zoneStampate = 0>
 				<cfloop array="#args.data.zones#" index="stanza">
 					<cfif stanza.zoneItems.len() EQ 0>
 						<cfcontinue>
 					</cfif>
 					<cfset zoneItemsCount = ArrayLen( stanza.zoneItems )>
+					<cfset zoneStampate = zoneStampate + 1>
+				<!--- titolo della zona e intestazione colonne fuori dal ciclo voci:
+				      prima ogni voce era una tabella a se' e l'intestazione si ripeteva
+				      sopra ognuna. -fs-table-paginate la fa tornare a ogni salto pagina. --->
+				<div style="border: 0; margin: 0; margin-top: .1in; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;<cfif zoneStampate GT 1> page-break-before: always;</cfif>">
+				<cfif stanza.getName() != 'Non assegnato'>
+				#stanza.getName()#:
+				</cfif>
+				</div>
+				<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
+					<thead>
+						<tr>
+							<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('article', langId)#</td>
+							<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
+							<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('price', langId)#</td>
+							<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('total', langId)#</td>
+						</tr>
+					</thead>
+					<tbody>
 					<cfloop from="1" to="#zoneItemsCount#" index="zoneItem">
-						<div class="item" style="page-break-inside: avoid !important;">
-							<cfif zoneItem == 1>
-								<div style="border: 0; margin: 0; margin-top: .1in; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
-									<cfif stanza.getName() != 'Non assegnato'>
-										#stanza.getName()#: 
-									</cfif>
-								</div>
-							</cfif>
-							<cfset oggetto = stanza.zoneItems[zoneItem]>
-							<table style="border-collapse: collapse; width: 100%;">
-								<tr>
-									<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('article', langId)#</td>
-									<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
-									<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('price', langId)#</td>
-									<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('total', langId)#</td>
-								</tr>
-								<tr>
+						<cfset oggetto = stanza.zoneItems[zoneItem]>
+						<tr style="page-break-inside: avoid;">
 									<td style="margin: 0 !important; padding: 3px; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
 										<table class="hiddenTable">
 											<tr>
@@ -205,7 +213,7 @@
 															<cfset item = oggetto.getItems()[item]>
 															<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 														</cfloop>
-														<cfif isNull(oggetto.getArticle()) && !isNull(oggetto.getNote()) && args.params.note>
+														<cfif isNull(oggetto.getArticle()) && !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
 															<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 														</cfif>
 													</cfif>
@@ -256,13 +264,13 @@
 											</tr>
 										</table>
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 2cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 2cm !important; text-align: right; padding-right: 0.1in;">
 										<cfset zoneQuantity = stanza.getQuantity()>
 										<cfset parentZoneQuantity = !isNull(stanza.getOrigin()) ? stanza.getOrigin().getQuantity() : 1>
 										<cfset oggettoQuantity = oggetto.getQuantity() * zoneQuantity * parentZoneQuantity>
 										#oggettoQuantity#
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 										<cfset prezzoFinale = oggetto.getPrice().getTotal()>
 										<cfif args.params.discounts>
 											<cfset sconto1 = oggetto.getPrice().getDiscount1()>
@@ -279,26 +287,30 @@
 										</cfif>
 										#LSNumberFormat( prezzoFinale, "9,999.99", "it_IT" )# €
 									</td>
-									<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 										#LSNumberFormat( oggetto.getQuantity() * oggetto.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 									</td>
-								</tr>
-							</table>
-						</div>
+						</tr>
 					</cfloop>
+					</tbody>
+				</table>
 				</cfloop>
 				<div style="width: 100%; height: 5mm;"></div>
-				<cfloop array="#args.data.articleItems#" index="servizio">
-					<div class="item" style="page-break-inside: avoid !important;">
-						<cfset quantity = servizio.getQuantity()>
-						<table style="border-collapse: collapse; width: 100%;">
+				<cfif ArrayLen( args.data.articleItems ) GT 0>
+					<!--- come le voci: una tabella sola, intestazione nel <thead> --->
+					<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
+						<thead>
 							<tr>
 								<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('service', langId)#</td>
 								<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
 								<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('price', langId)#</td>
 								<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; padding-right: 0.1in;">#printLabel('total', langId)#</td>
 							</tr>
-							<tr>
+						</thead>
+						<tbody>
+						<cfloop array="#args.data.articleItems#" index="servizio">
+							<cfset quantity = servizio.getQuantity()>
+							<tr style="page-break-inside: avoid;">
 								<td style="padding: 2mm 2mm 4mm 2mm; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
 									<table class="hiddenTable">
 										<tr>
@@ -309,56 +321,72 @@
 										</tr>
 									</table>
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 									#quantity#
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 									#LSNumberFormat( servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; padding-right: 0.1in;">
 									#LSNumberFormat( quantity * servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
 							</tr>
-						</table>
-					</div>
-				</cfloop>
+						</cfloop>
+						</tbody>
+					</table>
+				</cfif>
 
-				<div style="width: 100%; text-align: right; position: relative;">
-					<table style="width: 4in; border-collapse: collapse; position: absolute; right: 0; top: .1in;">
+				<!--- Il blocco totali era in position: absolute, quindi fuori dal flusso:
+				      il testo finale partiva da sopra e i due si sovrapponevano. Ora e'
+				      impaginato come nel classic, in una cella allineata a destra. --->
+				<div style="width: 100%; text-align: right; page-break-inside: avoid; margin-top: 0.2in;">
+					<table style="border: 0">
+						<tr style="border: 0">
+							<td style="width: 70%; border: 0"></td>
+							<td style="width: 30%; border: 0">
+					<!--- stesso piede del classic: ogni sconto con la sua percentuale e
+					      lo sconto incondizionato con la sua voce --->
+					<cfset totali          = args.data.quotationPrice.getCalculatedTotals()>
+					<cfset scontoPerc1     = Val( totali[ 'discount1' ] )>
+					<cfset scontoPerc2     = Val( totali[ 'discount2' ] )>
+					<cfset scontoFlat      = Val( totali[ 'flatDiscount' ] )>
+					<cfset merceLorda      = Val( totali[ 'totalGoods' ] )>
+					<cfset scontoImporto1  = merceLorda * scontoPerc1 / 100>
+					<cfset scontoImporto2  = ( merceLorda - scontoImporto1 ) * scontoPerc2 / 100>
+					<cfset merceNetta      = merceLorda - scontoImporto1 - scontoImporto2>
+					<cfset mostraSconti    = args.params.discounts AND ( scontoPerc1 GT 0 OR scontoPerc2 GT 0 OR scontoFlat GT 0 )>
+							<table style="width: 4in; border-collapse: collapse;">
 						<cfif !args.params.hideTotal>
 						<tr>
 							<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
 							<td>
-								<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
-									#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
+								<cfif mostraSconti>
+									#LSNumberFormat( merceLorda, "9,999.99", "it_IT" )# €
 								<cfelse>
-									#LSNumberFormat(
-										args.data.quotationPrice.getCalculatedTotals()['totalGoods'] *
-										( 1 - args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ) *
-										( 1 - args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100 )
-									, "9,999.99", "it_IT" ) # €
+									<!--- sconti nascosti: netto, incondizionato compreso --->
+									#LSNumberFormat( merceNetta - scontoFlat, "9,999.99", "it_IT" )# €
 								</cfif>
 							</td>
 						</tr>
-						<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
-							<tr>
-								<td><strong>#printLabel('discounts', langId)#</strong></td>
-								<td>
-									- #LSNumberFormat(
-										args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
-										, "9,999.99", "it_IT" )
-									# €
-								</td>
-							</tr>
-							<tr>
-								<td><strong></strong></td>
-								<td>
-									- #LSNumberFormat(
-										(args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 )) * args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100
-										, "9,999.99", "it_IT" )
-									# €
-								</td>
-							</tr>
+						<cfif mostraSconti>
+							<cfif scontoPerc1 GT 0>
+								<tr>
+									<td><strong>#printLabel('discount', langId)# #printPercent( scontoPerc1 )#</strong></td>
+									<td>- #LSNumberFormat( scontoImporto1, "9,999.99", "it_IT" )# €</td>
+								</tr>
+							</cfif>
+							<cfif scontoPerc2 GT 0>
+								<tr>
+									<td><strong>#printLabel('discount', langId)# #printPercent( scontoPerc2 )#</strong></td>
+									<td>- #LSNumberFormat( scontoImporto2, "9,999.99", "it_IT" )# €</td>
+								</tr>
+							</cfif>
+							<cfif scontoFlat GT 0>
+								<tr>
+									<td><strong>#printLabel('flatDiscount', langId)#</strong></td>
+									<td>- #LSNumberFormat( scontoFlat, "9,999.99", "it_IT" )# €</td>
+								</tr>
+							</cfif>
 						</cfif>
 						<tr>
 							<cfif #!isNull( args.data.quotation.getVatCode())#>
@@ -368,6 +396,13 @@
 							</cfif>
 							<td>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['vatAmount'], "9,999.99", "it_IT" )# €</td>
 						</tr>
+						<!--- spedizione prima del totale fattura, come nel classic --->
+						<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
+							<tr>
+								<td>#printLabel('shipping', langId)#</td>
+								<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
+							</tr>
+						</cfif>
 						<tr>
 							<td><strong>#printLabel('invoiceTotal', langId)#</strong></td>
 							<td><strong>#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['total'], "9,999.99", "it_IT" )# €</strong></td>
@@ -379,13 +414,10 @@
 							</tr>
 						</cfif>
 						</cfif>
-						<cfif #!isNull( args.data.quotationPrice.getShippingCost())#>
-							<tr>
-								<td>#printLabel('shipping', langId)#</td>
-								<td>#LSNumberFormat( args.data.quotationPrice.getShippingCost(), "9,999.99", "it_IT" )# €</td>
-							</tr>
-						</cfif>
-					</table>
+							</table>
+						</td>
+					</tr>
+				</table>
 				</div>
 
 				<cfif isProforma>

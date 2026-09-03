@@ -35,13 +35,20 @@
 			</cfdocumentitem>
 
 			<cfoutput>
+				<!--- il cambio zona e' una rottura: ogni zona parte da pagina nuova.
+				      Si conta solo quello che si stampa davvero, le zone vuote sono
+				      saltate e non devono lasciare una pagina bianca dietro di se'.
+				      Il salto sta sul wrapper della prima voce perche' il titolo zona
+				      e' dentro quel blocco. --->
+				<cfset zoneStampate = 0>
 				<cfloop array="#args.data.zones#" index="stanza">
 					<cfif stanza.zoneItems.len() EQ 0>
 						<cfcontinue>
 					</cfif>
 					<cfset zoneItemsCount = ArrayLen( stanza.zoneItems )>
+					<cfset zoneStampate = zoneStampate + 1>
 					<cfloop from="1" to="#zoneItemsCount#" index="zoneItem">
-						<div class="item" style="page-break-inside: avoid;">
+						<div class="item" style="page-break-inside: avoid;<cfif zoneItem EQ 1 AND zoneStampate GT 1> page-break-before: always;</cfif>">
 							<cfif zoneItem == 1>
 								<div style="border: 0; margin: 0; margin-top: .1in; padding: .2em; width: fit-content; font-size: 14pt; font-weight: bold;">
 									#stanza.getName()#
@@ -64,21 +71,21 @@
 										</cfif>
 									</td>
 									<td style="padding-right: 0; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 9cm !important;">
-										<span style="font-size: 8pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+										<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 										<cfif !isNull(oggetto.getPosition())>
-											<div style="font-size: 8pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
+											<div style="font-size: 7pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
 										</cfif>
 										<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 											<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 											<cfloop from="1"  to="#itemsCount#" index="item">
 												<cfset item = oggetto.getItems()[item]>
-												<span style="font-size: 8pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
+												<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 											</cfloop>
 											<cfif !isNull(oggetto.getQuantity())>
 												<cfset zoneQuantity = stanza.getQuantity()>
 												<cfset parentZoneQuantity = !isNull(stanza.getOrigin()) ? stanza.getOrigin().getQuantity() : 1>
 												<cfset oggettoQuantity = oggetto.getQuantity() * zoneQuantity * parentZoneQuantity>
-												<span style="font-size: 8pt; text-transform: lowecase">#printLabel('qty', langId)#: #oggettoQuantity#</span>
+												<span style="font-size: 7pt; text-transform: lowecase">#printLabel('qty', langId)#: #oggettoQuantity#</span>
 											</cfif>
 											<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 												<br><br>
@@ -96,17 +103,17 @@
 																		#fruitPosition.order + 1#<cfif fpi < fruitPositionsCount > - </cfif>
 																	</cfloop>
 																</b> : Cod.
-																<span style="text-transform: lowercase; font-size: 8pt;">
+																<span style="text-transform: lowercase; font-size: 7pt;">
 																	#fruit.getFruit().getCode()#<br>
 																	<cfif IsArray( fruit.getItems() )>
 																		<cfloop array="#fruit.getItems()#" index="fruitItem">
-																			<span style="font-size: 8pt; text-transform: lowecase">
+																			<span style="font-size: 7pt; text-transform: lowecase">
 																				#fruitItem.getProductItem().getAttribute().getName()#: #fruitItem.getProductItem().getAttributeValue().getRawValue().getName()#
 																			</span><br>
 																		</cfloop>
 																	</cfif>
 																	<cfif !isNull(fruit.getNote()) && args.params.note>
-																		<span style="font-size: 8pt; margin-top: 4pt;">
+																		<span style="font-size: 7pt; margin-top: 4pt;">
 																			<i>( Note: #fruit.getNote()# )</i>
 																		</span>
 																	</cfif>

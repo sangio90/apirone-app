@@ -156,35 +156,48 @@
 					<cfloop from="1" to="#groupPlantsCount#" index="plantIndex">
 						#printPlant(plant = categoryGroup.plants[plantIndex], langId = langId, sectionTitle = plantIndex EQ 1 ? sectionTitle : "")#
 					</cfloop>
-					<cfloop from="1" to="#groupItemsCount#" index="groupItemIndex">
-					<cfset oggetto = categoryGroup.items[groupItemIndex]>
-					<div class="item" style="page-break-inside: avoid !important;">
-						<cfif groupItemIndex EQ 1 AND Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
-						<cfset zones = oggetto.zones>
-						<cfset quantity = oggetto.quantity>
-						<cfset oggetto = oggetto.item>
-						<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
-						<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
-						<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
-						<cfset prezzoScontato = oggetto.getPrice().getTotal()>
-						<cfset sconto1 = Val( oggetto.getPrice().getDiscount1() ?: 0 )>
-						<cfset sconto2 = Val( oggetto.getPrice().getDiscount2() ?: 0 )>
-						<cfset moltiplicatore = (1 - (sconto1 / 100)) * (1 - (sconto2 / 100))>
-						<cfset prezzoPieno = moltiplicatore EQ 0 ? 0 : prezzoScontato / moltiplicatore>
-						<cfset scontoTesto = "">
-						<cfif sconto1 GT 0><cfset scontoTesto = printPercent( sconto1 )></cfif>
-						<cfif sconto2 GT 0><cfset scontoTesto = ListAppend( scontoTesto, printPercent( sconto2 ), "+" )></cfif>
-						<cfif !Len( scontoTesto )><cfset scontoTesto = printPercent( 0 )></cfif>
-						<table style="border-collapse: collapse; width: 100%;">
-							<tr>
+					<cfif groupItemsCount GT 0>
+						<cfif Len( sectionTitle ) AND groupPlantsCount EQ 0><div class="category-section">#sectionTitle#</div></cfif>
+						<!---
+							Una sola tabella per gruppo, con l'intestazione colonne nel <thead>.
+							Prima ogni voce era una tabella a se' e l'intestazione si ripeteva
+							sotto ogni articolo.
+							-fs-table-paginate e' l'estensione di Flying Saucer che fa ripetere
+							il <thead> dopo un salto pagina: senza, cfdocument lo stampa una volta
+							sola e le pagine successive restano senza intestazione ( verificato ).
+							Il blocco non spezzabile e' passato dal <div> per voce alla <tr>,
+							altrimenti le righe non potrebbero stare tutte nella stessa tabella.
+						--->
+						<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
+							<thead>
+								<tr>
 								<td style="width: 11.2cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('article', langId)#</td>
 								<td style="width: 2.0cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 0; border-right: 0; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('unitPrice', langId)#</td>
 								<td style="width: 1.5cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 0; border-right: 0; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('discount', langId)#</td>
 								<td style="width: 1.0cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 0; border-right: 0; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
 								<td style="width: 2.1cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 0; border-right: 0; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('netUnitPrice', langId)#</td>
 								<td style="width: 2.2cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 0; border-right: 1px solid black; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('total', langId)#</td>
-							</tr>
-							<tr>
+								</tr>
+							</thead>
+							<tbody>
+							<cfloop from="1" to="#groupItemsCount#" index="groupItemIndex">
+								<cfset oggetto = categoryGroup.items[groupItemIndex]>
+								<cfset zones = oggetto.zones>
+								<cfset quantity = oggetto.quantity>
+								<cfset oggetto = oggetto.item>
+								<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
+								<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
+								<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
+								<cfset prezzoScontato = oggetto.getPrice().getTotal()>
+								<cfset sconto1 = Val( oggetto.getPrice().getDiscount1() ?: 0 )>
+								<cfset sconto2 = Val( oggetto.getPrice().getDiscount2() ?: 0 )>
+								<cfset moltiplicatore = (1 - (sconto1 / 100)) * (1 - (sconto2 / 100))>
+								<cfset prezzoPieno = moltiplicatore EQ 0 ? 0 : prezzoScontato / moltiplicatore>
+								<cfset scontoTesto = "">
+								<cfif sconto1 GT 0><cfset scontoTesto = printPercent( sconto1 )></cfif>
+								<cfif sconto2 GT 0><cfset scontoTesto = ListAppend( scontoTesto, printPercent( sconto2 ), "+" )></cfif>
+								<cfif !Len( scontoTesto )><cfset scontoTesto = printPercent( 0 )></cfif>
+								<tr style="page-break-inside: avoid;">
 								<td style="margin: 0 !important; padding: 3px; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 11.2cm !important;">
 									<table class="hiddenTable">
 										<tr>
@@ -213,19 +226,13 @@
 											--->
 											<td style="<cfif args.params.images>padding-left: 0.25cm;</cfif>">
 												<span style="font-size: 7pt; text-transform: lowecase">#!isNull(oggetto.getArticle()) ? oggetto.getArticle().getName() : oggetto.getProduct().getDescription()#</span><br>
-											<cfif hasDim && thisDimType NEQ "PLA" && thisDimType NEQ "SEG">
-												<div style="font-size: 7pt; margin-top: 2px;">
-													<cfif !isNull(thisDimMC.getLength())>
-														<span style="white-space: nowrap;">#printLabel('dimLegend3', langId)#:</span>
-														<span style="white-space: nowrap;">#thisDimMC.getLength()# x #thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
-													<cfelse>
-														<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-														<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# cm</span>
-													</cfif>
-												</div>
-											</cfif>
-											<cfif isNull(oggetto.getArticle())>
-													<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getNote()#</span><br>
+												<!---
+													Dimensioni sempre qui sotto al nome, anche per placche e
+													segnaletica: prima finivano nella riga sotto, insieme alle
+													posizioni. L'unità la decide il tipo di articolo.
+												--->
+												<cfif hasDim>
+													#printDimensions( thisDimMC, langId, ( thisDimType EQ "PLA" OR thisDimType EQ "SEG" ) ? "mm" : "cm" )#
 												</cfif>
 												<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 													<cfset itemsCount = ArrayLen( oggetto.getItems() )>
@@ -233,9 +240,15 @@
 														<cfset item = oggetto.getItems()[item]>
 														<span style="font-size: 7pt; text-transform: lowecase">#item.getProductItem().getAttribute().getName()#: #item.getProductItem().getAttributeValue().getRawValue().getName()#</span><br>
 													</cfloop>
-													<cfif !isNull(oggetto.getNote()) && args.params.note>
-														<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
-													</cfif>
+												</cfif>
+												<!---
+													Nota della voce una volta sola, qui in fondo. Prima usciva
+													anche subito sotto al titolo ( e lì ignorando il flag note ),
+													quindi si vedeva doppia. Fuori dal blocco degli attributi:
+													anche le voci senza attributi devono mostrarla.
+												--->
+												<cfif !isNull(oggetto.getNote()) && Len( Trim( oggetto.getNote() ) ) && args.params.note>
+													<span style="font-size: 7pt; text-transform: lowecase">Note: #oggetto.getNote()#</span>
 												</cfif>
 											</td>
 										</tr>
@@ -244,12 +257,6 @@
 											      applicato alla descrizione, altrimenti "Posizioni" e
 											      la lista frutti restano incollate all'immagine --->
 											<td style="vertical-align: bottom; padding: 3pt 0 3px <cfif args.params.images>0.25cm<cfelse>0</cfif>;">
-											<cfif hasDim && thisDimType EQ "PLA">
-												<div style="font-size: 7pt; margin-bottom: 4px;">
-													<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-													<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
-												</div>
-											</cfif>
 												<cfif IsInstanceOf(oggetto, "com.apirone.core.model.bean.QuotationItemPlate") && oggetto.getFruits().len() GT 0>
 													<div style="font-size: 7pt; line-height: 15px;">
 														Lista Frutti:
@@ -287,12 +294,6 @@
 														</cfif>
 													</div>
 												</cfif>
-												<cfif hasDim && thisDimType EQ "SEG">
-													<div style="font-size: 7pt; margin-bottom: 4px;">
-														<span style="white-space: nowrap;">#printLabel('dimLegend2', langId)#:</span>
-														<span style="white-space: nowrap;">#thisDimMC.getWidth()# x #thisDimMC.getHeight()# mm</span>
-													</div>
-												</cfif>
 												<!---
 													Righe posizione da stampare. La quantità non si riporta
 													più: è già nella sua colonna, qui era una ripetizione.
@@ -328,28 +329,33 @@
 										</tr>
 									</table>
 								</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.0cm !important;">#LSNumberFormat( prezzoPieno, "9,999.99", "it_IT" )# €</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.5cm !important;">#scontoTesto#</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.0cm !important;">#quantity#</td>
-									<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.1cm !important;">#LSNumberFormat( prezzoScontato, "9,999.99", "it_IT" )# €</td>
-									<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.2cm !important;">#LSNumberFormat( quantity * prezzoScontato, "9,999.99", "it_IT" )# €</td>
-							</tr>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.0cm !important;">#LSNumberFormat( prezzoPieno, "9,999.99", "it_IT" )# €</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.5cm !important;">#scontoTesto#</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.0cm !important;">#quantity#</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.1cm !important;">#LSNumberFormat( prezzoScontato, "9,999.99", "it_IT" )# €</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.2cm !important;">#LSNumberFormat( quantity * prezzoScontato, "9,999.99", "it_IT" )# €</td>
+						</tr>
+							</cfloop>
+							</tbody>
 						</table>
-					</div>
-				</cfloop>
+					</cfif>
 				</cfloop>
 				<div style="width: 100%; height: 5mm;"></div>
-				<cfloop array="#args.data.articleItems#" index="servizio">
-					<div class="item" style="page-break-inside: avoid !important;">
-						<cfset quantity = servizio.getQuantity()>
-						<table style="border-collapse: collapse; width: 100%;">
+				<cfif ArrayLen( args.data.articleItems ) GT 0>
+					<!--- come per le voci: una tabella sola, intestazione nel <thead> --->
+					<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
+						<thead>
 							<tr>
 								<td style="width: 12cm; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; padding-left: 0.1in;">#printLabel('service', langId)#</td>
 								<td style="width: 2cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('qty', langId)#</td>
 								<td style="width: 3cm; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('price', langId)#</td>
 								<td style="width: 3cm; border-left: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-right: 1px solid black; text-align: right; white-space: nowrap; padding-right: 0.1in;">#printLabel('total', langId)#</td>
 							</tr>
-							<tr>
+						</thead>
+						<tbody>
+						<cfloop array="#args.data.articleItems#" index="servizio">
+							<cfset quantity = servizio.getQuantity()>
+							<tr style="page-break-inside: avoid;">
 								<td style="padding: 2mm 2mm 4mm 2mm; align-items: center; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 0; width: 12cm !important;">
 									<table class="hiddenTable">
 										<tr>
@@ -360,61 +366,77 @@
 										</tr>
 									</table>
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#quantity#
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-right: 0; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#LSNumberFormat( servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
-								<td style="padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#LSNumberFormat( quantity * servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
-							</tr>
-						</table>
-					</div>
-				</cfloop>
+					</tr>
+						</cfloop>
+						</tbody>
+					</table>
+				</cfif>
 
 				<div style="width: 100%; text-align: right; page-break-inside: avoid; margin-top: 0.2in;">
 					<table style="border: 0">
 						<tr style="border: 0">
 							<td style="width: 70%; border: 0"></td>
 							<td style="width: 30%; border: 0">
-								<table style="width: 4in; border-collapse: collapse;">
-									<cfif !args.params.hideTotal>
-									<tr>
-										<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
-										<td>
-											<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
-												#LSNumberFormat( args.data.quotationPrice.getCalculatedTotals()['totalGoods'], "9,999.99", "it_IT" )# €
-											<cfelse>
-												#LSNumberFormat(
-													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] *
-													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ) *
-													( 1 - args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100 )
-												, "9,999.99", "it_IT" ) # €
+									<!---
+										Sconti del piede: prima uscivano due importi, il secondo
+										senza nemmeno un'etichetta, e lo sconto incondizionato non
+										compariva affatto pur essendo già scalato dal totale.
+										Ora ogni riga porta la sua percentuale, come la colonna
+										sconto delle righe di preventivo, e l'incondizionato ha
+										la sua voce.
+									--->
+									<cfset totali          = args.data.quotationPrice.getCalculatedTotals()>
+									<cfset scontoPerc1     = Val( totali[ 'discount1' ] )>
+									<cfset scontoPerc2     = Val( totali[ 'discount2' ] )>
+									<cfset scontoFlat      = Val( totali[ 'flatDiscount' ] )>
+									<cfset merceLorda      = Val( totali[ 'totalGoods' ] )>
+									<cfset scontoImporto1  = merceLorda * scontoPerc1 / 100>
+									<cfset scontoImporto2  = ( merceLorda - scontoImporto1 ) * scontoPerc2 / 100>
+									<cfset merceNetta      = merceLorda - scontoImporto1 - scontoImporto2>
+									<cfset mostraSconti    = args.params.discounts AND ( scontoPerc1 GT 0 OR scontoPerc2 GT 0 OR scontoFlat GT 0 )>
+									<table style="width: 4in; border-collapse: collapse;">
+										<cfif !args.params.hideTotal>
+										<tr>
+											<td><strong>#printLabel('goodsTotal', langId)#</strong></td>
+											<td>
+												<cfif mostraSconti>
+													#LSNumberFormat( merceLorda, "9,999.99", "it_IT" )# €
+												<cfelse>
+													<!--- sconti nascosti: si mostra il netto, incondizionato
+													      compreso, altrimenti i conti in fondo non tornano --->
+													#LSNumberFormat( merceNetta - scontoFlat, "9,999.99", "it_IT" )# €
+												</cfif>
+											</td>
+										</tr>
+										<cfif mostraSconti>
+											<cfif scontoPerc1 GT 0>
+												<tr>
+													<td><strong>#printLabel('discount', langId)# #printPercent( scontoPerc1 )#</strong></td>
+													<td>- #LSNumberFormat( scontoImporto1, "9,999.99", "it_IT" )# €</td>
+												</tr>
 											</cfif>
-										</td>
-									</tr>
-									<cfif args.params.discounts && ( args.data.quotationPrice.getCalculatedTotals()['discount1'] GT 0 OR args.data.quotationPrice.getCalculatedTotals()['discount2'] GT 0 )>
-										<tr>
-											<td><strong>#printLabel('discounts', langId)#</strong></td>
-											<td>
-												- #LSNumberFormat(
-													args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - (args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 ))
-													, "9,999.99", "it_IT" )
-												# €
-											</td>
-										</tr>
-										<tr>
-											<td><strong></strong></td>
-											<td>
-												- #LSNumberFormat(
-													(args.data.quotationPrice.getCalculatedTotals()['totalGoods'] - ( args.data.quotationPrice.getCalculatedTotals()['totalGoods'] * args.data.quotationPrice.getCalculatedTotals()['discount1'] / 100 )) * args.data.quotationPrice.getCalculatedTotals()['discount2'] / 100
-													, "9,999.99", "it_IT" )
-												# €
-											</td>
-										</tr>
-									</cfif>
+											<cfif scontoPerc2 GT 0>
+												<tr>
+													<td><strong>#printLabel('discount', langId)# #printPercent( scontoPerc2 )#</strong></td>
+													<td>- #LSNumberFormat( scontoImporto2, "9,999.99", "it_IT" )# €</td>
+												</tr>
+											</cfif>
+											<cfif scontoFlat GT 0>
+												<tr>
+													<td><strong>#printLabel('flatDiscount', langId)#</strong></td>
+													<td>- #LSNumberFormat( scontoFlat, "9,999.99", "it_IT" )# €</td>
+												</tr>
+											</cfif>
+										</cfif>
 									<tr>
 										<cfif #!isNull( args.data.quotation.getVatCode())#>
 											<td>#args.data.quotation.getVatCode().getName()#</td>

@@ -1479,6 +1479,14 @@ AP.quotation.printModal = (function () {
 			grouping: "categories",
 			options: {images: true, note: true, discounts: false, plants: false, hideTotal: false}
 		},
+		// Le voci sono organizzate per ambiente: il raggruppamento per categorie
+		// non si applica, quindi il secondo livello resta nascosto. Il template
+		// non disegna le piante, per questo l'opzione non compare.
+		zone: {
+			grouping: "none",
+			hideGrouping: true,
+			options: {images: true, note: true, discounts: false, hideTotal: false}
+		},
 		photo: {
 			grouping: "categories",
 			options: {note: false, plants: false}
@@ -1717,6 +1725,7 @@ AP.quotation.printModal = (function () {
 			const config = reportConfig();
 
 			$("input[name='grouping'][value='" + config.grouping + "']").prop("checked", true);
+			$("#qt-print-grouping-cont").toggle(!config.hideGrouping);
 
 			$.each(OPTION_FIELDS, function (name, field) {
 				const available = Object.prototype.hasOwnProperty.call(config.options, name);
