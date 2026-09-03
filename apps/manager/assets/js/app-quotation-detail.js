@@ -1485,7 +1485,10 @@ AP.quotation.printModal = (function () {
 		},
 		technical: {
 			grouping: "categories",
-			options: {images: true, note: false, plants: false}
+			// la tecnica riporta sempre immagini e note: sono parte del documento,
+			// non un'opzione
+			options: {images: true, note: true, plants: false},
+			locked: ["images", "note"]
 		},
 		// La proforma riusa la stampa del preventivo ma non riporta mai le foto,
 		// e in più chiede progressivo e percentuale di anticipo.
