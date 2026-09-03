@@ -1259,7 +1259,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			json.quotationItem.signageConfigItem.id,
 			quotation,
 			quotationItem,
-			// vedi la nota sul calcolo accessori: preloadedProduct non si può omettere
 			NullValue()
 		);
 		var line = super.bean( "QuotationItemPriceLine" );
