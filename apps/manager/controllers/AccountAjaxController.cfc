@@ -46,8 +46,21 @@ component extends="com.apirone.core.controller.AbsController" {
 		account.setName( json?.name );
 		account.setPwd( json?.pwd );
 		account.setStatus( status.setId( json.status.id ) );
-		account.setIdUtenteVerticale( json?.idUtenteVerticale );
-		account.setIdAgenteVerticale( json?.idAgenteVerticale );
+		// I due id verticale sono facoltativi, ma il form li manda come stringa vuota
+		// quando non sono compilati e il setter di una property Numeric la rifiuta
+		// ( "Cannot cast String [] to a value of type [Numeric]" ): bastava lasciarne
+		// uno vuoto perché il salvataggio dell'account fallisse.
+		// Non valorizzarli lascia la colonna a NULL, che è anche il modo di svuotarli.
+		// Niente json?.campo qui dentro: la safe navigation dentro a un && manda in
+		// VerifyError il compilatore di questo Lucee ( 5.4.8 ), e a saltare non è la
+		// riga ma l'intero componente.
+		if ( StructKeyExists( json, "idUtenteVerticale" ) && IsNumeric( json.idUtenteVerticale ) ) {
+			account.setIdUtenteVerticale( json.idUtenteVerticale );
+		}
+
+		if ( StructKeyExists( json, "idAgenteVerticale" ) && IsNumeric( json.idAgenteVerticale ) ) {
+			account.setIdAgenteVerticale( json.idAgenteVerticale );
+		}
 
 		if ( !len( json.id ) ) {
 			messageId = "account.created";
