@@ -59,7 +59,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public com.apirone.core.model.bean.Outcome function delete( required String productItemId ){
 		var outcome = super.bean( "Outcome" );
-		var obj     = get( arguments.productItemId );
 
 		outcome.setData( { productItemId = arguments.productItemId } );
 
