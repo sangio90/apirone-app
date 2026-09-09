@@ -50,7 +50,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
 		QuotationItem quotationItem = javacast("null", ""),
-		Product preloadedProduct = javacast("null", "")
+		any preloadedProduct = javacast("null", "") // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
 		){
 		var price = simulate( argumentCollection = arguments );
 		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
@@ -66,7 +66,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
 		QuotationItem quotationItem = javacast("null", ""),
-		Product preloadedProduct = javacast("null", "")
+		any preloadedProduct = javacast("null", "") // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
 	){
 		if ( arguments.quantity LTE 0 ) {
 			Throw(
