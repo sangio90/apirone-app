@@ -14,6 +14,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "typeId" ] = getTypeIdBySlug( rc.typeId );
 		params[ "quotationId" ] = rc.id;
+		// Le righe del preventivo si vedono tutte: niente paginazione (paramsFromUrl imposta limit 15 di default)
+		params[ "limit" ]  = -1;
+		params[ "offset" ] = 0;
 		params[ "orderBy" ] = [ { "field" = "quotationItem.ordinamento", "dir" = "asc" }, { "field" = "quotationZonePosition.code", "dir" = "asc" } ];
 		params[ "quotationZoneId" ] = Len( rc.quotationZoneId ) ? rc.quotationZoneId : null;
 
@@ -35,6 +38,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "quotationId" ] = rc.id;
 		params[ "quotationZoneId" ] = Len( rc.zoneId ) ? rc.zoneId : null;
+		// Anche per zona (pianta) servono tutte le righe, senza paginazione
+		params[ "limit" ]  = -1;
+		params[ "offset" ] = 0;
 
 		var rows = super.fire( "QuotationItem.search", params );
 
