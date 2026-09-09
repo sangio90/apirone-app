@@ -12,8 +12,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
     	private method
 	*/
 
+	/*
+		Costruisce un FileType a partire dal file di configurazione statico.
+		Il JSON parsato e l'elenco lingue sono memoizzati nel request scope: evita
+		di rileggere il file ed eseguire una query langs per ogni bean FileType
+		costruito (~110 volte durante il salvataggio di una placca).
+	*/
 	private com.apirone.core.model.bean.FileType function build( required String fileTypeId ){
-		var records = DeserializeJSON( FileRead( "/config/data/fileTypes.json.cfm" ) );
+		// Config statica: il parsing del JSON avviene una sola volta per request
+		if ( !StructKeyExists( request, "_fileTypesConfig" ) ) {
+			request._fileTypesConfig = DeserializeJSON( FileRead( "/config/data/fileTypes.json.cfm" ) );
+		}
+		var records = request._fileTypesConfig;
 
 		for ( var record in records ) {
 			if ( record.id == arguments.fileTypeId ) {
@@ -32,7 +42,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public array function createTexts( required struct record ){
-		var langs = getLangService().list();
+		// Elenco lingue statico: memoizzato nel request scope per
+		// evitare una query langs per ogni FileType
+		if ( !StructKeyExists( request, "_fileTypeLangs" ) ) {
+			request._fileTypeLangs = getLangService().list();
+		}
+		var langs = request._fileTypeLangs;
 
 		var texts = [];
 
