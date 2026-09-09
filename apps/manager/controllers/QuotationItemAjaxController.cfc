@@ -1210,10 +1210,17 @@ component extends="com.apirone.core.controller.AbsController" {
 		if (!IsNull(id)) {
 			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } );
 
+			// La Quotation è la stessa per tutti gli item, già caricata in batch dalla list:
+			// viene passata a ogni aggiornaPrezzo per evitare il refetch completo per ogni riga (N+1).
+			var sharedQuotation = NullValue();
+			if ( ArrayLen( quotationItems ) ) {
+				sharedQuotation = quotationItems[ 1 ].getQuotation();
+			}
+
 			transaction {
 				for (var quotationItem in quotationItems) {
 					if (isNull(quotationItem.getArticle())) {
-						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem } );
+						super.fire( "quotationItem.aggiornaPrezzo", { "quotationItem" = quotationItem, "preloadedQuotation" = sharedQuotation } );
 					}
 				}
 				result.setData( { "message" = getMessage( "quotationItem.deleted" ) } );
