@@ -939,13 +939,13 @@
 		}
 		/* fine */
 
-		/* intestazione di sezione del raggruppamento per tipo categoria */
+		/* intestazione di sezione del raggruppamento per tipo categoria.
+		   Nessuna riga sotto: la tabella che segue ha già il border-top e le due
+		   linee vicine sembravano un errore. */
 		.category-section {
 			text-align: left;
 			margin-top: 0.18in;
 			margin-bottom: 0.04in;
-			padding-bottom: 2px;
-			border-bottom: 1px solid #000;
 			font-size: 12px;
 			font-weight: bold;
 			text-transform: uppercase;

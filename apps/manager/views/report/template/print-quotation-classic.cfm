@@ -324,11 +324,11 @@
 										</tr>
 									</table>
 								</td>
-									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.0cm !important;">#LSNumberFormat( prezzoPieno, "9,999.99", "it_IT" )# €</td>
-									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.5cm !important;">#scontoTesto#</td>
-									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.0cm !important;">#quantity#</td>
-									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.1cm !important;">#LSNumberFormat( prezzoScontato, "9,999.99", "it_IT" )# €</td>
-									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.2cm !important;">#LSNumberFormat( quantity * prezzoScontato, "9,999.99", "it_IT" )# €</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.0cm !important;">#LSNumberFormat( prezzoPieno, "9,999.99", "it_IT" )# €</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.5cm !important;">#scontoTesto#</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 1.0cm !important;">#quantity#</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.1cm !important;">#LSNumberFormat( prezzoScontato, "9,999.99", "it_IT" )# €</td>
+									<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; text-align: right; white-space: nowrap; padding-right: 0.1in; width: 2.2cm !important;">#LSNumberFormat( quantity * prezzoScontato, "9,999.99", "it_IT" )# €</td>
 						</tr>
 							</cfloop>
 							</tbody>
@@ -361,13 +361,13 @@
 										</tr>
 									</table>
 								</td>
-								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#quantity#
 								</td>
-								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#LSNumberFormat( servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
-								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
+								<td style="vertical-align: top; padding-right: 0; border-left: 0; border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; padding-top: 5px; font-size: 7pt; line-height: 12px; width: 3cm !important; text-align: right; white-space: nowrap; padding-right: 0.1in;">
 									#LSNumberFormat( quantity * servizio.getPrice().getTotal(), "9,999.99", "it_IT" )# €
 								</td>
 					</tr>
