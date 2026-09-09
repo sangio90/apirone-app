@@ -150,6 +150,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				bean.setStatus( status.setId( "ACT" ) );
 				bean.setSpecial( false );
 				bean.setCustomImage( false );
+				bean.setBozza( false );
 				bean.setNote( "" );
 				bean.setPrice( price );
 

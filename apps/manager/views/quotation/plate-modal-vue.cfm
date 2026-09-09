@@ -325,6 +325,11 @@
                                                     <input class="form-check-input" type="checkbox" name="special" v-model="detailForm.data.special">
                                                     <!--- detailForm.data.special: flag booleano. Se true, indica che l'articolo ha un prezzo speciale/personalizzato (non calcolato automaticamente dal listino). --->
                                                 </div>
+                                                <div class="mb-1 mt-2">Bozza:</div>
+                                                <div>
+                                                    <input class="form-check-input" type="checkbox" name="bozza" v-model="detailForm.data.bozza">
+                                                    <!--- detailForm.data.bozza: flag booleano. Se true, la riga è ancora una bozza (non definitiva). --->
+                                                </div>
                                             </div>
 
                                             <div class="col-3">

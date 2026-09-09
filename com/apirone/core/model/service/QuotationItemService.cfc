@@ -325,7 +325,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	/**
 	 * Sincronizza tutti i QuotationItem con lo stesso instance_group_id di quello dato.
-	 * Copia i campi "configurazione articolo" (zona, prodotto, quantità, note, special, prezzo).
+	 * Copia i campi "configurazione articolo" (zona, prodotto, quantità, note, special, bozza, prezzo).
 	 * NON copia le posizioni pianta (sono specifiche per ogni istanza).
 	 */
 	public void function syncInstanceGroup( required String quotationItemId ){
@@ -343,6 +343,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			sibling.setNote( source.getNote() );
 			sibling.setSpecial( source.getSpecial() );
 			sibling.setCustomImage( source.getCustomImage() );
+			sibling.setBozza( source.getBozza() );
 			if ( !IsNull( source.getProduct() ) ) sibling.setProduct( source.getProduct() );
 			if ( !IsNull( source.getPrice() ) )   sibling.setPrice( source.getPrice() );
 
@@ -634,7 +635,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				} );
 			}
 
-			if ( ArrayLen( fruits ) ) {
+			if ( ArrayLen( fruits ) || isPlateCategory( r.product_category_type_id ) ) {
 				var bean = super.bean( "QuotationItemPlate" );
 
 				bean.setFruits( fruits );
@@ -669,6 +670,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( !IsNull( r.ordinamento ) ) bean.setOrdinamento( r.ordinamento );
 			bean.setSpecial( BooleanFormat( Val( r.special ) ) );
 			bean.setCustomImage( BooleanFormat( Val( r.custom_image ) ) );
+			bean.setBozza( BooleanFormat( Val( r.bozza ) ) );
 
 			// Quotation: dalla mappa batch
 			if ( Len( r.quotation_id ) && StructKeyExists( quotationMap, r.quotation_id ) ) {
@@ -751,6 +753,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return map;
 	}
 
+	/**
+	 * Una riga è una placca per categoria prodotto (tipo "PLA", letto dalla join in
+	 * QuotationItemDAO.read/readByIds), non perché ha dei frutti: una placca salvata
+	 * senza frutti deve comunque diventare un QuotationItemPlate (frame, blockOrientations),
+	 * altrimenti il memento editPlate fallisce su getFrame().
+	 */
+	private Boolean function isPlateCategory( any productCategoryTypeId ){
+		return !IsNull( arguments.productCategoryTypeId )
+			&& Len( arguments.productCategoryTypeId )
+			&& UCase( arguments.productCategoryTypeId ) == "PLA";
+	}
+
 	private com.apirone.core.model.bean.QuotationItem function build( required String quotationItemId ){
 		var record = getDao().read( arguments.quotationItemId );
 
@@ -768,7 +782,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	private com.apirone.core.model.bean.QuotationItem function buildFromRow( required any record ){
 		var fruits = getQuotationItemFruitService().list( quotationItemId = arguments.record.quotation_item_id );
 
-		if ( fruits.len() > 0 ) {
+		if ( fruits.len() > 0 || isPlateCategory( arguments.record.product_category_type_id ) ) {
 			arraySort( fruits, function( a, b ){
 				return a.getPositions()[ 1 ].order - b.getPositions()[ 1 ].order;
 			} );
@@ -853,6 +867,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( !isNull( arguments.record.ordinamento ) ) bean.setOrdinamento( arguments.record.ordinamento );
 		bean.setSpecial( BooleanFormat( Val( arguments.record.special ) ) );
 		bean.setCustomImage( BooleanFormat( Val( arguments.record.custom_image ) ) );
+		bean.setBozza( BooleanFormat( Val( arguments.record.bozza ) ) );
 
 		if( Len( arguments.record.quotation_zone_position_id ) ) {
 			bean.setPosition( getQuotationZonePositionService().get( arguments.record.quotation_zone_position_id ) );

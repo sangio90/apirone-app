@@ -45,6 +45,7 @@ AP.plate.modal = ( function() {
                 quantity: 1,
                 special: false,
                 customImage: false,
+                bozza: false,
                 note: "",
                 status: { id: "ACT" },
                 position: { id: "", code: "" },
@@ -223,7 +224,7 @@ AP.plate.modal = ( function() {
             cellOrientation: plate.cellOrientation.id,
             id: plate.id,
             code: plate.code,
-            image: plate.image.uri,
+            image: plate.image?.uri || "",
             // placche a blocchi: la griglia viene costruita da drawBlocksWithin()
             blocks: scaledBlocks,
             displayScale: displayScale,
@@ -257,6 +258,15 @@ AP.plate.modal = ( function() {
     const BASE = "/manager/ajax";
 
     /**
+     * Memoria degli attributi frutto per cui i figli sono già stati richiesti al server.
+     * Chiave: fruitId + "-" + itemId (fi.id); valore: originId (productItemId selezionato).
+     * processFruitCascade la usa per riconoscere gli attributi foglia (il server non restituisce
+     * figli): senza questa memoria childrenLoaded resta false per sempre e ogni giro del watcher
+     * li ricaricherebbe, riassegnando fruit.items e innescando un loop cascata → render → watcher.
+     */
+    const fruitChildrenLoaded = new Map();
+
+    /**
      * Recupera i dati completi di una placca.
      * @param {string} id - Identificativo della placca.
      * @returns {Object} Promise della richiesta AJAX.
@@ -278,6 +288,7 @@ AP.plate.modal = ( function() {
      * e ripristina il template originale prima di crearne una nuova.
      */
     function mountVue() {
+        fruitChildrenLoaded.clear();
         if ( window.vm ) {
             window.vm.$destroy();
             window.vm = null;
@@ -1707,6 +1718,7 @@ AP.plate.modal = ( function() {
                     const attributeId = itemAttr.attributeId;
 
                     if ( originId === "" ) {
+                        fruitChildrenLoaded.delete( fruitId + "-" + itemId );
                         itemAttr.values.forEach( ( v ) => {
                             v.selected = false;
                             v.note = null;
@@ -1739,6 +1751,10 @@ AP.plate.modal = ( function() {
                                     fruit.items = fruitItems.slice();
                                     return;
                                 }
+
+                                // figli richiesti per questa selezione: anche se il server non ne
+                                // restituisce (attributo foglia) la cascata non deve ripeterla
+                                fruitChildrenLoaded.set( fruitId + "-" + itemId, String( originId ) );
 
                                 const parent = fruitItems[parentIndex];
                                 parent.values.forEach( ( v ) => {
@@ -1832,6 +1848,19 @@ AP.plate.modal = ( function() {
                  */
                 handleFruitProductItemSelect: async function( fruitId, selectedId, itemId, value ) {
                     await this.loadFruitProductItems( fruitId, selectedId, itemId );
+
+                    // Se la selezione ha dei figli, il watcher (processFruitCascade) li carica
+                    // e ridisegna la placca. Per gli attributi foglia o per la deselezione la
+                    // cascata non ha nulla da caricare e quindi non ridisegna: overlay attributo
+                    // e combinazioni vanno aggiornati esplicitamente qui.
+                    const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
+                    const item = fruit?.items?.find( ( fi ) => { return fi.id === itemId; } );
+                    const hasChildren = !!( item && selectedId && fruit.items.some( ( ci ) => {
+                        return ci.parentAttributeId === item.attributeId && String( ci.parentItemId ) === String( selectedId );
+                    } ) );
+                    if ( !hasChildren ) {
+                        this.renderPlateWithFruits();
+                    }
                 },
 
                 /**
@@ -1845,8 +1874,10 @@ AP.plate.modal = ( function() {
                  * potrebbero avere figli da caricare.
                  *
                  * processed (Set) traccia le coppie fruitId + attributeId già processate
-                 * per evitare loop infiniti su attributi foglia (senza figli): per questi
-                 * childrenLoaded è sempre false, ma non vanno rieseguiti all'infinito.
+                 * nel giro corrente. Per gli attributi foglia (senza figli) childrenLoaded
+                 * non può essere dedotto dagli items: ci pensa fruitChildrenLoaded, che
+                 * ricorda per quale selezione i figli sono già stati richiesti, così i
+                 * giri successivi del watcher non li ricaricano (e non ridisegnano) all'infinito.
                  *
                  * childrenLoaded verifica se esistono già items con parentAttributeId
                  * e parentItemId corrispondenti alla selezione corrente. Se true, significa
@@ -1874,7 +1905,8 @@ AP.plate.modal = ( function() {
                                     if ( !selected || !selected.productItemId ) {
                                         continue;
                                     }
-                                    const childrenLoaded = fruit.items.some( ( ci ) => {
+                                    const alreadyRequested = fruitChildrenLoaded.get( fruit.id + "-" + item.id ) === String( selected.productItemId );
+                                    const childrenLoaded = alreadyRequested || fruit.items.some( ( ci ) => {
                                         return ci.parentAttributeId === item.attributeId && ci.parentItemId === selected.productItemId;
                                     } );
                                     if ( childrenLoaded ) {
@@ -2266,8 +2298,8 @@ AP.plate.modal = ( function() {
                 // MARK: Save
                 /**
                  * Salva la placca sul server.
-                 * Verifica la presenza di almeno un frutto e, in caso di custom image,
-                 * che sia stata selezionata un'immagine.
+                 * Verifica che la placca sia configurata (anche senza frutti) e, in caso di
+                 * custom image, che sia stata selezionata un'immagine.
                  * Prepara i dati includendo posizioni, zone e fruit positions.
                  * Genera un'anteprima tramite html2canvas da inviare come base64.
                  * Al successo, mostra il modale post-salvataggio.
@@ -2276,8 +2308,10 @@ AP.plate.modal = ( function() {
                 save: async function() {
                     AP.loading.show();
 
-                    if ( !pub.fruitsController?.fruits.length ) {
-                        AP.widget.notify( "error", "Devi configurare almeno un frutto per poter procedere." );
+                    // La placca si può salvare anche senza frutti (placca cieca / retro struttura):
+                    // basta che sia stata configurata e disegnata (linea, modello, finitura).
+                    if ( !pub.fruitsController || !this.isPlateDefined ) {
+                        AP.widget.notify( "error", "Devi configurare la placca (linea, modello e finitura) prima di salvare." );
                         AP.loading.hide();
                         return false;
                     }
@@ -2699,6 +2733,7 @@ AP.plate.modal = ( function() {
             window.vm.detailForm.data.quantity = data.quotationItem.quantity;
             window.vm.detailForm.data.special = data.quotationItem.special === "true";
             window.vm.detailForm.data.customImage = data.quotationItem.customImage === "true";
+            window.vm.detailForm.data.bozza = data.quotationItem.bozza === "true";
             window.vm.detailForm.data.plateQuotationItemProductItems = data.quotationItem.items || [];
 
             const qz = data.quotationItem.quotationZone;

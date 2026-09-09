@@ -31,6 +31,9 @@
                         <div class="ms-1 pb-2" style="color: rgb(199, 113, 0);" data-bind="visible: special" title="Speciale">
                             <i class="fas fa-star"></i>
                         </div>
+                        <div class="ms-1 pb-2" style="color: rgb(120, 120, 120);" data-bind="visible: bozza" title="Bozza">
+                            <i class="fas fa-pencil-ruler"></i>
+                        </div>
                         <div class="ms-1 pb-2" style="color: rgb(90, 90, 200); position: relative;" data-bind="visible: instanceGroupId" title="Istanza">
                             <i class="fas fa-link"></i>
                             <span style="position: absolute; top: -4px; right: -8px; font-size: 8px; background: rgb(90,90,200); color: white; border-radius: 50%; width: 13px; height: 13px; display: flex; align-items: center; justify-content: center;" data-bind="text: instanceGroupCount"></span>

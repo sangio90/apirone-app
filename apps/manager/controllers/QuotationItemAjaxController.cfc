@@ -92,6 +92,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var status  = super.bean( "Status" );
 		bean.setStatus( status.setId( json.quotationItem.status.id ) );
 		bean.setNote( json.quotationItem.note );
+		if ( !IsNull( json.quotationItem.bozza ) ) bean.setBozza( json.quotationItem.bozza );
 
 		bean.setPrice( price );
 
@@ -572,6 +573,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setCustomImage( json.quotationItem.customImage );
 
 		bean.setSpecial( json.quotationItem.special );
+		if ( !IsNull( json.quotationItem.bozza ) ) bean.setBozza( json.quotationItem.bozza );
 		bean.setNote( json.quotationItem.note );
 		bean.setStatus( status.setId( json.quotationItem.status.id ) );
 		if ( !Len( id ) ) {
@@ -712,6 +714,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		bean.setSpecial( json.quotationItem.special );
+		if ( !IsNull( json.quotationItem.bozza ) ) bean.setBozza( json.quotationItem.bozza );
 		bean.setNote( json.quotationItem.note );
 		bean.setStatus( status.setId( json.quotationItem.status.id ) );
 		if ( !Len( id ) ) {
@@ -896,6 +899,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		bean.setStatus( status.setId( json.item.status.id ) );
 		bean.setQuotationZone( zone.setId( json.item.quotationZone.id ) );
 		bean.setSpecial( json.item.special );
+		if ( !IsNull( json.item.bozza ) ) bean.setBozza( json.item.bozza );
 		bean.setCustomImage( json.item.customImage );
 		bean.setFrame( frame.setOrientation( orientation.setId( json.item.product.orientation.id ) ) );
 		bean.setNote( json.item.note )

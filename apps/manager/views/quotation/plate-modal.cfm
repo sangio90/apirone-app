@@ -182,6 +182,12 @@
                                                     name="special"
                                                     data-bind="checked: detailForm.data.special">
                                             </div>
+                                            <div class="mb-1 mt-2">Bozza:</div>
+                                            <div>
+                                                <input class="form-check-input" type="checkbox"
+                                                    name="bozza"
+                                                    data-bind="checked: detailForm.data.bozza">
+                                            </div>
                                         </div>
 
                                         <div class="col-3">

@@ -768,6 +768,7 @@ AP.quotation.detail = (function () {
 						}
 						xhr.data.forEach(function (item) {
 							item.special = item.special == 'true'
+							item.bozza = item.bozza == 'true'
 						})
 
 						setQuotationItems(xhr.data, requestTypeId);

@@ -30,6 +30,7 @@ AP.accessory.modal = ( function() {
                 id: "",
                 special: false,
                 customImage: false,
+                bozza: false,
                 quantity: 1,
                 price: {
                     id: null,
@@ -76,7 +77,8 @@ AP.accessory.modal = ( function() {
         models: new kendo.data.DataSource(),
         finishes: new kendo.data.DataSource(),
         accessoryImages: new kendo.data.DataSource(),
-        backgroundImage: {},
+        backgroundImage: { url: "" },
+        backgroundCustomImage: { url: "" },
         maxRows: 0,
         modelConfig: {
             height: null,
@@ -1078,6 +1080,7 @@ AP.accessory.modal = ( function() {
 			viewModel.set( "detailForm.data", data );
             viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
             viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
+            viewModel.set('detailForm.data.quotationItem.bozza', viewModel.get('detailForm.data.quotationItem.bozza') == 'true')
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })

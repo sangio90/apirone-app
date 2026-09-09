@@ -53,6 +53,13 @@
 								</div>
                             </div>
 						</div>
+
+						<div class="form-group row pb-3">
+							<label class="col-sm-3 control-label text-sm-end" for="article-bozza">Bozza</label>
+							<div class="col-sm-9">
+								<input class="form-check-input" type="checkbox" name="bozza" id="article-bozza" data-bind="checked: detailForm.data.quotationItem.bozza" />
+							</div>
+						</div>
 					</div>
 
 					<footer class="card-footer">    

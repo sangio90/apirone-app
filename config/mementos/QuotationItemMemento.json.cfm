@@ -21,6 +21,7 @@
         "article.code",
         "article.name",
         "special",
+        "bozza",
         "image",
         "note",
         "ordinamento",
@@ -44,6 +45,7 @@
                 "note",
                 "createdAt",
                 "special",
+                "bozza",
                 "customImage",
                 "position.id",
                 "position.code",
@@ -68,6 +70,7 @@
                 "note",
                 "createdAt",
                 "special",
+                "bozza",
                 "customImage",
                 "position.id",
                 "position.code",
@@ -90,6 +93,7 @@
                 "note",
                 "createdAt",
                 "special",
+                "bozza",
                 "position",
                 "status"
             ]

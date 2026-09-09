@@ -3,14 +3,18 @@
 		<cfargument name="quotationItemId" type="String" required="true">
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				quotation_item_id::varchar,
-				quotation_id::varchar,
-				quotation_zone_id::varchar,
-				*
+				quotation_items.quotation_item_id::varchar,
+				quotation_items.quotation_id::varchar,
+				quotation_items.quotation_zone_id::varchar,
+				quotation_items.*,
+				product_categories.product_category_type_id
 			FROM
 				quotation_items
+				LEFT JOIN products ON products.product_id = quotation_items.product_id
+				LEFT JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				LEFT JOIN product_categories ON product_categories.product_category_id = catalog_bundles.product_category_id
 			WHERE
-				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+				quotation_items.quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
 		</cfquery>
 		<cfreturn local.q>
 	</cffunction>
@@ -100,6 +104,7 @@
 			INSERT INTO quotation_items (
 				special,
 				custom_image,
+				bozza,
 				status_id,
 				quotation_id,
 				quotation_zone_id,
@@ -127,6 +132,7 @@
 			) VALUES (
 				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
 				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getCustomImage()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getBozza()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
@@ -190,6 +196,7 @@
 				quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotation().getId()#">::uuid,
 				special = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getSpecial()#">,
 				custom_image = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getCustomImage()#">,
+				bozza = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getBozza()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
 				quotation_zone_id =
 					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
@@ -385,12 +392,16 @@
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				quotation_item_id::varchar,
-				quotation_id::varchar,
-				quotation_zone_id::varchar,
-				*
+				quotation_items.quotation_item_id::varchar,
+				quotation_items.quotation_id::varchar,
+				quotation_items.quotation_zone_id::varchar,
+				quotation_items.*,
+				product_categories.product_category_type_id
 			FROM quotation_items
-			WHERE quotation_item_id = ANY(
+				LEFT JOIN products ON products.product_id = quotation_items.product_id
+				LEFT JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				LEFT JOIN product_categories ON product_categories.product_category_id = catalog_bundles.product_category_id
+			WHERE quotation_items.quotation_item_id = ANY(
 				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
 		</cfquery>

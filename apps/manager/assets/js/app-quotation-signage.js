@@ -51,6 +51,7 @@ AP.signage.modal = ( function() {
                 signageRows: new kendo.data.DataSource(),
                 special: false,
                 customImage: false,
+                bozza: false,
                 status: {
                     id: "ACT",
                     name: "Attivo"
@@ -92,6 +93,7 @@ AP.signage.modal = ( function() {
         fontSizes: new kendo.data.DataSource(),
         signageImages: new kendo.data.DataSource(),
         backgroundImage: { url: "" },
+        backgroundCustomImage: { url: "" },
         fontFamilyName: "",
         maxRows: 0,
         // Mostra un warning nell'anteprima quando il SignageConfigItem selezionato
@@ -1723,6 +1725,7 @@ AP.signage.modal = ( function() {
         viewModel.set( "detailForm.data", data );
         viewModel.set( "detailForm.data.quotationItem.customImage", viewModel.get( "detailForm.data.quotationItem.customImage" ) == "true" );
         viewModel.set( "detailForm.data.quotationItem.special", viewModel.get( "detailForm.data.quotationItem.special" ) == "true" );
+        viewModel.set( "detailForm.data.quotationItem.bozza", viewModel.get( "detailForm.data.quotationItem.bozza" ) == "true" );
         viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { "id": "", "code": "" } );
 
         var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );

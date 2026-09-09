@@ -443,7 +443,7 @@ AP.plate.grid = ( function() {
                 css: {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
-                    "background-image": `url('${this.image}')`,
+                    "background-image": this.image ? `url('${this.image}')` : "none",
 					position: 'relative',
                 },
                 appendTo: $rootNode,
@@ -603,7 +603,7 @@ AP.plate.grid = ( function() {
                 css: {
                     width: `${this.width}px`,
                     height: `${this.height}px`,
-                    "background-image": `url('${this.image}')`,
+                    "background-image": this.image ? `url('${this.image}')` : "none",
                     position: "relative",
                 },
                 appendTo: $rootNode,
