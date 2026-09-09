@@ -1,0 +1,2 @@
+ALTER TABLE public.quotation_items
+ADD COLUMN bozza BOOLEAN DEFAULT FALSE;
