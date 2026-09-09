@@ -1061,7 +1061,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							result.error = 'Prima esporta gli articoli. ' & code & varCode;
+							result.error = 'Prima esporta gli articoli.'
 							return result;
 						}
 
