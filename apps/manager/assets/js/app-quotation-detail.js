@@ -117,6 +117,12 @@ AP.quotation.detail = (function () {
 	 * sovrapposte (es. cambio tab rapido): lo spinner sparisce quando finisce l'ultima.
 	 */
 	var itemsLoadingCount = 0;
+	/*
+	 * Richieste righe in volo, per URL. All'apertura la stessa lista viene chiesta due
+	 * volte (checkUrlTab o click sul tab, e il callback di getZones): la seconda chiamata
+	 * viene saltata invece di far partire due letture parallele che si rallentano a vicenda.
+	 */
+	var itemsRequestsInFlight = {};
 	var setItemsLoading = function (loading) {
 		itemsLoadingCount = Math.max(0, itemsLoadingCount + (loading ? 1 : -1));
 		var active = itemsLoadingCount > 0;
@@ -775,6 +781,11 @@ AP.quotation.detail = (function () {
 				url = url + "?quotationZoneId=" + AP.getUserPref("quotation." + AP.page.quotation.id + ".zone.id");
 			}
 
+			if (itemsRequestsInFlight[url]) {
+				return false;
+			}
+			itemsRequestsInFlight[url] = true;
+
 			var requestTypeId = typeId;
 			setItemsLoading(true);
 			// Svuota subito la lista del tab richiesto: durante il caricamento non si devono
@@ -801,6 +812,7 @@ AP.quotation.detail = (function () {
 				}
 			}).always(function () {
 				// anche in caso di errore: mai lasciare i tab bloccati
+				delete itemsRequestsInFlight[url];
 				setItemsLoading(false);
 			});
 
