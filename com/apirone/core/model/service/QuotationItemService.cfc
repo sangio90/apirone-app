@@ -173,25 +173,41 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
 
-		// Carica il bean esistente via batch getMany() per evitare la cascata N+1
-		var beanMap = getMany( [ arguments.quotationItem.getId() ] );
-		var oldBean = StructKeyExists( beanMap, arguments.quotationItem.getId() )
-			? beanMap[ arguments.quotationItem.getId() ]
-			: NullValue();
+		// Il confronto fra i frutti serve solo per gli ID: legge gli id esistenti
+		// con una sola query invece di ricaricare e ricostruire l'intero item con
+		// getMany() (cascata N+1 di build completi)
+		var oldFruitIds = [];
+		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+			var fruitRows = getQuotationItemFruitService().getDao().findByQuotationItemIds( [ arguments.quotationItem.getId() ] );
+			for ( var fruitRow in fruitRows ) {
+				oldFruitIds.append( fruitRow.quotation_item_fruit_id );
+			}
+		}
 
 		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
 			var fruitIdsToDeleted = [];
 
-			for ( var thisFruit in oldBean.getFruits() ) {
+			// Raccoglie gli id dei frutti nuovi valorizzati
+			// (i tappi ricalcolati hanno id vuoto)
+			var newFruitIds = [];
+			for ( var thisFruit in arguments.quotationItem.getFruits() ) {
+				if ( !IsNull( thisFruit.getId() ) && thisFruit.getId() != "" ) {
+					newFruitIds.append( thisFruit.getId() );
+				}
+			}
+
+			// Un frutto esistente assente fra i nuovi va eliminato
+			// (stessa semantica del vecchio confronto)
+			for ( var oldFruitId in oldFruitIds ) {
 				var found = false;
-				for ( var newFruit in arguments.quotationItem.getFruits() ) {
-					if ( !IsNull( thisFruit.getId() ) && thisFruit.getId() == newFruit.getId() ) {
+				for ( var newFruitId in newFruitIds ) {
+					if ( newFruitId == oldFruitId ) {
 						found = true;
 						break;
 					}
 				}
 				if ( !found ) {
-					fruitIdsToDeleted.add( thisFruit.getId() );
+					fruitIdsToDeleted.add( oldFruitId );
 				}
 			}
 		}
@@ -229,7 +245,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
-				var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
+				// Passa il bean già caricato: l'hash non contiene id di riga, quindi il
+				// bean in memoria (già sincronizzato con i frutti ricomputati) produce
+				// lo stesso hash di un reload completo
+				var hash = getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem );
 				if ( !IsNull( hash ) ) {
 					updateHash( arguments.quotationItem.getId(), hash );
 				}
@@ -885,7 +904,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return bean;
 	}
 
-	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing( required Struct data ){
+	/*
+		Recupera il pricing di una placca.
+		I parametri opzionali preloadedQuotation e preloadedQuotationItem permettono
+		al chiamante (es. aggiornaPrezzo nel ciclo sulle altre righe) di passare i
+		bean già caricati, evitando di ricostruire la stessa Quotation per ogni item (N+1).
+	*/
+	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing(
+		required Struct data,
+		preloadedQuotation = javacast( "null", "" ),
+		preloadedQuotationItem = javacast( "null", "" )
+	){
 
 		var json = arguments.data;
 
@@ -926,17 +955,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		//TODO debuggare qui per capire cosa fare per il discorso "ok placca senza frutti e aggiunta tappi"
-		var quotationItem = null;
-		if (json.item.id != "") {
+		// QuotationItem: se il chiamante l'ha già caricato viene riusato,
+		// altrimenti caricamento singolo originale
+		var quotationItem = arguments.preloadedQuotationItem;
+		if ( IsNull( quotationItem ) && json.item.id != "" ) {
 			var qiMap = getMany( [ json.item.id ] );
 			quotationItem = StructKeyExists( qiMap, json.item.id )
 				? qiMap[ json.item.id ]
 				: null;
 		}
 
-		var quotation = null;
-		if (json.quotationId != "") {
-			var qMap = super.service( "Quotation" ).getMany( [ json.quotationId ] );
+		// Quotation: se il chiamante l'ha già caricata viene riusata, altrimenti
+		// caricamento singolo originale
+		var quotation = arguments.preloadedQuotation;
+		if ( IsNull( quotation ) && json.quotationId != "" ) {
+			var qMap = getQuotationService().getMany( [ json.quotationId ] );
 			quotation = StructKeyExists( qMap, json.quotationId )
 				? qMap[ json.quotationId ]
 				: null;
@@ -1206,7 +1239,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing( required Struct data ){
+	/*
+		Recupera il pricing di un item signage. I parametri opzionali
+		preloadedQuotation e preloadedQuotationItem permettono al chiamante di
+		passare i bean già caricati, evitando un refetch per item (N+1).
+	*/
+	public com.apirone.core.model.bean.QuotationItemPrice function getSignagePricing(
+		required Struct data,
+		preloadedQuotation = javacast( "null", "" ),
+		preloadedQuotationItem = javacast( "null", "" )
+	){
 		var json = arguments.data;
 
 		var pricing = super.bean( "QuotationItemPrice" );
@@ -1253,12 +1295,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			lettersQuantity += Val( signageRow.charCount ) ? signageRow.charCount : 0;
 		}
 
-		var qMap = getQuotationService().getMany( [ json.quotationId ] );
-		var quotation = StructKeyExists( qMap, json.quotationId )
-			? qMap[ json.quotationId ]
-			: null;
-		var quotationItem = null;
-		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+		// Quotation: se il chiamante l'ha già caricata viene riusata, altrimenti
+		// caricamento singolo originale
+		var quotation = arguments.preloadedQuotation;
+		if ( IsNull( quotation ) ) {
+			var qMap = getQuotationService().getMany( [ json.quotationId ] );
+			quotation = StructKeyExists( qMap, json.quotationId )
+				? qMap[ json.quotationId ]
+				: null;
+		}
+
+		// QuotationItem: se il chiamante l'ha già caricato viene riusato,
+		// altrimenti caricamento singolo originale
+		var quotationItem = arguments.preloadedQuotationItem;
+		if ( IsNull( quotationItem ) && !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
 			var qiMap = getMany( [ json.quotationItem.id ] );
 			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
 				? qiMap[ json.quotationItem.id ]
@@ -1289,7 +1339,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return pricing;
 	}
 
-	public com.apirone.core.model.bean.QuotationItemPrice function getPricing( required Struct data ){
+	/*
+		Recupera il pricing di un item semplice (non placca/signage).
+		I parametri opzionali preloadedQuotation e preloadedQuotationItem permettono
+		al chiamante di passare i bean già caricati, evitando un refetch per item (N+1).
+	*/
+	public com.apirone.core.model.bean.QuotationItemPrice function getPricing(
+		required Struct data,
+		preloadedQuotation = javacast( "null", "" ),
+		preloadedQuotationItem = javacast( "null", "" )
+	){
 		var json = arguments.data;
 
 		var pricing = super.bean( "QuotationItemPrice" );
@@ -1331,12 +1390,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		var qMap = getQuotationService().getMany( [ json.quotationId ] );
-		var quotation = StructKeyExists( qMap, json.quotationId )
-			? qMap[ json.quotationId ]
-			: null;
-		var quotationItem = null;
-		if ( !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
+		// Quotation: se il chiamante l'ha già caricata viene riusata, altrimenti
+		// caricamento singolo originale
+		var quotation = arguments.preloadedQuotation;
+		if ( IsNull( quotation ) ) {
+			var qMap = getQuotationService().getMany( [ json.quotationId ] );
+			quotation = StructKeyExists( qMap, json.quotationId )
+				? qMap[ json.quotationId ]
+				: null;
+		}
+
+		// QuotationItem: se il chiamante l'ha già caricato viene riusato,
+		// altrimenti caricamento singolo originale
+		var quotationItem = arguments.preloadedQuotationItem;
+		if ( IsNull( quotationItem ) && !isNull( json.quotationItem.id ) && json.quotationItem.id != '' ) {
 			var qiMap = getMany( [ json.quotationItem.id ] );
 			quotationItem = StructKeyExists( qiMap, json.quotationItem.id )
 				? qiMap[ json.quotationItem.id ]
@@ -1411,6 +1478,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
 
+		// La Quotation è la stessa per tutte le righe: viene estratta una sola volta dai bean
+		// già caricati in batch e passata a ogni aggiornaPrezzo (evita il rebuild per item, N+1).
+		var sharedQuotation = NullValue();
+		for ( var loadedRow in rows ) {
+			if ( StructKeyExists( itemMap, loadedRow.quotation_item_id ) ) {
+				var itemQuotation = itemMap[ loadedRow.quotation_item_id ].getQuotation();
+				if ( !IsNull( itemQuotation ) ) {
+					sharedQuotation = itemQuotation;
+					break;
+				}
+			}
+		}
+
 		for ( var row in rows ) {
 			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
 				? itemMap[ row.quotation_item_id ]
@@ -1423,7 +1503,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem);
+			aggiornaPrezzo( quotationItem, sharedQuotation );
 		}
 	}
 
@@ -1445,6 +1525,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
 
+		// La Quotation è la stessa per tutte le righe: viene estratta una sola volta dai bean
+		// già caricati in batch e passata a ogni aggiornaPrezzo (evita il rebuild per item, N+1).
+		var sharedQuotation = NullValue();
+		for ( var loadedRow in rows ) {
+			if ( StructKeyExists( itemMap, loadedRow.quotation_item_id ) ) {
+				var itemQuotation = itemMap[ loadedRow.quotation_item_id ].getQuotation();
+				if ( !IsNull( itemQuotation ) ) {
+					sharedQuotation = itemQuotation;
+					break;
+				}
+			}
+		}
+
 		for ( var row in rows ) {
 			var quotationItem = StructKeyExists( itemMap, row.quotation_item_id )
 				? itemMap[ row.quotation_item_id ]
@@ -1458,11 +1551,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			aggiornaPrezzo(quotationItem);
+			aggiornaPrezzo( quotationItem, sharedQuotation );
 		}
 	}
 
-	public function aggiornaPrezzo( required quotationItem )
+	/*
+		Ricalcola il prezzo dell'item ricevuto.
+		Il parametro opzionale preloadedQuotation permette al chiamante (es.
+		aggiornaPrezzoAltriArticoli...) di passare la Quotation già caricata in
+		batch, evitando un refetch completo della Quotation per ogni riga (N+1).
+	*/
+	public function aggiornaPrezzo( required quotationItem, preloadedQuotation = javacast( "null", "" ) )
 	{
 		if (!isNull(quotationItem.getArticle())) {
 			return false;
@@ -1568,7 +1667,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			allFruits.append( realFruits, true );
 			allFruits.append( plugBeans, true );
 			quotationItem.setFruits( allFruits );
-			var price = getPlatePricing(json)
+			var price = getPlatePricing( json, preloadedQuotation, quotationItem )
 		}
 
 		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
@@ -1620,7 +1719,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			for ( var signageRow in quotationItem.getSignageRows() ) {
 				json.quotationItem.signageRows._data.append({ charCount = signageRow.getCharCount() });
 			}
-			var price = getSignagePricing(json)
+			var price = getSignagePricing( json, preloadedQuotation, quotationItem )
 		} elseif (isNull(quotationItem.getArticle()) && !IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
 			json = {
 				"quotationId": "",
@@ -1663,7 +1762,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					]
 				});
 			}
-			var price = getPricing(json)
+			var price = getPricing( json, preloadedQuotation, quotationItem )
 		}
 
 		quotationItem.setPrice( price )

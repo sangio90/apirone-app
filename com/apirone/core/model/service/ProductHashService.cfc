@@ -144,13 +144,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return NullValue();
 	}
 
-	public String function createHash( required String quotationItemId ){
-		// Carica il QuotationItem completo via batch getMany() invece del
-		// singolo get() -> buildFromRow() che causa cascata N+1
-		var beanMap        = getQuotationItemService().getMany( [ arguments.quotationItemId ] );
-		var quotationItem = StructKeyExists( beanMap, arguments.quotationItemId )
-			? beanMap[ arguments.quotationItemId ]
-			: NullValue();
+	/*
+		Calcola l'hash dell'item. Il parametro opzionale preloadedQuotationItem
+		(atteso: bean QuotationItem) permette al chiamante di riusare un bean già
+		caricato, evitando un secondo build completo dell'item.
+	*/
+	public String function createHash( required String quotationItemId, preloadedQuotationItem = javacast( "null", "" ) ){
+		// Senza bean pre-caricato: carica l'item completo via batch getMany()
+		// invece del singolo get() -> buildFromRow() che causa cascata N+1
+		var quotationItem = arguments.preloadedQuotationItem;
+		if ( IsNull( quotationItem ) ) {
+			var beanMap = getQuotationItemService().getMany( [ arguments.quotationItemId ] );
+			quotationItem = StructKeyExists( beanMap, arguments.quotationItemId )
+				? beanMap[ arguments.quotationItemId ]
+				: NullValue();
+		}
 
 		var jsonData = prepareQuotationItemJson( quotationItem );
 
