@@ -2,7 +2,7 @@
 
 <cfoutput>
     <nmscript type="text/x-kendo-template" id="quotation-grid-row-tmpl">
-        <tr class="k-master-row" data-uid="##: uid ##">
+        <tr class="k-master-row hand" data-uid="##: uid ##" title="Apri il preventivo">
              <td style="border-left: 4px solid ##=statusHistory.status.color.hex##">
                 <span data-bind="text: shortId"></span>
             </td>

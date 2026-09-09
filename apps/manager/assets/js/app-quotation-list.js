@@ -198,6 +198,26 @@ AP.quotation.list = ( function() {
 
         kendo.bind( AP.quotation.fields.listRoot, viewModel );
 
+        /*
+            Riga cliccabile: un click in un punto qualsiasi della riga apre il preventivo.
+            Restano esclusi i comandi (modifica, duplica, elimina, checkbox) e le loro celle,
+            così un click "vicino" a un bottone non porta via dalla lista; e una selezione
+            di testo con il mouse non viene scambiata per un click.
+        */
+        fields.listRoot.on( "click", "tr.k-master-row", function( e ) {
+            var target = $( e.target );
+            if ( target.closest( "a, button, input, label, .btn" ).length || target.closest( "td" ).hasClass( "text-center" ) ) {
+                return;
+            }
+            if ( window.getSelection && String( window.getSelection() ).length ) {
+                return;
+            }
+            var item = viewModel.get( "rows" ).getByUid( $( this ).data( "uid" ) );
+            if ( item && item.id ) {
+                window.location.href = "/manager/quotations/" + item.id;
+            }
+        } );
+
         viewModel.get( "rows" ).fetch( function() {
             AP.loading.hide();
             if ( $( "#quotation-status-filter" ).val() ) {
