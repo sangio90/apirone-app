@@ -1045,11 +1045,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						if ( isNull(quotationItem.getHash()) || Trim( quotationItem.getHash() ) == "" ) {
 							result.success = false;
 							result.error = 'Hash riga preventivo non trovata.';
+							return result;
 						}
 						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
 						if ( isNull(productHash) ) {
 							result.success = false;
 							result.error = 'Hash prodotto non trovato.';
+							return result;
 						}
 						//appurato che la riga di preventivo ha un hash associato e che l'hash corrisponda effettivamente ad un record sulla tabella degli hash
 						//cerchiamo se l'hash è gia stato associato ad un codice esportato in verticale.
@@ -1061,7 +1063,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 						} else {
 							//se non esiste nemmeno il varCode negli exported vuol dire che non è sicuramente mai stato fatta la export articoli
-							result.error = 'Prima esporta gli articoli. ' & code & varCode;
+							result.error = 'Prima esporta gli articoli.';
 							return result;
 						}
 

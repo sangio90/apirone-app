@@ -128,12 +128,114 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var records = getDao().find( argumentCollection = arguments );
 
+		// Prewarm verticale in batch: legge raw|variant|color di tutti i componenti
+		// trovati in una sola query (apirone) e precompila le memo ERP (listin +
+		// artico), così i priceCalculatorRead per componente non interrogano
+		// verticale uno alla volta.
+		if ( records.recordCount GT 0 ) {
+			var componentIdsForPrewarm = [];
+			records.each( function( record ){
+				ArrayAppend( componentIdsForPrewarm, record.component_id );
+			} );
+
+			var triplesForPrewarm = getDao().getComponentTriplesByComponentIds( componentIdsForPrewarm );
+			var prewarmTriples    = [];
+			var prewarmRawIds     = [];
+			var seenRawIds        = {};
+			triplesForPrewarm.each( function( t ){
+				if ( !IsNull( t.raw_product_id ) && Len( Trim( t.raw_product_id ) ) ) {
+					ArrayAppend( prewarmTriples, {
+						rawProductId = t.raw_product_id,
+						variantId    = t.variant_id,
+						colorId      = t.color_id
+					} );
+					if ( !StructKeyExists( seenRawIds, t.raw_product_id ) ) {
+						seenRawIds[ t.raw_product_id ] = true;
+						ArrayAppend( prewarmRawIds, t.raw_product_id );
+					}
+				}
+			} );
+			getDao().getComponentCostByTriples( prewarmTriples );
+			getDao().getRawProductDataByIds( prewarmRawIds );
+		}
+
 		records.each( function( record ){
 			var component = getDao().priceCalculatorRead( componentId = record.component_id, productItemId = !isNull(arguments.productItemId) ? arguments.productItemId : null )
 			rows.add(component)
 		} );
 
 		return rows
+	}
+
+	/**
+	 * Precarica in batch TUTTI i dati verticale (costi listin + nomi raw product) necessari al
+	 * calcolo prezzo di una placca: componenti own e attributo degli item selezionati, componenti
+	 * di placca/frutti/tappi e componenti linea+modello (bundle). Chiamato una sola volta a inizio
+	 * pricing (getPlatePricing) così i calcoli per frutto/tappo e i prewarm interni dei path di
+	 * calcolo non fanno più round trip verso l'ERP (memo già popolata, batch early-return).
+	 *
+	 * @productItemIds Array di productItemId (componenti own + attributo legati agli item selezionati)
+	 * @productIds      Array di productId (componenti di placca/frutti/tappi)
+	 * @lineId          Linea della placca (per i componenti bundle)
+	 * @modelId         Modello della placca (per i componenti bundle)
+	 */
+	public void function prewarmPricingComponents(
+		required Array productItemIds,
+		required Array productIds,
+		String lineId,
+		String modelId
+	){
+		var tripleMap = {};
+		var rawIdMap  = {};
+
+		// Collettore locale: deduplica le triple e raccoglie i raw id da qualsiasi set di record
+		var collectTriples = function( records ){
+			for ( var rec in records ) {
+				if ( !IsNull( rec.raw_product_id ) && Len( Trim( rec.raw_product_id ) ) ) {
+					tripleMap[ Trim( rec.raw_product_id ) & "|" & Trim( rec.variant_id ) & "|" & Trim( rec.color_id ) ] = {
+						rawProductId = rec.raw_product_id,
+						variantId    = rec.variant_id,
+						colorId      = rec.color_id
+					};
+					rawIdMap[ rec.raw_product_id ] = true;
+				}
+			}
+		};
+
+		if ( ArrayLen( arguments.productItemIds ) ) {
+			// Componenti own degli item (stessa sorgente del path item del calcolo prezzo)
+			collectTriples( getDao().priceCalculatorReadByProductItemIds( arguments.productItemIds ) );
+
+			// Componenti attributo degli item (l'altra sorgente del path item)
+			var piRecords = getProductItemDAO().readByIds( arguments.productItemIds );
+			var attrValueIds    = [];
+			var attrValueSeen   = {};
+			for ( var pi in piRecords ) {
+				if ( !IsNull( pi.attribute_raw_value_id ) && !StructKeyExists( attrValueSeen, pi.attribute_raw_value_id ) ) {
+					attrValueSeen[ pi.attribute_raw_value_id ] = true;
+					ArrayAppend( attrValueIds, pi.attribute_raw_value_id );
+				}
+			}
+			if ( ArrayLen( attrValueIds ) ) {
+				collectTriples( getDao().readByAttributeValueIds( attrValueIds ) );
+			}
+		}
+
+		if ( ArrayLen( arguments.productIds ) ) {
+			collectTriples( getDao().getComponentTriplesByProductIds( arguments.productIds ) );
+		}
+
+		if ( !IsNull( arguments.lineId ) && !IsNull( arguments.modelId ) ) {
+			collectTriples( getDao().getComponentTriplesByLineModel( arguments.lineId, arguments.modelId ) );
+		}
+
+		var triples = [];
+		for ( var tripleKey in tripleMap ) {
+			ArrayAppend( triples, tripleMap[ tripleKey ] );
+		}
+
+		getDao().getComponentCostByTriples( triples );
+		getDao().getRawProductDataByIds( StructKeyArray( rawIdMap ) );
 	}
 
 	/**
@@ -160,20 +262,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		// 1) Componenti "own" (product_item_id = pid) con override correlato in una sola query
 		var ownRecords = getDao().priceCalculatorReadByProductItemIds( arguments.productItemIds );
-		for ( var r in ownRecords ) {
-			var component = buildPriceCalculatorComponent(
-				id            = r.id,
-				isDeleted     = r.isDeleted,
-				totalQuantity = r.totalQuantity,
-				rawProductId  = r.raw_product_id,
-				variantId     = r.variant_id,
-				colorId       = r.color_id
-			);
-
-			if ( StructKeyExists( result, r.product_item_id ) ) {
-				ArrayAppend( result[ r.product_item_id ], component );
-			}
-		}
 
 		// 2) Componenti "base attribute" (attribute_raw_value_id) con override scoped per item
 		var piRecords = getProductItemDAO().readByIds( arguments.productItemIds );
@@ -198,8 +286,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
+		var attrRecords = [];
+		var overrideMap = {};
 		if ( ArrayLen( attrValueIds ) ) {
-			var attrRecords = getDao().readByAttributeValueIds( attrValueIds );
+			attrRecords = getDao().readByAttributeValueIds( attrValueIds );
 
 			// Raccoglie gli id dei componenti attributo e legge gli override in batch
 			var attrComponentIds = [];
@@ -207,7 +297,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				ArrayAppend( attrComponentIds, ar.component_id );
 			}
 
-			var overrideMap = {};
 			if ( ArrayLen( attrComponentIds ) ) {
 				var overrideRecords = getDao().readOverridesByComponentIdsAndProductItemIds(
 					componentIds   = attrComponentIds,
@@ -217,40 +306,89 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					overrideMap[ ov.component_id & "_" & ov.product_item_id ] = ov;
 				}
 			}
+		}
 
-			// Costruisce i componenti attributo per ogni product item (override scoped per item)
-			for ( var ar in attrRecords ) {
-				var pids = StructKeyExists( attrValueToPids, ar.attribute_raw_value_id )
-					? attrValueToPids[ ar.attribute_raw_value_id ]
-					: [];
+		// 3) Prewarm verticale in batch: una sola query listin (una riga per terna raw|variant|color,
+		// con la stessa priorità del singolo getComponentCost) e una sola query artico per i nomi.
+		// Riempie le memo per request così i build seguenti non interrogano l'ERP uno alla volta.
+		var tripleMap = {};
+		var rawIdMap  = {};
+		for ( var r in ownRecords ) {
+			if ( !IsNull( r.raw_product_id ) && Len( Trim( r.raw_product_id ) ) ) {
+				tripleMap[ Trim( r.raw_product_id ) & "|" & Trim( r.variant_id ) & "|" & Trim( r.color_id ) ] = {
+					rawProductId = r.raw_product_id,
+					variantId    = r.variant_id,
+					colorId      = r.color_id
+				};
+				rawIdMap[ r.raw_product_id ] = true;
+			}
+		}
+		for ( var ar in attrRecords ) {
+			if ( !IsNull( ar.raw_product_id ) && Len( Trim( ar.raw_product_id ) ) ) {
+				tripleMap[ Trim( ar.raw_product_id ) & "|" & Trim( ar.variant_id ) & "|" & Trim( ar.color_id ) ] = {
+					rawProductId = ar.raw_product_id,
+					variantId    = ar.variant_id,
+					colorId      = ar.color_id
+				};
+				rawIdMap[ ar.raw_product_id ] = true;
+			}
+		}
+		var triples = [];
+		for ( var tripleKey in tripleMap ) {
+			ArrayAppend( triples, tripleMap[ tripleKey ] );
+		}
+		getDao().getComponentCostByTriples( triples );
+		getDao().getRawProductDataByIds( StructKeyArray( rawIdMap ) );
 
-				for ( var pid in pids ) {
-					var overrideKey = ar.component_id & "_" & pid;
-					var overrideRow = StructKeyExists( overrideMap, overrideKey ) ? overrideMap[ overrideKey ] : NullValue();
+		// 4) Componenti "own": costruiti dopo il prewarm, i getComponentCost/getRawProductData interni
+		// trovano tutto già in memo (zero query ERP per componente)
+		for ( var r in ownRecords ) {
+			var component = buildPriceCalculatorComponent(
+				id            = r.id,
+				isDeleted     = r.isDeleted,
+				totalQuantity = r.totalQuantity,
+				rawProductId  = r.raw_product_id,
+				variantId     = r.variant_id,
+				colorId       = r.color_id
+			);
 
-					var isDeleted = false;
-					var totalQuantity = ar.quantity;
-					if ( !IsNull( overrideRow ) ) {
-						isDeleted = !IsNull( overrideRow.deleted ) && BooleanFormat( overrideRow.deleted );
-						if ( isDeleted ) {
-							totalQuantity = 0;
-						} else if ( !IsNull( overrideRow.quantity ) ) {
-							totalQuantity = ar.quantity + overrideRow.quantity;
-						}
+			if ( StructKeyExists( result, r.product_item_id ) ) {
+				ArrayAppend( result[ r.product_item_id ], component );
+			}
+		}
+
+		// 5) Costruisce i componenti attributo per ogni product item (override scoped per item)
+		for ( var ar in attrRecords ) {
+			var pids = StructKeyExists( attrValueToPids, ar.attribute_raw_value_id )
+				? attrValueToPids[ ar.attribute_raw_value_id ]
+				: [];
+
+			for ( var pid in pids ) {
+				var overrideKey = ar.component_id & "_" & pid;
+				var overrideRow = StructKeyExists( overrideMap, overrideKey ) ? overrideMap[ overrideKey ] : NullValue();
+
+				var isDeleted = false;
+				var totalQuantity = ar.quantity;
+				if ( !IsNull( overrideRow ) ) {
+					isDeleted = !IsNull( overrideRow.deleted ) && BooleanFormat( overrideRow.deleted );
+					if ( isDeleted ) {
+						totalQuantity = 0;
+					} else if ( !IsNull( overrideRow.quantity ) ) {
+						totalQuantity = ar.quantity + overrideRow.quantity;
 					}
+				}
 
-					var component = buildPriceCalculatorComponent(
-						id            = ar.component_id,
-						isDeleted     = isDeleted,
-						totalQuantity = totalQuantity,
-						rawProductId  = ar.raw_product_id,
-						variantId     = ar.variant_id,
-						colorId       = ar.color_id
-					);
+				var component = buildPriceCalculatorComponent(
+					id            = ar.component_id,
+					isDeleted     = isDeleted,
+					totalQuantity = totalQuantity,
+					rawProductId  = ar.raw_product_id,
+					variantId     = ar.variant_id,
+					colorId       = ar.color_id
+				);
 
-					if ( StructKeyExists( result, pid ) ) {
-						ArrayAppend( result[ pid ], component );
-					}
+				if ( StructKeyExists( result, pid ) ) {
+					ArrayAppend( result[ pid ], component );
 				}
 			}
 		}

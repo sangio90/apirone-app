@@ -8,6 +8,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="ProductService" inject="ProductService";
+	property name="ComponentService" inject="ComponentService";
 	property name="StatusService" inject="StatusService";
 	property name="ArticleService" inject="ArticleService";
 	property name="ProductHashService" inject="ProductHashService";
@@ -988,6 +989,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var productMap = getProductService().getMany( productIdsToPreload );
+
+		// Prewarm verticale: una sola coppia di query listin/artico per TUTTA la placca
+		// (componenti degli item selezionati di placca e frutti + componenti dei prodotti
+		// placca/frutti/tappi). I prewarm interni dei calcoli per frutto non fanno più round trip.
+		var allProductItemIds = duplicate( productItemsIds );
+		for ( var fruitItem in json.item.fruits._data ) {
+			for ( var fruitItemValue in fruitItem.items._data ) {
+				for ( var value in fruitItemValue.values ) {
+					if ( value.selected ) {
+						allProductItemIds.add( value.productItemId );
+					}
+				}
+			}
+		}
+
+		getComponentService().prewarmPricingComponents(
+			productItemIds = allProductItemIds,
+			productIds     = productIdsToPreload,
+			lineId         = productMap[ product.id ].getLine().getId(),
+			modelId        = productMap[ product.id ].getModel().getId()
+		);
 
 		var platePrice = calculator.calculate(
 			product.id,
