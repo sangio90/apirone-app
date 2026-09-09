@@ -111,6 +111,26 @@ AP.quotation.detail = (function () {
 		});
 	};
 
+	/*
+	 * Stato "sto caricando le righe": spinner sopra le liste, tab Placche/Segnaletiche/
+	 * Accessori/Servizi disabilitati e liste attenuate. Un contatore gestisce le richieste
+	 * sovrapposte (es. cambio tab rapido): lo spinner sparisce quando finisce l'ultima.
+	 */
+	var itemsLoadingCount = 0;
+	var setItemsLoading = function (loading) {
+		itemsLoadingCount = Math.max(0, itemsLoadingCount + (loading ? 1 : -1));
+		var active = itemsLoadingCount > 0;
+		$("#quotation-items-loader").toggle(active);
+		$("#nav-plate-tab, #nav-signage-tab, #nav-accessory-tab, #nav-article-tab").prop("disabled", active);
+		$("#nav-tabContent .tab-pane").css({ opacity: active ? 0.4 : "", pointerEvents: active ? "none" : "" });
+		// cursore "vietato" e tab attenuati (regole in quotation.css) + spinner piccolo sul tab che sta caricando
+		$("#nav-tab").toggleClass("items-loading", active);
+		$("#nav-tab .tab-loading-spinner").remove();
+		if (active) {
+			$("#nav-" + viewModel.get("typeId") + "-tab").append('<span class="spinner-border spinner-border-sm ms-2 tab-loading-spinner" role="status" aria-hidden="true"></span>');
+		}
+	};
+
 	var setQuotationItems = function (items, typeId) {
 		if (!typeId) typeId = viewModel.get("typeId");
 
@@ -756,6 +776,10 @@ AP.quotation.detail = (function () {
 			}
 
 			var requestTypeId = typeId;
+			setItemsLoading(true);
+			// Svuota subito la lista del tab richiesto: durante il caricamento non si devono
+			// vedere le righe del caricamento precedente (es. le 22 placche di prima).
+			setQuotationItems([], requestTypeId);
 			NM.util.ajax({
 				method: "GET",
 				url: url,
@@ -775,6 +799,9 @@ AP.quotation.detail = (function () {
 						setTimeout(initSortable, 150);
 					}
 				}
+			}).always(function () {
+				// anche in caso di errore: mai lasciare i tab bloccati
+				setItemsLoading(false);
 			});
 
 			return false;

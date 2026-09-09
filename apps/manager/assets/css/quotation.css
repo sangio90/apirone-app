@@ -339,3 +339,20 @@ input#input-item-total[readonly] {
 	border-radius: 4px;
 	visibility: visible !important;
 }
+
+/*
+ * Tab righe preventivo (Placche/Segnaletiche/Accessori/Servizi) durante il caricamento:
+ * i bottoni sono disabled (Bootstrap mette pointer-events: none), quindi il cursore
+ * "vietato" va sul contenitore; i tab non attivi vengono attenuati e barrati dal cursore.
+ */
+#nav-tab.items-loading .d-flex {
+	cursor: not-allowed;
+}
+#nav-tab.items-loading .nav-link {
+	opacity: 0.45;
+	filter: grayscale(1);
+}
+#nav-tab.items-loading .nav-link.active {
+	opacity: 1;
+	filter: none;
+}

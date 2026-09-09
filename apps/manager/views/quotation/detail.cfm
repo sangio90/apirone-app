@@ -159,6 +159,11 @@
                                     </nav>
 
                                     <div class="tab-content" id="nav-tabContent">
+                                        <!--- Spinner mostrato da loadItems() mentre carica le righe del tab attivo; nel frattempo i tab sono disabilitati --->
+                                        <div id="quotation-items-loader" class="text-center py-5" style="display: none;">
+                                            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento</span></div>
+                                            <div class="text-muted mt-2">Caricamento articoli in corso...</div>
+                                        </div>
                                         <div class="tab-pane fade show active" id="nav-plate" role="tabpanel">
                                             <div>
                                                 <div id="qt-items-plate" data-template="quotation-item-preview-tmpl" data-bind="source: quotationItemsPlate" class="row">
