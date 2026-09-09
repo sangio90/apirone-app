@@ -198,6 +198,209 @@
 		<cfreturn dataMemo[ arguments.rawProductId ]>
 	</cffunction>
 
+	<!---
+		Legge in UNA sola query (apirone) raw_product_id/variant_id/color_id di più componenti.
+		Serve per precompilare le memo di verticale prima dei priceCalculatorRead per componente.
+	--->
+	<cffunction name="getComponentTriplesByComponentIds" returntype="Query" access="public">
+		<cfargument name="componentIds" type="Array" required="true">
+
+		<cfquery name="q" datasource="apirone">
+			SELECT
+				c.component_id   AS component_id,
+				c.raw_product_id AS raw_product_id,
+				c.variant_id     AS variant_id,
+				c.color_id       AS color_id
+			FROM components c
+			WHERE c.component_id IN (
+				<cfqueryparam value="#ArrayToList( arguments.componentIds )#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn q>
+	</cffunction>
+
+	<!---
+		Legge in una sola query (apirone) raw_product_id/variant_id/color_id di tutti i componenti
+		di più prodotti (placca + frutti + tappi). Serve per il prewarm verticale a inizio pricing.
+	--->
+	<cffunction name="getComponentTriplesByProductIds" returntype="Query" access="public">
+		<cfargument name="productIds" type="Array" required="true">
+
+		<cfquery name="q" datasource="apirone">
+			SELECT
+				c.component_id   AS component_id,
+				c.raw_product_id AS raw_product_id,
+				c.variant_id     AS variant_id,
+				c.color_id       AS color_id
+			FROM components c
+			WHERE c.product_id = ANY( ARRAY[<cfqueryparam value="#ArrayToList( arguments.productIds )#" list="true" cfsqltype="varchar">]::uuid[] )
+		</cfquery>
+
+		<cfreturn q>
+	</cffunction>
+
+	<!---
+		Legge in una sola query (apirone) raw_product_id/variant_id/color_id dei componenti
+		linea+modello (i "bundle" del calcolo prezzo). Serve per il prewarm verticale a inizio pricing.
+	--->
+	<cffunction name="getComponentTriplesByLineModel" returntype="Query" access="public">
+		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="modelId" type="String" required="true">
+
+		<cfquery name="q" datasource="apirone">
+			SELECT
+				c.component_id   AS component_id,
+				c.raw_product_id AS raw_product_id,
+				c.variant_id     AS variant_id,
+				c.color_id       AS color_id
+			FROM components c
+			WHERE c.line_id = <cfqueryparam value="#arguments.lineId#" cfsqltype="varchar">::uuid
+			AND c.model_id = <cfqueryparam value="#arguments.modelId#" cfsqltype="varchar">::uuid
+		</cfquery>
+
+		<cfreturn q>
+	</cffunction>
+
+	<!---
+		Recupera in UNA sola query verticale i costi (lispre) di tutte le triple raw|variant|color pendenti.
+		Per ogni terna è applicata la STESSA priorità del singolo getComponentCost():
+		variant+color ( 1 ), solo variant ( 2 ), solo color ( 3 ), qualsiasi riga ( 4 ).
+		Riempie la memo per request: i successivi getComponentCost() restituiscono il costo senza toccare l'ERP.
+	--->
+	<cffunction name="getComponentCostByTriples" returntype="void" access="public">
+		<cfargument name="triples" type="Array" required="true">
+
+		<cfif NOT ArrayLen( arguments.triples )>
+			<cfreturn>
+		</cfif>
+
+		<cfset var costMemo = getVerticaleMemo( "_componentCostCache" )>
+
+		<!--- Scarta le triple già presenti in memo: la query interroga solo il necessario. --->
+		<cfset var pending = []>
+		<cfloop array="#arguments.triples#" index="t">
+			<cfset var memoKey = Trim( t.rawProductId ) & "|" & Trim( t.variantId ) & "|" & Trim( t.colorId )>
+			<cfif NOT StructKeyExists( costMemo, memoKey )>
+				<cfset ArrayAppend( pending, {
+					rawProductId = Trim( t.rawProductId ),
+					variantId    = Trim( t.variantId ),
+					colorId      = Trim( t.colorId )
+				} )>
+			</cfif>
+		</cfloop>
+
+		<cfif NOT ArrayLen( pending )>
+			<cfreturn>
+		</cfif>
+
+		<!---
+			OUTER APPLY esegue la sottoquery ( SELECT TOP 1 ... ) una volta PER OGNI riga della lista
+			valori t: è l'equivalente per-riga di un LEFT JOIN con TOP 1. Se per una terna non esiste
+			nessuna riga di listino, la sottoquery non produce righe e la riga di t resta comunque nel
+			resultato con lispre NULL. Il CASE nell'ORDER BY replica l'ordine di
+			priorità del singolo getComponentCost(): terna esatta, poi variant, poi color, poi qualsiasi.
+		--->
+		<cfquery name="costsByTriple" datasource="verticale">
+			SELECT
+				t.rawProductId AS rawProductId,
+				t.variantId    AS variantId,
+				t.colorId      AS colorId,
+				best.lispre    AS lispre
+			FROM (
+				VALUES
+				<cfloop array="#pending#" index="i" item="p">
+					<cfif i GT 1>,</cfif>
+					(
+						<cfqueryparam value="#p.rawProductId#" cfsqltype="varchar">,
+						<cfqueryparam value="#p.variantId#" cfsqltype="varchar">,
+						<cfqueryparam value="#p.colorId#" cfsqltype="varchar">
+					)
+				</cfloop>
+			) AS t ( rawProductId, variantId, colorId )
+			OUTER APPLY (
+				SELECT TOP 1 lispre
+				FROM azapi_listin l
+				WHERE TRIM(lisart) = TRIM(t.rawProductId)
+				AND (
+					( TRIM(liscvr) = TRIM(t.variantId) AND TRIM(liscol) = TRIM(t.colorId) )
+					OR TRIM(liscvr) = TRIM(t.variantId)
+					OR TRIM(liscol) = TRIM(t.colorId)
+					OR 1=1
+				)
+				ORDER BY
+					CASE
+						WHEN TRIM(liscvr) = TRIM(t.variantId) AND TRIM(liscol) = TRIM(t.colorId) THEN 1
+						WHEN TRIM(liscvr) = TRIM(t.variantId) THEN 2
+						WHEN TRIM(liscol) = TRIM(t.colorId) THEN 3
+						ELSE 4
+					END
+			) best
+		</cfquery>
+
+		<!--- Stessa normalizzazione del singolo getComponentCost: lispre assente o vuota diventa 0. --->
+		<cfloop query="costsByTriple">
+			<cfset var memoKey2 = Trim( costsByTriple.rawProductId ) & "|" & Trim( costsByTriple.variantId ) & "|" & Trim( costsByTriple.colorId )>
+			<cfset var componentCost = 0>
+			<cfif Len( costsByTriple.lispre )>
+				<cfset componentCost = costsByTriple.lispre>
+			</cfif>
+			<cfset costMemo[ memoKey2 ] = componentCost>
+		</cfloop>
+	</cffunction>
+
+	<!---
+		Recupera in UNA sola query verticale nome e tipo di lavorazione di tutti i raw product pendenti.
+		Riempie la memo per request: i successivi getRawProductData() non toccano l'ERP.
+		Le chiavi restano i valori passati così come sono (stesso comportamento del singolo getRawProductData).
+	--->
+	<cffunction name="getRawProductDataByIds" returntype="void" access="public">
+		<cfargument name="rawProductIds" type="Array" required="true">
+
+		<cfset var dataMemo = getVerticaleMemo( "_rawProductCache" )>
+
+		<!--- Scarta gli id già in memo o vuoti. --->
+		<cfset var pendingIds = []>
+		<cfloop array="#arguments.rawProductIds#" index="rid">
+			<cfif NOT StructKeyExists( dataMemo, rid ) AND Len( Trim( rid ) )>
+				<cfset ArrayAppend( pendingIds, rid )>
+			</cfif>
+		</cfloop>
+
+		<cfif NOT ArrayLen( pendingIds )>
+			<cfreturn>
+		</cfif>
+
+		<cfquery name="rawProductsById" datasource="verticale">
+			SELECT
+				a.arcodart AS arcodart,
+				a.ardesart AS ardesart,
+				CASE WHEN a.artipmat = 'LAV' THEN 'LV' ELSE 'MP' END AS raw_product_processiong_type
+			FROM azapi_artico a
+			WHERE a.arcodart IN (
+				<cfqueryparam value="#ArrayToList( pendingIds )#" list="true" cfsqltype="varchar">
+			)
+		</cfquery>
+
+		<cfset var rowsByName = {}>
+		<cfloop query="rawProductsById">
+			<cfset rowsByName[ Trim( rawProductsById.arcodart ) ] = {
+				"raw_product_name"             = rawProductsById.ardesart,
+				"raw_product_processiong_type" = rawProductsById.raw_product_processiong_type
+			}>
+		</cfloop>
+
+		<!--- Chiave della memo: l'id COSÌ COME passato dal chiamante (stesso comportamento del singolo
+			getRawProductData, che interroga arcodart = valore esatto ignorando gli spazi finali). --->
+		<cfloop array="#pendingIds#" index="rid">
+			<cfif StructKeyExists( rowsByName, Trim( rid ) )>
+				<cfset dataMemo[ rid ] = rowsByName[ Trim( rid ) ]>
+			<cfelse>
+				<cfset dataMemo[ rid ] = { "raw_product_name" = "", "raw_product_processiong_type" = "" }>
+			</cfif>
+		</cfloop>
+	</cffunction>
+
 	<cffunction returntype="Query" name="find">
 		<cfargument name="lineId" type="String">
 		<cfargument name="modelId" type="String">
