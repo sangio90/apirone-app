@@ -724,7 +724,7 @@
 
 		<cfquery datasource="verticaleExport">
 			INSERT INTO ORDINI_APIR (
-				CF_IDCLI, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
+				CF_IDCLI, CF___CAP, CFBLOCCO, CFDESCR1, CFINDIRI, CFLOCALI, CFMOROSO, CFPARIVA,
 				CFPROVIN, CFREFAMM, CFSTAISO, CFTELEFO, CPROWNUM, CPROWORD, DEDESDOD, DEDESMER,
 				DEIDDMER, DEINDDOD, DEINDMER, DELOCDOD, DELOCMER, DENAZDOD, DENAZMER,
 				DEPRODOD, DEPROMER, DECAPDOC, DECAPDES, MM_STATO, CFLINGUA, MMCODAGE, MMCODAG2, MMCODAG3, MMCODAG4,
@@ -737,6 +737,7 @@
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.CF___CAP ?: '',10)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFBLOCCO,1)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFDESCR1,40)#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.CFINDIRI,35)#" cfsqltype="varchar">,
