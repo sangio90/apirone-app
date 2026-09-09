@@ -88,7 +88,11 @@ component {
 		// Track stats: inizio timing
 		var startTick = GetTickCount();
 
-		var target = Duplicate( arguments.target );
+		// Nessun Duplicate() del target: convert() legge soltanto (invoca i getter) e non
+		// modifica mai l'oggetto, mentre la copia profonda dell'intero grafo (prodotto,
+		// frutti, preventivo, posizioni...) ripetuta anche per ogni oggetto annidato costava
+		// il 90% del tempo delle liste (22 placche: 2,5 s di conversione contro 0,2 s).
+		var target = arguments.target;
 
 		var metadata = $getCachedMetadata( target );
 		var entityName = metadata.keyExists( "fullname" ) ? ListLast( metadata.fullname, "." ) : "";
