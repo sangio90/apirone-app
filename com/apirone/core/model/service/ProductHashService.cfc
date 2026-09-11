@@ -248,7 +248,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				});
 
 				for (var fruitRow in fruitRows) {
-					fruitItems.append({ "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) });
+					var fruitItem = { "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) };
+
+					// la posizione dell'incisione fa parte della configurazione: la stessa
+					// combinazione con il simbolo in due posizioni diverse è un articolo diverso.
+					// La chiave si aggiunge solo quando c'è un marker, così gli hash già
+					// calcolati (e i codici export collegati) restano validi.
+					if ( !IsNull( fruitRow.getEngravingMarkerId() ) ) {
+						fruitItem[ "engravingMarkerId" ] = fruitRow.getEngravingMarkerId();
+					}
+
+					fruitItems.append( fruitItem );
 				}
 			}
 

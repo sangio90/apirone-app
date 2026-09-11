@@ -282,6 +282,44 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/**
+	 * Nodo "incisione" per l'export 3D: griglia (codice attributo radice), numero del marker
+	 * e coordinate del centro dell'incisione, sia in px dell'immagine orizzontale del frutto
+	 * sia in mm dall'angolo in alto a sinistra. Null se il valore non è posizionato.
+	 */
+	private Any function buildEngravingJson( required quotationItemProductItem ){
+		var qipi = arguments.quotationItemProductItem;
+
+		if ( IsNull( qipi.getEngravingMarkerId() ) && IsNull( qipi.getEngravingXMm() ) ) {
+			return NullValue();
+		}
+
+		var griglia = "";
+		var marker  = "";
+
+		if ( !IsNull( qipi.getEngravingMarkerId() ) ) {
+			var markerBean = super.service( "ProductEngravingMarker" ).get( qipi.getEngravingMarkerId() );
+
+			if ( !IsNull( markerBean ) && !IsNull( markerBean.getId() ) && Len( markerBean.getId() ) ) {
+				marker = markerBean.getOrder();
+
+				var attribute = super.service( "Attribute" ).get( markerBean.getAttributeId() );
+				if ( !IsNull( attribute ) ) {
+					griglia = attribute.getCode();
+				}
+			}
+		}
+
+		return {
+			"griglia" = griglia,
+			"marker"  = marker,
+			"x_px"    = ( IsNull( qipi.getEngravingXPx() ) ? "" : qipi.getEngravingXPx() ),
+			"y_px"    = ( IsNull( qipi.getEngravingYPx() ) ? "" : qipi.getEngravingYPx() ),
+			"x_mm"    = ( IsNull( qipi.getEngravingXMm() ) ? "" : qipi.getEngravingXMm() ),
+			"y_mm"    = ( IsNull( qipi.getEngravingYMm() ) ? "" : qipi.getEngravingYMm() )
+		};
+	}
+
 	private Struct function build3dItemJson( required item, String langId = "IT" ){
 		var codiceArticolo = "";
 		var codiceVariante = "";
@@ -395,12 +433,20 @@ component extends="com.apirone.core.controller.AbsController" {
 			if ( !isNull( fruit.getItems() ) ) {
 				for ( var qif in fruit.getItems() ) {
 					var pif = qif.getProductItem();
-					ArrayAppend( attributiFrutto, {
+					var attributoFrutto = {
 						"attributo"      = pif.getAttribute().getName( arguments.langId ),
 						"attributo_code" = pif.getAttribute().getCode(),
 						"valore"         = pif.getAttributeValue().getName( arguments.langId ),
 						"valore_code"    = !isNull( pif.getAttributeValue().getRawValue() ) ? pif.getAttributeValue().getRawValue().getCode() : ""
-					});
+					};
+
+					// posizione dell'incisione scelta sulla griglia del frutto (solo sul simbolo)
+					var incisione = buildEngravingJson( qif );
+					if ( !IsNull( incisione ) ) {
+						attributoFrutto[ "incisione" ] = incisione;
+					}
+
+					ArrayAppend( attributiFrutto, attributoFrutto );
 				}
 			}
 			ArrayAppend( frutti, {
@@ -996,6 +1042,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			? super.service( "ProductItem" ).getMany( selectedProductItemIds )
 			: {};
 
+		var engravingService = super.service( "ProductEngravingMarker" );
+
 		for ( var thisFruit in json.item.fruits._data ) {
 
 			var positions = json.positions[ thisFruit.id ];
@@ -1042,6 +1090,25 @@ component extends="com.apirone.core.controller.AbsController" {
 						productItemBean.setNote( selectedValue.note );
 					}
 					productItemBean.setLevel( productItemRow.level );
+
+					// griglia incisioni: posizione scelta per il simbolo. Il marker arriva dal
+					// client, ma le coordinate si rileggono dal db (il preventivo non deve
+					// cambiare se la griglia del frutto viene modificata dopo il salvataggio).
+					if ( !IsNull( selectedValue.engravingMarkerId ) && Len( selectedValue.engravingMarkerId ) ) {
+						var engravingMarker = engravingService.findMarkerForProductItem(
+							productEngravingMarkerId = selectedValue.engravingMarkerId,
+							productItemId            = selectedValue.productItemId,
+							productId                = product.getId()
+						);
+
+						if ( !IsNull( engravingMarker ) ) {
+							productItemBean.setEngravingMarkerId( engravingMarker.getId() );
+							productItemBean.setEngravingXPx( engravingMarker.getXPx() );
+							productItemBean.setEngravingYPx( engravingMarker.getYPx() );
+							productItemBean.setEngravingXMm( engravingMarker.getXMm() );
+							productItemBean.setEngravingYMm( engravingMarker.getYMm() );
+						}
+					}
 
 					items.add( productItemBean );
 				}

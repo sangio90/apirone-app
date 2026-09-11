@@ -190,6 +190,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				itemBean.setQuotationItemId( ir.quotation_item_id );
 				itemBean.setLevel( ir.level );
 				itemBean.setNote( ir.note );
+				if ( !IsNull( ir.engraving_marker_id ) ) itemBean.setEngravingMarkerId( ir.engraving_marker_id );
+				if ( !IsNull( ir.engraving_x_px ) ) itemBean.setEngravingXPx( ir.engraving_x_px );
+				if ( !IsNull( ir.engraving_y_px ) ) itemBean.setEngravingYPx( ir.engraving_y_px );
+				if ( !IsNull( ir.engraving_x_mm ) ) itemBean.setEngravingXMm( ir.engraving_x_mm );
+				if ( !IsNull( ir.engraving_y_mm ) ) itemBean.setEngravingYMm( ir.engraving_y_mm );
 				// product_item_id salvato temporaneamente per il lookup batch
 				itemBean._productItemId = ir.product_item_id;
 				ArrayAppend( itemMap[ fruitId ], itemBean );

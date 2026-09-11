@@ -55,10 +55,12 @@
 				pi.orderby,
 				arv.attribute_raw_value_id,
 				arv.attribute_id::varchar AS attribute_id,
+				a.code AS attribute_code,
 				arv.allow_note,
 				arv.raw_value_id
 			FROM product_items pi
 			INNER JOIN attributes_raw_values arv USING ( attribute_raw_value_id )
+			INNER JOIN attributes a ON a.attribute_id = arv.attribute_id
 			WHERE pi.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
 				<cfif !IsNull( arguments.originId )>
 					AND pi.origin_id = <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">

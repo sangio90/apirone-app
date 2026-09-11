@@ -13,6 +13,11 @@
 		"origin",
 		"origin.attribute",
 		"level",
-		"note"
+		"note",
+		"engravingMarkerId",
+		"engravingXPx",
+		"engravingYPx",
+		"engravingXMm",
+		"engravingYMm"
 	]
 }

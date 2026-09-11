@@ -210,6 +210,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				"orderby"  = r.orderby,
 				"attribute" = {
 					"id"   = r.attribute_id,
+					"code" = r.attribute_code,
 					"name" = ( StructKeyExists( attrTextMap, r.attribute_id ) ? attrTextMap[ r.attribute_id ] : "** Not found" )
 				},
 				"attributeValue" = {

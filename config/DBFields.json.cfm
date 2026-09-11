@@ -320,6 +320,15 @@
         "type": "Integer"
     },
 
+    "productEngravingMarker.order": {
+        "name": "\"order\"",
+        "type": "Integer"
+    },
+    "productEngravingMarker.id": {
+        "name": "product_engraving_marker_id",
+        "type": "Integer"
+    },
+
     "frameBlock.order": {
         "name": "\"order\"",
         "type": "Integer"

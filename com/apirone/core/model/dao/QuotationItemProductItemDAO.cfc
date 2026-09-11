@@ -90,7 +90,12 @@
 				origin_id,
 				product_item_id,
 				level,
-				note
+				note,
+				engraving_marker_id,
+				engraving_x_px,
+				engraving_y_px,
+				engraving_x_mm,
+				engraving_y_mm
 			) VALUES (
 
 				<cfif !IsNull( arguments.productItem.getQuotationItemId() )>
@@ -118,7 +123,12 @@
 					<cfqueryparam cfsqltype="Text" value="#arguments.productItem.getNote()#">
 				<cfelse>
 					NULL
-				</cfif>
+				</cfif>,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getEngravingMarkerId() ?: 0#" null="#IsNull( arguments.productItem.getEngravingMarkerId() )#">,
+				<cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingXPx() ?: 0#" null="#IsNull( arguments.productItem.getEngravingXPx() )#">,
+				<cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingYPx() ?: 0#" null="#IsNull( arguments.productItem.getEngravingYPx() )#">,
+				<cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingXMm() ?: 0#" null="#IsNull( arguments.productItem.getEngravingXMm() )#">,
+				<cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingYMm() ?: 0#" null="#IsNull( arguments.productItem.getEngravingYMm() )#">
 			)
 			RETURNING quotation_item_product_item_id
 		</cfquery>
@@ -160,7 +170,12 @@
 						<cfqueryparam cfsqltype="Text" value="#arguments.productItem.getNote()#">
 					<cfelse>
 						NULL
-					</cfif>
+					</cfif>,
+				engraving_marker_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productItem.getEngravingMarkerId() ?: 0#" null="#IsNull( arguments.productItem.getEngravingMarkerId() )#">,
+				engraving_x_px = <cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingXPx() ?: 0#" null="#IsNull( arguments.productItem.getEngravingXPx() )#">,
+				engraving_y_px = <cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingYPx() ?: 0#" null="#IsNull( arguments.productItem.getEngravingYPx() )#">,
+				engraving_x_mm = <cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingXMm() ?: 0#" null="#IsNull( arguments.productItem.getEngravingXMm() )#">,
+				engraving_y_mm = <cfqueryparam cfsqltype="Decimal" scale="2" value="#arguments.productItem.getEngravingYMm() ?: 0#" null="#IsNull( arguments.productItem.getEngravingYMm() )#">
 			WHERE
 				quotation_item_product_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productItem.getId()#">::uuid
 		</cfquery>

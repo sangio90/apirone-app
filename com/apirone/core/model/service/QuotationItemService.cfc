@@ -616,6 +616,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				qipiBean.setQuotationItemId( qr.quotation_item_id );
 				qipiBean.setLevel( qr.level );
 				qipiBean.setNote( qr.note );
+				if ( !IsNull( qr.engraving_marker_id ) ) qipiBean.setEngravingMarkerId( qr.engraving_marker_id );
+				if ( !IsNull( qr.engraving_x_px ) ) qipiBean.setEngravingXPx( qr.engraving_x_px );
+				if ( !IsNull( qr.engraving_y_px ) ) qipiBean.setEngravingYPx( qr.engraving_y_px );
+				if ( !IsNull( qr.engraving_x_mm ) ) qipiBean.setEngravingXMm( qr.engraving_x_mm );
+				if ( !IsNull( qr.engraving_y_mm ) ) qipiBean.setEngravingYMm( qr.engraving_y_mm );
 				// ProductItem: dalla mappa pre-caricata
 				if ( !IsNull( qr.product_item_id ) && StructKeyExists( qipiProductItemMap, qr.product_item_id ) ) {
 					qipiBean.setProductItem( qipiProductItemMap[ qr.product_item_id ] );

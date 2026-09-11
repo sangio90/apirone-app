@@ -356,3 +356,71 @@ input#input-item-total[readonly] {
 	opacity: 1;
 	filter: none;
 }
+
+/* ---------------------------------------------------------------------------
+   Griglia incisioni: simbolo posizionato sul frutto nella modale placca.
+   Il contenitore usa lo stesso box degli altri overlay (ruotato per i frutti
+   verticali), quindi le coordinate dei marker restano quelle dell'immagine
+   orizzontale del frutto.
+   --------------------------------------------------------------------------- */
+.fruit-engraving-layer {
+    pointer-events: none;
+}
+
+.fruit-engraving-snap {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border: 1px dashed rgba(0, 0, 0, .5);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .35);
+    opacity: 0;
+    transition: opacity .15s ease-in-out;
+}
+
+.fruit-engraving-layer.is-dragging .fruit-engraving-snap {
+    opacity: 1;
+}
+
+.fruit-engraving-snap.is-target {
+    border-color: #2e7d32;
+    border-style: solid;
+    background: rgba(46, 125, 50, .35);
+}
+
+.fruit-engraving-symbol {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: left .08s ease-out, top .08s ease-out;
+    pointer-events: none;
+}
+
+.fruit-engraving-symbol.is-draggable {
+    pointer-events: auto;
+    cursor: grab;
+}
+
+.fruit-engraving-symbol.is-dragging {
+    cursor: grabbing;
+    outline: 1px dashed rgba(46, 125, 50, .9);
+    transition: none;
+}
+
+.fruit-engraving-note {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.fruit-engraving-missing {
+    font-size: 11px;
+    color: #b35c00;
+}
+
+.fruit-engraving-symbol.is-empty {
+    border: 1px dashed rgba(0, 0, 0, .55);
+    background-color: rgba(255, 255, 255, .25);
+}

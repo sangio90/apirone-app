@@ -226,6 +226,12 @@
                                                                         {{ val.attributeValue && val.attributeValue.rawValue ? val.attributeValue.rawValue.name : (val.attributeValue && val.attributeValue.name ? val.attributeValue.name : '') }}
                                                                     </option>
                                                                 </select>
+                                                                <template v-if="engravingPositionLabel(fruit, fi)">
+                                                                    <!--- Griglia incisioni: posizione scelta per il simbolo. Il valore si cambia trascinando il simbolo sull'anteprima della placca (snap ai marker della griglia del frutto). --->
+                                                                    <div class="fruit-engraving-note mb-2" :style="{ marginLeft: (1.5 * ((fi.level || 0) + 1)) + 'rem' }">
+                                                                        {{ engravingPositionLabel(fruit, fi) }}
+                                                                    </div>
+                                                                </template>
                                                                 <template v-if="checkIfSelectedAllowsNote(fi)">
                                                                     <label class="mb-1" :style="{ marginLeft: (1.5 * ((fi.level || 0) + 1)) + 'rem', fontSize: '11px' }">NOTE</label>
                                                                     <input
@@ -238,6 +244,10 @@
                                                                 </template>
                                                             </div>
                                                         </template>
+                                                        <div v-if="engravingWarning(fruit)" class="fruit-engraving-missing mb-2">
+                                                        <!--- Avviso non bloccante: il frutto ha un simbolo inciso ma nessuna griglia definita sulla scheda prodotto, quindi il simbolo resta centrato come prima. --->
+                                                            <i class="fa fa-triangle-exclamation"></i> {{ engravingWarning(fruit) }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div v-if="getFruitCount === 0" class="text-center mt-4">

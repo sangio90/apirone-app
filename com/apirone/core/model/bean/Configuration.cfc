@@ -17,6 +17,14 @@ component output="true" accessors="true" {
 				"directory" = { "prefix" = settings.get( "font.prefix" ) }
 			},
 			"filesHost"    = "#settings.get( "files.host" )#",
+			// griglia incisioni frutti: codici degli attributi "radice" dell'incisione, in ordine
+			// di priorità risalendo l'albero (superiore, inferiore, logo)
+			"engravingRootAttributeCodes" = [ "IS", "II", "IL" ],
+			// attributi che portano il simbolo inciso (il valore che si posiziona sulla griglia)
+			"engravingSymbolAttributeCodes" = [ "SM" ],
+			// lato del riquadro del simbolo inciso, in mm: usato per disegnarlo in scala
+			// sull'anteprima della placca e nelle stampe
+			"engravingSymbolSizeMm" = 10,
 			"imagesConfig" = {
 				"productItem" = {
 					"path"  = "product-items",

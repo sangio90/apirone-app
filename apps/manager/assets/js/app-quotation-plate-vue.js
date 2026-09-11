@@ -344,6 +344,20 @@ AP.plate.modal = ( function() {
                 json3dText: "", /** Contenuto JSON 3D della placca. */
                 json3dLoading: false, /** Flag di caricamento per il JSON 3D. */
 
+                /**
+                 * Griglie incisioni dei frutti sulla placca, per id prodotto frutto:
+                 * { attributes: [ { id, code, name, markers[] } ], rootCodes, symbolCodes, symbolSizeMm }.
+                 * Caricata una volta per prodotto da /ajax/products/:id/engraving-markers.
+                 */
+                engravingGrids: {},
+                /**
+                 * Posizione scelta per ogni simbolo inciso, chiave "fruitId-itemId":
+                 * { markerId, order, code }. Tenuta fuori da detailForm.data.fruits per non
+                 * far scattare il watcher profondo a ogni trascinamento; il dato che viene
+                 * salvato è value.engravingMarkerId sul valore selezionato.
+                 */
+                engravingSelection: {},
+
                 /** Dati di prezzatura: sconti, metodo di calcolo, righe e totale. */
                 pricing: {
                     data: {
@@ -1438,7 +1452,7 @@ AP.plate.modal = ( function() {
                                         const fi = fruit.items[ fiIdx ];
                                         const selected = fi.values && fi.values.find( function( v ) { return v.selected; } );
                                         if ( selected && selected.productItemId ) {
-                                            this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId, 1040 + fiIdx );
+                                            this.updateFruitAttributeOverlay( fruit.id, fi.attributeId, selected, fi.parentAttributeId, 1040 + fiIdx, fi );
                                         }
                                     }
                                 }
@@ -1559,6 +1573,10 @@ AP.plate.modal = ( function() {
 
                     const productId = thisFruit.fruit.id;
 
+                    // griglia incisioni del frutto (posizioni ammesse per il simbolo):
+                    // parte in parallelo, serve prima di disegnare gli overlay
+                    const engravingGrid = this.loadEngravingGrid( productId );
+
                     await ajax( {
                         method: "GET",
                         url: BASE + "/product-items?productId=" + productId,
@@ -1584,6 +1602,7 @@ AP.plate.modal = ( function() {
                                                 id: NM.util.uuid(),
                                                 attributeId: item.attribute.id,
                                                 attributeName: item.attribute.name,
+                                                attributeCode: item.attribute.code,
                                                 level: 0,
                                                 values: [ {
                                                     attributeValue: item.attributeValue,
@@ -1620,6 +1639,8 @@ AP.plate.modal = ( function() {
                         } );
                     }
 
+                    await engravingGrid;
+
                     // Se i valori degli attributi sono salvati nel db, applica quelli
                     if ( savedSelections.length > 0 ) {
                         this._cascadingFruit = true;
@@ -1629,6 +1650,17 @@ AP.plate.modal = ( function() {
                                 if ( fi.attributeId == qipi.productItem.attribute.id ) {
                                     const match = fi.values.find( ( v ) => { return v.productItemId == qipi.productItem.id; } );
                                     if ( match ) {
+                                        // posizione dell'incisione salvata col preventivo
+                                        // (assegnazione non reattiva: vedi drawFruitEngravingSymbol)
+                                        if ( qipi.engravingMarkerId != null ) {
+                                            match.engravingMarkerId = qipi.engravingMarkerId;
+                                        }
+                                        // coordinate salvate: servono a ritrovare la posizione
+                                        // se la griglia del frutto è stata rifatta
+                                        if ( qipi.engravingXMm != null ) {
+                                            match.engravingXMm = qipi.engravingXMm;
+                                            match.engravingYMm = qipi.engravingYMm;
+                                        }
                                         match.selected = true;
                                         await this.$nextTick();
                                         await this.loadFruitProductItems( fruitId, qipi.productItem.id, fi.id, true );
@@ -1829,6 +1861,7 @@ AP.plate.modal = ( function() {
                                                 id: NM.util.uuid(),
                                                 attributeId: item.attribute.id,
                                                 attributeName: item.attribute.name,
+                                                attributeCode: item.attribute.code,
                                                 parentAttributeId: attributeId,
                                                 parentItemId: originId,
                                                 level: fruitItems[parentIndex].level + 1,
@@ -1944,7 +1977,10 @@ AP.plate.modal = ( function() {
                                     continue;
                                 }
                                 for ( const item of fruit.items ) {
-                                    const key = fruit.id + "-" + item.attributeId;
+                                    // chiave sull'id della riga, non sull'attributo: lo stesso
+                                    // attributo può comparire in due rami del frutto (INCISIONE
+                                    // LOGO sotto IS e sotto II) e vanno processati entrambi
+                                    const key = fruit.id + "-" + item.id;
                                     if ( processed.has( key ) ) {
                                         continue;
                                     }
@@ -1992,8 +2028,9 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Oggetto valore del product item con immagini.
                  * @param {string} [parentAttributeId] - Identificativo opzionale dell'attributo padre.
                  * @param {number} zIndex - Z-index calcolato in base alla posizione nell'array fruit.items.
+                 * @param {Object} [item] - Attributo di appartenenza del valore (serve per l'incisione).
                  */
-                updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId, zIndex ) {
+                updateFruitAttributeOverlay: function( fruitId, attributeId, value, parentAttributeId, zIndex, item ) {
                     if ( !value || !attributeId ) {
                         return;
                     }
@@ -2001,14 +2038,424 @@ AP.plate.modal = ( function() {
                     if ( !fruitEl.length ) {
                         return;
                     }
-                    const overlayKey = parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId;
+                    // la chiave usa l'id della riga quando c'è: due attributi uguali in rami
+                    // diversi (SIMBOLO sotto IS e sotto II) devono avere overlay distinti
+                    const overlayKey = item?.id
+                        ? "i" + String( item.id ).replace( /[^A-Za-z0-9_-]/g, "" )
+                        : ( parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId );
                     fruitEl.find( "> .fruit-overlay-" + overlayKey ).remove();
+
+                    // incisioni: il simbolo non si disegna a tutto frutto ma in scala nella
+                    // posizione scelta sulla griglia, ed è trascinabile da marker a marker
+                    const engraving = item ? this.engravingContext( fruitId, item ) : null;
+                    if ( engraving && engraving.markers.length ) {
+                        this.drawFruitEngravingSymbol( fruitId, overlayKey, item, value, engraving, zIndex + 60 );
+                        return;
+                    }
                     // immagine orizzontale + rotazione CSS per i frutti verticali
                     const imageUri = value.horizontalImage?.uri;
                     if ( imageUri ) {
                         const style = this.fruitOverlayStyle( fruitId, zIndex );
                         fruitEl.append( `<div class="fruit-overlay-${overlayKey}" style="${style} background-image: url('${imageUri}'); background-size: contain; background-repeat: no-repeat; background-position: center"></div>` );
                     }
+                },
+
+                // MARK: Engraving grid
+                /**
+                 * Carica (una sola volta per prodotto frutto) la griglia incisioni:
+                 * attributi radice con i loro marker, codici radice/simbolo e dimensione
+                 * del simbolo. Le richieste in volo sono deduplicate.
+                 * @param {string} productId - Identificativo del prodotto frutto.
+                 * @returns {Promise<Object>} Griglia del frutto.
+                 */
+                loadEngravingGrid: function( productId ) {
+                    const empty = { attributes: [], rootCodes: [], symbolCodes: [], symbolSizeMm: 10 };
+                    if ( !productId ) {
+                        return Promise.resolve( empty );
+                    }
+                    if ( this.engravingGrids[ productId ] ) {
+                        return Promise.resolve( this.engravingGrids[ productId ] );
+                    }
+                    if ( !this._engravingRequests ) {
+                        this._engravingRequests = {};
+                    }
+                    if ( this._engravingRequests[ productId ] ) {
+                        return this._engravingRequests[ productId ];
+                    }
+
+                    this._engravingRequests[ productId ] = ( async () => {
+                        const grid = { ...empty };
+                        await ajax( {
+                            method: "GET",
+                            url: "/manager/ajax/products/" + productId + "/engraving-markers",
+                            callback: {
+                                done: ( xhr ) => {
+                                    if ( !xhr.data ) {
+                                        return;
+                                    }
+                                    grid.attributes   = xhr.data.attributes || [];
+                                    grid.rootCodes    = xhr.data.rootCodes || [];
+                                    grid.symbolCodes  = xhr.data.symbolCodes || [];
+                                    grid.symbolSizeMm = Number( xhr.data.symbolSizeMm ) || 10;
+                                },
+                            },
+                        } );
+                        this.$set( this.engravingGrids, productId, grid );
+                        return grid;
+                    } )();
+
+                    return this._engravingRequests[ productId ];
+                },
+
+                /**
+                 * Attributo radice dell'incisione (IS/II/IL) a cui appartiene un attributo
+                 * del frutto: risale la catena dei padri e tiene il più in alto fra quelli
+                 * radice, come fa ProductEngravingMarkerService.resolveRootAttributeId.
+                 * @param {Object} fruit - Frutto configurato.
+                 * @param {Object} item - Attributo di partenza.
+                 * @param {Object} grid - Griglia incisioni del frutto.
+                 * @returns {Object|null} Attributo radice con i suoi marker.
+                 */
+                engravingRootAttribute: function( fruit, item, grid ) {
+                    let current = item;
+                    let found   = null;
+                    let guard   = 0;
+
+                    while ( current && guard < 10 ) {
+                        guard++;
+                        const attr = ( grid.attributes || [] ).find( ( a ) => { return a.id === current.attributeId; } );
+                        if ( attr ) {
+                            found = attr;
+                        }
+                        if ( !current.parentAttributeId ) {
+                            break;
+                        }
+                        current = this.fruitParentItem( fruit, current );
+                    }
+
+                    return found;
+                },
+
+                /**
+                 * Riga padre di un attributo del frutto. Si segue il product item selezionato
+                 * dal padre (parentItemId), non l'attributo: lo stesso attributo può comparire
+                 * in due rami (INCISIONE LOGO sotto incisione superiore e inferiore) e cercarlo
+                 * per attributeId restituirebbe sempre il primo.
+                 * @param {Object} fruit - Frutto configurato.
+                 * @param {Object} item - Attributo di partenza.
+                 * @returns {Object|undefined} Riga padre.
+                 */
+                fruitParentItem: function( fruit, item ) {
+                    const items = fruit.items || [];
+
+                    if ( item.parentItemId != null ) {
+                        const byProductItem = items.find( ( i ) => {
+                            return ( i.values || [] ).some( ( v ) => { return String( v.productItemId ) === String( item.parentItemId ); } );
+                        } );
+                        if ( byProductItem ) {
+                            return byProductItem;
+                        }
+                    }
+
+                    return items.find( ( i ) => { return i.attributeId === item.parentAttributeId; } );
+                },
+
+                /**
+                 * Contesto incisione di un attributo frutto: valorizzato solo se l'attributo
+                 * porta il simbolo inciso (codice in symbolCodes) e il suo ramo risale a un
+                 * attributo radice con almeno un marker.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {Object} item - Attributo del frutto.
+                 * @returns {Object|null} { markers, rootAttributeId, rootCode, rootName, symbolSizeMm }
+                 */
+                engravingContext: function( fruitId, item ) {
+                    const fruit = this.detailForm.data.fruits.find( ( f ) => { return f.id === fruitId; } );
+                    const grid  = fruit && fruit.fruit ? this.engravingGrids[ fruit.fruit.id ] : null;
+
+                    if ( !grid || !item || !item.attributeCode ) {
+                        return null;
+                    }
+                    if ( ( grid.symbolCodes || [] ).indexOf( item.attributeCode ) === -1 ) {
+                        return null;
+                    }
+
+                    const root = this.engravingRootAttribute( fruit, item, grid );
+                    if ( !root ) {
+                        return null;
+                    }
+
+                    return {
+                        markers: root.markers || [],
+                        rootAttributeId: root.id,
+                        rootCode: root.code,
+                        rootName: root.name,
+                        symbolSizeMm: grid.symbolSizeMm,
+                    };
+                },
+
+                /**
+                 * Scala di disegno della placca (mm → px), quella del designer.
+                 * @returns {number}
+                 */
+                engravingDisplayScale: function() {
+                    return pub.fruitsController?.plate?.displayScale ?? 1;
+                },
+
+                /**
+                 * Disegna il simbolo inciso sul frutto nella posizione scelta sulla griglia,
+                 * insieme ai punti di aggancio (visibili durante il trascinamento).
+                 * Le coordinate dei marker sono in mm rispetto all'angolo in alto a sinistra
+                 * del frutto orizzontale: il contenitore usa lo stesso stile degli altri
+                 * overlay, quindi per i frutti verticali ci pensa la rotazione CSS.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {string} overlayKey - Chiave dell'overlay (per la rimozione al re-render).
+                 * @param {Object} item - Attributo del simbolo.
+                 * @param {Object} value - Valore selezionato (porta l'immagine e il marker scelto).
+                 * @param {Object} engraving - Contesto incisione (vedi engravingContext).
+                 * @param {number} zIndex - z-index dell'overlay.
+                 */
+                drawFruitEngravingSymbol: function( fruitId, overlayKey, item, value, engraving, zIndex ) {
+                    const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
+                    if ( !fruitEl.length ) {
+                        return;
+                    }
+
+                    const markers = engraving.markers;
+                    const scale   = this.engravingDisplayScale();
+                    const size    = Math.max( 6, engraving.symbolSizeMm * scale );
+
+                    // marker salvato se esiste ancora; se la griglia è stata rifatta il marker
+                    // non c'è più ma restano le coordinate salvate col preventivo, quindi si
+                    // riaggancia alla posizione più vicina; in ultima istanza la prima
+                    let marker = markers.find( ( m ) => { return String( m.id ) === String( value.engravingMarkerId ); } );
+                    if ( !marker && value.engravingXMm != null && value.engravingYMm != null ) {
+                        let nearest = null;
+                        for ( const m of markers ) {
+                            const distance = Math.pow( m.xMm - value.engravingXMm, 2 ) + Math.pow( m.yMm - value.engravingYMm, 2 );
+                            if ( !nearest || distance < nearest.distance ) {
+                                nearest = { marker: m, distance: distance };
+                            }
+                        }
+                        marker = nearest?.marker;
+                    }
+                    if ( !marker ) {
+                        marker = markers[ 0 ];
+                    }
+                    // assegnazione semplice (non $set): la proprietà non è reattiva e il
+                    // watcher profondo sui frutti non deve ripartire a ogni disegno
+                    value.engravingMarkerId = marker.id;
+                    this.$set( this.engravingSelection, fruitId + "-" + item.id, {
+                        markerId: marker.id,
+                        order: marker.order,
+                        count: markers.length,
+                        code: engraving.rootCode,
+                    } );
+
+                    const $layer = $( `<div class="fruit-overlay-${overlayKey} fruit-engraving-layer" style="${this.fruitOverlayStyle( fruitId, zIndex )}"></div>` );
+
+                    for ( const m of markers ) {
+                        $layer.append( $( "<div/>", {
+                            "class": "fruit-engraving-snap",
+                            "data-marker-id": m.id,
+                            "data-order": m.order,
+                            "data-x": m.xMm,
+                            "data-y": m.yMm,
+                            css: { left: ( m.xMm * scale ) + "px", top: ( m.yMm * scale ) + "px" },
+                        } ) );
+                    }
+
+                    const $symbol = $( "<div/>", {
+                        "class": "fruit-engraving-symbol",
+                        css: {
+                            left: ( marker.xMm * scale ) + "px",
+                            top: ( marker.yMm * scale ) + "px",
+                            width: size + "px",
+                            height: size + "px",
+                        },
+                    } );
+                    // immagine del simbolo: prima quella del product item (come per tutti gli altri
+                    // overlay del frutto, ed è quella che si vede sulla scheda prodotto), poi quella
+                    // generica del valore attributo (files.attribute_raw_value_id, di solito un SVG).
+                    // Sempre la versione orizzontale: la rotazione dei frutti verticali la fa il CSS.
+                    const symbolUri = value.horizontalImage?.uri || value.attributeValue?.horizontalImage?.uri;
+                    if ( symbolUri ) {
+                        $symbol.css( "background-image", `url('${symbolUri}')` );
+                    } else {
+                        // valori senza disegno (CUSTOM, TESTO CUSTOM...): resta il riquadro
+                        // tratteggiato, così la posizione si vede e si può spostare
+                        $symbol.addClass( "is-empty" );
+                    }
+                    $layer.append( $symbol );
+                    fruitEl.append( $layer );
+
+                    if ( this.canEdit && markers.length > 1 ) {
+                        this.makeEngravingSymbolDraggable( $symbol, $layer, fruitId, item, value, engraving, scale );
+                    } else {
+                        $symbol.attr( "title", `Incisione ${engraving.rootCode} · posizione ${marker.order}` );
+                    }
+                },
+
+                /**
+                 * Rende trascinabile il simbolo inciso: durante il trascinamento il simbolo
+                 * si aggancia in tempo reale al marker più vicino al puntatore (distanza
+                 * calcolata sulle coordinate a schermo, così vale anche per i frutti ruotati)
+                 * e al rilascio la posizione scelta viene scritta sul valore selezionato.
+                 * @param {Object} $symbol - Elemento jQuery del simbolo.
+                 * @param {Object} $layer - Contenitore degli agganci.
+                 * @param {string} fruitId - Identificativo del frutto.
+                 * @param {Object} item - Attributo del simbolo.
+                 * @param {Object} value - Valore selezionato.
+                 * @param {Object} engraving - Contesto incisione.
+                 * @param {number} scale - Scala mm → px.
+                 */
+                makeEngravingSymbolDraggable: function( $symbol, $layer, fruitId, item, value, engraving, scale ) {
+                    const self = this;
+                    const key  = fruitId + "-" + item.id;
+
+                    const applyMarker = function( marker ) {
+                        $symbol.css( { left: ( marker.xMm * scale ) + "px", top: ( marker.yMm * scale ) + "px" } );
+                        $symbol.attr( "title", `Incisione ${engraving.rootCode} · posizione ${marker.order} di ${engraving.markers.length} (trascina per spostare)` );
+                    };
+
+                    $symbol.addClass( "is-draggable" );
+                    applyMarker( engraving.markers.find( ( m ) => { return String( m.id ) === String( value.engravingMarkerId ); } ) || engraving.markers[ 0 ] );
+
+                    // il frutto è un draggable di jQuery UI: il mousedown sul simbolo non deve arrivarci
+                    $symbol.on( "mousedown", function( event ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } );
+
+                    $symbol.on( "pointerdown", function( event ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        $symbol.addClass( "is-dragging" );
+                        $layer.addClass( "is-dragging" );
+
+                        const onMove = function( moveEvent ) {
+                            const nearest = self.nearestEngravingMarker( $layer, moveEvent.clientX, moveEvent.clientY );
+                            if ( !nearest ) {
+                                return;
+                            }
+                            $layer.find( ".fruit-engraving-snap" ).removeClass( "is-target" );
+                            $( nearest.element ).addClass( "is-target" );
+                            applyMarker( nearest.marker );
+                        };
+
+                        const onUp = function( upEvent ) {
+                            document.removeEventListener( "pointermove", onMove );
+                            document.removeEventListener( "pointerup", onUp );
+                            $symbol.removeClass( "is-dragging" );
+                            $layer.removeClass( "is-dragging" );
+                            $layer.find( ".fruit-engraving-snap" ).removeClass( "is-target" );
+
+                            const nearest = self.nearestEngravingMarker( $layer, upEvent.clientX, upEvent.clientY );
+                            if ( !nearest ) {
+                                return;
+                            }
+                            applyMarker( nearest.marker );
+                            value.engravingMarkerId = nearest.marker.id;
+                            self.$set( self.engravingSelection, key, {
+                                markerId: nearest.marker.id,
+                                order: nearest.marker.order,
+                                count: engraving.markers.length,
+                                code: engraving.rootCode,
+                            } );
+                        };
+
+                        document.addEventListener( "pointermove", onMove );
+                        document.addEventListener( "pointerup", onUp );
+                    } );
+                },
+
+                /**
+                 * Marker più vicino a un punto dello schermo fra gli agganci disegnati.
+                 * @param {Object} $layer - Contenitore degli agganci.
+                 * @param {number} clientX - Coordinata X del puntatore.
+                 * @param {number} clientY - Coordinata Y del puntatore.
+                 * @returns {Object|null} { element, marker }
+                 */
+                nearestEngravingMarker: function( $layer, clientX, clientY ) {
+                    let best     = null;
+                    let bestDist = Number.POSITIVE_INFINITY;
+
+                    $layer.find( ".fruit-engraving-snap" ).each( function() {
+                        const rect = this.getBoundingClientRect();
+                        const dx   = ( rect.left + rect.width / 2 ) - clientX;
+                        const dy   = ( rect.top + rect.height / 2 ) - clientY;
+                        const dist = ( dx * dx ) + ( dy * dy );
+                        if ( dist < bestDist ) {
+                            bestDist = dist;
+                            best = this;
+                        }
+                    } );
+
+                    if ( !best ) {
+                        return null;
+                    }
+
+                    return {
+                        element: best,
+                        marker: {
+                            id: best.dataset.markerId,
+                            order: Number( best.dataset.order ),
+                            xMm: Number( best.dataset.x ),
+                            yMm: Number( best.dataset.y ),
+                        },
+                    };
+                },
+
+                /**
+                 * Etichetta della posizione scelta per il simbolo inciso di un attributo,
+                 * mostrata sotto la tendina nella lista attributi del frutto.
+                 * @param {Object} fruit - Frutto configurato.
+                 * @param {Object} item - Attributo del frutto.
+                 * @returns {string} Testo o stringa vuota.
+                 */
+                engravingPositionLabel: function( fruit, item ) {
+                    const selection = this.engravingSelection[ fruit.id + "-" + item.id ];
+                    if ( !selection ) {
+                        return "";
+                    }
+                    const selected = item.values?.find( function( v ) { return v.selected; } );
+                    if ( !selected ) {
+                        return "";
+                    }
+                    return `Incisione in posizione ${selection.order} di ${selection.count}: trascina il simbolo sull'anteprima per spostarlo.`;
+                },
+
+                /**
+                 * Avviso non bloccante per i frutti con un simbolo inciso selezionato ma
+                 * senza griglia definita: il simbolo resta centrato come prima.
+                 * @param {Object} fruit - Frutto configurato.
+                 * @returns {string} Testo dell'avviso o stringa vuota.
+                 */
+                engravingWarning: function( fruit ) {
+                    const grid = fruit && fruit.fruit ? this.engravingGrids[ fruit.fruit.id ] : null;
+                    if ( !grid || !( grid.attributes || [] ).length ) {
+                        return "";
+                    }
+
+                    const missing = [];
+                    for ( const fi of ( fruit.items || [] ) ) {
+                        if ( !fi.attributeCode || ( grid.symbolCodes || [] ).indexOf( fi.attributeCode ) === -1 ) {
+                            continue;
+                        }
+                        if ( !fi.values?.some( function( v ) { return v.selected; } ) ) {
+                            continue;
+                        }
+                        const root = this.engravingRootAttribute( fruit, fi, grid );
+                        if ( root && !( root.markers || [] ).length && missing.indexOf( root.name ) === -1 ) {
+                            missing.push( root.name );
+                        }
+                    }
+
+                    if ( !missing.length ) {
+                        return "";
+                    }
+
+                    return `Griglia incisioni non definita (${missing.join( ", " )}): il simbolo resta centrato sul frutto.`;
                 },
 
                 /**

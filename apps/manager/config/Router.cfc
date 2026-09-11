@@ -366,6 +366,10 @@
 		get( "/ajax/products/:id/combinations" ).to( "ProductAjaxController.combinations" ).end();
 		post( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.sortItems" ).end();
 		get( "/ajax/products/:id/items/order" ).to( "ProductAjaxController.listItemsForSort" ).end();
+		// la POST (path piu' lungo) va prima della GET: ColdBox prende la prima rotta il cui
+		// pattern combacia con l'inizio dell'URL e poi controlla il verbo
+		post( "/ajax/products/:id/engraving-markers/:attributeId" ).to( "ProductEngravingMarkerAjaxController.save" ).end();
+		get( "/ajax/products/:id/engraving-markers" ).to( "ProductEngravingMarkerAjaxController.list" ).end();
 		post( "/ajax/products/:id/items/clone" ).to( "ProductAjaxController.cloneItems" ).end();
 		get( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.listAttributesForSort" ).end();
 		post( "/ajax/products/:id/attributes/order" ).to( "ProductAjaxController.sortAttributes" ).end();

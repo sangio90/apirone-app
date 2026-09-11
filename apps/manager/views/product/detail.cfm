@@ -78,6 +78,17 @@
                                                 Altri dati
                                         </a>
                                     </li>
+                                    <cfif ArrayLen( prc.page.engraving.attributes )>
+                                    <!--- griglia incisioni: solo frutti con attributi IS/II/IL, modificabile da ADM/TCD --->
+                                    <li class="nav-item" data-bind="role: this" data-role-list="ADM/TCD">
+                                        <a class="nav-link" role="tab" data-bs-toggle="tab" aria-selected="false"
+                                            id="product-engravings-tab"
+                                            href="##product-engravings"
+                                            aria-controls="product-engravings">
+                                                Griglia incisioni
+                                        </a>
+                                    </li>
+                                    </cfif>
                                 </ul>
 
                             </div>
@@ -366,6 +377,8 @@
 
                                         </div>
 
+
+                                        <cfif ArrayLen( prc.page.engraving.attributes )>#view( "product/engravings-tab" )#</cfif>
                                     </div>
 
                                 </form>

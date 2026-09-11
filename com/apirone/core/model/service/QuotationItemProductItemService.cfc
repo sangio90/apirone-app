@@ -244,6 +244,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bean.setQuotationItemId( record.quotation_item_id );
 			bean.setLevel( record.level );
 			bean.setNote( record.note );
+			if ( !IsNull( record.engraving_marker_id ) ) bean.setEngravingMarkerId( record.engraving_marker_id );
+			if ( !IsNull( record.engraving_x_px ) ) bean.setEngravingXPx( record.engraving_x_px );
+			if ( !IsNull( record.engraving_y_px ) ) bean.setEngravingYPx( record.engraving_y_px );
+			if ( !IsNull( record.engraving_x_mm ) ) bean.setEngravingXMm( record.engraving_x_mm );
+			if ( !IsNull( record.engraving_y_mm ) ) bean.setEngravingYMm( record.engraving_y_mm );
 
 			// ProductItem: dalla mappa pre-caricata
 			if ( !IsNull( record.product_item_id ) && StructKeyExists( productItemMap, record.product_item_id ) ) {
@@ -269,6 +274,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		bean.setQuotationItemId( record.quotation_item_id );
 		bean.setLevel( record.level );
 		bean.setNote( record.note );
+		if ( !IsNull( record.engraving_marker_id ) ) bean.setEngravingMarkerId( record.engraving_marker_id );
+		if ( !IsNull( record.engraving_x_px ) ) bean.setEngravingXPx( record.engraving_x_px );
+		if ( !IsNull( record.engraving_y_px ) ) bean.setEngravingYPx( record.engraving_y_px );
+		if ( !IsNull( record.engraving_x_mm ) ) bean.setEngravingXMm( record.engraving_x_mm );
+		if ( !IsNull( record.engraving_y_mm ) ) bean.setEngravingYMm( record.engraving_y_mm );
 
 		// Entity collegate (caricate singolarmente)
 		bean.setProductItem( getProductItemService().get( record.product_item_id ) );

@@ -138,6 +138,22 @@ component extends="com.apirone.core.controller.AbsController" {
 		// prc.page[ "attributes" ]          = memy.convertList( super.fire( "attribute.list" ), "suggest" );
 		prc.page[ "product" ]             = memy.convert( prc.product, "detail" );
 
+		// Griglia incisioni: solo per i frutti con attributi radice dell'incisione (IS, II, IL).
+		// I marker veri li carica il tab via ajax; qui bastano attributi, immagine e moduli.
+		var engravingService    = super.service( "ProductEngravingMarker" );
+		var engravingAttributes = engravingService.listEngravingAttributes( productId = product.getId(), langId = ( request.keyExists( "lang" ) ? request.lang.getId() : "IT" ) );
+		var engravingImage      = engravingService.findBaseImage( productId = product.getId(), positionCount = Val( product.getPositionCount() ) );
+		prc.page[ "engraving" ] = {
+			"attributes"    = engravingAttributes,
+			"rootCodes"     = engravingService.rootAttributeCodes(),
+			"positionCount" = Val( product.getPositionCount() ),
+			"image"         = engravingImage,
+			"canEdit"       = ( !IsNull( session.user ) && !IsNull( session.user.getRole() ) && ArrayContains( [ "ADM", "TCD" ], session.user.getRole().getId() ) )
+		};
+		if ( ArrayLen( engravingAttributes ) ) {
+			prc.jsFiles.add( "app-product-engravings" );
+		}
+
 		prc.page[ "categories" ] = super.getCategoriesAsJSON();
 
 		prc.jsFiles.add( "app-file" );
