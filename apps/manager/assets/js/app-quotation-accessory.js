@@ -164,7 +164,8 @@ AP.accessory.modal = ( function() {
                 vm.get( "detailForm.data.quotationItem.product.finish.id" ) != "" &&
                 vm.get( "detailForm.data.quotationItem.product.category.id" ) != "" &&
                 vm.get( "detailForm.data.quotationItem.product.line.id" ) != "" &&
-                vm.get( "detailForm.data.quotationItem.product.model.id" ) != ""
+                vm.get( "detailForm.data.quotationItem.product.model.id" ) != "" &&
+                vm.get( "detailForm.data.quotationItem.product.id" ) != "" // senza prodotto trovato non si salva
             ) {
                 viewModel.set( "canSave", true );
             } else {
@@ -297,6 +298,17 @@ AP.accessory.modal = ( function() {
                                 if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                                     await self.firstLoadProductItems();
                                 }
+                            } else {
+                                // Nessun prodotto per categoria/linea/modello/finitura: si azzera il
+                                // prodotto (altrimenti resterebbe l'id della finitura scelta prima),
+                                // si svuotano albero e anteprima e si avvisa. checkCanSave() qui
+                                // sotto disabilita il salvataggio finché non si cambia combinazione.
+                                viewModel.set( "detailForm.data.quotationItem.product.id", "" );
+                                viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                                viewModel.set( "backgroundImage.url", "" );
+                                $( "#accessory-product-items" ).empty();
+                                $( "#accessory-export-code" ).empty();
+                                AP.widget.notify( "warning", "Nessun prodotto configurato per questa combinazione di categoria, linea, modello e finitura: scegli un'altra finitura o un altro modello." );
                             }
                         },
                     },
@@ -825,7 +837,14 @@ AP.accessory.modal = ( function() {
                     data: JSON.stringify( parsedData ),
                     callback: {
                         done: function( xhr ) {
-                            if( xhr.status === "ERROR" ) {
+                            // INVALID: validazione lato server (es. prodotto non trovato per la combinazione)
+                            if ( xhr.status === "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
+                                AP.loading.hide();
+                                return;
+                            }
+                            // il server risponde sia "ERROR" sia "ERRORE" (combinazione non disponibile)
+                            if( xhr.status === "ERROR" || xhr.status === "ERRORE" ) {
                                 if ( xhr.data && xhr.data.error ) {
                                     AP.widget.notify( "error", xhr.data.error );
                                 } else {

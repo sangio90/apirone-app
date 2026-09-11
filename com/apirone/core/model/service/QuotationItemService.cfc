@@ -1401,6 +1401,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var productItemsIds = [];
 
 		var product = json.quotationItem.product;
+
+		// Combinazione categoria/linea/modello/finitura senza prodotto: il client
+		// manda product.id vuoto (o assente). Errore tipizzato, che i controller
+		// traducono in una risposta INVALID leggibile invece di un 500.
+		if ( IsNull( product ) || !StructKeyExists( product, "id" ) || !Len( Trim( product.id ) ) ) {
+			Throw(
+				type    = "ApirOne.ProductNotFound",
+				message = "Nessun prodotto configurato per la combinazione categoria, linea, modello e finitura scelta: cambia finitura o modello."
+			);
+		}
+
 		if ( product.keyExists( "items" ) ) {
 			var productItemsData = isArray( product.items ) ? product.items : product.items._data;
 			for ( var item in productItemsData ) {

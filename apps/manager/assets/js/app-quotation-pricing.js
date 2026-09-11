@@ -107,6 +107,12 @@ AP.quotation.itemPricing = ( function() {
                 data: JSON.stringify( payload ),
                 callback: {
                     done: function( xhr ) {
+                        // validazione lato server (es. nessun prodotto per la combinazione scelta)
+                        if ( xhr.status === "INVALID" ) {
+                            AP.loading.hide();
+                            NM.form.showMessages( xhr.data );
+                            return;
+                        }
                         if ( xhr.data ) {
                             AP.loading.hide();
                             viewModel.set( "pricing.data", xhr.data );

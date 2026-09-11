@@ -593,7 +593,15 @@ component extends="com.apirone.core.controller.AbsController" {
 			bean.setPosition( null );
 		}
 		
-		var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
+		try {
+			var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
+		} catch ( "ApirOne.ProductNotFound" e ) {
+			// nessun prodotto per la combinazione scelta: messaggio al client, non un 500
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = e.message } ] } );
+			event.setValue( "result", result );
+			return;
+		}
 		bean.setPrice( price );
 
 		var product = super
@@ -1282,12 +1290,21 @@ component extends="com.apirone.core.controller.AbsController" {
 	function calculate( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content )
 
-		if (rc.type == "signage") {
-			var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
-		} elseif(rc.type == "plate") {
-			var price = super.fire( 'QuotationItem.getPlatePricing', { 'data' = json } );
-		} else {
-			var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
+		try {
+			if (rc.type == "signage") {
+				var price = super.fire( 'QuotationItem.getSignagePricing', { 'data' = json } );
+			} elseif(rc.type == "plate") {
+				var price = super.fire( 'QuotationItem.getPlatePricing', { 'data' = json } );
+			} else {
+				var price = super.fire( 'QuotationItem.getPricing', { 'data' = json } );
+			}
+		} catch ( "ApirOne.ProductNotFound" e ) {
+			// nessun prodotto per la combinazione scelta: messaggio al client, non un 500
+			var result = super.getResult();
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = e.message } ] } );
+			event.setValue( "result", result );
+			return;
 		}
 
 		var memy = super.getMementify();
