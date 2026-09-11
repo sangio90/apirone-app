@@ -848,27 +848,32 @@ AP.quotation.detail = (function () {
 		// edit
 
 		edit: function (event) {
+			viewModel.openItemEditor(event.data.id);
+			event.preventDefault();
+		},
+
+		// Apre la modale di modifica della riga con l'id dato, in base al tab corrente
+		// (placca, accessorio, segnaletica, servizio). Usata dal pulsante "Modifica"
+		// e dopo la duplicazione come copia, per aprire subito la riga appena creata.
+		openItemEditor: function (id) {
 			AP.loading.show();
 			var typeId = viewModel.get("typeId");
 
 			if (typeId == "plate") {
-				plateApp().edit({id: event.data.id});
+				plateApp().edit({id: id});
 			}
 
 			if (typeId == "accessory") {
-				accessoryApp().edit({id: event.data.id});
+				accessoryApp().edit({id: id});
 			}
 
 			if (typeId == "signage") {
-				signageApp().edit({id: event.data.id});
+				signageApp().edit({id: id});
 			}
 
 			if (typeId == "article") {
-				articleApp().edit(event.data.id);
+				articleApp().edit(id);
 			}
-
-			event.preventDefault();
-
 		},
 
 		clone: function (event) {
@@ -891,7 +896,13 @@ AP.quotation.detail = (function () {
 						$("#item-duplicate-modal").modal("hide");
 						AP.widget.notify("success", "Articolo duplicato correttamente.");
 						AP.quotation.totalPricing.markDirty();
+						// la lista si aggiorna comunque in background; per la copia si apre
+						// subito la modale della riga appena creata, così si può modificarla
+						// senza doverla cercare nell'elenco (l'istanza invece resta com'era)
 						viewModel.loadItems();
+						if (!asInstance && xhr.data && xhr.data.id) {
+							viewModel.openItemEditor(xhr.data.id);
+						}
 					}
 				}
 			});

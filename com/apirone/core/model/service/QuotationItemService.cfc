@@ -319,13 +319,39 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// Azzera le posizioni: il clone parte senza posizioni pianta
 		cloneBean.setPositions( [] );
 
+		// Copia (non istanza): se l'originale ha la posizione compilata, la copia
+		// nasce con "<codice>-BIS" così si distingue subito dall'originale. Bean
+		// nuovo senza id: ensurePosition() in create() la registra nella zona.
+		if ( !arguments.asInstance && !IsNull( original.getPosition() ) && Len( Trim( original.getPosition().getCode() ?: "" ) ) ) {
+			var bisPosition = super.bean( "QuotationZonePosition" );
+			bisPosition.setCode( Trim( original.getPosition().getCode() ) & "-BIS" );
+			cloneBean.setPosition( bisPosition );
+		}
+
 		var newId = "";
 		transaction {
 			newId = create( cloneBean );
 
+			// Copia: ordinamento dell'originale + 5, cioè a metà fra l'originale e la
+			// riga successiva (l'elenco usa passi di 10), così la copia sta subito dopo
+			// di lui (A01, A01-BIS, A02) invece che in fondo con il max+10 di create().
+			// Scritto dopo create() perché con ordinamento 0 (righe storiche mai
+			// riordinate) create() lo sostituirebbe comunque con max+10.
+			if ( !arguments.asInstance ) {
+				getDao().updateOrdinamento( newId, Val( original.getOrdinamento() ) + 5 );
+			}
+
 			// Se istanza: aggiorna anche l'originale con lo stesso instance_group_id
 			if ( arguments.asInstance ) {
 				getDao().updateInstanceGroupId( arguments.quotationItemId, newInstanceGroupId );
+			}
+
+			// Immagini della riga (anteprima e immagine custom): copiate con file fisici
+			// propri, così la copia ha subito la foto invece di restare vuota fino al
+			// primo salvataggio dalla modale.
+			var sourceFiles = getFileService().list( quotationItemId = arguments.quotationItemId );
+			for ( var sourceFile in sourceFiles ) {
+				getFileService().duplicateForQuotationItem( sourceFile.getId(), newId );
 			}
 
 			// Copia le signage rows se presenti

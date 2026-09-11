@@ -33,6 +33,10 @@ component extends="com.apirone.core.controller.AbsController" {
 					firstPos.setCoordinateY( draft.getCoordinateY() );
 					firstPos.setAngle( draft.getAngle() );
 					firstPos.setVisible( true );
+					// dimensione marker: l'ultima usata nella pagina pianta, se il client la manda
+					if ( !IsNull( json.sizeMultiplier ) && Val( json.sizeMultiplier ) GT 0 ) {
+						firstPos.setSizeMultiplier( Int( Val( json.sizeMultiplier ) ) );
+					}
 					super.fire( "QuotationItemPosition.update", [ firstPos ] );
 				}
 				super.fire( "QuotationItemDraft.delete", [ rc.id ] );
@@ -164,6 +168,10 @@ component extends="com.apirone.core.controller.AbsController" {
 					firstPos.setCoordinateY( draft.getCoordinateY() );
 					firstPos.setAngle( draft.getAngle() );
 					firstPos.setVisible( true );
+					// dimensione marker: l'ultima usata nella pagina pianta, se il client la manda
+					if ( !IsNull( json.sizeMultiplier ) && Val( json.sizeMultiplier ) GT 0 ) {
+						firstPos.setSizeMultiplier( Int( Val( json.sizeMultiplier ) ) );
+					}
 					super.fire( "QuotationItemPosition.update", [ firstPos ] );
 				}
 

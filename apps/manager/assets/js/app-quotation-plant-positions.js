@@ -54,6 +54,7 @@ AP.quotation.plantPositions = (function () {
 				rotatedDraft: null,
 				selectedDraftId: null,
 				multiplierPos: null,
+				lastSizeMultiplier: null,
             },
 
 			watch: {
@@ -784,6 +785,14 @@ AP.quotation.plantPositions = (function () {
 				changeMultiplier(pos, delta) {
 					var newVal = Math.max(10, Math.min(500, (parseInt(pos.sizeMultiplier, 10) || 100) + delta));
 					this.$set(pos, 'sizeMultiplier', newVal);
+					this.lastSizeMultiplier = newVal;
+				},
+
+				onVisibleChange(pos, quotationItem) {
+					if (pos.visible && this.lastSizeMultiplier && (parseInt(pos.sizeMultiplier, 10) || 100) === 100) {
+						this.$set(pos, 'sizeMultiplier', this.lastSizeMultiplier);
+					}
+					this.syncInstanceVisible(pos, quotationItem);
 				},
 
 				openConfigureDraft(draft) {

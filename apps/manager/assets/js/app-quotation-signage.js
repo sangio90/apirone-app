@@ -1384,7 +1384,7 @@ AP.signage.modal = ( function() {
                             $.ajax({
                                 method: "POST",
                                 url: "/manager/ajax/quotation-item-drafts/" + draftId + "/apply",
-                                data: JSON.stringify({ quotationItemId: xhr.data.id }),
+                                data: JSON.stringify({ quotationItemId: xhr.data.id, sizeMultiplier: window.plantPositionsVm ? window.plantPositionsVm.lastSizeMultiplier : null }),
                                 contentType: "application/json"
                             }).always(function() {
                                 if ( window.plantPositionsVm ) {

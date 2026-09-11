@@ -149,6 +149,40 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newFileId;
 	}
 
+	/**
+	 * Copia un file di riga preventivo su un'altra riga (duplicazione articolo) con un
+	 * file fisico proprio: passa da create(), che assegna un nome univoco, inserisce la
+	 * riga files e genera le versioni ridimensionate, così le due righe non condividono
+	 * lo stesso file e possono rigenerare o perdere la propria anteprima in autonomia.
+	 * Restituisce l'id del nuovo file, stringa vuota se l'originale non esiste su disco.
+	 */
+	public String function duplicateForQuotationItem( required String fileId, required String quotationItemId ){
+		var file = get( arguments.fileId );
+		if ( IsNull( file ) ) {
+			return "";
+		}
+
+		var sourcePath = file.getPath();
+		if ( !FileExists( sourcePath ) ) {
+			return "";
+		}
+
+		// create() sposta il file sorgente: si lavora su una copia temporanea
+		var tmpPath = GetTempDirectory() & "copy_" & Left( LCase( Replace( CreateUUID(), "-", "", "ALL" ) ), 8 ) & "_" & file.getName();
+		FileCopy( sourcePath, tmpPath );
+
+		var entity = super.bean( "Entity" );
+		entity.setKey( "quotationItem.id" );
+		entity.setValue( arguments.quotationItemId );
+
+		return create(
+			filePath = tmpPath,
+			typeId   = file.getType().getId(),
+			kindId   = file.getKind().getId(),
+			entity   = entity
+		);
+	}
+
 	public String function duplicateForZone( required String fileId, required String quotationZoneId ){
 		var file = get( arguments.fileId );
 		return getDao().duplicateQuotationZoneFile( file = file, quotationZoneId = arguments.quotationZoneId );

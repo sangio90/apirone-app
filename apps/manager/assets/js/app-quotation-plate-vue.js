@@ -2447,7 +2447,7 @@ AP.plate.modal = ( function() {
                         $.ajax({
                             method: "POST",
                             url: "/manager/ajax/quotation-item-drafts/" + draftId + "/apply",
-                            data: JSON.stringify({ quotationItemId: newItemId }),
+                            data: JSON.stringify({ quotationItemId: newItemId, sizeMultiplier: window.plantPositionsVm ? window.plantPositionsVm.lastSizeMultiplier : null }),
                             contentType: "application/json"
                         }).always(function() {
                             if ( window.plantPositionsVm ) {

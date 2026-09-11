@@ -190,7 +190,7 @@
                                 <div class="col-12">
                                     <div v-if="quotationItems.length > 0" style="align-items: center; display: flex; height: 100%;">
                                         <div class="quotation-list">
-                                        	<div v-for="(quotationItemByType, index) in filteredQuotationItemsGroupedByType" :key="quotationItemByType.type" style="margin-right: 20px; display: flex">
+                                        	<div v-for="(quotationItemByType, index) in filteredQuotationItemsGroupedByType" :key="quotationItemByType.type" class="quotation-type-group">
                                         	<div
 												v-for="quotationItem in quotationItemByType"
 												:key="quotationItem.id"
@@ -224,7 +224,7 @@
 															@click="selectPosition(p)"
 														>
 															<div style="margin-top: .3em;">
-																<input type="checkbox" class="form-check-input" v-model="p.visible" @change="syncInstanceVisible(p, quotationItem)">
+																<input type="checkbox" class="form-check-input" v-model="p.visible" @change="onVisibleChange(p, quotationItem)">
 															</div>
 															<div class="position-title" style="margin-right: .3em;">
 																{{ quotationItem.position ? quotationItem.position.code : 'N/A' }}
@@ -370,8 +370,22 @@
         padding: .3em;
     }
 
+    /* Elenco articoli sotto la pianta: la lista non deve allargarsi oltre la
+       colonna (è figlia di un flex) e ogni gruppo per tipo va a capo invece di
+       schiacciare le card in un'unica riga che sforava dal contenitore. */
+    .quotation-list {
+        width: 100%;
+        min-width: 0;
+    }
+    .quotation-type-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        margin-right: 20px;
+    }
     .quotation-item {
     	display: inline-block;
+    	flex: 0 0 auto;
         margin-top: .3em;
         margin-left: .3em;
         border-radius: 10px;
