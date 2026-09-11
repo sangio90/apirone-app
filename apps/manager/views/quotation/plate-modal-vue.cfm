@@ -99,7 +99,9 @@
 
                             <div class="row mb-2 pb-2 bb-1">
                             <!--- Riga "Pulisci configurazione". bb-1: bordo inferiore per separazione visiva. --->
-                                <div class="col-12 text-end">
+                                <div class="col-8 small" v-html="exportCodeHtml"></div>
+                                <!--- Anteprima del codice export (articolo + variante a 10 caratteri) composta dal server con la stessa logica dell'esportazione; si aggiorna a ogni cambio di attributo. --->
+                                <div class="col-4 text-end">
                                     <a class="underline hand" @click="clearFilters" v-if="visibleUpperClearButton">Pulisci configurazione</a>
                                     <!--- v-if="visibleUpperClearButton": mostra il link solo quando ci sono selezioni attive da resettare. visibleUpperClearButton: proprietà computata Vue, true quando id è vuoto (nuova placca). @click="clearFilters": resetta tutte le selezioni (linea, modello, finitura, attributi, designer). --->
                                 </div>
@@ -148,7 +150,8 @@
                                                 <!--- Itera sugli attributi del prodotto. Ogni oggetto item ha: attributeId (ID numerico), attributeName (nome descrittivo), level (livello gerarchico, 0 = radice), values (array di opzioni con productItemId, selected, attributeValue). --->
                                                     <div v-if="item.values && item.values.length" :id="'attribute-container-' + item.attributeId" :key="item.attributeId">
                                                     <!--- v-if: mostra il container solo se ci sono opzioni disponibili. :id dinamico per manipolazione DOM. --->
-                                                        <label class="mb-1" :style="{ marginLeft: (1.5 * item.level) + 'rem' }">{{ item.attributeName }}</label>
+                                                        <label class="mb-1" :style="{ marginLeft: (1.5 * item.level) + 'rem' }">{{ item.attributeName }}<span v-if="importantAttributeCode(item.attributeId)" class="badge rounded-pill bg-light text-secondary border ms-1 export-attr-badge" style="font-size: 9px; vertical-align: middle;" :title="'Attributo da esportare: il codice ' + importantAttributeCode(item.attributeId) + ' entra nel codice variante (10 caratteri)'"><i class="fas fa-file-export"></i> {{ importantAttributeCode(item.attributeId) }}</span></label>
+                                                        <!--- Badge discreto sugli attributi "da esportare" (importantAttributes del prodotto): il loro codice entra nel codice variante. --->
                                                         <!--- :style: indentazione dinamica basata sul livello dell'attributo (level 0 = 0rem, level 1 = 1.5rem, ecc.). Crea un effetto ad albero visivo. --->
                                                         <select
                                                             class="form-control form-control-sm select-item me-3 mb-2"
@@ -327,8 +330,11 @@
                                                 </div>
                                                 <div class="mb-1 mt-2">Bozza:</div>
                                                 <div>
-                                                    <input class="form-check-input" type="checkbox" name="bozza" v-model="detailForm.data.bozza">
-                                                    <!--- detailForm.data.bozza: flag booleano. Se true, la riga è ancora una bozza (non definitiva). --->
+                                                    <select name="bozza" class="form-control form-control-sm" v-model="detailForm.data.bozza">
+                                                        <option :value="false">No</option>
+                                                        <option :value="true">Sì</option>
+                                                    </select>
+                                                    <!--- detailForm.data.bozza: flag booleano (default false). Tendina Sì/No: :value booleani, così il modello resta true/false. --->
                                                 </div>
                                             </div>
 

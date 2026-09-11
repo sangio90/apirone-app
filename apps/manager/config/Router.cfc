@@ -549,6 +549,7 @@
 		get( "/ajax/quotation-items/plate/:id/export3d" ).to( "QuotationItemAjaxController.plate3dExport" ).end();
 		get( "/ajax/quotation-items/plate/:id/export" ).to( "QuotationItemAjaxController.plateExport" ).end();
 		get( "/ajax/quotation-items/plate/:id" ).to( "QuotationItemAjaxController.editPlate" ).end();
+		post( "/ajax/quotation-items/export-code-preview" ).to( "QuotationItemAjaxController.exportCodePreview" ).end();
 		post( "/ajax/quotation-items/signage" ).to( "QuotationItemAjaxController.saveSignage" ).end();
 		post( "/ajax/quotation-items/plate" ).to( "QuotationItemAjaxController.savePlate" ).end();
 		get( "/ajax/quotation-items/accessory/:id" ).to( "QuotationItemAjaxController.editAccessory" ).end();

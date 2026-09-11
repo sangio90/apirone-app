@@ -30,7 +30,7 @@ AP.accessory.modal = ( function() {
                 id: "",
                 special: false,
                 customImage: false,
-                bozza: false,
+                bozza: "false", // tendina Sì/No: stringa "true"/"false" (binding value del select)
                 quantity: 1,
                 price: {
                     id: null,
@@ -180,6 +180,7 @@ AP.accessory.modal = ( function() {
             $( "#accessoryLine" ).prop( "disabled", false );
             $( "#accessoryModel" ).prop( "disabled", false );
             $( "#accessory-product-items" ).empty();
+            $( "#accessory-export-code" ).empty();
         },
 
         loadLines: async function( event ) {
@@ -631,11 +632,35 @@ AP.accessory.modal = ( function() {
             return true;
         },
 
+        // Anteprima del codice export (articolo + variante) per la configurazione corrente
+        // e badge sugli attributi "da esportare". Vedi AP.quotation.exportCode.
+        refreshExportCode: function() {
+            const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
+            const items = viewModel.get( "detailForm.data.quotationItem.product.items" );
+            if ( !productId || !items || typeof items.data !== "function" ) {
+                AP.quotation.exportCode.render( "#accessory-export-code", null );
+                return;
+            }
+            const productItemIds = [];
+            items.data().forEach( function( item ) {
+                ( item.values || [] ).forEach( function( v ) {
+                    if ( v.selected ) {
+                        productItemIds.push( v.product_item_id );
+                    }
+                } );
+            } );
+            AP.quotation.exportCode.preview( "accessory", { productId: productId, productItemIds: productItemIds }, function( outcome ) {
+                AP.quotation.exportCode.render( "#accessory-export-code", outcome );
+                AP.quotation.exportCode.markImportant( "#accessory-product-items", outcome && outcome.importantAttributes );
+            } );
+        },
+
         renderProductItems: function() {
             const container = $( "#accessory-product-items" );
             container.empty();
             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
             const attributeArray = productItems.data();
+            viewModel.refreshExportCode();
             attributeArray.forEach( function( item ) {
                 const attrName = item.attribute_name;
                 const values = item.values;
@@ -934,6 +959,7 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 $( "#accessory-product-items" ).empty();
+            $( "#accessory-export-code" ).empty();
                 AP.deleteUserPref( "accessory.lineId" );
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
@@ -944,6 +970,7 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 $( "#accessory-product-items" ).empty();
+            $( "#accessory-export-code" ).empty();
                 AP.deleteUserPref( "accessory.modelId" );
                 AP.deleteUserPref( "accessory.finishId" );
                 AP.deleteUserPref( "accessory.product.items" );
@@ -952,6 +979,7 @@ AP.accessory.modal = ( function() {
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 $( "#accessory-product-items" ).empty();
+            $( "#accessory-export-code" ).empty();
                 AP.deleteUserPref( "accessory.finishId" );
                 AP.deleteUserPref( "accessory.product.items" );
             } );
@@ -1099,7 +1127,7 @@ AP.accessory.modal = ( function() {
 			viewModel.set( "detailForm.data", data );
             viewModel.set('detailForm.data.quotationItem.customImage', viewModel.get('detailForm.data.quotationItem.customImage') == 'true')
             viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
-            viewModel.set('detailForm.data.quotationItem.bozza', viewModel.get('detailForm.data.quotationItem.bozza') == 'true')
+            viewModel.set('detailForm.data.quotationItem.bozza', String(viewModel.get('detailForm.data.quotationItem.bozza') == 'true'))
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })

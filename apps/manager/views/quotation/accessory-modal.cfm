@@ -77,7 +77,8 @@
                         </div>
 
                         <div class="row mb-2 pb-2 bb-1">
-                            <div class="col-12 text-end">
+                            <div class="col-8 small" id="accessory-export-code"></div>
+                            <div class="col-4 text-end">
                                 <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
                         </div>

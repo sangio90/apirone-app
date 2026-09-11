@@ -51,7 +51,7 @@ AP.signage.modal = ( function() {
                 signageRows: new kendo.data.DataSource(),
                 special: false,
                 customImage: false,
-                bozza: false,
+                bozza: "false", // tendina Sì/No: stringa "true"/"false" (binding value del select)
                 status: {
                     id: "ACT",
                     name: "Attivo"
@@ -221,6 +221,7 @@ AP.signage.modal = ( function() {
             $( "#signageFinish" ).prop( "disabled", false );
             $( "#signageFont" ).prop( "disabled", false );
             $( "#product-items" ).empty();
+            $( "#signage-export-code" ).empty();
         },
 
         toggleJsonExport: function() {
@@ -313,6 +314,8 @@ AP.signage.modal = ( function() {
         },
 
         parseLines: async function( e ) {
+            // il corpo del font entra nel codice variante: aggiorna l'anteprima del codice export
+            viewModel.refreshExportCode();
             viewModel.set( "maxRows", viewModel.get( "detailForm.data.quotationItem.signageConfigItem.rowCount" ) );
             if ( viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().length > viewModel.get( "maxRows" ) ) {
                 if ( viewModel.get( "detailForm.data.quotationItem.id" ) != "" ) {
@@ -1136,11 +1139,42 @@ AP.signage.modal = ( function() {
             } );
         },
 
+        // Anteprima del codice export (articolo + variante) per la configurazione corrente
+        // e badge sugli attributi "da esportare". Per la segnaletica la variante è font + corpo,
+        // quindi serve anche il signageConfigItem. Vedi AP.quotation.exportCode.
+        refreshExportCode: function() {
+            const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
+            const items = viewModel.get( "detailForm.data.quotationItem.product.items" );
+            if ( !productId || !items || typeof items.data !== "function" ) {
+                AP.quotation.exportCode.render( "#signage-export-code", null );
+                return;
+            }
+            const productItemIds = [];
+            items.data().forEach( function( item ) {
+                ( item.values || [] ).forEach( function( v ) {
+                    if ( v.selected ) {
+                        productItemIds.push( v.product_item_id );
+                    }
+                } );
+            } );
+            const payload = {
+                productId: productId,
+                productItemIds: productItemIds,
+                signage: true,
+                signageConfigItemId: viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) || ""
+            };
+            AP.quotation.exportCode.preview( "signage", payload, function( outcome ) {
+                AP.quotation.exportCode.render( "#signage-export-code", outcome );
+                AP.quotation.exportCode.markImportant( "#product-items", outcome && outcome.importantAttributes );
+            } );
+        },
+
         renderProductItems: function() {
             const container = $( "#product-items" );
             container.empty();
             const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
             var attributeArray = productItems.data();
+            viewModel.refreshExportCode();
 
             attributeArray.forEach( function( item ) {
                 const attrName = item.attribute_name;
@@ -1725,7 +1759,7 @@ AP.signage.modal = ( function() {
         viewModel.set( "detailForm.data", data );
         viewModel.set( "detailForm.data.quotationItem.customImage", viewModel.get( "detailForm.data.quotationItem.customImage" ) == "true" );
         viewModel.set( "detailForm.data.quotationItem.special", viewModel.get( "detailForm.data.quotationItem.special" ) == "true" );
-        viewModel.set( "detailForm.data.quotationItem.bozza", viewModel.get( "detailForm.data.quotationItem.bozza" ) == "true" );
+        viewModel.set( "detailForm.data.quotationItem.bozza", String( viewModel.get( "detailForm.data.quotationItem.bozza" ) == "true" ) );
         viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { "id": "", "code": "" } );
 
         var ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );

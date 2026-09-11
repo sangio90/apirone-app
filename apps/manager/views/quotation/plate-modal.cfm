@@ -184,9 +184,11 @@
                                             </div>
                                             <div class="mb-1 mt-2">Bozza:</div>
                                             <div>
-                                                <input class="form-check-input" type="checkbox"
-                                                    name="bozza"
-                                                    data-bind="checked: detailForm.data.bozza">
+                                                <select name="bozza" class="form-control form-control-sm"
+                                                    data-bind="value: detailForm.data.bozza">
+                                                    <option value="false">No</option>
+                                                    <option value="true">Sì</option>
+                                                </select>
                                             </div>
                                         </div>
 

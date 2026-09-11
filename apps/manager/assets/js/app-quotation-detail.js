@@ -1818,3 +1818,83 @@ AP.quotation.printModal = (function () {
 
 	return pub;
 }());
+
+
+/*
+ * Anteprima del codice export nelle modali articolo (placca, accessorio, segnaletica).
+ * Il codice (articolo + variante a 10 caratteri) viene composto dal server con la
+ * stessa logica dell'esportazione (Quotation.composeExportCode), così l'utente vede
+ * mentre compila gli attributi se quelli "da esportare" entrano nei 10 caratteri.
+ */
+AP.quotation.exportCode = (function () {
+	var pub = {};
+	var timers = {};
+
+	var esc = function (str) {
+		return $("<div>").text(str == null ? "" : String(str)).html();
+	};
+
+	// Chiede l'anteprima (debounce per chiave: una richiesta per modale ogni 250 ms).
+	// payload: { productId, productItemIds, signage, signageConfigItemId }
+	pub.preview = function (key, payload, done) {
+		clearTimeout(timers[key]);
+		timers[key] = setTimeout(function () {
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/quotation-items/export-code-preview",
+				data: JSON.stringify(payload),
+				callback: {
+					done: function (xhr) {
+						done(xhr && xhr.data ? xhr.data : null);
+					}
+				}
+			});
+		}, 250);
+	};
+
+	// HTML della riga "Codice export": codici sulla prima riga, eventuale errore
+	// (lo stesso messaggio dell'export) su una riga a sé, senza andare a capo.
+	pub.html = function (outcome) {
+		if (!outcome) {
+			return "";
+		}
+		var html = '<div><span class="text-muted">Codice export:</span> ';
+		if (outcome.articleCode) {
+			html += '<code title="Codice articolo: categoria + linea + modello + finitura">' + esc(outcome.articleCode) + "</code>";
+		}
+		if (outcome.success) {
+			html += ' <code title="Codice variante: 10 caratteri, attributi da esportare + zeri di riempimento">' + esc(outcome.variantCode) + "</code>";
+		}
+		html += "</div>";
+		if (!outcome.success && outcome.error) {
+			html += '<div class="text-danger text-nowrap"><i class="fas fa-exclamation-triangle"></i> ' + esc(outcome.error) + "</div>";
+		}
+		return html;
+	};
+
+	pub.render = function (container, outcome) {
+		$(container).html(pub.html(outcome));
+	};
+
+	// Badge discreto accanto al nome dell'attributo "da esportare"
+	pub.badge = function (code) {
+		return $('<span class="badge rounded-pill bg-light text-secondary border ms-1 export-attr-badge" style="font-size: 9px; vertical-align: middle;"></span>')
+			.attr("title", 'Attributo da esportare: il codice "' + code + '" entra nel codice variante (10 caratteri)')
+			.html('<i class="fas fa-file-export"></i> ' + esc(code));
+	};
+
+	// Applica i badge agli attributi importanti dentro un albero attributi (modali Kendo):
+	// ogni attributo ha un contenitore #attribute-container-<attributeId> con il label per primo.
+	pub.markImportant = function (container, importantAttributes) {
+		var $c = $(container);
+		$c.find(".export-attr-badge").remove();
+		(importantAttributes || []).forEach(function (attr) {
+			var $label = $c.find("#attribute-container-" + attr.id + " > label").first();
+			if ($label.length) {
+				$label.append(pub.badge(attr.code));
+			}
+		});
+	};
+
+	return pub;
+})();

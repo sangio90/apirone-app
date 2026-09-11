@@ -184,7 +184,7 @@ AP.plate.modal = ( function() {
                 // price: 0,
                 special: false,
                 customImage: false,
-                bozza: false,
+                bozza: "false", // tendina Sì/No: stringa "true"/"false" (binding value del select)
                 note: '',
                 status: {
                     id: "ACT"
@@ -1614,7 +1614,7 @@ AP.plate.modal = ( function() {
             viewModel.set( "detailForm.data.quantity", data.quotationItem.quantity );
             viewModel.set( "detailForm.data.special", data.quotationItem.special == 'true' );
             viewModel.set( "detailForm.data.customImage", data.quotationItem.customImage == 'true' );
-            viewModel.set( "detailForm.data.bozza", data.quotationItem.bozza == 'true' );
+            viewModel.set( "detailForm.data.bozza", String( data.quotationItem.bozza == 'true' ) );
             //in base al bool di customImage setto questi due parametri, se showCustomImage mostrerò il div con l'immagine custom e nasconderò quello con l'immagine composta dai vari attributes
             //altrimenti farò il contrario
 

@@ -1400,6 +1400,97 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/**
+	 * Anteprima del codice export (codice articolo + codice variante a 10 caratteri)
+	 * per la configurazione corrente di una modale articolo. Usa la stessa logica
+	 * dell'esportazione (Quotation.composeExportCode) senza scrivere nulla, così
+	 * l'utente vede subito se gli attributi "da esportare" entrano nei 10 caratteri.
+	 * Body JSON: { productId, productItemIds: [], signage: bool, signageConfigItemId }
+	 */
+	function exportCodePreview( event, rc, prc ){
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+
+		var data = {
+			"success"             = false,
+			"error"               = "",
+			"articleCode"         = "",
+			"variantCode"         = "",
+			"name"                = "",
+			"variantParts"        = [],
+			"importantAttributes" = []
+		};
+
+		var productId = json.productId ?: "";
+
+		if ( !Len( productId ) ) {
+			data.error = "Prodotto non selezionato.";
+			result.setData( data );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var product = super.service( "Product" ).get( productId );
+		if ( IsNull( product ) ) {
+			data.error = "Prodotto non trovato.";
+			result.setData( data );
+			event.setValue( "result", result );
+			return;
+		}
+
+		// Attributi "da esportare" del prodotto (id + codice): servono alla modale per evidenziarli
+		var importantAttributes = product.getImportantAttributes();
+		if ( !IsNull( importantAttributes ) ) {
+			for ( var importantAttribute in importantAttributes ) {
+				var attribute = super.service( "Attribute" ).get( attributeId = importantAttribute.getId() );
+				if ( IsNull( attribute ) ) continue;
+				ArrayAppend( data.importantAttributes, {
+					"id"   = attribute.getId(),
+					"code" = Trim( attribute.getCode() ?: "" )
+				} );
+			}
+		}
+
+		var quotationItemData = {
+			"productId"    = product.getId(),
+			"categoryId"   = IsNull( product.getCategory() ) ? "" : product.getCategory().getId(),
+			"lineId"       = IsNull( product.getLine() )     ? "" : product.getLine().getId(),
+			"modelId"      = IsNull( product.getModel() )    ? "" : product.getModel().getId(),
+			"finishId"     = IsNull( product.getFinish() )   ? "" : product.getFinish().getId(),
+			"productItems" = []
+		};
+
+		for ( var productItemId in ( json.productItemIds ?: [] ) ) {
+			if ( Len( Trim( productItemId ) ) ) {
+				ArrayAppend( quotationItemData.productItems, { "productItemId" = productItemId } );
+			}
+		}
+
+		// Segnaletica: la variante è font + corpo, esattamente come nell'export
+		var isSignage = json.signage ?: false;
+		if ( IsBoolean( isSignage ) && isSignage ) {
+			quotationItemData[ "signageRows" ] = [];
+			if ( Len( json.signageConfigItemId ?: "" ) ) {
+				quotationItemData[ "signageConfigItemId" ] = json.signageConfigItemId;
+			}
+		}
+
+		try {
+			var outcome = super.service( "Quotation" ).composeExportCode( quotationItemData = quotationItemData );
+			data.success      = outcome.success;
+			data.error        = outcome.error;
+			data.articleCode  = outcome.articleCode;
+			data.variantCode  = outcome.variantCode;
+			data.name         = outcome.name;
+			data.variantParts = outcome.variantParts;
+		} catch ( any e ) {
+			data.error = "Codice non componibile: configurazione incompleta.";
+		}
+
+		result.setData( data );
+		event.setValue( "result", result );
+	}
+
 	private String function getTypeIdBySlug(
 			required String slug
 		){

@@ -10,12 +10,6 @@
 						name="special" 
 						data-bind="checked: detailForm.data.quotationItem.special">
 				</div>
-				<div class="mb-1 mt-2">Bozza:</div>
-				<div>
-					<input class="form-check-input" type="checkbox"
-						name="bozza"
-						data-bind="checked: detailForm.data.quotationItem.bozza">
-				</div>
 			</div>
 			<div class="col-5">
 				<div id="imageCustomInput" data-bind="visible: detailForm.data.quotationItem.id">
@@ -45,6 +39,16 @@
 						data-value-field="id"
 						data-text-field="name"
 						>
+					</select>
+				</div>
+			</div>
+			<div class="col-12 mb-2">
+				<div class="mb-1">Bozza:</div>
+				<div>
+					<select name="bozza" class="form-control form-control-sm"
+						data-bind="value: detailForm.data.quotationItem.bozza">
+						<option value="false">No</option>
+						<option value="true">Sì</option>
 					</select>
 				</div>
 			</div>

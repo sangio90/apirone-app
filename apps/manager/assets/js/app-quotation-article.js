@@ -23,7 +23,7 @@ AP.article.modal = ( function() {
                 name: "",
                 quantity: 1,
                 note: "",
-                bozza: false,
+                bozza: "false", // tendina Sì/No: stringa "true"/"false" (binding value del select)
                 price: {
                     total: 0,
                     amount: 0,
@@ -140,7 +140,7 @@ AP.article.modal = ( function() {
             callback: {
                 done: function( xhr ) {
                     xhr.data.quotationItem.price.amount = xhr.data.quotationItem.price.total
-                    xhr.data.quotationItem.bozza = xhr.data.quotationItem.bozza == 'true'
+                    xhr.data.quotationItem.bozza = String(xhr.data.quotationItem.bozza == 'true')
                     viewModel.set( "detailForm.data.quotationItem", xhr.data.quotationItem );
                     NM.util.openModal( fields.articleModalRoot );
                 },

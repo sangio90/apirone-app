@@ -334,6 +334,8 @@ AP.plate.modal = ( function() {
                 productItemsImages: {}, /** Mappa degli URI delle immagini dei product items, indicizzata per ID. */
                 activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
                 smallLoading: false, /** Flag di caricamento. */
+                exportCodePreview: null, /** Anteprima codice export (articolo + variante) dal server, vedi refreshExportCode. */
+                importantAttributes: [], /** Attributi "da esportare" del prodotto ({ id, code }), per il badge accanto al nome. */
                 canEdit: AP.page.canEdit, /** Flag che indica se il preventivo è modificabile. */
                 showJsonPanel: false, /** Flag per mostrare il pannello JSON export (provvisorio). */
                 jsonExportText: "", /** Contenuto JSON dell'export placca. */
@@ -386,6 +388,13 @@ AP.plate.modal = ( function() {
                  */
                 visibleLowerClearButton: function() {
                     return this.detailForm.data.id === "";
+                },
+
+                /**
+                 * HTML della riga "Codice export" (helper condiviso AP.quotation.exportCode).
+                 */
+                exportCodeHtml: function() {
+                    return AP.quotation.exportCode.html( this.exportCodePreview );
                 },
             },
 
@@ -929,6 +938,41 @@ AP.plate.modal = ( function() {
                  * Organizza gli items per attributo raggruppandone i valori.
                  * Se esiste già un quotation item, ripristina le selezioni salvate.
                  */
+                /**
+                 * Chiede al server l'anteprima del codice export (articolo + variante a 10
+                 * caratteri) per il prodotto e gli attributi placca selezionati, con la stessa
+                 * logica dell'esportazione. Aggiorna anche l'elenco degli attributi "da esportare".
+                 */
+                refreshExportCode: function() {
+                    const productId = this.detailForm.data.product.id;
+                    if ( !productId ) {
+                        this.exportCodePreview = null;
+                        this.importantAttributes = [];
+                        return;
+                    }
+                    const productItemIds = [];
+                    for ( const item of ( this.detailForm.data.product.items || [] ) ) {
+                        for ( const v of ( item.values || [] ) ) {
+                            if ( v.selected && v.productItemId ) {
+                                productItemIds.push( v.productItemId );
+                            }
+                        }
+                    }
+                    AP.quotation.exportCode.preview( "plate", { productId: productId, productItemIds: productItemIds }, ( outcome ) => {
+                        this.exportCodePreview = outcome;
+                        this.importantAttributes = ( outcome && outcome.importantAttributes ) || [];
+                    } );
+                },
+
+                /**
+                 * Codice dell'attributo se è tra quelli "da esportare", altrimenti stringa vuota.
+                 * @param {string} attributeId - Identificativo dell'attributo.
+                 */
+                importantAttributeCode: function( attributeId ) {
+                    const found = ( this.importantAttributes || [] ).find( ( a ) => { return a.id === attributeId; } );
+                    return found ? found.code : "";
+                },
+
                 firstLoadProductItems: async function() {
                     const quotationItemId = this.detailForm.data.id;
                     const productId = this.detailForm.data.product.id;
@@ -1015,6 +1059,8 @@ AP.plate.modal = ( function() {
                             }
                         }
                     }
+
+                    this.refreshExportCode();
                 },
 
                 /**
@@ -1286,6 +1332,7 @@ AP.plate.modal = ( function() {
                 handleProductItemSelect: async function( selectedId, attributeId, value ) {
                     await this.loadProductItems( selectedId, attributeId );
                     this.renderPlateWithFruits();
+                    this.refreshExportCode();
                 },
 
                 // MARK: Fruits
@@ -2488,6 +2535,8 @@ AP.plate.modal = ( function() {
                     this.detailForm.data.product.line.id = "";
                     this.detailForm.data.product.model.id = "";
                     this.detailForm.data.product.finish.id = "";
+                    this.exportCodePreview = null;
+                    this.importantAttributes = [];
                 },
 
                 /**

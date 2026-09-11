@@ -358,7 +358,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"productItemIds" = [],
 			"attributeNotes" = [],
 			"fontName"       = "",
-			"fontSize"       = ""
+			"fontSize"       = "",
+			"variantParts"   = [],
+			"importantAttributeIds" = []
 		};
 
 		var data = arguments.quotationItemData;
@@ -392,6 +394,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return outcome;
 		}
 		code &= Trim( finish.getCode() );
+		outcome.articleCode = code; // valorizzato subito: utile all'anteprima anche quando la variante non si compone
 
 		var varCode = "";
 
@@ -423,6 +426,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var importantAttributes = product.getImportantAttributes();
+		if ( !IsNull( importantAttributes ) ) {
+			for ( var importantAttribute in importantAttributes ) {
+				ArrayAppend( outcome.importantAttributeIds, importantAttribute.getId() );
+			}
+		}
 
 		if ( StructKeyExists( data, "productItems" ) ) {
 			for ( var entry in data.productItems ) {
@@ -467,10 +475,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						& '") non entra nel codice variante (già '
 						& Len( varCode )
 						& ' su 10 caratteri). Verificare i codici degli attributi importanti del prodotto.';
+					outcome.variantCode = varCode;
 					return outcome;
 				}
 
 				varCode &= slotCode;
+				ArrayAppend( outcome.variantParts, {
+					"attributeId"   = attribute.getId(),
+					"attributeCode" = Trim( attribute.getCode() ),
+					"valueCode"     = Trim( rawValue.getCode() )
+				} );
 			}
 		}
 

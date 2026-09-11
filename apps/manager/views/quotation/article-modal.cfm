@@ -55,9 +55,12 @@
 						</div>
 
 						<div class="form-group row pb-3">
-							<label class="col-sm-3 control-label text-sm-end" for="article-bozza">Bozza</label>
+							<label class="col-sm-3 control-label text-sm-end pt-2" for="article-bozza">Bozza</label>
 							<div class="col-sm-9">
-								<input class="form-check-input" type="checkbox" name="bozza" id="article-bozza" data-bind="checked: detailForm.data.quotationItem.bozza" />
+								<select name="bozza" id="article-bozza" class="form-control" data-bind="value: detailForm.data.quotationItem.bozza">
+									<option value="false">No</option>
+									<option value="true">Sì</option>
+								</select>
 							</div>
 						</div>
 					</div>
