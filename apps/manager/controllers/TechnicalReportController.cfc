@@ -22,6 +22,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	variables.PLATE_CANVAS_LONG_PX   = 1200;
 	variables.PLATE_CANVAS_SHORT_PX  = 500;
 	variables.PLATE_CANVAS_MAX_SCALE = 4;
+	// Bordo da aggiungere all'armatura, per lato, quando in model_configs mancano le
+	// misure della placca intera: le placche hanno di norma 2-3 cm di corpo attorno ai frutti.
+	variables.PLATE_BORDER_FALLBACK_MM = 25;
 
 	// Tipologie generabili anche su un preventivo non ancora calcolato, perché il
 	// loro template non riporta prezzi né totali e quindi non legge quotationPrice.
@@ -305,7 +308,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			arrayAppend( allItems, z.zoneItems, true );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
-		quoteObj.plateImages    = buildPlateCrops( allItems );
+		quoteObj.plateImages    = buildPlateCrops( allItems, quoteObj.modelConfigMap );
 
 		return quoteObj;
 	}
@@ -379,7 +382,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			arrayAppend( allItems, quoteObj.items[hashKey].item );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
-		quoteObj.plateImages    = buildPlateCrops( allItems );
+		quoteObj.plateImages    = buildPlateCrops( allItems, quoteObj.modelConfigMap );
 
 		return quoteObj;
 	}
@@ -408,7 +411,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	 * che non si riescono a ritagliare non ci sono, e la stampa le adatta al box
 	 * com'è sempre stato.
 	 */
-	private Struct function buildPlateCrops( required Array items ){
+	private Struct function buildPlateCrops( required Array items, Struct modelConfigMap = {} ){
 		var crops  = { "byItem" = {}, "maxWidthMm" = 0, "maxHeightMm" = 0 };
 		var frames = {};
 
@@ -449,25 +452,51 @@ component extends="com.apirone.core.controller.AbsController" {
 			// l'ingombro in millimetri, quindi niente ritaglio
 			if ( geometry.width LTE 0 || geometry.height LTE 0 ) continue;
 
+			// Ingombro della placca intera, non della sola armatura: le immagini prodotto
+			// sono in scala (stessi px/mm dell'armatura) e disegnano tutto il corpo della
+			// placca centrato nella tela, quindi si può ritagliare la placca com'è davvero,
+			// col bordo attorno ai frutti. Le misure stanno in model_configs (orizzontali);
+			// se mancano si allarga l'armatura di un bordo standard per lato.
+			var plateWidth  = 0;
+			var plateHeight = 0;
+			var productId   = item.getProduct().getId();
+			if ( StructKeyExists( arguments.modelConfigMap, productId ) ) {
+				var modelConfig = arguments.modelConfigMap[ productId ];
+				plateWidth  = Val( modelConfig.getWidth() );
+				plateHeight = Val( modelConfig.getHeight() );
+				if ( geometry.orientationId EQ "VER" ) {
+					var swap    = plateWidth;
+					plateWidth  = plateHeight;
+					plateHeight = swap;
+				}
+			}
+			if ( plateWidth LTE 0 || plateHeight LTE 0 ) {
+				plateWidth  = geometry.width  + 2 * variables.PLATE_BORDER_FALLBACK_MM;
+				plateHeight = geometry.height + 2 * variables.PLATE_BORDER_FALLBACK_MM;
+			}
+			// la placca non può essere più piccola dell'armatura
+			geometry[ "plateWidth" ]  = Max( plateWidth,  geometry.width );
+			geometry[ "plateHeight" ] = Max( plateHeight, geometry.height );
+
 			var path = cropPlateImage( item.getImage(), geometry );
 
 			if ( !Len( path ) ) continue;
 
 			crops.byItem[ item.getId() ] = {
 				"path"     = path,
-				"widthMm"  = geometry.width,
-				"heightMm" = geometry.height
+				"widthMm"  = geometry.plateWidth,
+				"heightMm" = geometry.plateHeight
 			};
 
-			crops.maxWidthMm  = Max( crops.maxWidthMm,  geometry.width );
-			crops.maxHeightMm = Max( crops.maxHeightMm, geometry.height );
+			crops.maxWidthMm  = Max( crops.maxWidthMm,  geometry.plateWidth );
+			crops.maxHeightMm = Max( crops.maxHeightMm, geometry.plateHeight );
 		}
 
 		return crops;
 	}
 
 	/**
-	 * Ritaglia l'anteprima sull'armatura e restituisce il percorso del PNG.
+	 * Ritaglia l'anteprima sulla placca intera ( armatura più bordo ) e restituisce il percorso del PNG.
 	 *
 	 * Il file prende il nome dal ritaglio e viene riusato: la stessa placca ricorre
 	 * più volte nello stesso documento e fra una stampa e l'altra.
@@ -492,8 +521,10 @@ component extends="com.apirone.core.controller.AbsController" {
 				variables.PLATE_CANVAS_MAX_SCALE
 			);
 
-			var frameW = arguments.geometry.width  * displayScale;
-			var frameH = arguments.geometry.height * displayScale;
+			// rettangolo da ritagliare: la placca intera ( plateWidth/plateHeight, calcolati
+			// da buildPlateCrops ), centrata nella tela come l'armatura e comunque dentro la tela
+			var plateW = Min( canvasW, ( arguments.geometry.plateWidth  ?: arguments.geometry.width )  * displayScale );
+			var plateH = Min( canvasH, ( arguments.geometry.plateHeight ?: arguments.geometry.height ) * displayScale );
 
 			var storedW = IsNull( arguments.image.getWidth() )  ? 0 : Val( arguments.image.getWidth() );
 			var storedH = IsNull( arguments.image.getHeight() ) ? 0 : Val( arguments.image.getHeight() );
@@ -513,10 +544,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			// 800px di larghezza. Il rapporto riporta le coordinate sui pixel veri.
 			var ratio = storedW / canvasW;
 
-			var x = Round( Max( 0, ( canvasW - frameW ) / 2 ) * ratio );
-			var y = Round( Max( 0, ( canvasH - frameH ) / 2 ) * ratio );
-			var w = Min( Round( frameW * ratio ), storedW - x );
-			var h = Min( Round( frameH * ratio ), storedH - y );
+			var x = Round( Max( 0, ( canvasW - plateW ) / 2 ) * ratio );
+			var y = Round( Max( 0, ( canvasH - plateH ) / 2 ) * ratio );
+			var w = Min( Round( plateW * ratio ), storedW - x );
+			var h = Min( Round( plateH * ratio ), storedH - y );
 
 			if ( w LTE 0 || h LTE 0 ) return "";
 
