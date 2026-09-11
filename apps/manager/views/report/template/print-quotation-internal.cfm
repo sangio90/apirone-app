@@ -11,7 +11,7 @@
 							</td>
 							<td style="border: 0; width: 12cm; padding-left: 1in; padding-top: .4in">
 								<h2>Preventivo N. #args.data.quotation.getQuotationNumber()#/#args.data.quotation.getVersionNumber()#</h2>
-								<table style="width: 100%; border: 0;">
+								<table style="width: 100%; border-collapse: collapse; border-top: 1px solid black; border-left: 1px solid black;">
 									<tr>
 										<td style="width: 40%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">Data</td>
 										<td style="width: 60%;border: 0; border-bottom: 1px solid black; border-right: 1px solid black;">#DateFormat( args.data.quotation.getQuotationDate(), "dd/mm/yyyy" )#</td>
