@@ -61,7 +61,7 @@ AP.signage.modal = ( function() {
             signageConfig: {
                 catalogBundle: {
                     category: {
-                        id: 20
+                        id: ""
                     },
                     line: {
                         id: ""
@@ -1455,6 +1455,7 @@ AP.signage.modal = ( function() {
 
         clearFilters: function() {
             viewModel.resetForm();
+            AP.deleteUserPref( "signage.categoryId" );
             AP.deleteUserPref( "signage.lineId" );
             AP.deleteUserPref( "signage.modelId" );
             AP.deleteUserPref( "signage.finishId" );
@@ -1536,12 +1537,10 @@ AP.signage.modal = ( function() {
         } );
 
         if ( categoriesResponse.data.length > 0 ) {
-            categoriesResponse.data = categoriesResponse.data.filter( c => c.id == 20 );
+            categoriesResponse.data = categoriesResponse.data.filter( c => c.type.id == "SEG" );
+            categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
             viewModel.get( "categories" ).data( categoriesResponse.data );
-            viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", categoriesResponse.data[0] );
         }
-
-        AP.setUserPref( "signage.categoryId", 20 );
 
         NM.util.openModal( AP.signage.fields.modalRoot );
         viewModel.resetForm();
@@ -1556,8 +1555,10 @@ AP.signage.modal = ( function() {
         const signageSignageConfigId = AP.getUserPref( "signage.signageConfigId" );
 
         if ( signageCategoryId ) {
-            const category = viewModel.categories.data().find( c => c.id == signageCategoryId );
+            let category = viewModel.categories.data().find( c => c.id == signageCategoryId );
             if ( category ) {
+                category = { id: category.id, name: category.name };
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.category", category );
                 await viewModel.loadLines();
                 if ( signageLineId ) {
                     let line = viewModel.lines.data().find( l => l.id == signageLineId );
@@ -1720,7 +1721,8 @@ AP.signage.modal = ( function() {
             },
         } );
 
-        categoriesResponse.data = categoriesResponse.data.filter( c => c.id == 20 );
+        categoriesResponse.data = categoriesResponse.data.filter( c => c.type.id == "SEG" );
+        categoriesResponse.data.unshift( { id: "", name: "-- seleziona" } );
         viewModel.get( "categories" ).data( categoriesResponse.data );
         NM.util.openModal( AP.signage.fields.modalRoot );
 
