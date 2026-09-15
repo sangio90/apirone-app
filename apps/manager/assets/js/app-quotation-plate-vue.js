@@ -493,7 +493,8 @@ AP.plate.modal = ( function() {
                         callback: {
                             done: ( xhr ) => {
                                 if ( xhr.data && xhr.data.length > 0 && xhr.data[0].uri ) {
-                                    this.backgroundCustomImage = xhr.data[0];
+                                    // Il template lega backgroundCustomImage.url, ma l'API restituisce uri.
+                                    this.backgroundCustomImage = Object.assign( {}, xhr.data[0], { url: xhr.data[0].uri } );
                                 }
                             },
                         },
