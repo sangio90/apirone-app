@@ -39,7 +39,7 @@
 			customer.setCountry( country );
 		}
 
-		var accountAddresses = data.indirizzi_spedizione;
+		var accountAddresses = data.indirizzi_spedizione ?: [];
 
 		if (Len( accountAddresses ) ) {
 

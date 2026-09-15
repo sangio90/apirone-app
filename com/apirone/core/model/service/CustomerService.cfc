@@ -18,7 +18,7 @@
 
 		// Recupera da CRM e mappa
 		var crmData  = getCrmApiService().getCustomer( customerId );
-		var customer = super.service("Customer");
+		var customer = super.bean("Customer");
 
 		if ( !IsNull( crmData ) && !IsNull( crmData.data ) ) {
 			crmData  = crmData.data;

@@ -512,6 +512,9 @@ AP.quotation.header = ( function() {
             url: "/manager/ajax/quotations/" + id,
             callback: {
                 done: function( xhr ) {
+                    if ( xhr.data.customer && !xhr.data.customer.shippingProfiles ) {
+                        xhr.data.customer.shippingProfiles = [];
+                    }
                     viewModel.set( "detailForm.data", xhr.data );
                     applyShippingProfile( xhr.data.shippingProfile || {} );
 
