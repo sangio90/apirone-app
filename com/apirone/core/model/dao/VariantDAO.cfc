@@ -1,11 +1,11 @@
-<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
+<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
 		<cfargument name="variantId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT *
 			FROM
-				#super.sanitizeSQL( "#variables.companyId#_codvar" )#
+				verticale_variants
 			WHERE
 				TRIM( varcod ) = <cfqueryparam cfsqltype="varchar" value="#arguments.variantId#">
 		</cfquery>
@@ -20,16 +20,16 @@
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="codvar.varcod">
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				varcod,
 				COUNT(varcod) OVER() AS total
 			FROM
-				#super.sanitizeSQL( "#variables.companyId#_codvar" )# AS codvar
+				verticale_variants AS codvar
 
 				<cfif !IsNull( arguments.rawProductId )>
 					INNER JOIN
-						#super.sanitizeSQL( "#variables.companyId#_comvar" )# AS comvar
+						verticale_variant_products AS comvar
 							ON comvar.cbcodvar = codvar.varcod
 				</cfif>
 
@@ -43,8 +43,8 @@
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
-				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
+				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
 

@@ -66,6 +66,20 @@
                     <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto... (Ctrl + K)">
                 </div>
 
+                <div id="sync-widget" class="me-3 d-flex align-items-center">
+                    <button id="sync-dropdown-btn" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bx bx-sync"></i> Sincronizza
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="sync-dropdown-btn">
+                        <a class="dropdown-item" href="javascript:void(0)" data-sync-source="verticale">Verticale</a>
+                        <a class="dropdown-item" href="javascript:void(0)" data-sync-source="crm">CRM</a>
+                    </div>
+                    <small class="text-muted lh-sm">
+                        <span id="sync-status-verticale"></span><br>
+                        <span id="sync-status-crm"></span>
+                    </small>
+                </div>
+
                 <div id="userbox" class="userbox">
                     <a href="##" data-bs-toggle="dropdown">
                         <figure class="profile-picture">
@@ -196,6 +210,7 @@
         <script src="/assets/#prc.staticVersion#/manager/js/app-util.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-widget.js"></script>
         <script src="/assets/#prc.staticVersion#/manager/js/app-search.js"></script>
+        <script src="/assets/#prc.staticVersion#/manager/js/app-sync.js"></script>
 
         #includeCssFiles()#
         #includeJsFiles()#

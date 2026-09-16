@@ -114,33 +114,34 @@
 			<cfreturn costMemo[ memoKey ]>
 		</cfif>
 
-		<cfquery name="verticalCost" datasource="verticale">
-			SELECT TOP 1 lispre
-			FROM azapi_listin
+		<cfquery name="verticalCost" datasource="apirone">
+			SELECT lispre
+			FROM verticale_price_list
 			WHERE TRIM(lisart) = <cfqueryparam value="#Trim(arguments.rawProductId)#" cfsqltype="varchar">
 			AND (
 				(
-					TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> AND 
+					TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> AND
 					TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
-				) 
+				)
 				OR TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
 				OR TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 				OR 1=1
 			)
 			ORDER BY
 				CASE
-					WHEN 
+					WHEN
 						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
-						AND TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
+						AND TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 						THEN 1
-					WHEN 
-						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar"> 
+					WHEN
+						TRIM(liscvr) = <cfqueryparam value="#Trim(arguments.variantId)#" cfsqltype="varchar">
 						THEN 2
-					WHEN 
-						TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar"> 
+					WHEN
+						TRIM(liscol) = <cfqueryparam value="#Trim(arguments.colorId)#" cfsqltype="varchar">
 						THEN 3
 					ELSE 4
 				END
+			LIMIT 1
 		</cfquery>
 
 		<!--- Memorizza il costo per i successivi riusi nella stessa richiesta, normalizzando i casi vuoti.
@@ -175,12 +176,12 @@
 			<cfreturn dataMemo[ arguments.rawProductId ]>
 		</cfif>
 
-		<cfquery name="rawProductData" datasource="verticale">
+		<cfquery name="rawProductData" datasource="apirone">
 			SELECT
 				ardesart as raw_product_name,
 				CASE WHEN artipmat = 'LAV' THEN 'LV' ELSE 'MP' END AS raw_product_processiong_type
 			FROM
-				azapi_artico a
+				verticale_raw_products a
 			WHERE
 				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
@@ -301,7 +302,7 @@
 			resultato con lispre NULL. Il CASE nell'ORDER BY replica l'ordine di
 			priorità del singolo getComponentCost(): terna esatta, poi variant, poi color, poi qualsiasi.
 		--->
-		<cfquery name="costsByTriple" datasource="verticale">
+		<cfquery name="costsByTriple" datasource="apirone">
 			SELECT
 				t.rawProductId AS rawProductId,
 				t.variantId    AS variantId,
@@ -318,9 +319,9 @@
 					)
 				</cfloop>
 			) AS t ( rawProductId, variantId, colorId )
-			OUTER APPLY (
-				SELECT TOP 1 lispre
-				FROM azapi_listin l
+			LEFT JOIN LATERAL (
+				SELECT lispre
+				FROM verticale_price_list l
 				WHERE TRIM(lisart) = TRIM(t.rawProductId)
 				AND (
 					( TRIM(liscvr) = TRIM(t.variantId) AND TRIM(liscol) = TRIM(t.colorId) )
@@ -335,7 +336,8 @@
 						WHEN TRIM(liscol) = TRIM(t.colorId) THEN 3
 						ELSE 4
 					END
-			) best
+				LIMIT 1
+			) best ON true
 		</cfquery>
 
 		<!--- Stessa normalizzazione del singolo getComponentCost: lispre assente o vuota diventa 0. --->
@@ -371,12 +373,12 @@
 			<cfreturn>
 		</cfif>
 
-		<cfquery name="rawProductsById" datasource="verticale">
+		<cfquery name="rawProductsById" datasource="apirone">
 			SELECT
 				a.arcodart AS arcodart,
 				a.ardesart AS ardesart,
 				CASE WHEN a.artipmat = 'LAV' THEN 'LV' ELSE 'MP' END AS raw_product_processiong_type
-			FROM azapi_artico a
+			FROM verticale_raw_products a
 			WHERE a.arcodart IN (
 				<cfqueryparam value="#ArrayToList( pendingIds )#" list="true" cfsqltype="varchar">
 			)

@@ -328,9 +328,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * Codice export di una voce di preventivo, calcolato senza scrivere nulla.
 	 *
 	 * Il codice è composto da 15 caratteri di articolo (categoria + linea +
-	 * modello + finitura) e 10 di variante: per la segnaletica font e corpo,
-	 * altrimenti i codici degli attributi "importanti" del prodotto, riempiti
-	 * di zeri fino a 10. È esattamente il valore che finisce in
+	 * modello + finitura) e 10 di variante: i codici degli attributi
+	 * "importanti" del prodotto, riempiti di zeri fino a 10 - anche per la
+	 * segnaletica, il cui font e corpo NON occupano più caratteri del codice
+	 * variante (restano solo in outcome.fontName/fontSize, per nota export e
+	 * anteprima UI). È esattamente il valore che finisce in
 	 * export_codes.export_code; il contatore (colCode) non c'entra ed è l'unica
 	 * parte che richiede una scrittura, quindi resta fuori da qui.
 	 *
@@ -398,8 +400,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var varCode = "";
 
-		// Segnaletica: la variante è font (5) + corpo (5) e satura da sola i 10
-		// caratteri, quindi nessun attributo importante può aggiungersi.
+		// Segnaletica: font e corpo NON occupano più caratteri del codice
+		// variante (solo outcome.fontName/fontSize, per nota export e anteprima
+		// UI) - i 10 caratteri restano liberi per gli attributi "importanti",
+		// esattamente come per gli altri tipi di prodotto.
 		if ( StructKeyExists( data, "signageRows" ) ) {
 			if ( !StructKeyExists( data, "signageConfigItemId" ) ) {
 				outcome.error = "Configurazione segnaletica non trovata.";
@@ -420,9 +424,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			outcome.fontSize = signageConfigItem.getSize().getName();
 			outcome.fontName = signageConfig.getFont().getName();
-
-			varCode = Right( "00000" & signageConfig.getFont().getCode(), 5 )
-				& Right( "00000" & outcome.fontSize, 5 );
 		}
 
 		var importantAttributes = product.getImportantAttributes();

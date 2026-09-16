@@ -6,15 +6,15 @@
 			<cfreturn getMockedCurrency( arguments.currencyId )>
 		</cfif>
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				valcod AS currency_id,
 				valdes AS currency,
 				valsim AS simbol
 			FROM
-				codval
+				verticale_currencies
 			WHERE
-				valcod = <cfqueryparam cfsqltype="Integer" value="#arguments.currencyId#">
+				valcod = <cfqueryparam cfsqltype="varchar" value="#arguments.currencyId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -26,14 +26,14 @@
 			<cfreturn listMockedCurrency()>
 		</cfif>
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				valcod AS currency_id,
 				valdes AS currency,
 				valsim AS simbol,
 				COUNT(valcod) OVER() AS total
 			FROM
-				codval
+				verticale_currencies
 			ORDER BY
 				valdes
 		</cfquery>

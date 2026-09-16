@@ -1,6 +1,6 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="CrmApiService" inject="CrmApiService";
+	property name="dao" inject="CrmLeadDAO";
 	property name="CrmMapper" inject="CrmMapper";
 	property name="cacheScope" type="String" default="Lead.bean";
 
@@ -16,10 +16,10 @@
 			return cache.data;
 		}
 
-		// Recupera da CRM e mappa
-		var crmData  = getCrmApiService().getLead( leadId );
+		// Recupera dalla tabella locale sincronizzata dal CRM e mappa
+		var crmData  = getDao().get( leadId );
 		var lead = new com.apirone.core.model.bean.Lead();
-		if (!IsNull(crmData) && !isNull(crmData.data)) {
+		if ( StructKeyExists( crmData, "data" ) && !isNull(crmData.data)) {
 			crmData = crmData.data;
 			lead = getCrmMapper().mapLead( crmData );
 			cm.put( getCacheScope(), leadId, lead );
@@ -35,7 +35,7 @@
 		var result = super.getResult();
 		var cm = getCacheManager();
 
-		var crmResults = getCrmApiService().searchLeads( str );
+		var crmResults = getDao().find( str );
 		var leads  = [];
 
 		for ( var crmData in crmResults.data ) {

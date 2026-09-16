@@ -8,13 +8,17 @@
 			<cfreturn super.getMockedCountry( arguments.countryId )>
 		</cfif>
 
-		<cfquery name="local.q" datasource="verticale">
+		<!---
+			isonaz porta il padding a spazi delle colonne CHAR di SQL Server (es. "IT ").
+			Su SQL Server il confronto "=" era implicitamente insensibile al padding;
+			su Postgres no, quindi va confrontato con TRIM() esplicito.
+		--->
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
-				ISONAZ,
 				*
-			FROM CODNAZ
-			WHERE 
-				ISONAZ = <cfqueryparam cfsqltype="varchar" value="#arguments.countryId#">
+			FROM verticale_countries
+			WHERE
+				TRIM( isonaz ) = <cfqueryparam cfsqltype="varchar" value="#Trim( arguments.countryId )#">
 		</cfquery>
 
 		<cfreturn local.q>

@@ -1871,10 +1871,13 @@ AP.quotation.exportCode = (function () {
 		}
 		var html = '<div><span class="text-muted">Codice export:</span> ';
 		if (outcome.articleCode) {
-			html += '<code title="Codice articolo: categoria + linea + modello + finitura">' + esc(outcome.articleCode) + "</code>";
+			html += '<small class="text-muted">art.</small> <code title="Codice articolo: categoria + linea + modello + finitura">' + esc(outcome.articleCode) + "</code>";
 		}
-		if (outcome.success) {
-			html += ' <code title="Codice variante: 10 caratteri, attributi da esportare + zeri di riempimento">' + esc(outcome.variantCode) + "</code>";
+		if (outcome.variantCode) {
+			var variantTitle = outcome.success
+				? "Codice variante: 10 caratteri, attributi da esportare + zeri di riempimento"
+				: "Codice variante parziale: calcolo interrotto prima di aggiungere tutti gli attributi da esportare";
+			html += ' <span class="text-muted">+</span> <small class="text-muted">var.</small> <code style="background-color:#eef2f7;border-radius:3px;padding:0 3px;" title="' + esc(variantTitle) + '">' + esc(outcome.variantCode) + "</code>";
 		}
 		html += "</div>";
 		if (!outcome.success && outcome.error) {

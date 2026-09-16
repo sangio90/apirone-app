@@ -1,6 +1,6 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="CrmApiService" inject="CrmApiService";
+	property name="dao" inject="CrmAccountDAO";
 	property name="CrmMapper" inject="CrmMapper";
 	property name="cacheScope" type="String" default="Customer.bean";
 
@@ -16,11 +16,11 @@
 			return cache.data;
 		}
 
-		// Recupera da CRM e mappa
-		var crmData  = getCrmApiService().getCustomer( customerId );
+		// Recupera dalla tabella locale sincronizzata dal CRM e mappa
+		var crmData  = getDao().get( customerId );
 		var customer = super.bean("Customer");
 
-		if ( !IsNull( crmData ) && !IsNull( crmData.data ) ) {
+		if ( StructKeyExists( crmData, "data" ) && !IsNull( crmData.data ) ) {
 			crmData  = crmData.data;
 			customer = getCrmMapper().mapCustomer( crmData );
 
@@ -37,7 +37,7 @@
 		var result = super.getResult();
 		var cm     = getCacheManager();
 
-		var crmResults = getCrmApiService().searchCustomers( str );
+		var crmResults = getDao().find( str );
 		var customers  = [];
 
 		for ( var crmData in crmResults.data ) {

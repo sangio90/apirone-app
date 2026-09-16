@@ -8,7 +8,7 @@
 
 		<!--- NOTE: This is a QoQ, I need to trim the value to the left. --->
 
-		<cfquery name="local.q" dbtype="query" datasource="verticale">
+		<cfquery name="local.q" dbtype="query">
 			SELECT *
 			FROM
 				thisQuery

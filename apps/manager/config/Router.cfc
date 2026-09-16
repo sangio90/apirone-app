@@ -15,6 +15,12 @@
 		get( "/ajax/search" ).to( "SearchAjaxController.list" ).end();
 		get( "/batch/update-terms" ).to( "BatchController.updateSearchTerms" ).end();
 
+		post( "/ajax/verticale-sync/run" ).to( "VerticaleSyncAjaxController.run" ).end();
+		get( "/ajax/verticale-sync/status" ).to( "VerticaleSyncAjaxController.status" ).end();
+
+		post( "/ajax/crm-sync/run" ).to( "CrmSyncAjaxController.run" ).end();
+		get( "/ajax/crm-sync/status" ).to( "CrmSyncAjaxController.status" ).end();
+
 		/*
 			dashboard
 		*/

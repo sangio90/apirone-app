@@ -8,12 +8,12 @@
 			<cfreturn super.getMockedVatCode( arguments.vatCodeId )>
 		</cfif>		
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				*
-			FROM 
-				codiva
-			WHERE 
+			FROM
+				verticale_vat_codes
+			WHERE
 				ivacod = <cfqueryparam cfsqltype="varchar" value="#arguments.vatCodeId#">
 		</cfquery>
 
@@ -30,12 +30,12 @@
 			<cfreturn super.listMockedVatCode()>
 		</cfif>				
 
-		<cfquery name="local.q" datasource="verticale">
-			SELECT 
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
 				ivacod,
 				COUNT(ivacod) OVER() AS total
-			FROM 
-				codiva
+			FROM
+				verticale_vat_codes
 			WHERE 1=1
 			<cfif arguments.limit GTE 0>
 				LIMIT 

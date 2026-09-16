@@ -6,14 +6,14 @@
 			<cfreturn getMockedPaymentMethod( arguments.paymentMethodId )>
 		</cfif>
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				pagcod AS payment_method_id,
 				pagdes AS payment_method
 			FROM
-				codpag
+				verticale_payment_methods
 			WHERE
-				pagcod = <cfqueryparam cfsqltype="Integer" value="#arguments.paymentMethodId#">
+				pagcod = <cfqueryparam cfsqltype="varchar" value="#arguments.paymentMethodId#">
 		</cfquery>
 
 		<cfreturn local.q>
@@ -30,13 +30,13 @@
 			<cfreturn listMockedPaymentMethod()>
 		</cfif>
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				pagcod AS payment_method_id,
 				pagdes AS payment_method,
 				COUNT(pagcod) OVER() AS total
 			FROM
-				codpag
+				verticale_payment_methods
 			WHERE 1=1
 
 			<cfif !IsNull( arguments.str )>
@@ -49,8 +49,8 @@
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
-				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
+				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
 

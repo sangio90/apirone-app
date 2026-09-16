@@ -1,6 +1,6 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
-	property name="CrmApiService" inject="CrmApiService";
+	property name="dao" inject="CrmOpportunityDAO";
 	property name="CrmMapper" inject="CrmMapper";
 	property name="cacheScope" type="String" default="Opportunity.bean";
 
@@ -16,11 +16,11 @@
 			return cache.data;
 		}
 
-		// Recupera da CRM e mappa
-		var crmData  = getCrmApiService().getOpportunity( opportunityId );
+		// Recupera dalla tabella locale sincronizzata dal CRM e mappa
+		var crmData  = getDao().get( opportunityId );
 		var opportunity = super.bean("Opportunity");
 
-		if (!IsNull(crmData) && !isNull(crmData.data)) {
+		if ( StructKeyExists( crmData, "data" ) && !isNull(crmData.data)) {
 			
 			crmData = crmData.data;
 			opportunity = getCrmMapper().mapOpportunity( crmData );
@@ -38,7 +38,7 @@
 		var result = super.getResult();
 		var cm = getCacheManager();
 
-		var crmResults = getCrmApiService().searchOpportunities( str );
+		var crmResults = getDao().find( str );
 		var opportunities  = [];
 
 		for ( var crmData in crmResults.data ) {

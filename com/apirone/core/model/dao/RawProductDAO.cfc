@@ -1,8 +1,8 @@
-<cfcomponent extends="com.apirone.core.model.dao.VerticaleDAO" accessors="true">
+<cfcomponent extends="com.apirone.core.model.dao.AbsDAO" accessors="true">
 	<cffunction name="read">
 		<cfargument name="rawProductId" type="String" required="true">
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 
 			SELECT
 				arcodart,
@@ -13,9 +13,9 @@
 				artipmat,
 				arunmis1,
 				artipcol,
-				IIF (artipmat = 'LAV', 'LV', 'MP') AS processiong_type_id
+				CASE WHEN artipmat = 'LAV' THEN 'LV' ELSE 'MP' END AS processiong_type_id
 			FROM
-				#variables.companyId#_artico a
+				verticale_raw_products a
 			WHERE
 				arcodart = <cfqueryparam cfsqltype="varchar" value="#arguments.rawProductId#">
 		</cfquery>
@@ -23,11 +23,11 @@
 		<cfreturn local.q>
 	</cffunction>
 
-	<!----	
-a = materia prima	
-m = prodotto finito	
-s = semilavorato	
-artiplav = lav = lavorazioni	
+	<!----
+a = materia prima
+m = prodotto finito
+s = semilavorato
+artiplav = lav = lavorazioni
 ---->
 
 	<cffunction returntype="Query" name="find">
@@ -39,7 +39,7 @@ artiplav = lav = lavorazioni
 		<cfargument name="offset" required="true" type="Numeric" default="0">
 		<cfargument name="orderby" required="true" type="String" default="arcodart">
 
-		<cfquery name="local.q" datasource="verticale">
+		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				arcodart,
 				ardesart,
@@ -47,9 +47,9 @@ artiplav = lav = lavorazioni
 				artipmat,
 				arunmis1,
 				COUNT(arcodart) OVER() AS total,
-				IIF (artipmat = 'LAV', 'LV', 'MT') AS processiong_type_id
+				CASE WHEN artipmat = 'LAV' THEN 'LV' ELSE 'MT' END AS processiong_type_id
 			FROM
-				#super.sanitizeSQL( "#variables.companyId#_artico" )# artico
+				verticale_raw_products artico
 			WHERE 1=1
 				AND arobsole <> 'S'
 
@@ -78,8 +78,8 @@ artiplav = lav = lavorazioni
 				#super.sanitizeSQL( arguments.orderby )#
 
 			<cfif arguments.limit GT 0>
-				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer"> ROWS
-				FETCH NEXT <cfqueryparam value="#arguments.limit#" cfsqltype="integer"> ROWS ONLY;
+				LIMIT <cfqueryparam value="#arguments.limit#" cfsqltype="integer">
+				OFFSET <cfqueryparam value="#arguments.offset#" cfsqltype="integer">
 			</cfif>
 		</cfquery>
 
