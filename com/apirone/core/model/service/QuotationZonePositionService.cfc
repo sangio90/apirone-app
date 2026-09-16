@@ -6,6 +6,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return build( arguments.quotationZonePositionId );
 	}
 
+	/**
+	 * Carica più posizioni in una sola query e le restituisce come mappa id -> bean.
+	 * Gli id duplicati vengono letti una sola volta (più item possono condividere
+	 * la stessa posizione).
+	 *
+	 * @param ids      lista di quotation_zone_position_id
+	 * @returns        struct con chiave = id della posizione e valore = bean QuotationZonePosition
+	 */
+	public Struct function getMany( required Array ids ) {
+		var map = {};
+
+		if ( !ArrayLen( arguments.ids ) ) {
+			return map;
+		}
+
+		// Deduplica: i batch di item referenziano spesso la stessa posizione
+		var uniqueIds = {};
+		for ( var id in arguments.ids ) {
+			uniqueIds[ id ] = true;
+		}
+
+		var records = getDao().readByIds( StructKeyArray( uniqueIds ) );
+
+		for ( var record in records ) {
+			map[ record.quotation_zone_position_id ] = buildFromFindRow( record );
+		}
+
+		return map;
+	}
+
 	public Array function list(){
 		arguments[ "limit" ] = -1;
 		return search( argumentCollection = arguments ).getData();

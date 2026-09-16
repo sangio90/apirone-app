@@ -30,6 +30,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return 0;
 		}
 		arguments['quotationId'] = quotation.getId();
+		// Memo di batch: l'aggregatore dei gemelli precalcola i totali per tutti gli item
+		// con una query di gruppo invece di una SUM per sibling. Valida perché il batch
+		// gira dopo l'update della placca salvata e nel resto della richiesta le quantità
+		// non cambiano; un item fuori memo (es. signage) cade sulla query singola.
+		var memoKey = arguments.quotationId & "|lf|" & arguments.quotationItemId;
+		if ( StructKeyExists( request, "_pricingSiblingTotals" ) && StructKeyExists( request._pricingSiblingTotals, memoKey ) ) {
+			return request._pricingSiblingTotals[ memoKey ];
+		}
 		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
@@ -38,6 +46,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			return 0;
 		}
 		arguments['quotationId'] = quotation.getId();
+		// Stessa memo di batch del wrapper linea+finitura (riempita da
+		// QuotationItemService.precomputeBatchTotals): per ogni item la memo contiene
+		// due chiavi, "|lf|" = totale delle righe con stessa linea+finitura (qui sotto
+		// non serve: è il prezzo per prodotto) e "|p|" = totale delle righe dello stesso prodotto
+		var memoKey = arguments.quotationId & "|p|" & arguments.quotationItemId;
+		if ( StructKeyExists( request, "_pricingSiblingTotals" ) && StructKeyExists( request._pricingSiblingTotals, memoKey ) ) {
+			return request._pricingSiblingTotals[ memoKey ];
+		}
 		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationAndProduct(argumentCollection = arguments);
 	}
 
@@ -175,7 +191,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quantity = arguments.quantity * zoneQuantity;
 		}
 
-
 		//var currency = currencySvc.get( arguments.currencyId );
 
 		// Memo per request: il markup generale è configurazione statica riletta a ogni
@@ -214,10 +229,22 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				)
 			}
 
-			lineCostRecord = super.service( "LineCost" ).list(
-				lineId   = product.getLine().getId(),
-				finishId = product.getFinish().getId()
-			);
+			// Memo per request: la tabella dei costi fissi linea/finitura è configurazione
+			// statica e i gemelli condividono la stessa coppia linea+finitura, quindi una
+			// lettura sola al posto di una per sibling
+			var lcKey = product.getLine().getId() & "|" & product.getFinish().getId();
+			if ( !StructKeyExists( request, "_pricingLineCostMemo" ) ) {
+				request._pricingLineCostMemo = {};
+			}
+			if ( StructKeyExists( request._pricingLineCostMemo, lcKey ) ) {
+				lineCostRecord = request._pricingLineCostMemo[ lcKey ];
+			} else {
+				lineCostRecord = super.service( "LineCost" ).list(
+					lineId   = product.getLine().getId(),
+					finishId = product.getFinish().getId()
+				);
+				request._pricingLineCostMemo[ lcKey ] = lineCostRecord;
+			}
 
 			//Se non nullo leggo il campo "cost" e lo scrivo in fixedCost
 			if ( len(lineCostRecord) > 0 ) {
@@ -243,13 +270,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			unitFixedCost = fixedCost / quantitaTotale;
 		}
 
-
 		appendLog(
 			message = "Costo fisso per #quantitaTotale# pezzi. Costo fisso #fixedCost# / #quantitaTotale#;Costo fisso unitario: #formatExtended( unitFixedCost )#"
 		);
 
 		addCost( "Costo fisso", unitFixedCost, "P" ); // sommerò gli "P" per il costo finale
-
 
 		/*
 			cost bundle
@@ -276,7 +301,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			bundleCost,
 			"P"
 		);
-
 
 		/*
 			cost base product
@@ -306,21 +330,28 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// Precarica in batch tutti i ProductItem (memo per request: gli stessi item tornano in
-		// tutti gli articoli gemelli che condividono il prodotto; beans usati in sola lettura)
-		var pmKey = ArrayToList( productItemIds );
-		if ( !StructKeyExists( request, "_pricingItemMapMemo" ) ) {
-			request._pricingItemMapMemo = {};
+		// Precarica i ProductItem con memo per SINGOLO id: ogni gemello ha il suo set di item,
+		// quindi una memo per lista di id non colpirebbe mai; per id invece ogni bean viene
+		// letto una sola volta per richiesta e riusato da tutti i calcoli (beans in sola lettura)
+		var productItemMap = {};
+		var missingItemIds = [];
+		if ( !StructKeyExists( request, "_pricingItemBeanMemo" ) ) {
+			request._pricingItemBeanMemo = {};
 		}
-
-		var productItemMap = NullValue();
-		if ( ArrayLen( productItemIds ) && StructKeyExists( request._pricingItemMapMemo, pmKey ) ) {
-			productItemMap = request._pricingItemMapMemo[ pmKey ];
-		} else if ( ArrayLen( productItemIds ) ) {
-			productItemMap = getProductItemService().getMany( productItemIds );
-			request._pricingItemMapMemo[ pmKey ] = productItemMap;
-		} else {
-			productItemMap = {};
+		for ( var itemId in productItemIds ) {
+			if ( StructKeyExists( request._pricingItemBeanMemo, itemId ) ) {
+				productItemMap[ itemId ] = request._pricingItemBeanMemo[ itemId ];
+			} else {
+				request._pricingProbeMissItem = ( request._pricingProbeMissItem ?: 0 ) + 1;
+				missingItemIds.append( itemId );
+			}
+		}
+		if ( ArrayLen( missingItemIds ) ) {
+			var fetchedItemMap = getProductItemService().getMany( missingItemIds );
+			for ( var fetchedId in fetchedItemMap ) {
+				request._pricingItemBeanMemo[ fetchedId ] = fetchedItemMap[ fetchedId ];
+				productItemMap[ fetchedId ] = fetchedItemMap[ fetchedId ];
+			}
 		}
 
 		// Precarica in batch tutti i componenti (own + base attribute) di ogni item
@@ -397,7 +428,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		appendLog( "** Fine del calcolo del prezzo degli attributi; Totale attributi: #formatExtended( calculateTotalCostItems() )#" );
 
-
 		/*
 			final cost
 		*/
@@ -414,7 +444,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		*/
 
 		var totalCostItems = calculateTotalCostItems();
-
 
 		/*
 			font price
@@ -495,7 +524,6 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			appendLog( "** Fine del calcolo del prezzo della segnaletica con lettering; Costo per lettera: #formatExtended( fontPricePerLetter )#, Costo totale lettering: #formatExtended( fontPricePerLetter * lettersQuantity )#" );
 		}
-
 
 		letteringPriceString = letteringPrice GT 0 ? "+ costo lettering: #formatExtended( letteringPrice )#": "";
 

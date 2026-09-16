@@ -293,18 +293,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// skipPrewarm letto con StructKeyExists: un null non viene bindato e la chiave non esisterebbe
 		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
 
-		var result = {};
-
-		// Inizializza una voce vuota per ogni item (preserva l'ordine e gli item senza componenti)
-		for ( var pid in arguments.productItemIds ) {
-			result[ pid ] = [];
+		// Memo per request per SINGOLO product item: i gemelli condividono gli stessi product
+		// item (stessa linea e finitura), quindi il primo chiamante calcola i mancanti e i
+		// successivi riusano i risultati senza query. I componenti sono struct di sola lettura
+		// nel pricing (calculateComponentsTotal li legge, non li modifica).
+		if ( !StructKeyExists( request, "_pcByProductItemMemo" ) ) {
+			request._pcByProductItemMemo = {};
+		}
+		var missingIds = [];
+		for ( var memoPid in arguments.productItemIds ) {
+			if ( !StructKeyExists( request._pcByProductItemMemo, memoPid ) ) {
+				missingIds.append( memoPid );
+			}
 		}
 
+		if ( ArrayLen( missingIds ) ) {
+
 		// 1) Componenti "own" (product_item_id = pid) con override correlato in una sola query
-		var ownRecords = getDao().priceCalculatorReadByProductItemIds( arguments.productItemIds );
+		var ownRecords = getDao().priceCalculatorReadByProductItemIds( missingIds );
 
 		// 2) Componenti "base attribute" (attribute_raw_value_id) con override scoped per item
-		var piRecords = getProductItemDAO().readByIds( arguments.productItemIds );
+		var piRecords = getProductItemDAO().readByIds( missingIds );
 
 		// Mappe: attribute_raw_value_id -> [productItemId] e lista degli attribute value unici
 		var attrValueToPids = {};
@@ -340,7 +349,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( ArrayLen( attrComponentIds ) ) {
 				var overrideRecords = getDao().readOverridesByComponentIdsAndProductItemIds(
 					componentIds   = attrComponentIds,
-					productItemIds = arguments.productItemIds
+					productItemIds = missingIds
 				);
 				for ( var ov in overrideRecords ) {
 					overrideMap[ ov.component_id & "_" & ov.product_item_id ] = ov;
@@ -385,6 +394,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getDao().getRawProductDataByIds( StructKeyArray( rawIdMap ) );
 		}
 
+		// Inizializza una voce vuota per ogni item mancante (preserva gli item senza componenti)
+		for ( var pid in missingIds ) {
+			request._pcByProductItemMemo[ pid ] = [];
+		}
+
 		// 4) Componenti "own": costruiti dopo il prewarm, i getComponentCost/getRawProductData interni
 		// trovano tutto già in memo (zero query ERP per componente)
 		for ( var r in ownRecords ) {
@@ -397,8 +411,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				colorId       = r.color_id
 			);
 
-			if ( StructKeyExists( result, r.product_item_id ) ) {
-				ArrayAppend( result[ r.product_item_id ], component );
+			if ( StructKeyExists( request._pcByProductItemMemo, r.product_item_id ) ) {
+				ArrayAppend( request._pcByProductItemMemo[ r.product_item_id ], component );
 			}
 		}
 
@@ -432,10 +446,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					colorId       = ar.color_id
 				);
 
-				if ( StructKeyExists( result, pid ) ) {
-					ArrayAppend( result[ pid ], component );
+				if ( StructKeyExists( request._pcByProductItemMemo, pid ) ) {
+					ArrayAppend( request._pcByProductItemMemo[ pid ], component );
 				}
 			}
+		}
+
+		}
+
+		// Risultato: tutte le voci richieste, dal calcolo o dalla memo
+		var result = {};
+		for ( var outPid in arguments.productItemIds ) {
+			result[ outPid ] = request._pcByProductItemMemo[ outPid ];
 		}
 
 		return result;
@@ -553,9 +575,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		records.each( function( record ){
 			var rowParams              = params;
 			rowParams[ "componentId" ] = record.component_id;
-			
+
 			getDao().reassign( argumentCollection = rowParams );
-			
+
 			super.logEvent(
 				event   = "component.UPDATED",
 				message = "Component [#rowParams[ "componentId" ]#] updated.",
@@ -566,7 +588,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					"newValue" = rowParams[ "newParam" ]
 				}
 			);
-		
+
 		} );
 
 		super.logEvent(
@@ -714,12 +736,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
 
 			for ( var thisComponent in attrComponents ) {
-				
+
 				// thisComponent is ComponentAttributeValue
 				// move to ComponentProductItem
 
 				var bean = super.bean("ComponentProductItem");
-				
+
 				bean.setRawMemento( thisComponent.getRawMemento() );
 				bean.setProductItem( productItem );
 				bean.setTypeId( "base" );
@@ -776,12 +798,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var attrComponents = list( attributeValueId = productItem.getAttributeValue().getId() );
 
 			for ( var thisComponent in attrComponents ) {
-				
+
 				// thisComponent is ComponentAttributeValue
 				// move to ComponentProductItem
 
 				var bean = super.bean("ComponentProductItem");
-				
+
 				bean.setRawMemento( thisComponent.getRawMemento() );
 				bean.setProductItem( productItem );
 				bean.setTypeId( "base" );

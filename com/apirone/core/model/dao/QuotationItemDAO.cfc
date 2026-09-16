@@ -343,6 +343,59 @@
 		<cfreturn local.q.total_quantity ?: 0>
 	</cffunction>
 
+	<!---
+		Calcola in una sola query i totali di quantità ("altre righe") per più item dello
+		stesso preventivo: per ogni item restituisce sia il totale delle righe con la stessa
+		linea+finitura sia quello delle righe con lo stesso prodotto, sempre escludendo
+		l'item stesso (stessa semantica delle due funzioni singole getQuantitaTotaleAltreRighe).
+		Serve all'aggregatore dei prezzi dei gemelli per pre-calcolare i totali in batch:
+		due query di gruppo al posto di una SUM per sibling.
+	--->
+	<cffunction name="getQuantitaTotaliBatchByQuotationItemIds" returntype="Query">
+		<cfargument name="quotationItemIds" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.quotationItemIds )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				i.quotation_item_id::varchar AS quotation_item_id,
+				(
+					SELECT
+						SUM(
+							COALESCE(o.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
+						)
+					FROM quotation_items o
+						LEFT JOIN products po ON o.product_id = po.product_id
+						LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = o.quotation_zone_id
+						LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
+					WHERE
+						o.quotation_id = i.quotation_id AND
+						po.line_id = pi.line_id AND
+						po.finish_id = pi.finish_id AND
+						o.quotation_item_id <> i.quotation_item_id
+				) AS total_by_line_finish,
+				(
+					SELECT
+						SUM(
+							COALESCE(o2.quantity, 0) * COALESCE(qz2.quantity, 1) * COALESCE(qzo2.quantity, 1)
+						)
+					FROM quotation_items o2
+						LEFT JOIN quotation_zones qz2 ON qz2.quotation_zone_id = o2.quotation_zone_id
+						LEFT JOIN quotation_zones qzo2 ON qzo2.quotation_zone_id = qz2.origin_id
+					WHERE
+						o2.quotation_id = i.quotation_id AND
+						o2.product_id = i.product_id AND
+						o2.quotation_item_id <> i.quotation_item_id
+				) AS total_by_product
+			FROM quotation_items i
+				JOIN products pi ON i.product_id = pi.product_id
+			WHERE
+				i.quotation_item_id = ANY( ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[] )
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="getAltreRigheByQuotationLineIdAndFinishId" returntype="Query">
 		<cfargument name="quotationId" type="String" required="true">
 		<cfargument name="quotationItemId" type="String" required="true">
