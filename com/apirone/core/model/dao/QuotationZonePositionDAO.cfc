@@ -11,10 +11,31 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Recupera in batch più posizioni dato un array di ID.
+		Utilizzato dal Service corrispondente per caricare i bean in blocco.
+	--->
+	<cffunction name="readByIds" returntype="Query">
+		<cfargument name="ids" type="Array" required="true">
+
+		<cfset var idsList = ArrayToList( arguments.ids )>
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				*
+			FROM quotation_zone_positions
+			WHERE quotation_zone_position_id IN (
+				<cfqueryparam value="#idsList#" list="true" cfsqltype="integer">
+			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
 	<cffunction name="find" returntype="Query">
 		<cfargument name="str" type="String" required="false">
 		<cfargument name="zoneId" type="String" required="false">
-		
+
 		<cfargument name="orderBy" type="String" required="true" default="quotation_zone_position_id">
 		<cfargument name="limit" type="Numeric" required="true" default="15">
 		<cfargument name="offset" type="Numeric" required="true" default="0">
@@ -28,7 +49,7 @@
 				quotation_zone_id,
 				COUNT(quotation_zone_position_id) OVER() AS total
 			FROM
-				quotation_zone_positions 
+				quotation_zone_positions
 			WHERE 1=1
 				<cfif !IsNull( arguments.zoneId )>
 					AND quotation_zone_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.zoneId#">::uuid

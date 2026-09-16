@@ -148,8 +148,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Calcola l'hash dell'item. Il parametro opzionale preloadedQuotationItem
 		(atteso: bean QuotationItem) permette al chiamante di riusare un bean già
 		caricato, evitando un secondo build completo dell'item.
+		Con computeOnly=true restituisce solo l'MD5 dell'impronta senza interrogare
+		il DB (né cerca né crea la riga su product_hashes): serve per i confronti
+		con l'hash salvata sull'item (es. QuotationItemService.update).
 	*/
-	public String function createHash( required String quotationItemId, preloadedQuotationItem = javacast( "null", "" ) ){
+	public String function createHash( required String quotationItemId, preloadedQuotationItem = javacast( "null", "" ), Boolean computeOnly = false ){
 		// Senza bean pre-caricato: carica l'item completo via batch getMany()
 		// invece del singolo get() -> buildFromRow() che causa cascata N+1
 		var quotationItem = arguments.preloadedQuotationItem;
@@ -167,6 +170,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		} else if (IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate")) {
 			jsonData = prepareQuotationItemPlateJson( quotationItem, jsonData );
+		}
+
+		// Modalità confronto: restituisce solo l'MD5 dell'impronta senza cercare o
+		// creare la riga su product_hashes (zero query). Serve a chi deve solo confrontare
+		// l'impronta con quella salvata sull'item (es. QuotationItemService.update).
+		if ( arguments.computeOnly ) {
+			var digested = serializeAndHash( jsonData );
+
+			return digested.md5;
 		}
 
 		var bean = prepareBean(jsonData);
@@ -269,21 +281,30 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return jsonData;
 	}
 
+	/*
+		Ordina le chiavi di primo livello del JSON dell'item, lo serializza e ne calcola
+		l'MD5. Restituisce { json = testo serializzato, md5 = impronta }. Separato da
+		prepareBean() per poter confrontare l'impronta con quella salvata senza toccare il DB.
+	*/
+	private Struct function serializeAndHash( jsonData ){
+		var sorted = sortTopLevelStruct( arguments.jsonData );
+		var serialized = serializeJson( sorted );
+
+		return { "json" = serialized, "md5" = hash( serialized, "MD5" ) };
+	}
+
 	private function prepareBean( jsonData ){
-		var sorted = sortTopLevelStruct(jsonData);
-		var jsonData = serializeJson( sorted );
+		var digested = serializeAndHash( arguments.jsonData );
 
-		var hashValue = hash(jsonData, "MD5");
-
-		var existProductHash = search( jsonData = jsonData );
+		var existProductHash = search( jsonData = digested.json );
 
 		if ( existProductHash.getCount() > 0 ) {
 			return existProductHash.getData()[1]
 		}
 
 		var bean = super.bean( "ProductHash" );
-		bean.setHash( hashValue );
-		bean.setJsonData( jsonData );
+		bean.setHash( digested.md5 );
+		bean.setJsonData( digested.json );
 
 		return bean;
 	}

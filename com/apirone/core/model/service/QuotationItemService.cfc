@@ -173,20 +173,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	public String function update( required com.apirone.core.model.bean.QuotationItem quotationItem ){
-
+		// Se l'impronta dell'item (calcolata sui dati in memoria) coincide con quella salvata
+		// nel bean (hash letta dal DB durante il build), la configurazione non è cambiata:
+		// l'hash esclude prezzo e quantità ma include frutti, posizioni, note e tappi
+		// ricalcolati, quindi salta la riscrittura completa di frutti/posizioni/product item
+		// e anche la riscrittura dell'hash stessa (la riga su product_hashes esiste già ed è
+		// già collegata: risparmia ricerca, lettura e UPDATE per ogni item gemello).
+		// Il confronto usa computeOnly: l'MD5 è calcolato solo in memoria, senza query.
+		// Tipico dell'aggiornaPrezzo dei gemelli, che cambia solo il prezzo.
 		// Il confronto fra i frutti serve solo per gli ID: legge gli id esistenti
 		// con una sola query invece di ricaricare e ricostruire l'intero item con
 		// getMany() (cascata N+1 di build completi)
+		// Se l'hash salvato non esiste (item nuovo o mai persistito) il confronto non scatta
+		// e la riscrittura completa dei frutti avviene come prima.
 		var oldFruitIds = [];
+		var fruitIdsToDeleted = [];
+		var doSkipFruits = false;
+		var newHash = NullValue();
 		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+			newHash = getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem, true );
+			var storedHash = arguments.quotationItem.getHash();
+			doSkipFruits = !IsNull( storedHash ) && !IsNull( newHash ) && storedHash == newHash;
+		}
+		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) && !doSkipFruits ) {
 			var fruitRows = getQuotationItemFruitService().getDao().findByQuotationItemIds( [ arguments.quotationItem.getId() ] );
 			for ( var fruitRow in fruitRows ) {
 				oldFruitIds.append( fruitRow.quotation_item_fruit_id );
 			}
 		}
 
-		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
-			var fruitIdsToDeleted = [];
+		if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) && !doSkipFruits ) {
 
 			// Raccoglie gli id dei frutti nuovi valorizzati
 			// (i tappi ricalcolati hanno id vuoto)
@@ -219,7 +235,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			getDao().update( arguments.quotationItem );
 
-			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) ) {
+			if ( IsInstanceOf( arguments.quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) && !doSkipFruits ) {
 				for( var thisFruitId in fruitIdsToDeleted ) {
 					getQuotationItemFruitService().delete( thisFruitId );
 				}
@@ -248,9 +264,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( isNull( arguments.quotationItem.getArticle() ) ) {
 				// Passa il bean già caricato: l'hash non contiene id di riga, quindi il
 				// bean in memoria (già sincronizzato con i frutti ricomputati) produce
-				// lo stesso hash di un reload completo
-				var hash = getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem );
-				if ( !IsNull( hash ) ) {
+				// lo stesso hash di un reload completo.
+				// Con doSkipFruits l'impronta salvata coincide già (configurazione invariata):
+				// niente UPDATE dell'hash, il valore su DB è già quello giusto.
+				var hash = IsNull( newHash ) ? getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem ) : newHash;
+				if ( !IsNull( hash ) && !doSkipFruits ) {
 					updateHash( arguments.quotationItem.getId(), hash );
 				}
 
@@ -672,8 +690,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// QuotationZonePosition: chiamate individuali (numero basso, non ha getMany)
-		var zonePositionCache = {};
+		// QuotationZonePosition: una sola query in batch per tutte le posizioni del
+		// batch (prima una chiamata individuale per riga: centinaia di round trip
+		// quando il batch contiene molte placche, ognuna con la sua posizione)
+		var zonePositionMap = {};
+		if ( ArrayLen( zonePositionIds ) ) {
+			zonePositionMap = getQuotationZonePositionService().getMany( zonePositionIds );
+		}
 
 		// --- Fase 3: costruisce i bean QuotationItem ---
 		for ( var r in records ) {
@@ -778,13 +801,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setItems( productItemMap[ r.quotation_item_id ] );
 			}
 
-			// QuotationZonePosition: chiamata individuale (cache locale)
-			if ( Len( r.quotation_zone_position_id ) ) {
-				var zpid = r.quotation_zone_position_id;
-				if ( !StructKeyExists( zonePositionCache, zpid ) ) {
-					zonePositionCache[ zpid ] = getQuotationZonePositionService().get( zpid );
-				}
-				bean.setPosition( zonePositionCache[ zpid ] );
+			// QuotationZonePosition: dalla mappa batch
+			if ( Len( r.quotation_zone_position_id ) && StructKeyExists( zonePositionMap, r.quotation_zone_position_id ) ) {
+				bean.setPosition( zonePositionMap[ r.quotation_zone_position_id ] );
 			}
 
 			// Positions: dalla mappa batch
@@ -945,10 +964,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public com.apirone.core.model.bean.QuotationItemPrice function getPlatePricing(
 		required Struct data,
 		preloadedQuotation = javacast( "null", "" ),
-		preloadedQuotationItem = javacast( "null", "" )
+		preloadedQuotationItem = javacast( "null", "" ),
+		skipPrewarm = javacast( "null", "" )
 	){
 
 		var json = arguments.data;
+
+		// Lettura difensiva di skipPrewarm: quando il chiamante non lo passa, Lucee NON binda
+		// un argomento posizionale con valore null (la chiave resterebbe numerica nell'arguments
+		// scope) e un accesso diretto lancerebbe "key doesn't exist". Da qui in poi viaggia
+		// solo un booleano, che si binda sempre.
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
 
 		var pricing = super.bean( "QuotationItemPrice" );
 		var method  = super.bean( "PriceMethod" );
@@ -1019,7 +1045,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			ArrayAppend( productIdsToPreload, variables.plugProductIdList, true );
 		}
 
-		var productMap = getProductService().getMany( productIdsToPreload );
+		// Memo per request: gli stessi prodotti (placca + frutti + tappi) tornano in tutti gli
+		// articoli gemelli; i bean prodotto sono usati in sola lettura nel pricing
+		var pmpKey = ArrayToList( productIdsToPreload );
+		if ( !StructKeyExists( request, "_pricingProductMapMemo" ) ) {
+			request._pricingProductMapMemo = {};
+		}
+		var productMap = NullValue();
+		if ( ArrayLen( productIdsToPreload ) && StructKeyExists( request._pricingProductMapMemo, pmpKey ) ) {
+			productMap = request._pricingProductMapMemo[ pmpKey ];
+		} else if ( ArrayLen( productIdsToPreload ) ) {
+			productMap = getProductService().getMany( productIdsToPreload );
+			request._pricingProductMapMemo[ pmpKey ] = productMap;
+		} else {
+			productMap = {};
+		}
 
 		// Prewarm verticale: una sola coppia di query listin/artico per TUTTA la placca
 		// (componenti degli item selezionati di placca e frutti + componenti dei prodotti
@@ -1035,12 +1075,20 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		getComponentService().prewarmPricingComponents(
-			productItemIds = allProductItemIds,
-			productIds     = productIdsToPreload,
-			lineId         = productMap[ product.id ].getLine().getId(),
-			modelId        = productMap[ product.id ].getModel().getId()
-		);
+		// skipPrewarm arriva solo dal ricalcolo a catena dei prezzi (l'aggregatore degli
+		// articoli gemelli, vedi aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId, che
+		// esegue UNO sweep verticale per tutte le placche prima del loop). In quel contesto
+		// le memo ERP contengono già i costi di tutti i componenti: il prewarm locale sarebbe
+		// uno spreco (diverse letture apirone per niente). Dal salvataggio normale (client)
+		// il flag non arriva e il prewarm locale gira come sempre.
+		if ( !doSkipPrewarm ) {
+			getComponentService().prewarmPricingComponents(
+				productItemIds = allProductItemIds,
+				productIds     = productIdsToPreload,
+				lineId         = productMap[ product.id ].getLine().getId(),
+				modelId        = productMap[ product.id ].getModel().getId()
+			);
+		}
 
 		var platePrice = calculator.calculate(
 			product.id,
@@ -1051,7 +1099,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			0,
 			quotation,
 			quotationItem,
-			StructKeyExists( productMap, product.id ) ? productMap[ product.id ] : NullValue()
+			StructKeyExists( productMap, product.id ) ? productMap[ product.id ] : NullValue(),
+			doSkipPrewarm
 		);
 
 		var line = super.bean( "QuotationItemPriceLine" );
@@ -1088,7 +1137,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				0,
 				quotation,
 				quotationItem,
-				StructKeyExists( productMap, fruit.fruit.id ) ? productMap[ fruit.fruit.id ] : NullValue()
+				StructKeyExists( productMap, fruit.fruit.id ) ? productMap[ fruit.fruit.id ] : NullValue(),
+				doSkipPrewarm
 			);
 
 			line.setName( "#fruit.fruit?.name#" );
@@ -1113,7 +1163,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					0,
 					quotation,
 					quotationItem,
-					plugProduct
+					plugProduct,
+					doSkipPrewarm
 				);
 				var plugLine = super.bean( "QuotationItemPriceLine" );
 				plugLine.setName( plug.type == "tappo" ? "Tappo" : "Mezzo tappo" );
@@ -1522,6 +1573,68 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getDao().getAltreRigheByQuotationAndProductId(argumentCollection = arguments);
 	}
 
+	/**
+	 * Precarica in batch i dati di pricing per gli item passati, sfruttando i bean già
+	 * caricati in batch da getMany():
+	 * 1. totali di quantità "altre righe" -> memo di richiesta usata dai wrapper di
+	 *    PriceCalculatorService (getQuantitaTotaleAltreRighe*): una query di gruppo al
+	 *    posto di una SUM per item;
+	 * 2. bean ProductItem già completi -> memo per id usata dal calcolo dei prezzi:
+	 *    ogni gemello ha il suo prodotto (quindi i suoi product item), ma sono già in
+	 *    memoria dopo il caricamento in batch, il pricing non deve rileggerli dal DB.
+	 * Da chiamare DOPO l'update della placca salvata (valori freschi) e prima del ciclo
+	 * di ricalcolo dei gemelli; nel resto della richiesta le quantità non cambiano.
+	 *
+	 * @param quotationId  id del preventivo (solo per costruire le chiavi di memo)
+	 * @param itemIds      id degli item da precalcolare
+	 * @param itemMap      mappa id -> bean QuotationItem già caricati (per il prefill dei ProductItem)
+	 * @returns            void
+	 */
+	private void function precomputeBatchTotals( required String quotationId, required Array itemIds, required Struct itemMap ){
+		if ( !ArrayLen( arguments.itemIds ) ) {
+			return;
+		}
+
+		if ( !StructKeyExists( request, "_pricingSiblingTotals" ) ) {
+			request._pricingSiblingTotals = {};
+		}
+
+		// Per ogni item la memo contiene due chiavi: "|lf|" = totale di quantità delle righe
+		// con la stessa linea+finitura (esclusa l'item stessa), "|p|" = totale delle righe
+		// con lo stesso prodotto. I wrapper di PriceCalculatorService leggono queste chiavi
+		// al posto di eseguire una SUM per ogni item gemello.
+		var totalRows = getDao().getQuantitaTotaliBatchByQuotationItemIds( arguments.itemIds );
+		for ( var totalRow in totalRows ) {
+			request._pricingSiblingTotals[ arguments.quotationId & "|lf|" & totalRow.quotation_item_id ] = Val( totalRow.total_by_line_finish ?: 0 );
+			request._pricingSiblingTotals[ arguments.quotationId & "|p|" & totalRow.quotation_item_id ] = Val( totalRow.total_by_product ?: 0 );
+		}
+
+		// Prefill della memo dei ProductItem (per id) con i bean già caricati in batch:
+		// il pricing di ogni gemello trova così i suoi item in memoria e non fa query
+		if ( !StructKeyExists( request, "_pricingItemBeanMemo" ) ) {
+			request._pricingItemBeanMemo = {};
+		}
+		// Gli stessi id servono per precompilare la memo dei componenti per product item
+		var batchProductItemIds = [];
+		for ( var siblingId in arguments.itemMap ) {
+			var siblingItems = arguments.itemMap[ siblingId ].getItems();
+			if ( !IsNull( siblingItems ) ) {
+				for ( var siblingItem in siblingItems ) {
+					var siblingProductItem = siblingItem.getProductItem();
+					if ( !IsNull( siblingProductItem ) && !IsNull( siblingProductItem.getId() ) ) {
+						request._pricingItemBeanMemo[ siblingProductItem.getId() ] = siblingProductItem;
+						batchProductItemIds.append( siblingProductItem.getId() );
+					}
+				}
+			}
+		}
+
+		// Prefill della memo dei componenti per product item (priceCalculatorSearchByProductItemIds):
+		// una passata sola per l'intero batch; le letture ERP interne sono già no-op perché lo
+		// sweep di prewarmPricingComponents ha riempito le memo dei costi
+		getComponentService().priceCalculatorSearchByProductItemIds( batchProductItemIds );
+	}
+
 	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
 		required String quotationItemId,
 		required String quotationId,
@@ -1541,6 +1654,81 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			itemIds.append( row.quotation_item_id );
 		}
 		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		// Totali "altre righe" precalcolati per tutto il batch (vedi precomputeBatchTotals)
+		precomputeBatchTotals( arguments.quotationId, StructKeyArray( itemMap ), itemMap );
+
+		// Prewarm verticale per TUTTI i gemelli in una passata: raccoglie item, prodotti
+		// (placca + frutti + tappi) e modelli distinti dai bean già caricati e fa una sola
+		// coppia di query listin/artico per l'intero batch. Senza questo sweep ogni gemella
+		// farebbe le proprie letture ERP (decine di round trip su preventivi con molte placche).
+		// I prewarm interni dei singoli aggiornaPrezzo vengono poi saltati (skipPrewarm),
+		// perché tutto il necessario è già nelle memo.
+		var hoistItemIds    = [];
+		var hoistProductIds = [];
+		var hoistModelIds   = {};
+		var hoistSeen       = {};
+
+		for ( var sibKey in itemMap ) {
+			var sib = itemMap[ sibKey ];
+
+			if ( !IsNull( sib.getProduct() ) ) {
+				var sibProductId = sib.getProduct().getId();
+				if ( !StructKeyExists( hoistSeen, "p" & sibProductId ) ) {
+					hoistSeen[ "p" & sibProductId ] = true;
+					hoistProductIds.append( sibProductId );
+				}
+				if ( !IsNull( sib.getProduct().getModel() ) ) {
+					hoistModelIds[ sib.getProduct().getModel().getId() ] = true;
+				}
+			}
+
+			if ( !IsNull( sib.getItems() ) ) {
+				for ( var sibItem in sib.getItems() ) {
+					var sibItemPiId = sibItem.getProductItem().getId();
+					if ( !StructKeyExists( hoistSeen, "i" & sibItemPiId ) ) {
+						hoistSeen[ "i" & sibItemPiId ] = true;
+						hoistItemIds.append( sibItemPiId );
+					}
+				}
+			}
+
+			if ( !IsNull( sib.getFruits() ) ) {
+				for ( var sibFruit in sib.getFruits() ) {
+					if ( !IsNull( sibFruit.getFruit() ) ) {
+						var sibFruitProductId = sibFruit.getFruit().getId();
+						if ( !StructKeyExists( hoistSeen, "p" & sibFruitProductId ) ) {
+							hoistSeen[ "p" & sibFruitProductId ] = true;
+							hoistProductIds.append( sibFruitProductId );
+						}
+					}
+					if ( !IsNull( sibFruit.getItems() ) ) {
+						for ( var sibFruitItem in sibFruit.getItems() ) {
+							var sibFruitPiId = sibFruitItem.getProductItem().getId();
+							if ( !StructKeyExists( hoistSeen, "i" & sibFruitPiId ) ) {
+								hoistSeen[ "i" & sibFruitPiId ] = true;
+								hoistItemIds.append( sibFruitPiId );
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// tappi (viti a vista no): getPlatePricing precarica anche i plug products
+		for ( var plugProductId in variables.plugProductIdList ) {
+			if ( !StructKeyExists( hoistSeen, "p" & plugProductId ) ) {
+				hoistSeen[ "p" & plugProductId ] = true;
+				hoistProductIds.append( plugProductId );
+			}
+		}
+
+		getComponentService().prewarmPricingComponents(
+			productItemIds = hoistItemIds,
+			productIds     = hoistProductIds,
+			lineId         = arguments.lineId,
+			modelIds       = StructKeyArray( hoistModelIds )
+		);
 
 		// La Quotation è la stessa per tutte le righe: viene estratta una sola volta dai bean
 		// già caricati in batch e passata a ogni aggiornaPrezzo (evita il rebuild per item, N+1).
@@ -1567,7 +1755,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				continue;
 			}
 
-			aggiornaPrezzo( quotationItem, sharedQuotation );
+			aggiornaPrezzo( quotationItem, sharedQuotation, true );
 		}
 	}
 
@@ -1588,6 +1776,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			itemIds.append( row.quotation_item_id );
 		}
 		var itemMap = ArrayLen( itemIds ) ? getMany( itemIds ) : {};
+
+		// Anche questo aggregatore precalcola i totali per i suoi item (chiavi già presenti
+		// vengono semplicemente riscritte con lo stesso valore)
+		precomputeBatchTotals( arguments.quotationId, StructKeyArray( itemMap ), itemMap );
 
 		// La Quotation è la stessa per tutte le righe: viene estratta una sola volta dai bean
 		// già caricati in batch e passata a ogni aggiornaPrezzo (evita il rebuild per item, N+1).
@@ -1625,8 +1817,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		aggiornaPrezzoAltriArticoli...) di passare la Quotation già caricata in
 		batch, evitando un refetch completo della Quotation per ogni riga (N+1).
 	*/
-	public function aggiornaPrezzo( required quotationItem, preloadedQuotation = javacast( "null", "" ) )
+	public function aggiornaPrezzo( required quotationItem, preloadedQuotation = javacast( "null", "" ), skipPrewarm = javacast( "null", "" ) )
 	{
+
+		// skipPrewarm letto con StructKeyExists: un null passato posizionalmente non viene bindato
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
+
 		if (!isNull(quotationItem.getArticle())) {
 			return false;
 		}
@@ -1731,7 +1927,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			allFruits.append( realFruits, true );
 			allFruits.append( plugBeans, true );
 			quotationItem.setFruits( allFruits );
-			var price = getPlatePricing( json, preloadedQuotation, quotationItem )
+			// doSkipPrewarm: l'eventuale sweep di massa è già stato fatto dall'aggregatore
+			var price = getPlatePricing( json, preloadedQuotation, quotationItem, doSkipPrewarm )
 		}
 
 		if (IsInstanceOf(quotationItem, "com.apirone.core.model.bean.QuotationItemSignage")) {
