@@ -40,12 +40,19 @@ AP.sync.widget = ( function() {
         return result;
     };
 
-    var formatLabel = function( source, lastCompletedAt ) {
-        if ( !lastCompletedAt ) {
+    var formatLabel = function( source, status ) {
+        // Testo persistente (non sparisce come un toast): mentre una sync lunga
+        // (es. CRM, alcuni minuti) è in corso, resta visibile finché non finisce -
+        // aiuta a non far ricliccare l'utente pensando che il click non sia partito.
+        if ( status.running ) {
+            return source.label + ": sincronizzazione in corso...";
+        }
+
+        if ( !status.lastcompletedat ) {
             return source.label + ": nessuna sincronizzazione ancora eseguita";
         }
 
-        var date = new Date( lastCompletedAt );
+        var date = new Date( status.lastcompletedat );
 
         var pad = function( n ) { return ( n < 10 ? "0" : "" ) + n; };
 
@@ -58,7 +65,7 @@ AP.sync.widget = ( function() {
     var applyStatus = function( key, status ) {
         var source = sources[ key ];
 
-        source.statusEl.text( formatLabel( source, status.lastcompletedat ) );
+        source.statusEl.text( formatLabel( source, status ) );
 
         if ( status.running ) {
             startPolling( key );
@@ -128,6 +135,11 @@ AP.sync.widget = ( function() {
                         fetchStatus( key, function( status ) { applyStatus( key, status ); } );
                         return;
                     }
+
+                    // Conferma immediata di presa in carico: senza, per una sync lenta
+                    // (es. CRM, alcuni minuti) l'utente non ha nessun riscontro del click
+                    // e rischia di cliccare più volte pensando che non sia partita.
+                    AP.widget.notify( "success", "Sincronizzazione " + source.label + " avviata." );
 
                     // Con sync veloci il job può già essere finito quando arriva questa
                     // risposta: senza questo controllo l'utente non vedrebbe nessuna
