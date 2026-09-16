@@ -50,9 +50,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
 		QuotationItem quotationItem = javacast("null", ""),
-		any preloadedProduct = javacast("null", "") // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
-		){
-		var price = simulate( argumentCollection = arguments );
+		any preloadedProduct = javacast("null", ""), // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
+		any skipPrewarm = javacast("null", "") // true = il chiamante ha già fatto lo sweep verticale (es. prewarm di tutti gli articoli gemelli): salta i prewarm interni
+	) {
+		// Chiamata esplicita (non argumentCollection): con gli argomenti posizionali il forwarding
+		// grezzo mappa la chiave numerica del decimo argomento sul decimo parametro di simulate
+		// (preloadedProduct), sovrascrivendolo e perdendo skipPrewarm.
+		// Nota: currencyId non esiste tra i parametri di calculate (il forwarding della vecchia
+		// versione non lo passava mai): simulate usa il suo default "EUR".
+		// skipPrewarm letto con StructKeyExists: un null passato posizionalmente non viene
+		// bindato da Lucee e la chiave non esisterebbe nell'arguments scope.
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
+		var price = simulate(
+			productId                      = arguments.productId,
+			quantity                       = arguments.quantity,
+			quotationItemZoneId            = arguments.quotationItemZoneId,
+			producItemtIds                 = arguments.producItemtIds,
+			lettersQuantity                = arguments.lettersQuantity,
+			simulationSignageConfigItemId  = arguments.simulationSignageConfigItemId,
+			quotation                      = arguments.quotation,
+			quotationItem                  = arguments.quotationItem,
+			preloadedProduct               = arguments.preloadedProduct,
+			skipPrewarm                    = doSkipPrewarm
+		);
 		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
 	}
 
@@ -66,7 +86,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric simulationSignageConfigItemId,
 		Quotation quotation = javacast("null", ""),
 		QuotationItem quotationItem = javacast("null", ""),
-		any preloadedProduct = javacast("null", "") // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
+		any preloadedProduct = javacast("null", ""), // "any": con il tipo Product, Lucee non casta il default nullo quando l'argomento viene omesso (es. PriceAjaxController.simulate)
+		any skipPrewarm = javacast("null", "") // true = il chiamante ha già fatto lo sweep verticale: salta i prewarm interni
 	){
 		if ( arguments.quantity LTE 0 ) {
 			Throw(
@@ -74,6 +95,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				message = "The quantity [#arguments.quantity#] must be greater than zero."
 			);
 		}
+
+		// skipPrewarm letto con StructKeyExists: un null passato posizionalmente non viene
+		// bindato e la chiave non esisterebbe; da qui in poi passa solo un booleano.
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
 
 		variables.costs     = [];
 
@@ -129,7 +154,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var quantity = arguments.quantity
 		if (!isNull(arguments.quotationItemZoneId)) {
-			var zone = getQuotationZoneService().get(arguments.quotationItemZoneId)
+			// Memo per request: gli articoli gemelli condividono le stesse zone e il build di
+			// QuotationZone è pesante (cascata fino alla quotation: utenti, ruoli, storico).
+			// Il bean è usato in sola lettura nel pricing, quindi il riuso è sicuro.
+			if ( !StructKeyExists( request, "_pricingZoneMemo" ) ) {
+				request._pricingZoneMemo = {};
+			}
+			var zone = NullValue();
+			if ( StructKeyExists( request._pricingZoneMemo, arguments.quotationItemZoneId ) ) {
+				zone = request._pricingZoneMemo[ arguments.quotationItemZoneId ];
+			} else {
+				zone = getQuotationZoneService().get(arguments.quotationItemZoneId)
+				request._pricingZoneMemo[ arguments.quotationItemZoneId ] = zone;
+			}
 			var originZone = zone.getOrigin()
 			var zoneQuantity = zone.getQuantity();
 			if (!isNull(originZone)) {
@@ -141,7 +178,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		//var currency = currencySvc.get( arguments.currencyId );
 
-		var settings = metadataSvc.list( typeId=107 );
+		// Memo per request: il markup generale è configurazione statica riletta a ogni
+		// calculate; il metadata type non cambia durante la richiesta
+		if ( !StructKeyExists( request, "_pricingMetadataMemo" ) ) {
+			request._pricingMetadataMemo = metadataSvc.list( typeId=107 );
+		}
+		var settings = request._pricingMetadataMemo;
 		var generalMarkup = settings[1].getValue();
 
 		// TODO: verificare come gestire la mancanza di prezzo
@@ -219,7 +261,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var bundleComponents = componentSvc.priceCalculatorSearch(
 				lineId                         = product.getLine().getId(),
 				modelId                        = product.getModel().getId(),
-				includeBaseAttributeComponents = true
+				includeBaseAttributeComponents = true,
+				skipPrewarm                    = doSkipPrewarm
 			);
 
 			var bundleCost = calculateComponentsTotal( bundleComponents, "CatalogBundle" );
@@ -239,7 +282,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			cost base product
 		*/
 
-		var productComponents = componentSvc.priceCalculatorSearch( productId = productId, includeBaseAttributeComponents = true );
+		var productComponents = componentSvc.priceCalculatorSearch( productId = productId, includeBaseAttributeComponents = true, skipPrewarm = doSkipPrewarm );
 
 		var productCost = calculateComponentsTotal( productComponents, "Product" );
 
@@ -263,13 +306,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 		}
 
-		// Precarica tutti i ProductItem in batch per evitare N+1 nel loop
-		var productItemMap = ArrayLen( productItemIds ) ? getProductItemService().getMany( productItemIds ) : {};
+		// Precarica in batch tutti i ProductItem (memo per request: gli stessi item tornano in
+		// tutti gli articoli gemelli che condividono il prodotto; beans usati in sola lettura)
+		var pmKey = ArrayToList( productItemIds );
+		if ( !StructKeyExists( request, "_pricingItemMapMemo" ) ) {
+			request._pricingItemMapMemo = {};
+		}
+
+		var productItemMap = NullValue();
+		if ( ArrayLen( productItemIds ) && StructKeyExists( request._pricingItemMapMemo, pmKey ) ) {
+			productItemMap = request._pricingItemMapMemo[ pmKey ];
+		} else if ( ArrayLen( productItemIds ) ) {
+			productItemMap = getProductItemService().getMany( productItemIds );
+			request._pricingItemMapMemo[ pmKey ] = productItemMap;
+		} else {
+			productItemMap = {};
+		}
 
 		// Precarica in batch tutti i componenti (own + base attribute) di ogni item
 		// per evitare una query per item (N+1) in priceCalculatorSearch()
 		var itemComponentsMap = ArrayLen( productItemIds )
-			? componentSvc.priceCalculatorSearchByProductItemIds( productItemIds )
+			? componentSvc.priceCalculatorSearchByProductItemIds( productItemIds, doSkipPrewarm )
 			: {};
 
 		for ( var itemId in productItemIds ) {
@@ -420,7 +477,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				if ( IsInstanceOf( product, "com.apirone.core.model.bean.ProductComplex" ) ) {
 					var signageBundleComponents = componentSvc.priceCalculatorSearch(
 						signageConfigItemId = simulationSignageConfigItemId,
-						includeBaseAttributeComponents = true
+						includeBaseAttributeComponents = true,
+						skipPrewarm = doSkipPrewarm
 					);
 
 					var fontPricePerLetter += calculateComponentsTotal( signageBundleComponents, "SignageConfigItem" );

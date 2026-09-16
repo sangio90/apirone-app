@@ -117,8 +117,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		Numeric productItemId,
 		Numeric attributeValueId,
 		Boolean includeBaseAttributeComponents = false hint="Only for product productItemId",
-		limit = -1
+		limit = -1,
+		skipPrewarm = javacast( "null", "" )
 	){
+		// skipPrewarm letto con StructKeyExists: un null non viene bindato e la chiave non esisterebbe
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
+
 		if ( !IsNull( arguments.productItemId ) AND arguments.includeBaseAttributeComponents ) {
 			return searchByProductItemIdForPriceCalculator( arguments.productItemId );
 		}
@@ -126,13 +130,34 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var rows   = [];
 		var result = super.getResult();
 
+		// Riuso per richiesta: i path linea+modello e prodotto (senza productItemId) restituiscono
+		// gli stessi componenti per tutta la richiesta (es. N placche gemelle dello stesso modello
+		// riusano gli stessi componenti bundle): una lettura sola invece di una per chiamata.
+		//
+		// Il productItemId (override scoped per item), l'attributeValueId e il path signage
+		// rendono il risultato variabile per chiamata: non si memoizzano.
+		var searchMemoKey = "";
+		if ( IsNull( arguments.productItemId ) && IsNull( arguments.attributeValueId ) && IsNull( arguments.signageItemProduct ) ) {
+			if ( !IsNull( arguments.lineId ) && !IsNull( arguments.modelId ) ) {
+				searchMemoKey = "bundle_" & arguments.lineId & "_" & arguments.modelId;
+			} else if ( !IsNull( arguments.productId ) ) {
+				searchMemoKey = "product_" & arguments.productId & ( arguments.includeBaseAttributeComponents ? "_ba" : "" );
+			}
+		}
+		if ( !StructKeyExists( request, "_componentSearchMemo" ) ) {
+			request._componentSearchMemo = {};
+		}
+		if ( Len( searchMemoKey ) && StructKeyExists( request._componentSearchMemo, searchMemoKey ) ) {
+			return request._componentSearchMemo[ searchMemoKey ];
+		}
+
 		var records = getDao().find( argumentCollection = arguments );
 
 		// Prewarm verticale in batch: legge raw|variant|color di tutti i componenti
 		// trovati in una sola query (apirone) e precompila le memo ERP (listin +
 		// artico), così i priceCalculatorRead per componente non interrogano
 		// verticale uno alla volta.
-		if ( records.recordCount GT 0 ) {
+		if ( !doSkipPrewarm && records.recordCount GT 0 ) {
 			var componentIdsForPrewarm = [];
 			records.each( function( record ){
 				ArrayAppend( componentIdsForPrewarm, record.component_id );
@@ -164,6 +189,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			rows.add(component)
 		} );
 
+		if ( Len( searchMemoKey ) ) {
+			request._componentSearchMemo[ searchMemoKey ] = rows;
+		}
+
 		return rows
 	}
 
@@ -177,13 +206,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * @productItemIds Array di productItemId (componenti own + attributo legati agli item selezionati)
 	 * @productIds      Array di productId (componenti di placca/frutti/tappi)
 	 * @lineId          Linea della placca (per i componenti bundle)
-	 * @modelId         Modello della placca (per i componenti bundle)
+	 * @modelId         Modello della placca (per i componenti bundle, chiamata singola)
+	 * @modelIds        Lista di modelli distinti (per il prewarm di più placche gemelle
+	 *                  con la stessa linea ma modelli diversi); alternativo a modelId
 	 */
 	public void function prewarmPricingComponents(
 		required Array productItemIds,
 		required Array productIds,
 		String lineId,
-		String modelId
+		String modelId,
+		Array modelIds
 	){
 		var tripleMap = {};
 		var rawIdMap  = {};
@@ -227,6 +259,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		if ( !IsNull( arguments.lineId ) && !IsNull( arguments.modelId ) ) {
 			collectTriples( getDao().getComponentTriplesByLineModel( arguments.lineId, arguments.modelId ) );
+		} else if ( !IsNull( arguments.lineId ) && !IsNull( arguments.modelIds ) ) {
+			// Modelli distinti (es. i gemelli condividono la linea ma non il modello): una lettura per modello
+			for ( var hModelId in arguments.modelIds ) {
+				collectTriples( getDao().getComponentTriplesByLineModel( arguments.lineId, hModelId ) );
+			}
 		}
 
 		var triples = [];
@@ -247,11 +284,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * @productItemIds Array di productItemId
 	 * @return Struct mappato per productItemId -> Array di struct componente
 	 */
-	public Struct function priceCalculatorSearchByProductItemIds( required Array productItemIds ){
+	public Struct function priceCalculatorSearchByProductItemIds( required Array productItemIds, skipPrewarm = javacast( "null", "" ) ){
 		// Nessun item da processare: evita di generare una query con IN () vuoto.
 		if ( !ArrayLen( arguments.productItemIds ) ) {
 			return {};
 		}
+
+		// skipPrewarm letto con StructKeyExists: un null non viene bindato e la chiave non esisterebbe
+		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
 
 		var result = {};
 
@@ -337,8 +377,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for ( var tripleKey in tripleMap ) {
 			ArrayAppend( triples, tripleMap[ tripleKey ] );
 		}
-		getDao().getComponentCostByTriples( triples );
-		getDao().getRawProductDataByIds( StructKeyArray( rawIdMap ) );
+
+		// Con skipPrewarm il chiamante ha già precaricato tutto lo sweep (memo piena,
+		// i due batch sarebbero no-op): si salta anche l'attraversamento delle triple.
+		if ( !doSkipPrewarm ) {
+			getDao().getComponentCostByTriples( triples );
+			getDao().getRawProductDataByIds( StructKeyArray( rawIdMap ) );
+		}
 
 		// 4) Componenti "own": costruiti dopo il prewarm, i getComponentCost/getRawProductData interni
 		// trovano tutto già in memo (zero query ERP per componente)
