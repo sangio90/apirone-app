@@ -1690,6 +1690,12 @@ AP.plate.grid = ( function() {
 
                 fruit.stopDragging();
                 this.renderFruits();
+                // i layer di incisione non sono più figli del frutto (vedi
+                // drawFruitEngravingSymbol in app-quotation-plate-vue.js): dopo un
+                // trascinamento vanno risincronizzati esplicitamente sulla nuova posizione.
+                // window.vm potrebbe non esistere in altri contesti che riusano questo
+                // designer (es. il builder placche): chiamata difensiva.
+                window.vm?.repositionEngravingLayers?.( fruit.id );
 
                 return;
             }
@@ -1747,6 +1753,8 @@ AP.plate.grid = ( function() {
             fruit.stopDragging();
 
             this.renderFruits();
+            // vedi commento nel ramo block-plate qui sopra
+            window.vm?.repositionEngravingLayers?.( fruit.id );
         }
     }
 

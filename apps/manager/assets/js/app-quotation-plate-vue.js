@@ -34,6 +34,82 @@ AP.plate.modal = ( function() {
     }
 
     /**
+     * Rasterizza un'immagine SVG (background-image) in un PNG delle dimensioni date,
+     * replicando "background-size:contain" + "background-position:center". Serve perché
+     * html2canvas non rasterizza in modo affidabile gli SVG senza width/height espliciti
+     * (solo viewBox, come i pittogrammi delle incisioni): li disegna microscopici invece
+     * che riempire il box. Il rendering nativo del browser (drawImage), invece, rispetta
+     * sempre il viewBox correttamente: da qui il giro per un canvas intermedio.
+     * @param {string} url - URL dell'immagine SVG.
+     * @param {number} w - Larghezza target in px.
+     * @param {number} h - Altezza target in px.
+     * @returns {Promise<string>} Data URL PNG risultante.
+     */
+    function svgUrlToPngDataUrl( url, w, h ) {
+        return new Promise( ( resolve, reject ) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                const canvas   = document.createElement( "canvas" );
+                canvas.width   = w;
+                canvas.height  = h;
+                const ctx      = canvas.getContext( "2d" );
+                const naturalW = img.naturalWidth || w;
+                const naturalH = img.naturalHeight || h;
+                const scale    = Math.min( w / naturalW, h / naturalH );
+                const drawW    = naturalW * scale;
+                const drawH    = naturalH * scale;
+                ctx.drawImage( img, ( w - drawW ) / 2, ( h - drawH ) / 2, drawW, drawH );
+                resolve( canvas.toDataURL( "image/png" ) );
+            };
+            img.onerror = reject;
+            img.src = url;
+        } );
+    }
+
+    /**
+     * Sostituisce temporaneamente il background-image SVG dei simboli di incisione dentro
+     * $root con un PNG pre-rasterizzato (vedi svgUrlToPngDataUrl), per l'anteprima
+     * html2canvas. Restituisce la lista delle sostituzioni fatte, da ripristinare subito
+     * dopo la cattura con restoreSvgSymbols().
+     * @param {Object} $root - Elemento jQuery radice su cui cercare .fruit-engraving-symbol.
+     * @returns {Promise<Array<{el: Object, original: string}>>} Sostituzioni da ripristinare.
+     */
+    async function rasterizeSvgSymbolsForPreview( $root ) {
+        const restores = [];
+        const symbols  = $root.find( ".fruit-engraving-symbol" ).filter( function() {
+            return /\.svg(["')]|\?)/i.test( $( this ).css( "background-image" ) );
+        } );
+        for ( const el of symbols.toArray() ) {
+            const $el   = $( el );
+            const bg    = $el.css( "background-image" );
+            const match = bg.match( /url\(["']?([^"')]+)["']?\)/ );
+            if ( !match ) {
+                continue;
+            }
+            const w = Math.max( 1, Math.round( $el.width() ) );
+            const h = Math.max( 1, Math.round( $el.height() ) );
+            try {
+                const dataUrl = await svgUrlToPngDataUrl( match[1], w, h );
+                restores.push( { el: $el, original: bg } );
+                $el.css( "background-image", `url('${dataUrl}')` );
+            } catch ( e ) {
+                // se il rasterize fallisce (es. CORS) meglio lasciare l'svg originale:
+                // peggio nella preview, ma non deve bloccare il salvataggio
+            }
+        }
+        return restores;
+    }
+
+    /**
+     * Ripristina i background-image SVG sostituiti da rasterizeSvgSymbolsForPreview().
+     * @param {Array<{el: Object, original: string}>} restores - Sostituzioni da annullare.
+     */
+    function restoreSvgSymbols( restores ) {
+        restores.forEach( ( r ) => { r.el.css( "background-image", r.original ); } );
+    }
+
+    /**
      * Crea e restituisce la struttura dati predefinita per il form di dettaglio della placca.
      * Contiene dati iniziali vuoti, elenchi di stato, titolo e configurazioni di prezzo.
      * @returns {Object} Oggetto form con proprietà data, statuses, itemStatuses, title, canSave, isClone, priceTypes.
@@ -2045,6 +2121,11 @@ AP.plate.modal = ( function() {
                         ? "i" + String( item.id ).replace( /[^A-Za-z0-9_-]/g, "" )
                         : ( parentAttributeId ? parentAttributeId + "-" + attributeId : attributeId );
                     fruitEl.find( "> .fruit-overlay-" + overlayKey ).remove();
+                    // i layer di incisione non sono più figli del frutto (vedi
+                    // drawFruitEngravingSymbol): vanno cercati e rimossi nell'ancora esterna
+                    this.engravingAnchor().find(
+                        '> .fruit-overlay-' + overlayKey + '[data-fruit-id="' + fruitId + '"]'
+                    ).remove();
 
                     // incisioni: il simbolo non si disegna a tutto frutto ma in scala nella
                     // posizione scelta sulla griglia, ed è trascinabile da marker a marker
@@ -2203,11 +2284,70 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
+                 * Ancora esterna su cui agganciare i layer di incisione: #quotation-plate-fruits
+                 * è dimensionato esattamente sulla placca fisica e ha overflow:hidden, quindi
+                 * taglia qualunque cosa esca dal proprio riquadro - non solo dal riquadro del
+                 * frutto, anche dal riquadro della placca stessa se piccola. Va agganciato dentro
+                 * #plate-layers (suo genitore diretto, area 1200x500 molto più ampia della placca,
+                 * overflow:hidden ma con margine ampio) e NON più in alto (#plate-background):
+                 * #plate-layers ha z-index:2147483647 per stare sempre sopra il resto della UI,
+                 * quindi un layer agganciato fuori da lui - pur restando visibile, perché in
+                 * quell'area #plate-layers è perlopiù trasparente - perde ogni evento di puntatore
+                 * (click/drag), che #plate-layers cattura comunque per via dello stacking.
+                 * @returns {Object} Elemento jQuery dell'ancora.
+                 */
+                engravingAnchor: function() {
+                    return $( "#plate-layers" );
+                },
+
+                /**
+                 * Posiziona un layer di incisione sul centro a schermo del frutto, rispetto
+                 * all'ancora esterna. Basato su getBoundingClientRect (non su calcoli sui
+                 * css dichiarati lungo la catena di antenati): funziona a prescindere da
+                 * eventuali trasformazioni/zoom intermedi. Va richiamato di nuovo ogni volta
+                 * che il frutto si sposta (il layer non è più figlio del frutto, quindi non
+                 * segue automaticamente un semplice aggiornamento css left/top del frutto).
+                 * @param {Object} $layer - Layer di incisione (jQuery).
+                 * @param {Object} fruitEl - Elemento del frutto (jQuery).
+                 */
+                positionEngravingLayer: function( $layer, fruitEl ) {
+                    const $anchor = this.engravingAnchor();
+                    if ( !$anchor.length || !fruitEl.length ) {
+                        return;
+                    }
+                    const fr = fruitEl[ 0 ].getBoundingClientRect();
+                    const ar = $anchor[ 0 ].getBoundingClientRect();
+                    $layer.css( {
+                        left: ( fr.left + fr.width / 2 - ar.left ) + "px",
+                        top: ( fr.top + fr.height / 2 - ar.top ) + "px",
+                    } );
+                },
+
+                /**
+                 * Risincronizza la posizione di tutti i layer di incisione di un frutto:
+                 * va richiamato dopo un trascinamento (il frutto non è più il genitore del
+                 * layer, quindi il riposizionamento del frutto non lo trascina più insieme).
+                 * Chiamato da app-quotation-plate-designer.js dopo ogni drag.
+                 * @param {string} fruitId - Identificativo del frutto spostato.
+                 */
+                repositionEngravingLayers: function( fruitId ) {
+                    const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
+                    const self = this;
+                    this.engravingAnchor()
+                        .find( '> .fruit-engraving-layer[data-fruit-id="' + fruitId + '"]' )
+                        .each( function() { self.positionEngravingLayer( $( this ), fruitEl ); } );
+                },
+
+                /**
                  * Disegna il simbolo inciso sul frutto nella posizione scelta sulla griglia,
                  * insieme ai punti di aggancio (visibili durante il trascinamento).
-                 * Le coordinate dei marker sono in mm rispetto all'angolo in alto a sinistra
-                 * del frutto orizzontale: il contenitore usa lo stesso stile degli altri
-                 * overlay, quindi per i frutti verticali ci pensa la rotazione CSS.
+                 * Le coordinate dei marker sono in mm rispetto al CENTRO del frutto
+                 * orizzontale (un marker può stare anche fuori dal frutto, incluso fuori dalla
+                 * placca stessa se piccola): per questo il layer NON è annidato dentro il
+                 * frutto (che erediterebbe il taglio di #quotation-plate-fruits) ma agganciato
+                 * a engravingAnchor() e posizionato in base alla posizione reale a schermo del
+                 * frutto (vedi positionEngravingLayer()). Per i frutti verticali la rotazione
+                 * 90° resta CSS, applicata al layer.
                  * @param {string} fruitId - Identificativo del frutto.
                  * @param {string} overlayKey - Chiave dell'overlay (per la rimozione al re-render).
                  * @param {Object} item - Attributo del simbolo.
@@ -2217,13 +2357,18 @@ AP.plate.modal = ( function() {
                  */
                 drawFruitEngravingSymbol: function( fruitId, overlayKey, item, value, engraving, zIndex ) {
                     const fruitEl = $( "#quotation-plate-fruits #" + fruitId );
-                    if ( !fruitEl.length ) {
+                    const $anchor = this.engravingAnchor();
+                    if ( !fruitEl.length || !$anchor.length ) {
                         return;
                     }
 
                     const markers = engraving.markers;
                     const scale   = this.engravingDisplayScale();
                     const size    = Math.max( 6, engraving.symbolSizeMm * scale );
+
+                    const isVertical  = this.fruitOrientationId( fruitId ) === "VER";
+                    const centerX     = ( isVertical ? fruitEl.height() : fruitEl.width() ) / 2;
+                    const centerY     = ( isVertical ? fruitEl.width() : fruitEl.height() ) / 2;
 
                     // marker salvato se esiste ancora; se la griglia è stata rifatta il marker
                     // non c'è più ma restano le coordinate salvate col preventivo, quindi si
@@ -2252,7 +2397,20 @@ AP.plate.modal = ( function() {
                         code: engraving.rootCode,
                     } );
 
-                    const $layer = $( `<div class="fruit-overlay-${overlayKey} fruit-engraving-layer" style="${this.fruitOverlayStyle( fruitId, zIndex )}"></div>` );
+                    const layerWidth  = centerX * 2;
+                    const layerHeight = centerY * 2;
+                    const $layer = $( "<div/>", {
+                        "class": `fruit-overlay-${overlayKey} fruit-engraving-layer`,
+                        "data-fruit-id": fruitId,
+                        "data-overlay-key": overlayKey,
+                        css: {
+                            position: "absolute",
+                            zIndex: zIndex + 9000,
+                            width: layerWidth + "px",
+                            height: layerHeight + "px",
+                            transform: "translate(-50%, -50%)" + ( isVertical ? " rotate(90deg)" : "" ),
+                        },
+                    } );
 
                     for ( const m of markers ) {
                         $layer.append( $( "<div/>", {
@@ -2261,15 +2419,15 @@ AP.plate.modal = ( function() {
                             "data-order": m.order,
                             "data-x": m.xMm,
                             "data-y": m.yMm,
-                            css: { left: ( m.xMm * scale ) + "px", top: ( m.yMm * scale ) + "px" },
+                            css: { left: ( centerX + m.xMm * scale ) + "px", top: ( centerY + m.yMm * scale ) + "px" },
                         } ) );
                     }
 
                     const $symbol = $( "<div/>", {
                         "class": "fruit-engraving-symbol",
                         css: {
-                            left: ( marker.xMm * scale ) + "px",
-                            top: ( marker.yMm * scale ) + "px",
+                            left: ( centerX + marker.xMm * scale ) + "px",
+                            top: ( centerY + marker.yMm * scale ) + "px",
                             width: size + "px",
                             height: size + "px",
                         },
@@ -2287,10 +2445,11 @@ AP.plate.modal = ( function() {
                         $symbol.addClass( "is-empty" );
                     }
                     $layer.append( $symbol );
-                    fruitEl.append( $layer );
+                    $anchor.append( $layer );
+                    this.positionEngravingLayer( $layer, fruitEl );
 
                     if ( this.canEdit && markers.length > 1 ) {
-                        this.makeEngravingSymbolDraggable( $symbol, $layer, fruitId, item, value, engraving, scale );
+                        this.makeEngravingSymbolDraggable( $symbol, $layer, fruitId, item, value, engraving, scale, centerX, centerY );
                     } else {
                         $symbol.attr( "title", `Incisione ${engraving.rootCode} · posizione ${marker.order}` );
                     }
@@ -2308,13 +2467,15 @@ AP.plate.modal = ( function() {
                  * @param {Object} value - Valore selezionato.
                  * @param {Object} engraving - Contesto incisione.
                  * @param {number} scale - Scala mm → px.
+                 * @param {number} centerX - Offset in px del centro del frutto (origine dei marker) nel layer.
+                 * @param {number} centerY - Offset in px del centro del frutto (origine dei marker) nel layer.
                  */
-                makeEngravingSymbolDraggable: function( $symbol, $layer, fruitId, item, value, engraving, scale ) {
+                makeEngravingSymbolDraggable: function( $symbol, $layer, fruitId, item, value, engraving, scale, centerX, centerY ) {
                     const self = this;
                     const key  = fruitId + "-" + item.id;
 
                     const applyMarker = function( marker ) {
-                        $symbol.css( { left: ( marker.xMm * scale ) + "px", top: ( marker.yMm * scale ) + "px" } );
+                        $symbol.css( { left: ( centerX + marker.xMm * scale ) + "px", top: ( centerY + marker.yMm * scale ) + "px" } );
                         $symbol.attr( "title", `Incisione ${engraving.rootCode} · posizione ${marker.order} di ${engraving.markers.length} (trascina per spostare)` );
                     };
 
@@ -2857,7 +3018,13 @@ AP.plate.modal = ( function() {
                     }
                     parsedData.positions = fruitPositions;
 
+                    // html2canvas non rasterizza in modo affidabile i pittogrammi delle
+                    // incisioni (SVG con solo viewBox, senza width/height): li disegna
+                    // microscopici. Si sostituiscono con un PNG pre-rasterizzato solo per lo
+                    // scatto, poi si ripristina subito l'SVG originale (serve per il drag).
+                    const svgRestores = await rasterizeSvgSymbolsForPreview( $( preview ) );
                     const canvas = await html2canvas( preview, { useCORS: true } );
+                    restoreSvgSymbols( svgRestores );
                     const imgData = scaleCanvasToBase64( canvas, 800 );
                     parsedData.imageBase64 = imgData;
 

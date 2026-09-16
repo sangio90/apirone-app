@@ -8,10 +8,13 @@
         <div class="row" data-bind="role: this" data-role-list="ADM/TCD">
             <div class="col-12">
                 <p class="text-muted small mb-3">
-                    Ogni marker è il centro di un'incisione ammessa. Trascina la "x" sull'immagine:
-                    le coordinate (px dell'immagine e mm, origine in alto a sinistra) sono mostrate in tempo reale.
-                    Per una posizione precisa puoi anche scrivere le coordinate nella tabella: px e mm restano
-                    allineati e il marker si sposta mentre digiti. Un modulo frutto misura 11,25 × 45 mm.
+                    Ogni marker è il centro di un'incisione ammessa. Trascina la "x" nel riquadro: le coordinate
+                    (px dell'immagine e mm, origine al CENTRO dell'immagine) sono mostrate in tempo reale. Il
+                    riquadro rappresenta l'area di lavoro completa, ±80mm dal centro in ogni direzione (160×160mm):
+                    un marker può stare anche fuori dall'immagine del frutto, ad esempio per una scritta sopra
+                    al pulsante e non dentro. Per una posizione precisa puoi anche scrivere le coordinate nella
+                    tabella: px e mm restano allineati e il marker si sposta mentre digiti. Un modulo frutto
+                    misura 11,25 × 45 mm.
                 </p>
                 <div id="product-engravings-blocks"></div>
             </div>
@@ -25,11 +28,30 @@
             display: inline-block;
             background: ##f4f4f4;
             border: 1px solid ##ddd;
+            overflow: hidden;
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
         }
-        .engraving-stage img { display: block; pointer-events: none; }
+        /* l'immagine è centrata nel quadrato (area di lavoro 160x160mm), non ancorata in alto a sinistra */
+        .engraving-stage img { display: block; position: absolute; pointer-events: none; }
+        .engraving-center-mark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .engraving-center-mark::before, .engraving-center-mark::after {
+            content: "";
+            position: absolute;
+            background: rgba(0, 0, 0, .35);
+        }
+        .engraving-center-mark::before { left: 50%; top: 0; width: 1px; height: 100%; margin-left: -.5px; }
+        .engraving-center-mark::after  { top: 50%; left: 0; height: 1px; width: 100%; margin-top: -.5px; }
         .engraving-coords {
             position: absolute;
             top: 4px;

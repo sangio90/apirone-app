@@ -1,13 +1,17 @@
 /*
  * Griglia incisioni di un frutto (tab "Griglia incisioni" della scheda prodotto).
  *
- * Per ogni attributo radice dell'incisione (IS, II, IL) mostra l'immagine orizzontale del
- * frutto con i marker: ogni marker è il centro di un'incisione ammessa, trascinabile con
- * il mouse, con le coordinate in px dell'immagine e in mm mostrate in tempo reale. Le stesse
- * coordinate sono modificabili a mano nella tabella a fianco (px e mm restano allineati).
- * Le coordinate sono relative all'angolo in alto a sinistra dell'immagine; la scala px/mm
- * viene dall'immagine stessa e dai moduli del frutto (11,25 × 45 mm per modulo), quindi
- * non dipende da come è visualizzata a video.
+ * Per ogni attributo radice dell'incisione (IS, II, IL) mostra un'area di lavoro quadrata di
+ * 160x160mm (±80mm per asse) con l'immagine orizzontale del frutto centrata dentro, e i
+ * marker: ogni marker è il centro di un'incisione ammessa, trascinabile con il mouse, con le
+ * coordinate in px dell'immagine e in mm mostrate in tempo reale. Le stesse coordinate sono
+ * modificabili a mano nella tabella a fianco (px e mm restano allineati). Le coordinate sono
+ * relative al CENTRO dell'immagine (non ai suoi bordi): un marker può stare anche fuori
+ * dall'immagine stessa, es. una scritta sopra al pulsante e non dentro. La scala px/mm viene
+ * dall'immagine stessa e dai moduli del frutto (11,25 × 45 mm per modulo), quindi non dipende
+ * da come è visualizzata a video; la scala di VISUALIZZAZIONE invece è calcolata sul lato
+ * dell'area di lavoro (160mm), non sull'immagine, per restare a una dimensione a video
+ * moderata e costante indipendentemente dalla risoluzione nativa dell'immagine.
  *
  * Dati: AP.page.engraving = { attributes: [{ id, code, name }], rootCodes, positionCount,
  * image: { uri, width, height }, canEdit }. I marker si leggono e si salvano con
@@ -27,11 +31,13 @@ AP.productEngravings = ( function() {
 
     var MODULE_MM = { width: 11.25, height: 45 };
 
-    // larghezza massima a video: l'immagine originale è piccola (4 px/mm), la si ingrandisce
-    // per lavorarci comodi senza toccare le coordinate salvate (sempre in px dell'originale)
-    var MAX_DISPLAY_WIDTH  = 720;
-    var MAX_DISPLAY_HEIGHT = 520;
-    var MIN_DISPLAY_SCALE  = 1;
+    // area di lavoro: ±80mm per asse (160x160mm), frutto centrato dentro. La scala di
+    // visualizzazione è calcolata su questo lato (non sull'immagine), per restare a una
+    // dimensione a video moderata e costante indipendentemente dalla risoluzione nativa
+    // dell'immagine - le coordinate salvate restano sempre in px dell'immagine originale.
+    var MAX_OFFSET_MM   = 80;
+    var WORK_AREA_MM     = MAX_OFFSET_MM * 2;
+    var TARGET_SQUARE_PX = 480;
 
     var cfg    = null;
     var blocks = {}; // attributeId -> { attribute, markers, $stage, $img, $coords, displayScale, dirty }
@@ -81,6 +87,7 @@ AP.productEngravings = ( function() {
                 + '</div>'
                 + '<div class="row"><div class="col-lg-7"><div class="engraving-stage">'
                 + '<img src="' + esc( cfg.image.uri ) + '" alt="">'
+                + '<div class="engraving-center-mark" title="Centro (0,0)"></div>'
                 + '<div class="engraving-coords" style="display:none"></div>'
                 + '</div></div>'
                 + '<div class="col-lg-5"><table class="table table-sm engraving-list"><thead><tr><th>N.</th><th>x px</th><th>y px</th><th>x mm</th><th>y mm</th><th></th></tr></thead><tbody></tbody></table></div></div>'
@@ -109,14 +116,29 @@ AP.productEngravings = ( function() {
         } );
     };
 
-    // scala di visualizzazione e primo disegno dei marker, quando l'immagine ha le misure
+    // scala di visualizzazione (calcolata sul lato dell'area di lavoro 160mm, non
+    // sull'immagine), stage quadrato fisso e immagine centrata dentro, poi primo disegno
+    // dei marker, quando l'immagine ha le misure
     var layoutBlock = function( block ) {
         var img = block.$img[ 0 ];
         if ( !img.naturalWidth ) { return; }
 
-        var scale = Math.max( MIN_DISPLAY_SCALE, Math.min( MAX_DISPLAY_WIDTH / img.naturalWidth, MAX_DISPLAY_HEIGHT / img.naturalHeight, 8 ) );
+        var workAreaNativePx = WORK_AREA_MM * pxPerMm( block );
+        var scale = TARGET_SQUARE_PX / workAreaNativePx;
         block.displayScale = scale;
-        block.$img.css( { width: Math.round( img.naturalWidth * scale ) + "px", height: Math.round( img.naturalHeight * scale ) + "px" } );
+
+        var squarePx = Math.round( workAreaNativePx * scale );
+        block.squarePx = squarePx;
+        block.$stage.css( { width: squarePx + "px", height: squarePx + "px" } );
+
+        var imgW = Math.round( img.naturalWidth * scale );
+        var imgH = Math.round( img.naturalHeight * scale );
+        block.$img.css( {
+            width: imgW + "px",
+            height: imgH + "px",
+            left: Math.round( ( squarePx - imgW ) / 2 ) + "px",
+            top: Math.round( ( squarePx - imgH ) / 2 ) + "px"
+        } );
 
         drawMarkers( block );
     };
@@ -141,15 +163,21 @@ AP.productEngravings = ( function() {
     };
 
     var positionMarker = function( block, $m, marker ) {
-        $m.css( { left: Math.round( marker.xPx * block.displayScale ) + "px", top: Math.round( marker.yPx * block.displayScale ) + "px" } );
+        var centerPx = block.squarePx / 2;
+        $m.css( {
+            left: Math.round( centerPx + marker.xPx * block.displayScale ) + "px",
+            top: Math.round( centerPx + marker.yPx * block.displayScale ) + "px"
+        } );
     };
 
-    var cell = function( marker, field, step ) {
+    var cell = function( block, marker, field, step ) {
         if ( !cfg.canEdit ) {
             return '<td>' + marker[ field ] + '</td>';
         }
+        var isPx = field === "xPx" || field === "yPx";
+        var bound = isPx ? round2( MAX_OFFSET_MM * pxPerMm( block ) ) : MAX_OFFSET_MM;
         return '<td><input type="number" class="form-control form-control-sm engraving-input" data-field="' + field + '"'
-            + ' step="' + step + '" min="0" value="' + marker[ field ] + '"></td>';
+            + ' step="' + step + '" min="' + ( -bound ) + '" max="' + bound + '" value="' + marker[ field ] + '"></td>';
     };
 
     var drawList = function( block ) {
@@ -157,8 +185,8 @@ AP.productEngravings = ( function() {
         block.markers.forEach( function( marker, index ) {
             block.$list.append(
                 '<tr data-index="' + index + '"><td class="engraving-order">' + marker.order + '</td>'
-                + cell( marker, "xPx", 1 ) + cell( marker, "yPx", 1 )
-                + cell( marker, "xMm", 0.25 ) + cell( marker, "yMm", 0.25 )
+                + cell( block, marker, "xPx", 1 ) + cell( block, marker, "yPx", 1 )
+                + cell( block, marker, "xMm", 0.25 ) + cell( block, marker, "yMm", 0.25 )
                 + '<td>' + ( cfg.canEdit ? '<a href="#" class="text-danger engraving-delete" title="Elimina marker"><i class="fas fa-trash"></i></a>' : '' ) + '</td></tr>'
             );
         } );
@@ -175,23 +203,21 @@ AP.productEngravings = ( function() {
     /**
      * Scrive una coordinata digitata sul marker tenendo allineata l'altra unità: px e mm
      * sono la stessa posizione espressa in modo diverso, quindi cambiandone una si ricalcola
-     * l'altra. Il valore viene limitato ai bordi dell'immagine.
+     * l'altra. Il valore viene limitato all'area di lavoro (±80mm dal centro).
      * #returns {boolean} false se il testo non è (ancora) un numero, es. campo in scrittura
      */
     var applyField = function( block, marker, field, rawValue ) {
         var value = parseFloat( String( rawValue ).replace( ",", "." ) );
         if ( !isFinite( value ) ) { return false; }
 
-        var img   = block.$img[ 0 ];
         var scale = pxPerMm( block );
 
         if ( field === "xPx" || field === "yPx" ) {
-            var maxPx = ( field === "xPx" ? img.naturalWidth : img.naturalHeight );
-            marker[ field ] = Math.max( 0, Math.min( round2( value ), maxPx ) );
+            var maxPx = MAX_OFFSET_MM * scale;
+            marker[ field ] = Math.max( -maxPx, Math.min( round2( value ), maxPx ) );
             marker[ field === "xPx" ? "xMm" : "yMm" ] = round2( marker[ field ] / scale );
         } else {
-            var maxMm = round2( ( field === "xMm" ? img.naturalWidth : img.naturalHeight ) / scale );
-            marker[ field ] = Math.max( 0, Math.min( round2( value ), maxMm ) );
+            marker[ field ] = Math.max( -MAX_OFFSET_MM, Math.min( round2( value ), MAX_OFFSET_MM ) );
             marker[ field === "xMm" ? "xPx" : "yPx" ] = round2( marker[ field ] * scale );
         }
 
@@ -260,9 +286,8 @@ AP.productEngravings = ( function() {
     var addMarker = function( block ) {
         var img = block.$img[ 0 ];
         if ( !img.naturalWidth ) { return; }
-        var xPx = round2( img.naturalWidth / 2 );
-        var yPx = round2( img.naturalHeight / 2 );
-        block.markers.push( { order: block.markers.length + 1, xPx: xPx, yPx: yPx, xMm: toMm( block, xPx ), yMm: toMm( block, yPx ) } );
+        // il centro dell'area di lavoro coincide ora con l'origine: nuovo marker a (0,0)
+        block.markers.push( { order: block.markers.length + 1, xPx: 0, yPx: 0, xMm: 0, yMm: 0 } );
         setDirty( block, true );
         drawMarkers( block );
         showCoords( block, block.markers[ block.markers.length - 1 ] );
@@ -277,7 +302,6 @@ AP.productEngravings = ( function() {
 
             var index  = Number( $m.data( "index" ) );
             var marker = block.markers[ index ];
-            var img    = block.$img[ 0 ];
             var rect   = block.$stage[ 0 ].getBoundingClientRect();
 
             $m.addClass( "is-dragging" );
@@ -285,13 +309,16 @@ AP.productEngravings = ( function() {
             $m.addClass( "is-selected" );
             showCoords( block, marker );
 
+            // il bordo dello stage COINCIDE con ±80mm dal centro: limitare displayX/Y ai
+            // bordi dello stage clampa automaticamente l'offset all'area di lavoro ammessa,
+            // senza bisogno di un clamp separato sui bordi dell'immagine (il marker può
+            // stare fuori dall'immagine, è proprio il punto dell'area di lavoro allargata)
             var onMove = function( ev ) {
                 var displayX = Math.max( 0, Math.min( rect.width,  ev.clientX - rect.left ) );
                 var displayY = Math.max( 0, Math.min( rect.height, ev.clientY - rect.top ) );
-                marker.xPx = round2( displayX / block.displayScale );
-                marker.yPx = round2( displayY / block.displayScale );
-                marker.xPx = Math.min( marker.xPx, img.naturalWidth );
-                marker.yPx = Math.min( marker.yPx, img.naturalHeight );
+                var centerPx = block.squarePx / 2;
+                marker.xPx = round2( ( displayX - centerPx ) / block.displayScale );
+                marker.yPx = round2( ( displayY - centerPx ) / block.displayScale );
                 marker.xMm = toMm( block, marker.xPx );
                 marker.yMm = toMm( block, marker.yPx );
                 positionMarker( block, $m, marker );

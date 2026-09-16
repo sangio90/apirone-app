@@ -285,7 +285,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	/**
 	 * Nodo "incisione" per l'export 3D: griglia (codice attributo radice), numero del marker
 	 * e coordinate del centro dell'incisione, sia in px dell'immagine orizzontale del frutto
-	 * sia in mm dall'angolo in alto a sinistra. Null se il valore non è posizionato.
+	 * sia in mm, rispetto al CENTRO del frutto (possono essere negative, il marker può stare
+	 * fuori dal frutto). Null se il valore non è posizionato.
 	 */
 	private Any function buildEngravingJson( required quotationItemProductItem ){
 		var qipi = arguments.quotationItemProductItem;
