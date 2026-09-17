@@ -1409,6 +1409,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			result.setData( { "general" = [ { "message" = e.message } ] } );
 			event.setValue( "result", result );
 			return;
+		} catch ( "ApirOne.NoPriceConfigured" e ) {
+			// combinazione di attributi non ancora completa (es. finitura non selezionata):
+			// messaggio al client, non un 500 - stesso trattamento di saveSignage()
+			var result = super.getResult();
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = e.message } ] } );
+			event.setValue( "result", result );
+			return;
 		}
 
 		var memy = super.getMementify();

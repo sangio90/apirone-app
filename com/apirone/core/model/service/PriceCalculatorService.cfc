@@ -162,9 +162,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		var price = product.getPrice( "PRICE" );
 		if ( IsNull( price ) ) {
+			// messaggio rivolto all'utente: descrizione leggibile del prodotto (linea,
+			// modello, finitura), non il guid interno - vedi anche "name" più sotto,
+			// stesso pattern
+			var missingPriceProductName = product.getDescription();
+			if ( Len( product.getCode() ) ) {
+				missingPriceProductName &= " (#product.getCode()#)";
+			}
+
 			Throw(
 				type    = "ApirOne.NoPriceConfigured",
-				message = "Nessun prezzo configurato per il prodotto [#productId#]."
+				message = "Nessun prezzo configurato per il prodotto [#missingPriceProductName#]."
 			);
 		}
 

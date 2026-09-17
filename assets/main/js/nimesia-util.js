@@ -56,6 +56,11 @@ NM.util.ajax = function( setup ) {
 
                 if ( statusText == "error" ) {
 
+                    // un errore non gestito non deve lasciare lo spinner globale bloccato
+                    // a schermo (es. chi ha chiamato l'ajax aveva fatto AP.loading.show()
+                    // prima della richiesta, contando su un done() che qui non arriverà mai)
+                    AP.loading?.hide?.();
+
                     if ( xhr.status == 500 ) {
                         AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
                         return;
