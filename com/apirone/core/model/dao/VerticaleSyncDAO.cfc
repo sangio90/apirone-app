@@ -68,8 +68,22 @@
 	--->
 
 	<cffunction name="syncPriceList" access="public" returntype="void">
+		<!---
+			LTRIM/RTRIM sui codici: le colonne sorgente lato Verticale (SQL Server) sono
+			a larghezza fissa (CHAR) e arrivano riempite di spazi finali. Senza il trim, i
+			confronti esatti con i codici già puliti salvati lato Apirone (es. components.
+			raw_product_id) falliscono silenziosamente - il prezzo/materiale/colore/variante
+			risulta "non trovato" anche se in realtà è presente nello specchio locale.
+			Confermato: leggendo dal vivo da Verticale il confronto invece risolve
+			(SQL Server tratta gli spazi finali come insignificanti nel confronto CHAR),
+			motivo per cui il problema si vedeva solo dopo la copia in Postgres.
+		--->
 		<cfquery name="local.q" datasource="verticale">
-			SELECT lisart, liscvr, liscol, lispre
+			SELECT
+				LTRIM(RTRIM(lisart)) AS lisart,
+				LTRIM(RTRIM(liscvr)) AS liscvr,
+				LTRIM(RTRIM(liscol)) AS liscol,
+				lispre
 			FROM azapi_listin
 		</cfquery>
 
@@ -88,7 +102,13 @@
 	<cffunction name="syncRawProducts" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
 			SELECT
-				arcodart, ardesart, artipmat, arsemlav, arunmis1, artipcol, arobsole
+				LTRIM(RTRIM(arcodart))  AS arcodart,
+				LTRIM(RTRIM(ardesart))  AS ardesart,
+				LTRIM(RTRIM(artipmat))  AS artipmat,
+				LTRIM(RTRIM(arsemlav))  AS arsemlav,
+				LTRIM(RTRIM(arunmis1))  AS arunmis1,
+				LTRIM(RTRIM(artipcol))  AS artipcol,
+				LTRIM(RTRIM(arobsole))  AS arobsole
 			FROM azapi_artico
 		</cfquery>
 
@@ -109,7 +129,7 @@
 
 	<cffunction name="syncRawProductTypes" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
-			SELECT codtip, destip
+			SELECT LTRIM(RTRIM(codtip)) AS codtip, LTRIM(RTRIM(destip)) AS destip
 			FROM azapi_codtip
 		</cfquery>
 
@@ -125,7 +145,7 @@
 
 	<cffunction name="syncVariants" access="public" returntype="void">
 		<cfquery name="local.variants" datasource="verticale">
-			SELECT varcod, vardes
+			SELECT LTRIM(RTRIM(varcod)) AS varcod, LTRIM(RTRIM(vardes)) AS vardes
 			FROM azapi_codvar
 		</cfquery>
 
@@ -139,7 +159,7 @@
 		)>
 
 		<cfquery name="local.variantProducts" datasource="verticale">
-			SELECT cbcodart, cbcodvar
+			SELECT LTRIM(RTRIM(cbcodart)) AS cbcodart, LTRIM(RTRIM(cbcodvar)) AS cbcodvar
 			FROM azapi_comvar
 		</cfquery>
 
@@ -155,7 +175,7 @@
 
 	<cffunction name="syncColors" access="public" returntype="void">
 		<cfquery name="local.colors" datasource="verticale">
-			SELECT clcodice, cldescri
+			SELECT LTRIM(RTRIM(clcodice)) AS clcodice, LTRIM(RTRIM(cldescri)) AS cldescri
 			FROM azapi_colori
 		</cfquery>
 
@@ -169,7 +189,7 @@
 		)>
 
 		<cfquery name="local.colorProducts" datasource="verticale">
-			SELECT clcodart, clcodcol
+			SELECT LTRIM(RTRIM(clcodart)) AS clcodart, LTRIM(RTRIM(clcodcol)) AS clcodcol
 			FROM azapi_comcol
 		</cfquery>
 
@@ -183,7 +203,7 @@
 		)>
 
 		<cfquery name="local.colorVariantProducts" datasource="verticale">
-			SELECT clcodart, clcodvar, clcodcol
+			SELECT LTRIM(RTRIM(clcodart)) AS clcodart, LTRIM(RTRIM(clcodvar)) AS clcodvar, LTRIM(RTRIM(clcodcol)) AS clcodcol
 			FROM azapi_cvrcom
 		</cfquery>
 
@@ -201,9 +221,9 @@
 	<cffunction name="syncCurrencies" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
 			SELECT
-				valcod AS valcod,
-				valdes AS valdes,
-				valsim AS valsim
+				LTRIM(RTRIM(valcod)) AS valcod,
+				LTRIM(RTRIM(valdes)) AS valdes,
+				LTRIM(RTRIM(valsim)) AS valsim
 			FROM codval
 		</cfquery>
 
@@ -220,7 +240,7 @@
 
 	<cffunction name="syncVatCodes" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
-			SELECT ivacod, ivades, ivaper
+			SELECT LTRIM(RTRIM(ivacod)) AS ivacod, LTRIM(RTRIM(ivades)) AS ivades, ivaper
 			FROM codiva
 		</cfquery>
 
@@ -237,7 +257,7 @@
 
 	<cffunction name="syncPaymentMethods" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
-			SELECT pagcod, pagdes
+			SELECT LTRIM(RTRIM(pagcod)) AS pagcod, LTRIM(RTRIM(pagdes)) AS pagdes
 			FROM codpag
 		</cfquery>
 
@@ -253,7 +273,7 @@
 
 	<cffunction name="syncCountries" access="public" returntype="void">
 		<cfquery name="local.q" datasource="verticale">
-			SELECT ISONAZ AS isonaz, CODNAZ AS codnaz, DESNAZ AS desnaz
+			SELECT LTRIM(RTRIM(ISONAZ)) AS isonaz, LTRIM(RTRIM(CODNAZ)) AS codnaz, LTRIM(RTRIM(DESNAZ)) AS desnaz
 			FROM codnaz
 		</cfquery>
 
