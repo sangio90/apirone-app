@@ -1693,7 +1693,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				}
 			}
 
-			if ( !IsNull( sib.getFruits() ) ) {
+			if ( IsInstanceOf( sib, "com.apirone.core.model.bean.QuotationItemPlate" ) && !IsNull( sib.getFruits() ) ) {
 				for ( var sibFruit in sib.getFruits() ) {
 					if ( !IsNull( sibFruit.getFruit() ) ) {
 						var sibFruitProductId = sibFruit.getFruit().getId();
