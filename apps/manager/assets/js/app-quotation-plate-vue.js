@@ -411,6 +411,7 @@ AP.plate.modal = ( function() {
                 activeTab: "plate", /** Tab attivo nel pannello degli attributi (plate | fruits). */
                 smallLoading: false, /** Flag di caricamento. */
                 exportCodePreview: null, /** Anteprima codice export (articolo + variante) dal server, vedi refreshExportCode. */
+                savedExportCode: "", /** Codice realmente salvato in export_codes per l'ultima esportazione di questa riga (vedi savedExportCode in editPlate), "" se mai esportata. */
                 importantAttributes: [], /** Attributi "da esportare" del prodotto ({ id, code }), per il badge accanto al nome. */
                 canEdit: AP.page.canEdit, /** Flag che indica se il preventivo è modificabile. */
                 showJsonPanel: false, /** Flag per mostrare il pannello JSON export (provvisorio). */
@@ -484,7 +485,15 @@ AP.plate.modal = ( function() {
                  * HTML della riga "Codice export" (helper condiviso AP.quotation.exportCode).
                  */
                 exportCodeHtml: function() {
-                    return AP.quotation.exportCode.html( this.exportCodePreview );
+                    return AP.quotation.exportCode.html( this.exportCodePreview, this.savedExportCode );
+                },
+
+                /**
+                 * Pulsanti di debug "JSON"/"JSON 3D": visibili solo a chi sta sviluppando
+                 * quella funzionalità, non fanno parte del flusso utente normale.
+                 */
+                canSeeJsonDebugButtons: function() {
+                    return AP.hasEmail( "guido.sangiovanni@gslabs.it" );
                 },
             },
 
@@ -537,6 +546,7 @@ AP.plate.modal = ( function() {
                     this.jsonExportText = "";
                     this.show3dPanel = false;
                     this.json3dText = "";
+                    this.savedExportCode = "";
                 },
 
                 // MARK: Custom Image
@@ -3036,6 +3046,11 @@ AP.plate.modal = ( function() {
                             done: ( xhr ) => {
                                 this.smallLoading = false;
                                 AP.loading.hide();
+                                // validazione lato server (es. attributi non compilati): non è un salvataggio riuscito
+                                if ( xhr.status === "INVALID" ) {
+                                    NM.form.showMessages( xhr.data );
+                                    return;
+                                }
                                 AP.widget.notify( "success", "Placca salvata correttamente." );
                                 this.showPostSaveModal( parsedData.quotationId, xhr.data && xhr.data.id );
                             },
@@ -3380,6 +3395,7 @@ AP.plate.modal = ( function() {
 
         if ( plateResponse.status === "SUCCESS" ) {
             const data = plateResponse.data;
+            window.vm.savedExportCode = data.savedExportCode || "";
             window.vm.populateProduct( data.quotationItem.product );
 
             // override orientamento blocchi salvati con la riga di preventivo

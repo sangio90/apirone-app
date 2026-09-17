@@ -119,6 +119,10 @@ AP.signage.modal = ( function() {
         showJsonPanel: false,
         jsonExportText: "",
         jsonExportLoading: false,
+        // Codice realmente salvato in export_codes per l'ultima esportazione di
+        // questa riga (vedi savedExportCode nella risposta di editSignage), "" se
+        // questa configurazione non è mai stata esportata.
+        savedExportCode: "",
 
         // aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
@@ -214,6 +218,7 @@ AP.signage.modal = ( function() {
             viewModel.set( "showJsonPanel", false );
             viewModel.set( "jsonExportText", "" );
             viewModel.set( "jsonExportLoading", false );
+            viewModel.set( "savedExportCode", "" );
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageLine" ).prop( "disabled", false );
@@ -1146,7 +1151,7 @@ AP.signage.modal = ( function() {
             const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
             const items = viewModel.get( "detailForm.data.quotationItem.product.items" );
             if ( !productId || !items || typeof items.data !== "function" ) {
-                AP.quotation.exportCode.render( "#signage-export-code", null );
+                AP.quotation.exportCode.render( "#signage-export-code", null, viewModel.get( "savedExportCode" ) );
                 return;
             }
             const productItemIds = [];
@@ -1164,7 +1169,7 @@ AP.signage.modal = ( function() {
                 signageConfigItemId: viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) || ""
             };
             AP.quotation.exportCode.preview( "signage", payload, function( outcome ) {
-                AP.quotation.exportCode.render( "#signage-export-code", outcome );
+                AP.quotation.exportCode.render( "#signage-export-code", outcome, viewModel.get( "savedExportCode" ) );
                 AP.quotation.exportCode.markImportant( "#product-items", outcome && outcome.importantAttributes );
             } );
         },
@@ -1524,6 +1529,10 @@ AP.signage.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
 
+        // Un articolo nuovo non è mai stato esportato: nessun badge "Esportato" residuo
+        // da una precedente modifica aperta nella stessa modale.
+        viewModel.set( "savedExportCode", "" );
+
         pricingApp().init( "signage", undefined );
 
         const categoriesResponse = await NM.util.ajax( {
@@ -1711,6 +1720,12 @@ AP.signage.modal = ( function() {
     pub.edit = async function( { id, clone = false, onSave } ) {
         viewModel.resetForm();
 
+        // Aggiorna l'hash dell'URL (#signage/{id}) così un refresh a modale aperta
+        // riporta al preventivo con questa riga già aperta in modifica (vedi
+        // checkUrlHash in app-quotation-detail.js e window.location.hash in
+        // app-quotation-plate-vue.js per lo stesso meccanismo sulle placche).
+        window.location.hash = "signage/" + id;
+
         const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=SEG",
@@ -1738,6 +1753,7 @@ AP.signage.modal = ( function() {
         var data = signageResponse.data;
 
         viewModel.set( "detailForm.title", "Modifica segnaletica" );
+        viewModel.set( "savedExportCode", data.savedExportCode || "" );
 
         var signageRowsArray = data.quotationItem.signageRows;
 

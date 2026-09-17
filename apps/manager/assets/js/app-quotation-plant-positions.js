@@ -15,6 +15,24 @@ $(document).ready(function () {
 AP.quotation.plantPositions = (function () {
     var pub = {};
     var vm = null;
+
+    // Copia piatta di una zona (solo i campi che servono alle modali Kendo/Vue placca/
+    // segnaletica/accessorio), da usare ovunque una zona di this.zones finisca nello shim
+    // AP.quotation.detail.config(): this.zones è reso reattivo da Vue e passarlo per
+    // riferimento diretto a codice esterno (Kendo) ha causato un TypeError "Converting
+    // circular structure to JSON" al salvataggio.
+    function toPlainZone(zone) {
+        if (!zone) return zone;
+        return {
+            id: zone.id,
+            shortId: zone.shortId,
+            name: zone.name,
+            quantity: zone.quantity,
+            origin: zone.origin ? toPlainZone(zone.origin) : zone.origin,
+            image: zone.image ? Object.assign({}, zone.image) : zone.image
+        };
+    }
+
     pub.init = function () {
         AP.loading && AP.loading.show();
         var el = document.getElementById("vue-plant-positions-app");
@@ -104,19 +122,42 @@ AP.quotation.plantPositions = (function () {
 
             methods: {
 				async deletePosition(pos) {
-					const getItems = this.getItems
-					if (window.confirm('Vuoi eliminare questa posizione?')) {
-						await $.ajax({
+					const self = this;
+					const doDelete = function () {
+						$.ajax({
 							url: "/manager/ajax/quotation-item-positions/" + pos.id,
 							method: "DELETE"
 						})
 							.done(function (res) {
-								AP.widget.notify( "success", "Riga cancellata correttamente." );
-								getItems();
+								var itemDeleted = res.data && res.data.itemDeleted;
+								AP.widget.notify( "success", itemDeleted ? "Articolo eliminato dal preventivo." : "Riga cancellata correttamente." );
+								self.getItems();
 							})
 							.fail(function (err) {
 								AP.widget.notify( "error", "Errore durante la cancellazione della posizione.");
 							})
+					};
+
+					// Se è l'ultima posizione dell'articolo, eliminarla lo porterebbe a quantità 0:
+					// il server elimina l'intero articolo (vedi QuotationItemPositionAjaxController.delete),
+					// quindi qui si avvisa l'utente con un messaggio più esplicito prima di procedere.
+					const quotationItem = this.quotationItems.find(function(qi) { return qi.id == pos.quotationItemId; });
+					const removesWholeItem = quotationItem && quotationItem.positions.length === 1 && quotationItem.quantity === 1;
+
+					if (removesWholeItem) {
+						bootbox.confirm({
+							title: "Conferma eliminazione articolo",
+							message: "Questa è l'ultima posizione di questo articolo: eliminandola, l'intero articolo verrà rimosso dal preventivo. Continuare?",
+							buttons: {
+								confirm: { label: "Si, elimina l'articolo", className: "btn-danger" },
+								cancel: { label: "Annulla", className: "btn-outline-secondary" }
+							},
+							callback: function (result) {
+								if (result) doDelete();
+							}
+						});
+					} else if (window.confirm('Vuoi eliminare questa posizione?')) {
+						doDelete();
 					}
 				},
 				getBackgroundColor: function(type) {
@@ -147,6 +188,11 @@ AP.quotation.plantPositions = (function () {
                     .done(function (res) {
                         const zonesData = res.data.filter(zone => zone.name != 'Non assegnato');
                         self.zones = zonesData;
+                        // Tiene sincronizzato lo shim AP.quotation.detail.config() (vedi sotto)
+                        // così le modali placca/segnaletica/accessorio trovano subito le zone
+                        // anche quando si apre direttamente una modifica, senza passare da un draft.
+                        AP.namespace("quotation.detail");
+                        AP.quotation.detail._plantZones = zonesData.map(toPlainZone);
                     })
                     .fail(function (err) {
                         AP.widget.notify( "error", "Errore durante il caricamento delle Zone.");
@@ -800,11 +846,20 @@ AP.quotation.plantPositions = (function () {
 					// Aggiorna lo shim detail.config con la zona corrente
 					var self = this;
 					var currentZone = self.zones.find(function(z) { return z.id === self.selectedZoneId; }) || { id: self.selectedZoneId, name: "" };
-					AP.quotation.detail._plantZone = { id: currentZone.id, name: currentZone.name };
-					AP.quotation.detail._plantZones = self.zones.map(function(z) { return { id: z.id, name: z.name }; });
+					AP.quotation.detail._plantZone = toPlainZone(currentZone);
+					AP.quotation.detail._plantZones = self.zones.map(toPlainZone);
 					if (draft.itemType === "ACC") AP.accessory.modal.new();
 					else if (draft.itemType === "SEG") AP.signage.modal.new();
 					else if (draft.itemType === "PLA") AP.plate.modal.new();
+				},
+
+				// Apre la modale di modifica della riga esistente, in base al tipo di prodotto
+				// (placca, accessorio, segnaletica). Usata dal pulsante matita nell'elenco articoli.
+				editItem(quotationItem) {
+					var typeId = quotationItem?.product?.catalogBundle?.category?.type?.id;
+					if (typeId === "ACC") AP.accessory.modal.edit({ id: quotationItem.id });
+					else if (typeId === "SEG") AP.signage.modal.edit({ id: quotationItem.id });
+					else if (typeId === "PLA") AP.plate.modal.edit({ id: quotationItem.id });
 				},
             },
 
@@ -824,6 +879,19 @@ AP.quotation.plantPositions = (function () {
 				});
 				document.getElementById('item-duplicate-instance-btn').addEventListener('click', function() {
 					self.executeDuplicate(true);
+				});
+
+				// Le modali placca/segnaletica/accessorio non invocano un callback onSave
+				// (mai cablato nemmeno nella pagina di dettaglio): alla chiusura si ricarica
+				// sempre l'elenco articoli della zona corrente, sia dopo un salvataggio che
+				// dopo un annullamento (query in più ma innocua).
+				['signage-modal', 'plate-modal-root', 'accessory-modal'].forEach(function(id) {
+					var modalEl = document.getElementById(id);
+					if (modalEl) {
+						modalEl.addEventListener('hide.bs.modal', function() {
+							self.getItems();
+						});
+					}
 				});
             }
         });

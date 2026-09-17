@@ -59,6 +59,35 @@ kendo.data.binders.role = kendo.data.Binder.extend({
     }
 });
 
+// Come AP.hasRole, ma per whitelist di email (feature riservate a utenti specifici,
+// es. pulsanti di debug JSON visibili solo a chi sta sviluppando quella funzionalità).
+AP.hasEmail = function (emails) {
+    const userEmail = AP.config.user?.email;
+    if (!userEmail) return false;
+
+    let emailsArray = [];
+    if (Array.isArray(emails)) {
+        emailsArray = emails;
+    } else if (typeof emails === "string") {
+        emailsArray = emails.split('/').map(e => e.trim());
+    }
+
+    return emailsArray.includes(userEmail);
+};
+
+kendo.data.binders.email = kendo.data.Binder.extend({
+    refresh: function() {
+        var emailsString = this.element.getAttribute("data-email-list");
+        var hasPermission = AP.hasEmail(emailsString);
+
+        if (hasPermission) {
+            $(this.element).show();
+        } else {
+            $(this.element).hide();
+        }
+    }
+});
+
 kendo.data.binders.roleEnable = kendo.data.Binder.extend({
     refresh: function() {
         var rolesString = this.element.getAttribute("data-role-list");

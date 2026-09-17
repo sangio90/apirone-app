@@ -97,6 +97,10 @@ AP.accessory.modal = ( function() {
         },
         showCustomImage: false,
         showImage: true,
+        // Codice realmente salvato in export_codes per l'ultima esportazione di
+        // questa riga (vedi savedExportCode nella risposta di editAccessory), "" se
+        // questa configurazione non è mai stata esportata.
+        savedExportCode: "",
 
         //aggiunto per cambiare i parametri che determinano se mostrare l'immagine ricavata o quella custom quando cambio il valore della checkbox customImage
         toggleCustomImage: function( event ) {
@@ -176,6 +180,7 @@ AP.accessory.modal = ( function() {
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
             viewModel.set( "detailForm.data.quotationItem.quotationZone", AP.quotation.detail.config().zone );
+            viewModel.set( "savedExportCode", "" );
             $( "#accessoryProductCategory" ).prop( "disabled", false );
             $( "#accessoryLine" ).prop( "disabled", false );
             $( "#accessoryModel" ).prop( "disabled", false );
@@ -638,7 +643,7 @@ AP.accessory.modal = ( function() {
             const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
             const items = viewModel.get( "detailForm.data.quotationItem.product.items" );
             if ( !productId || !items || typeof items.data !== "function" ) {
-                AP.quotation.exportCode.render( "#accessory-export-code", null );
+                AP.quotation.exportCode.render( "#accessory-export-code", null, viewModel.get( "savedExportCode" ) );
                 return;
             }
             const productItemIds = [];
@@ -650,7 +655,7 @@ AP.accessory.modal = ( function() {
                 } );
             } );
             AP.quotation.exportCode.preview( "accessory", { productId: productId, productItemIds: productItemIds }, function( outcome ) {
-                AP.quotation.exportCode.render( "#accessory-export-code", outcome );
+                AP.quotation.exportCode.render( "#accessory-export-code", outcome, viewModel.get( "savedExportCode" ) );
                 AP.quotation.exportCode.markImportant( "#accessory-product-items", outcome && outcome.importantAttributes );
             } );
         },
@@ -991,6 +996,9 @@ AP.accessory.modal = ( function() {
             viewModel.set( "callback.onSave", onSave );
         }
         viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
+        // Un articolo nuovo non è mai stato esportato: nessun badge "Esportato" residuo
+        // da una precedente modifica aperta nella stessa modale.
+        viewModel.set( "savedExportCode", "" );
         pricingApp().init( "accessory", undefined );
 
         let categoriesResponse = await NM.util.ajax( {
@@ -1097,6 +1105,12 @@ AP.accessory.modal = ( function() {
     pub.edit = async function( { id, clone = false, onSave } ) {
         viewModel.resetForm();
 
+        // Aggiorna l'hash dell'URL (#accessory/{id}) così un refresh a modale aperta
+        // riporta al preventivo con questa riga già aperta in modifica (vedi
+        // checkUrlHash in app-quotation-detail.js e window.location.hash in
+        // app-quotation-plate-vue.js per lo stesso meccanismo sulle placche).
+        window.location.hash = "accessory/" + id;
+
         const categoriesResponse = await NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/categories?typeId=ACC",
@@ -1129,6 +1143,7 @@ AP.accessory.modal = ( function() {
             viewModel.set('detailForm.data.quotationItem.special', viewModel.get('detailForm.data.quotationItem.special') == 'true')
             viewModel.set('detailForm.data.quotationItem.bozza', String(viewModel.get('detailForm.data.quotationItem.bozza') == 'true'))
 			viewModel.set( "detailForm.title", "Modifica accessorio" );
+			viewModel.set( "savedExportCode", data.savedExportCode || "" );
 
             viewModel.set( "detailForm.data.quotationItem.position", data.quotationItem.position ?? { 'id': '', 'code': '' })
 

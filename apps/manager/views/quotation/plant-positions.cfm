@@ -197,8 +197,16 @@
 												class="quotation-item"
 												:style="{ border: '2px solid', borderColor: getColor(quotationItem), backgroundColor: 'white'}"
 												>
-													<div>
+													<div style="display:flex; align-items:center; justify-content:space-between;">
+														<span>
 											{{ quotationItem.type }}<span v-if="quotationItem.instanceGroupId" :title="'Istanza (' + quotationItem.instanceGroupCount + ')'" style="margin-left:.4em; color:##888; font-size:.8em;"><i class="fas fa-link"></i></span>
+														</span>
+														<i
+															class="fas fa-pencil-alt"
+															style="cursor:pointer; color:##555;"
+															title="Modifica articolo"
+															@click="editItem(quotationItem)"
+														></i>
 										</div>
 													<!-- HEADER ITEM -->
 													<div class="quotation-item-header">

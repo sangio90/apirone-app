@@ -45,6 +45,55 @@ component extends="com.apirone.core.controller.AbsController" {
 				var quotationItemPosition = super.fire( "QuotationItemPosition.get", [ rc.key ] );
 				var quotationItemService = super.service( "QuotationItem" );
 				var quotationItem = quotationItemService.get( quotationItemPosition.getQuotationItemId() );
+
+				// Ultima posizione dell'articolo: eliminarla lo porterebbe a quantità 0, lasciando
+				// una riga di preventivo residua senza posizioni. Si elimina l'intero articolo
+				// invece (le posizioni sono ON DELETE CASCADE su quotation_items). Il client chiede
+				// conferma esplicita prima di arrivare qui (vedi app-quotation-plant-positions.js).
+				if ( quotationItem.getQuantity() == 1 && quotationItem.getPositions().len() == 1 ) {
+					var quotationId = quotationItem.getQuotation().getId();
+					if ( isNull( quotationItem.getArticle() ) ) {
+						var lineId   = quotationItem.getProduct().getLine().getId();
+						var finishId = quotationItem.getProduct().getFinish().getId();
+						var productId = quotationItem.getProduct().getId();
+					}
+
+					var deleteOutcome = quotationItemService.delete( quotationItem.getId() );
+					if ( deleteOutcome.getStatus() == "ERROR" ) {
+						var error = super.getValidationError(
+							message = getMessage( "quotationItem.notDeleted" ),
+							field   = "general"
+						);
+						validation.addError( error );
+
+						event.setValue( "result", validation );
+						return;
+					}
+
+					if ( isNull( quotationItem.getArticle() ) ) {
+						if ( IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemPlate" ) || IsInstanceOf( quotationItem, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+							super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId", {
+								"quotationId" = quotationId,
+								"quotationItemId" = quotationItem.getId(),
+								"lineId" = lineId,
+								"finishId" = finishId
+								}
+							);
+						} else {
+							super.fire( "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId", {
+								"quotationId" = quotationId,
+								"quotationItemId" = quotationItem.getId(),
+								"productId" = productId
+								}
+							);
+						}
+					}
+
+					result.setData( { "message" = getMessage( "quotationItem.deleted" ), "itemDeleted" = true } );
+					event.setValue( "result", result );
+					return;
+				}
+
 				if (quotationItem.getQuantity() == quotationItem.getPositions().len() ) {
 					quotationItem.setQuantity( quotationItem.getQuantity() - 1 );
 					quotationItemService.update( quotationItem );
@@ -59,6 +108,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					validation.addError( error );
 
 					event.setValue( "result", validation );
+					return;
 				}
 			} catch ( any e ) {
 				transaction action="rollback";

@@ -14,7 +14,7 @@
 			UPDATE crm_sync_status
 			SET
 				running = true,
-				started_at = now(),
+				started_at = (now() AT TIME ZONE 'UTC'),
 				started_by_user_id = <cfqueryparam cfsqltype="varchar" value="#arguments.userId#" null="#!Len( arguments.userId )#">::uuid,
 				last_error = NULL
 			WHERE
@@ -34,7 +34,7 @@
 				UPDATE crm_sync_status
 				SET
 					running = false,
-					finished_at = now(),
+					finished_at = (now() AT TIME ZONE 'UTC'),
 					last_error = NULL
 				WHERE
 					id = 1

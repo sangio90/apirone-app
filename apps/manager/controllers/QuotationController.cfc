@@ -31,6 +31,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.cssFiles.add( "quotation" );
 		prc.jsFiles.add( "app-quotation-plant-positions" );
+		prc.jsFiles.add( "app-quotation-export-code" );
 		prc.jsFiles.add( "app-quotation-pricing" );
 		prc.jsFiles.add( "app-quotation-plate-designer" );
 		prc.jsFiles.add( "app-quotation-plate-vue" );
@@ -105,6 +106,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsFiles.add( "app-quotation-header" );
 		prc.jsFiles.add( "app-quotation-status" );
 		prc.jsFiles.add( "app-quotation-detail" );
+		prc.jsFiles.add( "app-quotation-export-code" );
 		prc.jsFiles.add( "app-quotation-pricing" );
 
 		prc.jsFiles.add( "app-quotation-plate-designer" );

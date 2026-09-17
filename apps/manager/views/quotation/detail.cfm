@@ -38,7 +38,12 @@
                         <span id="plant-draft-badge" class="badge bg-danger position-absolute top-0 end-0 mt-1 me-1" style="display:none;font-size:10px;"></span>
                     </div>
                     <div class="col-3">
-                        #button( bind="click:export3dPlates", size="sm", label="JSON 3D placche", icon="cube", class="w-100", variant="outline-secondary" )#
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm w-100"
+                                data-email-list="guido.sangiovanni@gslabs.it"
+                                data-bind="click:export3dPlates, email: this">
+                            <i class="fas fa-cube"></i> JSON 3D placche
+                        </button>
                     </div>
                     <div class="col-3">
                         <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bind="click:markAsSent, visible:canEdit">

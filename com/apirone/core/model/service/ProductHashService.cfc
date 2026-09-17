@@ -201,11 +201,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var productItems = [];
 		if (!isNull(items)) {
-			ArraySort( items, function(a, b) {
-				return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
-			});
+			var sortedItems = sortItemsByTree( items );
 
-			for (var item in items) {
+			for (var item in sortedItems) {
 				productItems.append( { "productItemId" = item.getProductItem().getId(), "note" = Trim( item.getNote() ) } );
 			}
 		}
@@ -255,9 +253,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var fruitItems = [];
 
 			if ( !isNull( fruitRows ) && fruitRows.len() ) {
-				arraySort(fruitRows, function(a, b) {
-					return compare(a.getProductItem().getOrderBy(), b.getProductItem().getOrderBy());
-				});
+				fruitRows = sortItemsByTree( fruitRows );
 
 				for (var fruitRow in fruitRows) {
 					var fruitItem = { "productItemId" = fruitRow.getProductItem().getId(), "note" = Trim( fruitRow.getNote() ) };
@@ -279,6 +275,62 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		jsonData['fruits'] = quotationItemFruits;
 
 		return jsonData;
+	}
+
+	/*
+		Ordina gli item selezionati (QuotationItemProductItem[]) seguendo la vera gerarchia
+		dell'albero attributi - genitore, poi i suoi figli, ricorsivamente - invece di un
+		confronto piatto sul solo orderBy del ProductItem: orderBy ordina esclusivamente i
+		VALORI dello STESSO attributo/genitore (indice DB product_items(product_id,
+		origin_id, orderby)), quindi confrontarlo fra item di attributi diversi produce un
+		ordine arbitrario. Bug scoperto sul codice variante export: gli attributi
+		comparivano in un ordine diverso da quello mostrato nell'albero della modale.
+	*/
+	private Array function sortItemsByTree( required Array items ){
+		var childrenByOrigin = {};
+		var roots = [];
+
+		for ( var item in arguments.items ) {
+			var origin = item.getProductItem().getOrigin();
+			if ( IsNull( origin ) ) {
+				roots.append( item );
+			} else {
+				var key = "o" & origin.getId();
+				if ( !StructKeyExists( childrenByOrigin, key ) ) {
+					childrenByOrigin[ key ] = [];
+				}
+				childrenByOrigin[ key ].append( item );
+			}
+		}
+
+		return flattenSiblingsByOrderBy( roots, childrenByOrigin );
+	}
+
+	/*
+		Ordina un gruppo di fratelli (stesso genitore, quindi stesso scope di orderBy) e
+		per ciascuno accoda ricorsivamente i suoi figli, anch'essi ordinati fra loro.
+	*/
+	private Array function flattenSiblingsByOrderBy( required Array siblings, required Struct childrenByOrigin ){
+		// Numerico, non compare(): orderBy è una stringa numerica e compare() confronta
+		// testualmente ("10" finirebbe prima di "2").
+		ArraySort( arguments.siblings, function( a, b ){
+			return Val( a.getProductItem().getOrderBy() ) - Val( b.getProductItem().getOrderBy() );
+		} );
+
+		var result = [];
+		for ( var item in arguments.siblings ) {
+			result.append( item );
+
+			var key = "o" & item.getProductItem().getId();
+			if ( StructKeyExists( arguments.childrenByOrigin, key ) ) {
+				var children = flattenSiblingsByOrderBy( arguments.childrenByOrigin[ key ], arguments.childrenByOrigin );
+				for ( var child in children ) {
+					result.append( child );
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/*

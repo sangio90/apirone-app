@@ -160,7 +160,7 @@ component extends="coldbox.system.Interceptor" {
 		var result = {
 			"appName"    = config.get( "appName" ),
 			"appVersion" = config.get( "appVersion" ),
-			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId(), "role" = roleId }
+			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId(), "role" = roleId, "email" = session.user.getAccount()?.getEmail() ?: "" }
 		};
 
 		return result;

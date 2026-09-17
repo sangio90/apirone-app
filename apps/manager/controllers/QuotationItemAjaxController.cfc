@@ -150,7 +150,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		data.append( {
 			"quotationItem" = parsedQuotationItemData,
-			"plate" = {}
+			"plate" = {},
+			"savedExportCode" = getSavedExportCode( quotationItem )
 		} );
 
 		result.setData( data );
@@ -580,7 +581,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		data.append( {
 			"quotationItem" = parsedQuotationItemData,
-			"signageConfig" = parsedSignageConfigData
+			"signageConfig" = parsedSignageConfigData,
+			"savedExportCode" = getSavedExportCode( quotationItem )
 		} );
 
 		result.setData( data );
@@ -595,7 +597,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var item = memy.convert( quotationItem, "edit" );
 		item.product["category"] = memy.convert( quotationItem.getProduct().getCategory() );
-		data.append( { "quotationItem" = item } );
+		data.append( { "quotationItem" = item, "savedExportCode" = getSavedExportCode( quotationItem ) } );
 
 		result.setData( data );
 		event.setValue( "result", result );
@@ -672,9 +674,20 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		product = product[ 1 ];
-		
+
 		bean.setProduct( super.fire( "Product.get", { "productId" = product.getId() } ) );
-		
+
+		var _items1 = json.quotationItem.product.keyExists( "items" ) ? ( json.quotationItem.product.items ?: [] ) : [];
+		var productItemsData = isArray( _items1 ) ? _items1 : ( structKeyExists( _items1, "_data" ) ? _items1._data : [] );
+
+		var missingAttributes = findMissingProductItemAttributes( productItemsData );
+		if ( ArrayLen( missingAttributes ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = "Completa tutti gli attributi prima di salvare: " & ArrayToList( missingAttributes, ", " ) } ] } );
+			event.setValue( "result", result );
+			return;
+		}
+
 		transaction {
 			if ( !Len( id ) ) {
 				messageId = "quotationItem.created";
@@ -699,9 +712,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				)
 			} );
 
-			if ( json.quotationItem.product.keyExists( "items" ) ) {
-				var _items1 = json.quotationItem.product.items ?: [];
-				var productItemsData = isArray( _items1 ) ? _items1 : ( structKeyExists( _items1, "_data" ) ? _items1._data : [] );
+			if ( ArrayLen( productItemsData ) ) {
 				productItemsData.each( function( productItemRow ){
 					var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 						return v.selected;
@@ -828,8 +839,19 @@ component extends="com.apirone.core.controller.AbsController" {
 			.getData();
 		
 		product = product[ 1 ];
-		
+
 		bean.setProduct( super.fire( "Product.get", { "productId" = product.getId() } ) );
+
+		var _items2 = json.quotationItem.product.items ?: [];
+		var productItemsData = isArray( _items2 ) ? _items2 : ( structKeyExists( _items2, "_data" ) ? _items2._data : [] );
+
+		var missingAttributes = findMissingProductItemAttributes( productItemsData );
+		if ( ArrayLen( missingAttributes ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = "Completa tutti gli attributi prima di salvare: " & ArrayToList( missingAttributes, ", " ) } ] } );
+			event.setValue( "result", result );
+			return;
+		}
 
 		var message = 'Errore durante il salvataggio della segnaletica.'
 		transaction {
@@ -878,8 +900,6 @@ component extends="com.apirone.core.controller.AbsController" {
 				)
 			} );
 
-			var _items2 = json.quotationItem.product.items ?: [];
-			var productItemsData = isArray( _items2 ) ? _items2 : ( structKeyExists( _items2, "_data" ) ? _items2._data : [] );
 			productItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( v ){
 					return v.selected;
@@ -1039,6 +1059,14 @@ component extends="com.apirone.core.controller.AbsController" {
 				selectedProductItemIds.append( plateSel[ 1 ].productItemId );
 			}
 		}
+		var missingAttributes = findMissingProductItemAttributes( plateItemsData );
+		if ( ArrayLen( missingAttributes ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = "Completa tutti gli attributi della placca prima di salvare: " & ArrayToList( missingAttributes, ", " ) } ] } );
+			event.setValue( "result", result );
+			return;
+		}
+
 		var productItemMap = ArrayLen( selectedProductItemIds )
 			? super.service( "ProductItem" ).getMany( selectedProductItemIds )
 			: {};
@@ -1072,6 +1100,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			var _fruitItems = thisFruit.items ?: [];
 			var fruitProductItemsData = isArray( _fruitItems ) ? _fruitItems : ( structKeyExists( _fruitItems, "_data" ) ? _fruitItems._data : [] );
+
+			var missingFruitAttributes = findMissingProductItemAttributes( fruitProductItemsData );
+			if ( ArrayLen( missingFruitAttributes ) ) {
+				result.setStatus( "INVALID" );
+				result.setData( { "general" = [ { "message" = "Completa tutti gli attributi del frutto '" & ( thisFruit.fruit?.name ?: "" ) & "' prima di salvare: " & ArrayToList( missingFruitAttributes, ", " ) } ] } );
+				event.setValue( "result", result );
+				return;
+			}
 
 			fruitProductItemsData.each( function( productItemRow ){
 				var selectedValue = selectedValues = ArrayFilter( productItemRow.values, function( value ){
@@ -1381,7 +1417,45 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", data );
 	}
 
-	private Struct function populatePositionBean( 
+	/*
+		Verifica che ogni riga dell'albero attributi (placca/segnaletica/accessorio, o i
+		frutti di una placca) abbia un valore selezionato. In precedenza una riga senza
+		selezione veniva semplicemente saltata in fase di salvataggio (nessun
+		quotationItemProductItem creato per quell'attributo): l'articolo veniva salvato
+		comunque, con l'attributo mancante. Restituisce i nomi degli attributi non
+		compilati (vuoto se tutto è a posto), da mostrare in un errore INVALID al client
+		invece di salvare.
+	*/
+	/*
+		Codice export effettivamente salvato in export_codes per la configurazione ATTUALE
+		dell'item (chiave: quotation_items.hash, l'impronta ricalcolata ad ogni salvataggio -
+		vedi QuotationItemService.update). Restituisce "" se l'item non ha hash (mai salvato)
+		o se questa esatta configurazione non è mai stata esportata: la modale mostra in quel
+		caso solo il codice calcolato al volo (AP.quotation.exportCode), senza quello salvato.
+	*/
+	private String function getSavedExportCode( required quotationItem ){
+		var itemHash = arguments.quotationItem.getHash();
+		if ( IsNull( itemHash ) || !Len( itemHash ) ) {
+			return "";
+		}
+
+		var exportCodesMap = super.fire( "ExportCode.mapByHashes", [ [ itemHash ] ] );
+
+		return StructKeyExists( exportCodesMap, itemHash ) ? exportCodesMap[ itemHash ] : "";
+	}
+
+	private Array function findMissingProductItemAttributes( required Array productItemsData ){
+		var missing = [];
+		for ( var row in arguments.productItemsData ) {
+			var selected = ArrayFilter( row.values, function( v ){ return v.selected; } );
+			if ( !ArrayLen( selected ) ) {
+				missing.append( row.attribute_name ?: ( row.attributeName ?: "attributo" ) );
+			}
+		}
+		return missing;
+	}
+
+	private Struct function populatePositionBean(
 			required Struct data
 		){
 		
