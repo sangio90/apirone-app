@@ -265,7 +265,14 @@ component extends="com.apirone.core.controller.AbsController" {
 		// TODO: move to DataMapper
 
 		var product = component.getRawProduct();
+		var variant = component.getVariant();
+		var color   = component.getColor();
 
+		// rawProduct/variant/color arrivano dalla sincronizzazione Verticale (vedi
+		// VerticaleSyncService): se il codice referenziato dal componente non esiste più
+		// nello specchio locale (rinominato/eliminato lato Verticale), il lookup
+		// restituisce null. Prima mandava in 500 l'intera pagina; ora il componente resta
+		// visibile con un'etichetta che segnala il riferimento mancante.
 		var row = {
 			"id"       = component.getId(),
 			"typeId"   = component.getTypeId(),
@@ -278,7 +285,12 @@ component extends="com.apirone.core.controller.AbsController" {
 				"quantity" = component?.getOverride()?.getQuantity()
 			},
 			"totalQuantity" = component.getTotalQuantity(),
-			"rawProduct"    = {
+			"rawProduct"    = IsNull( product ) ? {
+				"id"              = "",
+				"name"            = "(non trovato in Verticale)",
+				"processingType"  = { "id" = "", "name" = "" },
+				"measurementUnit" = { "id" = "", "name" = "" }
+			} : {
 				"id"             = product.getId(),
 				"name"           = product.getName(),
 				"processingType" = {
@@ -290,13 +302,13 @@ component extends="com.apirone.core.controller.AbsController" {
 					"name" = product.getMeasurementUnit().getName()
 				}
 			},
-			"variant" = {
-				"id"   = component.getVariant().getId(),
-				"name" = component.getVariant().getName()
+			"variant" = IsNull( variant ) ? { "id" = "", "name" = "(non trovato in Verticale)" } : {
+				"id"   = variant.getId(),
+				"name" = variant.getName()
 			},
-			"color" = {
-				"id"   = component.getColor().getId(),
-				"name" = component.getColor().getName()
+			"color" = IsNull( color ) ? { "id" = "", "name" = "(non trovato in Verticale)" } : {
+				"id"   = color.getId(),
+				"name" = color.getName()
 			}
 		}
 
