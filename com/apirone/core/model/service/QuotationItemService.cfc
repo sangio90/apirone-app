@@ -1826,6 +1826,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if (!isNull(quotationItem.getArticle())) {
 			return false;
 		}
+		// Una riga gemella con quantità 0 (es. in compilazione) non è prezzabile: PriceCalculatorService
+		// rifiuta quantità <= 0. Saltarla qui evita che blocchi il ricalcolo/salvataggio delle altre righe.
+		if ( Val( quotationItem.getQuantity() ) <= 0 ) {
+			return false;
+		}
 		var quotationId = quotationItem.getQuotation().getId()
 		var productId = quotationItem.getProduct().getId();
 		var quantity = quotationItem.getQuantity();
