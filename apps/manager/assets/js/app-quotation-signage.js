@@ -82,6 +82,12 @@ AP.signage.modal = ( function() {
         productItemsNotes: [],
     };
 
+    // Codici (categoria/linea/modello/finitura) da ripreselezionare a cascata dopo un cambio
+    // interattivo, catturati in handleSelectChanges() PRIMA che azzeri i campi sottostanti -
+    // vedi onCategoryChanged/onLineChanged/onModelChanged più sotto per il perché non si può
+    // catturarli lì.
+    var pendingPreserveCodes = null;
+
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         categories: new kendo.data.DataSource(),
@@ -687,6 +693,126 @@ AP.signage.modal = ( function() {
             $( e.currentTarget ).addClass( "selected-text-align" ).siblings()
                 .removeClass( "selected-text-align" )
                 .addClass( "selected-text-align-not" );
+        },
+
+        findByCode: function( list, code ) {
+            if ( !code || !list || !list.length ) { return null; }
+            return list.filter( function( item ) { return item.code === code; } )[0] || null;
+        },
+
+        // L'oggetto scritto da Kendo nel viewModel quando si seleziona una voce dal combobox
+        // contiene solo i campi configurati con data-value-field/data-text-field (id/name),
+        // MAI l'intero elemento della lista: "code" non è mai presente lì. Per questo il
+        // codice della selezione corrente va sempre letto dalla lista (dati grezzi
+        // dell'ajax, con "code") tramite l'id corrente, non dall'oggetto bindato.
+        getCodeFromList: function( list, id ) {
+            if ( !id || !list ) { return null; }
+            var found = list.filter( function( item ) { return item.id == id; } )[0];
+            return found ? found.code : null;
+        },
+
+        /*
+            Cambiando categoria/linea/modello a un livello già compilato, proviamo a
+            mantenere lo stesso codice al/ai livello/i sotto (es. stesso "modello" se esiste
+            con lo stesso codice anche nella nuova linea), innescando comunque tutta la
+            cascata sotto come se l'utente li avesse riselezionati a mano - re-render del
+            preview incluso (vedi il listener su fontFamilyName in pub.init).
+            I codici da preservare NON si possono catturare qui: handleSelectChanges() ha già
+            un listener nativo jQuery sullo stesso <select> (registrato prima del binding MVVM)
+            che azzera modello/finitura/ecc. PRIMA che questi handler "onXChanged" partano -
+            per questo li cattura lui in pendingPreserveCodes appena parte il cambio, e qui ce
+            li limitiamo a consumare.
+            Usate SOLO dagli handler "onXChanged" sui cambi interattivi dei dropdown: i loader
+            "loadX" restano invariati e vengono ancora chiamati così come sono da chi ricarica
+            in blocco un item esistente o ripristina le preferenze utente su un nuovo item,
+            senza alcuna preselezione automatica in quei casi.
+        */
+        onCategoryChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadLines();
+
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) ) {
+                await this.preserveLineByCode( codes.lineCode, codes.modelCode, codes.finishCode );
+            } else {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { id: "", name: "" } );
+                this.clearModelAndBelow();
+            }
+        },
+
+        preserveLineByCode: async function( lineCode, modelCode, finishCode ) {
+            var matched = this.findByCode( viewModel.get( "lines" ).data(), lineCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", matched );
+                await this.loadModels();
+                await this.preserveModelByCode( modelCode, finishCode );
+            } else {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { id: "", name: "" } );
+                this.clearModelAndBelow();
+            }
+        },
+
+        onLineChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadModels();
+
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) ) {
+                await this.preserveModelByCode( codes.modelCode, codes.finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        preserveModelByCode: async function( modelCode, finishCode ) {
+            var matched = this.findByCode( viewModel.get( "models" ).data(), modelCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", matched );
+                await this.loadFinishes();
+                await this.preserveFinishByCode( finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        onModelChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+            console.log( "DEBUG onModelChanged - codes", JSON.stringify(codes), "model.id", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
+
+            await this.loadFinishes();
+
+            if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ) {
+                await this.preserveFinishByCode( codes.finishCode );
+            } else {
+                console.log( "DEBUG onModelChanged - model.id falsy after loadFinishes, clearing" );
+                this.clearFinish();
+            }
+        },
+
+        preserveFinishByCode: async function( finishCode ) {
+            var matched = this.findByCode( viewModel.get( "finishes" ).data(), finishCode );
+            console.log( "DEBUG preserveFinishByCode - finishCode", finishCode, "matched", matched, "finishesList", viewModel.get("finishes").data().map(function(i){return i.id+"|"+i.code;}) );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.quotationItem.product.finish", matched );
+                await this.loadSignageConfigs();
+            } else {
+                this.clearFinish();
+            }
+        },
+
+        clearFinish: function() {
+            viewModel.set( "detailForm.data.quotationItem.product.finish", { id: "", name: "" } );
+        },
+
+        clearModelAndBelow: function() {
+            viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { id: "", name: "" } );
+            this.clearFinish();
         },
 
         loadLines: async function( event ) {
@@ -1485,6 +1611,11 @@ AP.signage.modal = ( function() {
 
         handleSelectChanges: function() {
             $( "#signangeProductCategory" ).on( "change", function( e ) {
+                pendingPreserveCodes = {
+                    lineCode: viewModel.getCodeFromList( viewModel.get( "lines" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) ),
+                    modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.line", { "id":"" } );
                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
@@ -1499,6 +1630,10 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageLine" ).on( "change", function( e ) {
+                pendingPreserveCodes = {
+                    modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
                 viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
@@ -1511,6 +1646,9 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.product.items" );
             } );
             $( "#signageModel" ).on( "change", function( e ) {
+                pendingPreserveCodes = {
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set( "detailForm.data.quotationItem.product.finish", { "id":"" } );
                 viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
