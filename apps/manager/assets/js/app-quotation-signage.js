@@ -782,21 +782,18 @@ AP.signage.modal = ( function() {
         onModelChanged: async function( event ) {
             var codes = pendingPreserveCodes || {};
             pendingPreserveCodes = null;
-            console.log( "DEBUG onModelChanged - codes", JSON.stringify(codes), "model.id", viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) );
 
             await this.loadFinishes();
 
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ) {
                 await this.preserveFinishByCode( codes.finishCode );
             } else {
-                console.log( "DEBUG onModelChanged - model.id falsy after loadFinishes, clearing" );
                 this.clearFinish();
             }
         },
 
         preserveFinishByCode: async function( finishCode ) {
             var matched = this.findByCode( viewModel.get( "finishes" ).data(), finishCode );
-            console.log( "DEBUG preserveFinishByCode - finishCode", finishCode, "matched", matched, "finishesList", viewModel.get("finishes").data().map(function(i){return i.id+"|"+i.code;}) );
 
             if ( matched ) {
                 viewModel.set( "detailForm.data.quotationItem.product.finish", matched );
