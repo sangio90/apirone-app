@@ -758,6 +758,23 @@ AP.quotation.plantPositions = (function () {
 						zIndex: 10
 					};
 				},
+				getEditBtnStyle(pos) {
+					return {
+						position: 'absolute',
+						left: (pos.coordinateX * 100) + '%',
+						top: (pos.coordinateY * 100) + '%',
+						transform: 'translate(+340%, +50%)',
+						backgroundColor: 'white',
+						border: '2px solid #fd7e14',
+						padding: '3px 6px',
+						borderRadius: '.9em',
+						cursor: 'pointer',
+						fontSize: '10px',
+						whiteSpace: 'nowrap',
+						pointerEvents: 'auto',
+						zIndex: 10
+					};
+				},
 				getMultiplierPanelStyle(pos) {
 					return {
 						position: 'absolute',

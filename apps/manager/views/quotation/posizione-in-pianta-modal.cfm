@@ -1,7 +1,7 @@
 ﻿<cfoutput>
     <div id="posizione-in-pianta-modal" class="modal fade posizione-in-pianta-modal" tabindex="-1">
 
-        <section class="modal-dialog modal-xl">
+        <section class="modal-dialog modal-sm">
             <div class="modal-content">
 
                 <form id="line-detail-form">

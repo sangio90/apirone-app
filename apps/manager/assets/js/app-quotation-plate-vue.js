@@ -3052,6 +3052,12 @@ AP.plate.modal = ( function() {
                                     return;
                                 }
                                 AP.widget.notify( "success", "Placca salvata correttamente." );
+                                // .modal("hide"): fa scattare il listener globale hide.bs.modal
+                                // (app-quotation-detail.js) che pulisce l'hash #plate/{id} dell'URL.
+                                // Senza, un reload successivo (es. click su "No" nel modale "vuoi
+                                // posizionarlo in pianta") riapre la stessa riga in modifica invece
+                                // di tornare alla vista normale del preventivo.
+                                AP.plate.fields.modalRoot.modal( "hide" );
                                 this.showPostSaveModal( parsedData.quotationId, xhr.data && xhr.data.id );
                             },
                             fail: () => {
@@ -3084,6 +3090,14 @@ AP.plate.modal = ( function() {
                                 window.plantPositionsVm.getItems();
                             }
                         });
+                        return;
+                    }
+
+                    // Già nella vista pianta: niente prompt "vuoi posizionarlo in pianta"
+                    // né redirect, si è già lì. Basta aggiornare l'elenco articoli (la
+                    // modale è già stata chiusa correttamente prima di chiamare questo metodo).
+                    if ( window.plantPositionsVm ) {
+                        window.plantPositionsVm.getItems();
                         return;
                     }
 

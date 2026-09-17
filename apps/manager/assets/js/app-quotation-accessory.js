@@ -884,7 +884,12 @@ AP.accessory.modal = ( function() {
                             }
 
                             if ( xhr.status === "SUCCESS" ) {
-                                $( "#accessory-modal" ).hide();
+                                // .modal("hide"), non il semplice .hide(): serve a far scattare il
+                                // listener globale hide.bs.modal (app-quotation-detail.js) che pulisce
+                                // l'hash #accessory/{id} dell'URL. Senza, un reload successivo (es.
+                                // click su "No" nel modale "vuoi posizionarlo in pianta") riapre la
+                                // stessa riga in modifica invece di tornare alla vista normale.
+                                $( "#accessory-modal" ).modal( "hide" );
 								AP.loading.hide()
 
 								if ( AP.page.pendingDraftId && xhr.data && xhr.data.id ) {
@@ -901,6 +906,14 @@ AP.accessory.modal = ( function() {
 											window.plantPositionsVm.getItems();
 										}
 									});
+									return;
+								}
+
+								// Già nella vista pianta: niente prompt "vuoi posizionarlo in pianta"
+								// né reload, si è già lì. Basta aggiornare l'elenco articoli (la
+								// modale è già stata chiusa correttamente qui sopra).
+								if ( window.plantPositionsVm ) {
+									window.plantPositionsVm.getItems();
 									return;
 								}
 

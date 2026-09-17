@@ -132,6 +132,13 @@
                                                                 :key="'mul-' + p.id"
                                                             ><i class="fas fa-expand-alt"></i></div>
                                                             <div
+                                                                class="plant-action-btn"
+                                                                :style="getEditBtnStyle(p)"
+                                                                @click.stop="editItem(quotationItem)"
+                                                                :key="'edit-' + p.id"
+                                                                title="Modifica articolo"
+                                                            ><i class="fas fa-pencil-alt"></i></div>
+                                                            <div
                                                                 v-if="multiplierPos && multiplierPos.id === p.id"
                                                                 :style="getMultiplierPanelStyle(p)"
                                                                 :key="'mulpanel-' + p.id"

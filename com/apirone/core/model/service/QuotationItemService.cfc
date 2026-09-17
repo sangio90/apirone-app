@@ -796,9 +796,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setImage( fileMap[ r.quotation_item_id ][ 1 ] );
 			}
 
-			// ProductItems: dalla mappa batch
+			// ProductItems: dalla mappa batch, riordinati secondo la gerarchia dell'albero
+			// attributi (il DB li restituisce nell'ordine, sostanzialmente casuale, della
+			// UUID di quotation_item_product_items - vedi sortItemsByTree).
 			if ( StructKeyExists( productItemMap, r.quotation_item_id ) ) {
-				bean.setItems( productItemMap[ r.quotation_item_id ] );
+				bean.setItems( getProductHashService().sortItemsByTree( productItemMap[ r.quotation_item_id ] ) );
 			}
 
 			// QuotationZonePosition: dalla mappa batch
@@ -929,7 +931,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var items = getQuotationItemProductItemService().list( quotationItemId = arguments.record.quotation_item_id );
 
 		if ( Len( items ) ) {
-			bean.setItems( items );
+			bean.setItems( getProductHashService().sortItemsByTree( items ) );
 		}
 
 		bean.setNote( arguments.record.note );

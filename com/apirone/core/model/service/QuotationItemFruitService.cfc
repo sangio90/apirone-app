@@ -3,6 +3,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="QuotationItemFruitDAO";
 	property name="productService" inject="ProductService";
+	property name="productHashService" inject="ProductHashService";
 	property name="quotationItemProductItemService" inject="QuotationItemProductItemService";
 	property name="quotationItemFruitPositionService" inject="QuotationItemFruitPositionService";
 	property name="productItemService" inject="ProductItemService";
@@ -258,9 +259,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				bean.setFruit( productMap[ record.fruit_id ] );
 			}
 
-			// Items: dalla mappa pre-caricata
+			// Items: dalla mappa pre-caricata, riordinati secondo la gerarchia dell'albero
+			// attributi (vedi ProductHashService.sortItemsByTree).
 			if ( StructKeyExists( itemMap, record.quotation_item_fruit_id ) && ArrayLen( itemMap[ record.quotation_item_fruit_id ] ) ) {
-				bean.setItems( itemMap[ record.quotation_item_fruit_id ] );
+				bean.setItems( getProductHashService().sortItemsByTree( itemMap[ record.quotation_item_fruit_id ] ) );
 			}
 
 			// Positions: dalla mappa pre-caricata
@@ -288,7 +290,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var items = getQuotationItemProductItemService().list( quotationItemFruitId = record.quotation_item_fruit_id );
 
 		if ( Len( items ) ) {
-			bean.setItems( items );
+			bean.setItems( getProductHashService().sortItemsByTree( items ) );
 		}
 
 		var positions = getQuotationItemFruitPositionService().list( quotationItemFruitId = record.quotation_item_fruit_id );

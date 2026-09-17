@@ -285,8 +285,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		origin_id, orderby)), quindi confrontarlo fra item di attributi diversi produce un
 		ordine arbitrario. Bug scoperto sul codice variante export: gli attributi
 		comparivano in un ordine diverso da quello mostrato nell'albero della modale.
+
+		Pubblica (non solo per l'hash): usata anche da QuotationItemService/
+		QuotationItemFruitService per ordinare gli item mostrati nelle stampe, che prima
+		uscivano nell'ordine (casuale) della UUID di quotation_item_product_items.
 	*/
-	private Array function sortItemsByTree( required Array items ){
+	public Array function sortItemsByTree( required Array items ){
 		var childrenByOrigin = {};
 		var roots = [];
 
