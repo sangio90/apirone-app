@@ -41,6 +41,10 @@ component extends="coldbox.system.Interceptor" {
 			prc.jsFiles  = []; // current js file for current html page
 			prc.cssFiles = []; // current css file for current html page
 
+			if ( !session.user.isLogged() ) {
+				tryAutoLoginFromRememberCookie();
+			}
+
 			prc.user = session.user;
 
 			request.lang = prc.user.getAccount()?.getLang() ?: loadDefaultLang();
@@ -158,9 +162,11 @@ component extends="coldbox.system.Interceptor" {
 		}
 
 		var result = {
-			"appName"    = config.get( "appName" ),
-			"appVersion" = config.get( "appVersion" ),
-			"user"       = { "id" = session.user.getId(), "shortId" = session.user.getShortId(), "role" = roleId, "email" = session.user.getAccount()?.getEmail() ?: "" }
+			"appName"         = config.get( "appName" ),
+			"appVersion"      = config.get( "appVersion" ),
+			"gitRevision"     = config.get( "gitRevision" ),
+			"gitRevisionDate" = config.get( "gitRevisionDate" ),
+			"user"            = { "id" = session.user.getId(), "shortId" = session.user.getShortId(), "role" = roleId, "email" = session.user.getAccount()?.getEmail() ?: "" }
 		};
 
 		return result;
@@ -168,6 +174,27 @@ component extends="coldbox.system.Interceptor" {
 
 	private Struct function getContainer(){
 		return server[ "wireBox-apirone" ];
+	}
+
+	/*
+		Le sessioni Lucee sono in memoria: ad ogni riavvio di CommandBox (o alla scadenza del
+		sessionTimeout) session.user torna vuoto. Se il browser ha ancora un cookie
+		"remember_token" valido, ri-autentica silenziosamente senza far ripassare l'utente
+		dal login. Nessun errore se il cookie manca o è scaduto/invalido: si resta semplicemente
+		sulla pagina di login come oggi.
+	*/
+	private Void function tryAutoLoginFromRememberCookie(){
+		if ( !StructKeyExists( cookie, "remember_token" ) || !Len( cookie.remember_token ) ) {
+			return;
+		}
+
+		var account = getContainer().getInstance( "AuthService" ).getAccountByRememberToken( cookie.remember_token );
+
+		if ( isNull( account ) ) {
+			return;
+		}
+
+		new com.apirone.core.controller.AbsController().setAuthUser( account );
 	}
 
 	private Struct function loadDefaultLang(){

@@ -1,6 +1,7 @@
 component extends="AbsService" accessors="true" {
 
 	property name="AccountService" inject="AccountService";
+	property name="AccountRememberTokenDAO" inject="AccountRememberTokenDAO";
 
 	public com.apirone.core.model.bean.LoginResult function login( required String email, required String pwd ){
 		
@@ -124,6 +125,39 @@ component extends="AbsService" accessors="true" {
 		} catch ( any e ) {
 			super.logEvent( event = "auth.RECOVERY_EMAIL_FAILED", message = e.message, payload = { accountId = account.getId() } );
 		}
+	}
+
+	/*
+		"Ricordami": token persistente che sopravvive a un riavvio del server (le sessioni
+		Lucee sono in memoria). Emesso ad ogni login riuscito, senza opt-in: il problema che
+		risolve (tutti gli utenti costretti a rifare il login ad ogni riavvio di CommandBox)
+		riguarda tutti gli utenti, non solo chi spunta una casella.
+	*/
+	public String function createRememberToken( required String accountId ){
+		var rawToken  = lCase( createUUID() ) & lCase( createUUID() );
+		var expiresAt = DateAdd( "d", 30, Now() );
+
+		getAccountRememberTokenDAO().insert(
+			accountId   = arguments.accountId,
+			hashedToken = Hash( rawToken, "SHA-512" ),
+			expiresAt   = DateFormat( expiresAt, "yyyy-mm-dd" ) & " " & TimeFormat( expiresAt, "HH:mm:ss" )
+		);
+
+		return rawToken;
+	}
+
+	public Any function getAccountByRememberToken( required String rawToken ){
+		var found = getAccountRememberTokenDAO().findValidByToken( Hash( arguments.rawToken, "SHA-512" ) );
+
+		if ( found.recordCount == 0 ) {
+			return;
+		}
+
+		return getAccountService().get( found.account_id );
+	}
+
+	public void function revokeRememberToken( required String rawToken ){
+		getAccountRememberTokenDAO().deleteByToken( Hash( arguments.rawToken, "SHA-512" ) );
 	}
 
 	public String function getRecoveryPwdEmailContent( required String resetUrl ){

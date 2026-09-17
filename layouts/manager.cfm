@@ -161,6 +161,13 @@
 
                 </div>
 
+                <cfif Len( prc.config.gitRevision ?: "" )>
+                    <div
+                        style="position:absolute; left:0; right:0; bottom:0; z-index:5; padding:4px 2px; text-align:center; font-size:9px; line-height:1.2; color:##ffffff; background:rgba(0,0,0,0.03); border-top:1px solid rgba(0,0,0,0.06); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"
+                        title="Aggiornato il #prc.config.gitRevisionDate#"
+                    >#prc.config.gitRevision#</div>
+                </cfif>
+
             </aside>
 
             <section role="main" class="content-body">

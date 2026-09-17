@@ -90,6 +90,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( access.getStatus() ) {
 			super.setAuthUser( access.getAccount() );
 
+			var rememberToken = super.fire( "auth.createRememberToken", [ access.getAccount().getId() ] );
+
+			cfcookie(
+				name     = "remember_token",
+				value    = "#rememberToken#",
+				expires  = "30",
+				httponly = true
+			);
+
 			Location( "/manager/dashboard", false );
 		} else {
 			setMessage( "Login e/o password errate.", "warning" );
@@ -114,6 +123,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function logout( event, rc, prc ){
+		if ( StructKeyExists( cookie, "remember_token" ) && Len( cookie.remember_token ) ) {
+			super.fire( "auth.revokeRememberToken", [ cookie.remember_token ] );
+
+			cfcookie( name = "remember_token", value = "", expires = "now" );
+		}
+
 		super.logout();
 
 		setMessage( "Ti sei disconnesso.", "success" );
