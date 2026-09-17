@@ -151,7 +151,10 @@ AP.signageConfig.detail = ( function() {
         getFontFamilySizes: function( event ) {
 
             var parent = event.parent().parent();
-            var sizes = parent.font.fontFamily.sizes.toJSON();
+            // fontFamily è nullable (font "semplici" senza famiglia associata): senza
+            // nessuna sizes disponibile da quella relazione, non da un dato mancante per errore.
+            var fontFamily = parent.font ? parent.font.fontFamily : null;
+            var sizes = fontFamily ? fontFamily.sizes.toJSON() : [];
 
             var dataSource = new kendo.data.DataSource();
 
