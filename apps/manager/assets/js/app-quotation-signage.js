@@ -1878,6 +1878,22 @@ AP.signage.modal = ( function() {
 
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
+
+        // Il preview di ogni riga (parsedLineContent) dipende da fontFamilyName. Cambiando
+        // Linea/Modello/Finitura il font può cambiare a cascata senza che l'utente tocchi mai
+        // direttamente il dropdown "Altezza font" (es. quando c'è un solo font disponibile
+        // viene selezionato in automatico): in quel caso il preview delle righe già scritte
+        // restava con il font-family/pittogrammi precedenti finché non si ritoccava a mano il
+        // testo di ogni riga. Osservando qui il cambio di fontFamilyName - l'unico punto dove
+        // viene aggiornato - il preview si aggiorna sempre, a prescindere da quale passaggio
+        // della cascata l'ha effettivamente cambiato.
+        viewModel.bind( "change", function( e ) {
+            if ( e.field === "fontFamilyName" ) {
+                viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( function( signageRow ) {
+                    viewModel.parsedLineContent( signageRow.content, signageRow.id );
+                } );
+            }
+        } );
     };
 
     pub.getItem = function() {
