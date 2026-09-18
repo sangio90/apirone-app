@@ -3127,7 +3127,9 @@ AP.plate.modal = ( function() {
                         hoCambiatoQuantita = pd.quantity !== plateResponse.data.quotationItem.quantity;
                     }
 
-                    if ( isNew || ( ( !pd.id || hoCambiatoZona || hoCambiatoQuantita ) && pd.quotationZone && pd.quotationZone.name !== "Non assegnato" ) ) {
+                    const hasZone = pd.quotationZone && pd.quotationZone.name && pd.quotationZone.name !== "Non assegnato";
+
+                    if ( hasZone && ( isNew || !pd.id || hoCambiatoZona || hoCambiatoQuantita ) ) {
                         modal.modal( "show" );
                         return;
                     }

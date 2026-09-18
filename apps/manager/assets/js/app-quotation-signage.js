@@ -1559,10 +1559,11 @@ AP.signage.modal = ( function() {
                             hoDiminuitoQuantita = parsedData?.quotationItem?.quantity < signageResponse?.data?.quotationItem?.quantity;
                         }
 
+                        const hasZone = parsedData.quotationItem.quotationZone?.name && parsedData.quotationItem.quotationZone.name !== "Non assegnato";
+
                         if (
-                            isNew ||
-                            ( !parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita ) &&
-                            parsedData.quotationItem.quotationZone?.name !== "Non assegnato"
+                            hasZone &&
+                            ( isNew || !parsedData.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita )
                         ) {
                             // TODO ci sono tanti casi da gestire:
                             // e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)

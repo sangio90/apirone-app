@@ -1346,10 +1346,11 @@ AP.plate.modal = ( function() {
 							hoDiminuitoQuantita = pd?.quantity < plateResponse?.data?.quotationItem?.quantity
 						}
 
+						const hasZone = pd.quotationZone?.name && pd.quotationZone.name !== 'Non assegnato';
+
 						if (
-							isNew ||
-							(!pd.id || hoCambiatoZona || hoCambiatoQuantita) &&
-							pd.quotationZone?.name !== 'Non assegnato'
+							hasZone &&
+							( isNew || !pd.id || hoCambiatoZona || hoCambiatoQuantita )
 						) {
 							//TODO ci sono tanti casi da gestire:
 							//e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)

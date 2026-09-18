@@ -126,6 +126,12 @@ AP.account.detail = ( function() {
                         callback: {
                             done: function( xhr ) {
 
+                                if ( xhr.status === "INVALID" ) {
+                                    status.html( "" );
+                                    NM.form.showMessages( xhr.data );
+                                    return;
+                                }
+
                                 AP.widget.notify( "success", "Account salvato con successo" );
                                 status.html( "" );
 

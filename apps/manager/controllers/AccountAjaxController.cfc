@@ -54,12 +54,26 @@ component extends="com.apirone.core.controller.AbsController" {
 		// Niente json?.campo qui dentro: la safe navigation dentro a un && manda in
 		// VerifyError il compilatore di questo Lucee ( 5.4.8 ), e a saltare non è la
 		// riga ma l'intero componente.
-		if ( StructKeyExists( json, "idUtenteVerticale" ) && IsNumeric( json.idUtenteVerticale ) ) {
-			account.setIdUtenteVerticale( json.idUtenteVerticale );
+		if ( StructKeyExists( json, "idUtenteVerticale" ) && Len( Trim( json.idUtenteVerticale ) ) && !IsNumeric( Trim( json.idUtenteVerticale ) ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = "ID Utente Verticale deve essere numerico o vuoto." } ] } );
+			event.setValue( "result", result );
+			return;
 		}
 
-		if ( StructKeyExists( json, "idAgenteVerticale" ) && IsNumeric( json.idAgenteVerticale ) ) {
-			account.setIdAgenteVerticale( json.idAgenteVerticale );
+		if ( StructKeyExists( json, "idAgenteVerticale" ) && Len( Trim( json.idAgenteVerticale ) ) && !IsNumeric( Trim( json.idAgenteVerticale ) ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "general" = [ { "message" = "ID Agente Verticale deve essere numerico o vuoto." } ] } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		if ( StructKeyExists( json, "idUtenteVerticale" ) && IsNumeric( Trim( json.idUtenteVerticale ) ) ) {
+			account.setIdUtenteVerticale( Trim( json.idUtenteVerticale ) );
+		}
+
+		if ( StructKeyExists( json, "idAgenteVerticale" ) && IsNumeric( Trim( json.idAgenteVerticale ) ) ) {
+			account.setIdAgenteVerticale( Trim( json.idAgenteVerticale ) );
 		}
 
 		if ( !len( json.id ) ) {

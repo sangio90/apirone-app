@@ -99,8 +99,6 @@
                                         <div class="col-sm-10">
                                             <input class="form-control" name="idUtenteVerticale" id="idUtenteVerticale"
                                                 data-rule-required="false"
-                                                <!--- solo cifre: la colonna è un intero e un decimale verrebbe troncato in silenzio --->
-                                                data-rule-digits="true"
                                                 data-bind="value: detailForm.data.idUtenteVerticale"
                                             >
                                         </div>
@@ -113,8 +111,6 @@
                                         <div class="col-sm-10">
                                             <input class="form-control" name="idAgenteVerticale" id="idAgenteVerticale"
                                                 data-rule-required="false"
-                                                <!--- solo cifre: la colonna è un intero e un decimale verrebbe troncato in silenzio --->
-                                                data-rule-digits="true"
                                                 data-bind="value: detailForm.data.idAgenteVerticale"
                                             >
                                         </div>

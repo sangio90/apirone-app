@@ -942,10 +942,11 @@ AP.accessory.modal = ( function() {
 									hoDiminuitoQuantita = pd?.quotationItem?.quantity < accessoryResponse?.data?.quotationItem?.quantity
 								}
 
+								const hasZone = pd.quotationItem.quotationZone?.name && pd.quotationItem.quotationZone.name !== 'Non assegnato';
+
 								if (
-									isNew ||
-									(!pd.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita) &&
-									pd.quotationItem.quotationZone?.name !== 'Non assegnato'
+									hasZone &&
+									( isNew || !pd.quotationItem.id || hoCambiatoZona || hoCambiatoQuantita )
 								) {
                                     //TODO ci sono tanti casi da gestire:
                                     //e.g. sposto da una zona all'altra, devo togliere tutti i marker e farli riposizionare(hard)
