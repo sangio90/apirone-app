@@ -59,12 +59,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			prc.textLink = "Componenti per #product.getLine().getName()# / #product.getModel().getCode()# / #product.getFinish().getName()#";
 
 			prc.statusList = super.fire( "status.list", [ "line" ] );
-			// TODO: passare anche la categoria
 			prc.models     = super.fire(
 				"model.list",
 				{
-					lineId     = prc.line.getId(),
-					categoryId = prc.category.getId()
+					catalogBundleLineId     = prc.line.getId(),
+					catalogBundleCategoryId = prc.category.getId()
 				}
 			);
 			prc.finishes = super.fire( "finish.list", { lineId = prc.line.getId() } );

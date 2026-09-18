@@ -109,12 +109,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				getDao().delete( arguments.productId );
+				getFileService().purgeDeletedByProductId( arguments.productId );
+
+				var catalogBundleId = getDao().delete( arguments.productId );
+				if ( Len( catalogBundleId ) ) {
+					getCatalogBundleService().deleteIfOrphaned( catalogBundleId );
+				}
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.CannotDeleteProduct" );
-				outcome.setMessage( "Cannot delete product [#arguments.productId#]" );
+				outcome.setMessage( friendlyDeleteErrorMessage( error, arguments.productId ) );
 			}
 		}
 
@@ -136,17 +141,38 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		transaction {
 			try {
-				getDao().delete( obj.getId() );
+				getFileService().purgeDeletedByProductId( productId );
+
+				var catalogBundleId = getDao().delete( obj.getId() );
+				if ( Len( catalogBundleId ) ) {
+					getCatalogBundleService().deleteIfOrphaned( catalogBundleId );
+				}
 			} catch ( any error ) {
 				outcome.setError( error );
 				outcome.setStatus( "ERROR" );
 				outcome.setType( "ApirOne.error.CannotDeleteProduct" );
-				outcome.setMessage( "Cannot delete product [#productId#]" );
+				outcome.setMessage( friendlyDeleteErrorMessage( error, productId ) );
 			}
 		}
 
 
 		return outcome;
+	}
+
+	/**
+	 * Traduce l'errore di cancellazione prodotto in un messaggio utile per l'utente.
+	 * Caso noto: FK su files (immagini/allegati del prodotto) - deleted_at su files è un
+	 * soft delete, la riga resta fisicamente e blocca comunque la cancellazione del
+	 * prodotto in FK, quindi il messaggio guida a rimuovere prima i file collegati.
+	 * Per qualsiasi altro errore, mostra comunque il messaggio originale: meglio un errore
+	 * tecnico visibile che un falso successo silenzioso.
+	 */
+	private String function friendlyDeleteErrorMessage( required any error, required String productId ){
+		if ( FindNoCase( "files_product_id_fk", arguments.error.message ) ) {
+			return "Impossibile eliminare: ci sono ancora file/immagini collegati a questo prodotto. Eliminali prima di rimuovere la combinazione.";
+		}
+
+		return "Cannot delete product [#arguments.productId#]: #arguments.error.message#";
 	}
 
 	public com.apirone.core.model.bean.Outcome function deleteAllByParams(
@@ -158,7 +184,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		outcome.setData( arguments );
 
 		transaction {
-			getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+			try {
+				getDao().deleteAllByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+				getCatalogBundleService().deleteOrphanedByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+			} catch ( any error ) {
+				outcome.setError( error );
+				outcome.setStatus( "ERROR" );
+				outcome.setType( "ApirOne.error.CannotDeleteProduct" );
+				outcome.setMessage( friendlyDeleteErrorMessage( error, "#arguments.lineId#/#arguments.categoryId#" ) );
+			}
 		}
 
 		return outcome;

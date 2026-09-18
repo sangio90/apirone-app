@@ -328,7 +328,7 @@
 		<cfreturn arguments.product.getId()>
 	</cffunction>
 
-	<cffunction name="delete" returntype="Boolean">
+	<cffunction name="delete" returntype="String">
 		<cfargument name="productId" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
@@ -336,9 +336,10 @@
 			FROM products
 			WHERE
 				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+			RETURNING catalog_bundle_id::varchar
 		</cfquery>
 
-		<cfreturn true>
+		<cfreturn local.q.recordCount AND !IsNull( local.q.catalog_bundle_id ) AND Len( local.q.catalog_bundle_id ) ? local.q.catalog_bundle_id : "">
 	</cffunction>
 
 	<cffunction name="deleteAllByParams" returntype="Boolean">

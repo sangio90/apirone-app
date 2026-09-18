@@ -397,6 +397,12 @@ AP.line.products = ( function() {
             } ),
             callback: {
                 done: function( xhr ) {
+                    if ( xhr.status == "ERROR" ) {
+                        status.html( "" );
+                        AP.widget.notify( "error", ( xhr.data && xhr.data.message ) || "Operazione non riuscita." );
+                        return;
+                    }
+
                     if ( xhr.status == "SUCCESS" ) {
                         var button = $( "button[data-values='" + values + "']" );
 

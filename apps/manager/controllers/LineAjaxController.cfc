@@ -151,9 +151,10 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function deleteProduct( event, rc, prc ){
-		var json = DeserializeJSON( GetHTTPRequestData().content );
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		var result = super.getResult();
 
-		super.fire(
+		var outcome = super.fire(
 			"product.deleteByParams",
 			{
 				modelId  = json.modelId,
@@ -162,9 +163,17 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		);
 
+		if ( outcome.getStatus() == "ERROR" ) {
+			result.setStatus( "ERROR" );
+			result.setData( { "message" = outcome.getMessage() } );
+			event.setValue( "result", result );
+			return;
+		}
+
 		var message = super.completeMessage( "product.deleted" );
 
-		event.setValue( "result", { "message" = message } );
+		result.setData( { "message" = message } );
+		event.setValue( "result", result );
 	}
 
 	function codeExists( event, rc, prc ){

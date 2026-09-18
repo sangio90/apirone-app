@@ -7,9 +7,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
-	 * Mappa hash della voce di preventivo -> codice export, per le stampe.
-	 * Gli hash senza codice non compaiono nella mappa: chi stampa decide cosa
-	 * fare (di norma non scrive nulla).
+	 * Mappa hash della voce di preventivo -> codice export completo, per le stampe.
+	 * Il codice restituito è export_code & counter, cioè lo stesso AR_CHIAVE scritto
+	 * su ARTICO_APIR ( vedi QuotationService.exportProducts() ): export_code da solo
+	 * non è univoco, è il counter a disambiguare export ripetuti dello stesso
+	 * articolo+variante. Gli hash senza codice non compaiono nella mappa: chi stampa
+	 * decide cosa fare (di norma non scrive nulla).
 	 */
 	public Struct function mapByHashes( required Array hashes ){
 		var map = {};
@@ -21,7 +24,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var records = getDao().findByHashes( arguments.hashes );
 
 		for ( var record in records ) {
-			map[ record.hash ] = record.export_code;
+			map[ record.hash ] = record.export_code & record.counter;
 		}
 
 		return map;

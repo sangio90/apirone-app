@@ -74,7 +74,11 @@ AP.quotation.exportCode = (function () {
 			return "";
 		}
 
-		var html = '<div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">';
+		var html = "";
+		if (liveHtml) {
+			html += '<div class="text-muted" style="font-size:.75rem;margin-bottom:.25rem;">Il "colore" (ultima parte del codice) viene assegnato solo al momento dell\'esportazione verso Verticale: qui non è visibile finché il prodotto non viene esportato.</div>';
+		}
+		html += '<div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">';
 		if (liveHtml) {
 			html += "<span>" + liveHtml + "</span>";
 		}

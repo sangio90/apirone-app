@@ -74,7 +74,35 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title    = "Categoria #prc.category.getName()# linea #prc.line.getName()#";
 		prc.subtitle = "Prodotti disponibili";
 
-		var models = super.fire( "model.list", { categoryId = prc.category.getId() } );
+		// Unione di due liste, non solo il filtro per linea+categoria: la colonna deve
+		// comparire sia per i modelli "candidati" per questa categoria (tag globale
+		// models.categories, es. taggati ma mai ancora abbinati a QUESTA linea - serve per
+		// poter aggiungere per la prima volta un modello mai usato qui, via il "+" della
+		// griglia) sia per i modelli già effettivamente in catalog_bundles per questa
+		// esatta linea+categoria (altrimenti un modello con products/catalog_bundle reali
+		// ma tag models.categories non aggiornato - es. mai taggato o taggato altrove -
+		// sparirebbe dalla griglia pur avendo prodotti attivi).
+		var modelsByCategoryTag = super.fire( "model.list", { categoryId = prc.category.getId() } );
+		var modelsByCatalogBundle = super.fire(
+			"model.list",
+			{
+				catalogBundleLineId     = prc.line.getId(),
+				catalogBundleCategoryId = prc.category.getId()
+			}
+		);
+
+		var models = [];
+		var seenModelIds = {};
+		for ( var model in modelsByCategoryTag ) {
+			seenModelIds[ model.getId() ] = true;
+			models.append( model );
+		}
+		for ( var model in modelsByCatalogBundle ) {
+			if ( !StructKeyExists( seenModelIds, model.getId() ) ) {
+				models.append( model );
+			}
+		}
+
 		prc.models = models;
 
 		prc.finishes = super.fire( "finish.list", { categoryId = prc.category.getId() } );

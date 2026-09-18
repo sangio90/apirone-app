@@ -175,6 +175,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return newId;
 	}
 
+	/**
+	 * Cancella il catalog_bundle indicato solo se non ha più prodotti collegati.
+	 * Da chiamare dopo la cancellazione di un singolo prodotto, altrimenti la riga
+	 * resta orfana e continua a comparire in model.list().
+	 */
+	public Boolean function deleteIfOrphaned( required String catalogBundleId ){
+		return getDao().deleteIfOrphaned( arguments.catalogBundleId );
+	}
+
+	/**
+	 * Come deleteIfOrphaned(), per la cancellazione massiva di tutti i prodotti di una
+	 * linea+categoria: ripulisce i catalog_bundles di quella linea+categoria rimasti
+	 * senza prodotti.
+	 */
+	public Numeric function deleteOrphanedByParams( required String lineId, required Numeric categoryId ){
+		return getDao().deleteOrphanedByParams( lineId = arguments.lineId, categoryId = arguments.categoryId );
+	}
+
 
 	/*
     	private method

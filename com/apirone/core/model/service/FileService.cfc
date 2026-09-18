@@ -69,6 +69,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getDao().delete( arguments.fileId );
 	}
 
+	/**
+	 * Cancella fisicamente i file di un prodotto già soft-eliminati (delete() sopra ha
+	 * solo valorizzato deleted_at). Da chiamare prima di cancellare un prodotto, altrimenti
+	 * la FK files_product_id_fk blocca la cancellazione anche per file già "rimossi" da UI.
+	 */
+	public Numeric function purgeDeletedByProductId( required String productId ){
+		return getDao().purgeDeletedByProductId( arguments.productId );
+	}
+
 	public String function create(
 		required String filePath, // full path of file, from /tmp for example
 		required String typeId, // configurated in Configuration.imagesConfig

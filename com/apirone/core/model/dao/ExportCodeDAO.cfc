@@ -26,7 +26,8 @@
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
 				product_hashes.hash,
-				export_codes.export_code
+				export_codes.export_code,
+				export_codes.counter
 			FROM export_codes
 				INNER JOIN product_hashes ON product_hashes.product_hash_id = export_codes.product_hash_id
 			WHERE product_hashes.hash IN (

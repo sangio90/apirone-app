@@ -198,6 +198,28 @@
 	</cffunction>
 
 	<!---
+		Cancellazione fisica dei file di un prodotto già soft-eliminati (deleted_at valorizzato
+		da delete()). files ha una FK su product_id: senza questa pulizia, un prodotto con
+		un'immagine già "cancellata" da UI (solo deleted_at, la riga resta) non può mai essere
+		davvero cancellato - va chiamata da ProductService prima di cancellare il prodotto.
+		Non tocca i file NON cancellati: quelli continuano a bloccare la cancellazione del
+		prodotto finché l'utente non li rimuove esplicitamente da UI.
+	--->
+	<cffunction name="purgeDeletedByProductId" returntype="Numeric">
+		<cfargument name="productId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			DELETE FROM files
+			WHERE
+				product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+				AND deleted_at IS NOT NULL
+			RETURNING file_id
+		</cfquery>
+
+		<cfreturn local.q.recordCount>
+	</cffunction>
+
+	<!---
 		Query ottimizzata per il profilo treelight: recupera in una sola query i file
 		legati a una lista di productItemId E a una lista di attributeRawValueId.
 		Usata da ProductItemService.listForTreelight().
