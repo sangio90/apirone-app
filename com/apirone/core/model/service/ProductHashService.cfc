@@ -219,6 +219,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"productItems": productItems
 		};
 
+		// Con "speciale" attivo l'impronta non deve mai coincidere con quella di
+		// un ALTRO item a parità di tutti gli altri attributi (altrimenti
+		// l'esportazione riuserebbe il colore già assegnato a quell'altro item):
+		// il sale è l'id dell'item stesso, non un valore casuale. Così l'hash
+		// resta stabile sui risalvataggi finché non cambia davvero un campo
+		// (stesso id + stessi altri campi = stesso JSON = stesso hash, colore
+		// già assegnato non tocca), e cambia solo quando cambia qualcos'altro
+		// nella configurazione (nuovo JSON = nuovo hash = nuovo colore al
+		// prossimo export).
+		if ( special ) {
+			jsonData[ "specialSalt" ] = quotationItem.getId();
+		}
+
 		return jsonData;
 	}
 

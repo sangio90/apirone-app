@@ -22,6 +22,12 @@ AP.accessory.modal = ( function() {
 
     var pub = {};
 
+    // Codici (linea/modello/finitura) da ripreselezionare a cascata dopo un cambio interattivo
+    // di categoria/linea/modello, catturati in handleSelectChanges() PRIMA che azzeri i campi
+    // sottostanti - vedi onCategoryChanged/onLineChanged/onModelChanged più sotto, stesso
+    // pattern di app-quotation-signage.js.
+    var pendingPreserveCodes = null;
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -263,6 +269,114 @@ AP.accessory.modal = ( function() {
             AP.setUserPref( "accessory.modelId", viewModel.get( "detailForm.data.quotationItem.product.model.id" ) );
         },
 
+        findByCode: function( list, code ) {
+            if ( !code || !list || !list.length ) { return null; }
+            return list.filter( function( item ) { return item.code === code; } )[0] || null;
+        },
+
+        // Vedi commento gemello in app-quotation-signage.js: l'oggetto scritto da Kendo nel
+        // viewModel quando si seleziona una voce dal combobox contiene solo id/name, mai "code"
+        // - va sempre letto dalla lista con i dati grezzi dell'ajax tramite l'id corrente.
+        getCodeFromList: function( list, id ) {
+            if ( !id || !list ) { return null; }
+            var found = list.filter( function( item ) { return item.id == id; } )[0];
+            return found ? found.code : null;
+        },
+
+        /*
+            Cambiando categoria/linea/modello a un livello già compilato, proviamo a mantenere
+            lo stesso codice al/ai livello/i sotto. Stesso pattern di app-quotation-signage.js:
+            i codici da preservare sono catturati da handleSelectChanges() in
+            pendingPreserveCodes PRIMA che azzeri i campi sottostanti, qui ce li limitiamo a
+            consumare. loadLines()/loadModels()/loadFinishes() restano invariati e vengono
+            chiamati così come sono anche da chi ricarica in blocco un item esistente, senza
+            alcuna preselezione automatica in quei casi.
+        */
+        onCategoryChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadLines();
+
+            if ( viewModel.get( "detailForm.data.quotationItem.product.category.id" ) ) {
+                await this.preserveLineByCode( codes.lineCode, codes.modelCode, codes.finishCode );
+            } else {
+                viewModel.set( "detailForm.data.quotationItem.product.line", { id: "", name: "" } );
+                this.clearModelAndBelow();
+            }
+        },
+
+        preserveLineByCode: async function( lineCode, modelCode, finishCode ) {
+            var matched = this.findByCode( viewModel.get( "lines" ).data(), lineCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.quotationItem.product.line", matched );
+                await this.loadModels();
+                await this.preserveModelByCode( modelCode, finishCode );
+            } else {
+                viewModel.set( "detailForm.data.quotationItem.product.line", { id: "", name: "" } );
+                this.clearModelAndBelow();
+            }
+        },
+
+        onLineChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadModels();
+
+            if ( viewModel.get( "detailForm.data.quotationItem.product.line.id" ) ) {
+                await this.preserveModelByCode( codes.modelCode, codes.finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        preserveModelByCode: async function( modelCode, finishCode ) {
+            var matched = this.findByCode( viewModel.get( "models" ).data(), modelCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.quotationItem.product.model", matched );
+                await this.loadFinishes();
+                await this.preserveFinishByCode( finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        onModelChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadFinishes();
+
+            if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) ) {
+                await this.preserveFinishByCode( codes.finishCode );
+            } else {
+                this.clearFinish();
+            }
+        },
+
+        preserveFinishByCode: async function( finishCode ) {
+            var matched = this.findByCode( viewModel.get( "finishes" ).data(), finishCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.quotationItem.product.finish", matched );
+                await this.loadProduct();
+            } else {
+                this.clearFinish();
+            }
+        },
+
+        clearFinish: function() {
+            viewModel.set( "detailForm.data.quotationItem.product.finish", { id: "", name: "" } );
+        },
+
+        clearModelAndBelow: function() {
+            viewModel.set( "detailForm.data.quotationItem.product.model", { id: "", name: "" } );
+            this.clearFinish();
+        },
+
         loadProduct: async function() {
             $('#accessory-preview-background-tree').empty()
             if (viewModel.get('detailForm.data.quotationItem.product.finish.id')) {
@@ -407,8 +521,11 @@ AP.accessory.modal = ( function() {
                                         const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
                                         if ( select.length > 0 ) {
                                             select.val( qipi.productItem.id );
-                                            // Carichiamo eventuali figli ricorsivamente
-                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
+                                            // Carichiamo eventuali figli ricorsivamente - skipAutoSelect
+                                            // true perche' stiamo ripristinando selezioni gia' persistite:
+                                            // il prossimo giro del loop imposta il vero valore figlio,
+                                            // non deve essere sovrascritto dal "primo valore" automatico.
+                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, true );
                                         }
                                     }
                                 }
@@ -419,7 +536,7 @@ AP.accessory.modal = ( function() {
             } );
         },
 
-        loadProductItems: function( originId, attributeId ) {
+        loadProductItems: function( originId, attributeId, skipAutoSelect ) {
             return new Promise( ( resolve, reject ) => {
                 const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
                 const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
@@ -483,7 +600,7 @@ AP.accessory.modal = ( function() {
                     method: "GET",
                     url: url,
                     callback: {
-                        done: function( xhr ) {
+                        done: async function( xhr ) {
                             if ( xhr.data.length > 0 ) {
                                 const toInsert = false;
                                 let parentIndex = -1;
@@ -538,6 +655,19 @@ AP.accessory.modal = ( function() {
                                 } );
                                 for ( let i = 0; i < attributes.length; i++ ) {
                                     productItems.insert( parentIndex + 1, attributes[i] );
+                                }
+
+                                // Auto-seleziona il primo valore di ogni nuovo figlio e carica
+                                // ricorsivamente, cosi la preselezione del "primo valore" si propaga
+                                // a tutti i livelli annidati e non solo al primo (vedi stesso pattern
+                                // in app-quotation-plate-vue.js: loadProductItems/skipAutoSelect).
+                                if ( !skipAutoSelect ) {
+                                    for ( const attr of attributes ) {
+                                        if ( attr.values && attr.values.length ) {
+                                            attr.values[0].selected = true;
+                                            await viewModel.loadProductItems( attr.values[0].product_item_id, attr.attribute_id );
+                                        }
+                                    }
                                 }
                             } else {
                                 // Se non ci sono figli, setto selected sul parent
@@ -973,6 +1103,11 @@ AP.accessory.modal = ( function() {
 
         handleSelectChanges: function() {
             $( "#accessoryProductCategory" ).on( "change", function(e) {
+                pendingPreserveCodes = {
+                    lineCode: viewModel.getCodeFromList( viewModel.get( "lines" ).data(), viewModel.get( "detailForm.data.quotationItem.product.line.id" ) ),
+                    modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.quotationItem.product.model.id" ) ),
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set('detailForm.data.quotationItem.product.line', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
@@ -985,6 +1120,10 @@ AP.accessory.modal = ( function() {
                 AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryLine" ).on( "change", function(e) {
+                pendingPreserveCodes = {
+                    modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.quotationItem.product.model.id" ) ),
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set('detailForm.data.quotationItem.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
@@ -995,6 +1134,9 @@ AP.accessory.modal = ( function() {
                 AP.deleteUserPref( "accessory.product.items" );
             } );
             $( "#accessoryModel" ).on( "change", function(e) {
+                pendingPreserveCodes = {
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
+                };
                 viewModel.set('detailForm.data.quotationItem.product.finish', { 'id':'' })
                 viewModel.set('detailForm.data.quotationItem.product.items', [])
                 $( "#accessory-product-items" ).empty();

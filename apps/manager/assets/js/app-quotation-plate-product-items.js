@@ -82,9 +82,13 @@ AP.plate.productItems = ( function() {
             if ( selectedOption ) {
                 select.val( selectedOption.productItemId );
             } else {
-                // Trigger automatico solo per attributi root (level 0) e solo se non siamo in modalità "skipAutoTrigger".
-                // skipAutoTrigger viene usato quando renderizziamo dopo loadProductItems per evitare loop infiniti.
-                if ( !skipAutoTrigger && item.level === 0 && !item.parentItemId ) {
+                // Trigger automatico del primo valore a QUALSIASI livello (non solo root): la
+                // preselezione del primo valore deve propagarsi a tutti gli attributi annidati,
+                // non solo al primo. Passa comunque da change -> onSelectChange -> loadProductItems
+                // + changeImage/updateImage, la stessa strada già usata per il livello 0, cosi
+                // l'aggiornamento immagine resta agganciato correttamente (bypassarlo qui aveva
+                // causato in passato la mancata immagine per il legno standard su placca wood).
+                if ( !skipAutoTrigger ) {
                     select.prop( "selectedIndex", 0 ).trigger( "change" );
                 } else {
                     select.prop( "selectedIndex", 0 );

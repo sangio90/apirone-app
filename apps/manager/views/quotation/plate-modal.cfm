@@ -28,7 +28,7 @@
                                     class="form-control"
                                     data-role="combobox"
                                     data-placeholder="-- Seleziona la linea"
-                                    data-bind="source: lines, value: detailForm.data.product.line.id, events: { change: loadModels }"
+                                    data-bind="source: lines, value: detailForm.data.product.line.id, events: { change: onLineChanged }"
                                     data-value-field="id"
                                     data-text-field="name"
                                     data-filter="contains">
@@ -42,7 +42,7 @@
                                     class="form-control"
                                     data-role="combobox"
                                     data-placeholder="-- Seleziona il modello"
-                                    data-bind="source: models, value: detailForm.data.product.model.id, events: { change: loadFinishes }"
+                                    data-bind="source: models, value: detailForm.data.product.model.id, events: { change: onModelChanged }"
                                     data-value-field="id"
                                     data-text-field="code"
                                     data-filter="contains">

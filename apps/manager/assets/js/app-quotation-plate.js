@@ -14,6 +14,8 @@ $( document ).ready( function() {
 
 AP.plate.modal = ( function() {
 
+    console.log( "[preserve-debug] app-quotation-plate.js loaded, build marker: preserve-by-code v1" );
+
     const gridModule = AP.plate.grid;
     const fields = AP.plate.fields;
 
@@ -24,6 +26,11 @@ AP.plate.modal = ( function() {
     function fileApp() {
         return AP.file.modal;
     }
+
+    // Codici (modello/finitura) da ripreselezionare a cascata dopo un cambio interattivo di
+    // linea/modello, catturati in handleSelectChanges() PRIMA che azzeri i campi sottostanti -
+    // vedi onLineChanged/onModelChanged più sotto, stesso pattern di app-quotation-signage.js.
+    var pendingPreserveCodes = null;
 
     const {
         constants,
@@ -812,26 +819,6 @@ AP.plate.modal = ( function() {
                                         verticalImage: item.verticalImage,
                                         orderby: item.orderby,
                                     };
-                                    if (parentIndex >= 1) {
-                                        attribute.values.push( {
-                                            attributeValue: {
-                                                allowNote: false,
-                                                horizontalImage: false,
-                                                verticalImage: false,
-                                                orderby: item.orderby,
-                                                id: null,
-                                                rawValue: {
-                                                    id: null,
-                                                    name: '-- Seleziona valore attributo'
-                                                }
-                                            },
-                                            productItemId: null,
-                                            selected: true,
-                                            horizontalImage: item.horizontalImage,
-                                            verticalImage: item.verticalImage,
-                                            orderby: item.orderby,
-                                        } );
-                                    }
                                     attributes.push( attribute );
                                 }
                                 attribute.values.push( {
@@ -1227,6 +1214,91 @@ AP.plate.modal = ( function() {
             AP.setUserPref( "plate.modelId", viewModel.get( "detailForm.data.product.model.id" ) );
         },
 
+        findByCode: function( list, code ) {
+            if ( !code || !list || !list.length ) { return null; }
+            return list.filter( function( item ) { return item.code === code; } )[0] || null;
+        },
+
+        // Vedi commento gemello in app-quotation-signage.js: l'oggetto scritto da Kendo nel
+        // viewModel quando si seleziona una voce dal combobox contiene solo id/name, mai "code"
+        // - va sempre letto dalla lista con i dati grezzi dell'ajax tramite l'id corrente.
+        getCodeFromList: function( list, id ) {
+            if ( !id || !list ) { return null; }
+            var found = list.filter( function( item ) { return item.id == id; } )[0];
+            return found ? found.code : null;
+        },
+
+        /*
+            Cambiando linea/modello a un livello già compilato, proviamo a mantenere lo stesso
+            codice al/ai livello/i sotto (es. stessa finitura se esiste con lo stesso codice
+            anche nel nuovo modello). Stesso pattern di app-quotation-signage.js: i codici da
+            preservare sono catturati da handleSelectChanges() in pendingPreserveCodes PRIMA
+            che azzeri i campi sottostanti, qui ce li limitiamo a consumare. loadModels()/
+            loadFinishes() restano invariati e vengono chiamati così come sono anche da chi
+            ricarica in blocco un item esistente, senza alcuna preselezione automatica in quei
+            casi.
+        */
+        onLineChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            pendingPreserveCodes = null;
+
+            await this.loadModels();
+
+            if ( viewModel.get( "detailForm.data.product.line.id" ) ) {
+                await this.preserveModelByCode( codes.modelCode, codes.finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        preserveModelByCode: async function( modelCode, finishCode ) {
+            var matched = this.findByCode( viewModel.get( "models" ).data(), modelCode );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.product.model", matched );
+                await this.loadFinishes();
+                await this.preserveFinishByCode( finishCode );
+            } else {
+                this.clearModelAndBelow();
+            }
+        },
+
+        onModelChanged: async function( event ) {
+            var codes = pendingPreserveCodes || {};
+            console.log( "[preserve-debug] onModelChanged - pendingPreserveCodes was:", codes );
+            pendingPreserveCodes = null;
+
+            await this.loadFinishes();
+
+            if ( viewModel.get( "detailForm.data.product.model.id" ) ) {
+                await this.preserveFinishByCode( codes.finishCode );
+            } else {
+                this.clearFinish();
+            }
+        },
+
+        preserveFinishByCode: async function( finishCode ) {
+            var finishesList = viewModel.get( "finishes" ).data();
+            var matched = this.findByCode( finishesList, finishCode );
+            console.log( "[preserve-debug] preserveFinishByCode - finishCode:", finishCode, "available codes:", finishesList.map( function( f ) { return f.code; } ), "matched:", matched );
+
+            if ( matched ) {
+                viewModel.set( "detailForm.data.product.finish", matched );
+                await this.loadProduct();
+            } else {
+                this.clearFinish();
+            }
+        },
+
+        clearFinish: function() {
+            viewModel.set( "detailForm.data.product.finish", { id: "", name: "" } );
+        },
+
+        clearModelAndBelow: function() {
+            viewModel.set( "detailForm.data.product.model", { id: "", name: "" } );
+            this.clearFinish();
+        },
+
         resetForm: function() {
 			viewModel.set( "detailForm", defaultDetailForm );
 			viewModel.set( "detailForm.data.quotationZone", AP.quotation.detail.config().zone );
@@ -1479,7 +1551,12 @@ AP.plate.modal = ( function() {
 		},
 
         handleSelectChanges: function() {
+            console.log( "[preserve-debug] handleSelectChanges() called - attaching native listeners" );
             $( "#plate-line" ).on( "change", function(e) {
+                pendingPreserveCodes = {
+                    modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.product.model.id" ) ),
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.product.finish.id" ) ),
+                };
                 viewModel.set('detailForm.data.product.model', { 'id':'' })
                 viewModel.set('detailForm.data.product.finish', { 'id':'' })
                 $('#quotation-plate-product-items').empty()
@@ -1497,6 +1574,10 @@ AP.plate.modal = ( function() {
                 AP.deleteUserPref( "plate.finishId" );
             } );
             $( "#plate-model" ).on( "change", function(e) {
+                pendingPreserveCodes = {
+                    finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.product.finish.id" ) ),
+                };
+                console.log( "[preserve-debug] plate-model native change - current finish.id:", viewModel.get( "detailForm.data.product.finish.id" ), "finishes list:", viewModel.get( "finishes" ).data(), "captured:", pendingPreserveCodes );
                 viewModel.set('detailForm.data.product.finish', { 'id':'' })
                 $('#quotation-plate-product-items').empty()
                 viewModel.set('detailForm.data.product.items', new kendo.data.DataSource( {

@@ -1088,8 +1088,11 @@ AP.signage.modal = ( function() {
                                         const select = $( `select[data-attribute-id="${qipi.productItem.attribute.id}"]` );
                                         if ( select.length > 0 ) {
                                             select.val( qipi.productItem.id );
-                                            // Carichiamo eventuali figli ricorsivamente
-                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id );
+                                            // Carichiamo eventuali figli ricorsivamente - skipAutoSelect
+                                            // true perche' stiamo ripristinando selezioni gia' persistite:
+                                            // il prossimo giro del loop imposta il vero valore figlio,
+                                            // non deve essere sovrascritto dal "primo valore" automatico.
+                                            await viewModel.loadProductItems( qipi.productItem.id, qipi.productItem.attribute.id, true );
                                         }
                                     }
                                 }
@@ -1100,7 +1103,7 @@ AP.signage.modal = ( function() {
             } );
         },
 
-        loadProductItems: function( originId, attributeId ) {
+        loadProductItems: function( originId, attributeId, skipAutoSelect ) {
             return new Promise( ( resolve, reject ) => {
                 const productId = viewModel.get( "detailForm.data.quotationItem.product.id" );
                 const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
@@ -1164,7 +1167,7 @@ AP.signage.modal = ( function() {
                     method: "GET",
                     url: url,
                     callback: {
-                        done: function( xhr ) {
+                        done: async function( xhr ) {
                             if ( xhr.data.length > 0 ) {
                                 let parentIndex = -1;
 
@@ -1216,6 +1219,19 @@ AP.signage.modal = ( function() {
                                 } );
                                 for ( let i = 0; i < attributes.length; i++ ) {
                                     productItems.insert( parentIndex + 1, attributes[i] );
+                                }
+
+                                // Auto-seleziona il primo valore di ogni nuovo figlio e carica
+                                // ricorsivamente, cosi la preselezione del "primo valore" si propaga
+                                // a tutti i livelli annidati e non solo al primo (vedi stesso pattern
+                                // in app-quotation-plate-vue.js: loadProductItems/skipAutoSelect).
+                                if ( !skipAutoSelect ) {
+                                    for ( const attr of attributes ) {
+                                        if ( attr.values && attr.values.length ) {
+                                            attr.values[0].selected = true;
+                                            await viewModel.loadProductItems( attr.values[0].product_item_id, attr.attribute_id );
+                                        }
+                                    }
                                 }
                             } else {
                                 // Se non ci sono figli, setto selected sul parent
