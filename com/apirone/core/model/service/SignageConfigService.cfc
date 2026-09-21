@@ -2,6 +2,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="SignageConfigDAO";
 	property name="fontService" inject="fontService";
+	property name="fontFamilyService" inject="FontFamilyService";
 	property name="catalogBundleService" inject="catalogBundleService";
 	property name="signageConfigItemService" inject="signageConfigItemService";
 	property name="FontFamilySizeService" inject="FontFamilySizeService";
@@ -156,6 +157,17 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				// Precarica i testi per i Font in batch
 				var fontTextMap = getTextService().listByEntityIds( "font.id", uniqueFontIds );
 
+				// Precarica le FontFamily (con pictograms/sizes) in batch: senza questo la
+				// tendina "Altezza" risulta vuota lato client, perché getFontFamilySizes()
+				// (app-signage-config.js) legge proprio font.fontFamily.sizes.
+				var fontFamilyIds = [];
+				for ( var fr in fontRecords ) {
+					if ( !IsNull( fr.font_family_id ) && !ArrayContains( fontFamilyIds, fr.font_family_id ) ) {
+						fontFamilyIds.append( fr.font_family_id );
+					}
+				}
+				var fontFamilyMap = ArrayLen( fontFamilyIds ) ? getFontFamilyService().getMany( fontFamilyIds ) : {};
+
 				for ( var fr in fontRecords ) {
 					var fontBean = super.bean( "Font" );
 					fontBean.setId( fr.font_id );
@@ -166,6 +178,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					// Testi: dalla mappa pre-caricata
 					if ( StructKeyExists( fontTextMap, fr.font_id ) ) {
 						fontBean.setTexts( fontTextMap[ fr.font_id ] );
+					}
+					// FontFamily: dalla mappa pre-caricata
+					if ( !IsNull( fr.font_family_id ) && StructKeyExists( fontFamilyMap, fr.font_family_id ) ) {
+						fontBean.setFontFamily( fontFamilyMap[ fr.font_family_id ] );
 					}
 					fontMap[ fr.font_id ] = fontBean;
 				}

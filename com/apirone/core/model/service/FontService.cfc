@@ -165,26 +165,18 @@
 		var records = getDao().readByIds( ids = arguments.ids );
 		var map     = {};
 
-		// Raccoglie tutti i font_family_id per precaricarli in batch
+		// Raccoglie tutti i font_family_id (univoci) per precaricarli in batch
 		var familyIds = [];
 		for ( var record in records ) {
-			if ( !IsNull( record.font_family_id ) ) {
+			if ( !IsNull( record.font_family_id ) && !ArrayContains( familyIds, record.font_family_id ) ) {
 				familyIds.append( record.font_family_id );
 			}
 		}
 
-		// Precarica le FontFamily in batch (via readByIds del DAO, senza getMany pubblico)
-		var familyMap = {};
-		if ( ArrayLen( familyIds ) ) {
-			var familyRecords = getFontFamilyService().getDao().readByIds( familyIds );
-			for ( var fr in familyRecords ) {
-				var familyBean = super.bean( "FontFamily" );
-				familyBean.setId( fr.font_family_id );
-				familyBean.setCode( fr.code );
-				familyBean.setName( fr.font_family );
-				familyMap[ fr.font_family_id ] = familyBean;
-			}
-		}
+		// Precarica le FontFamily in batch con FontFamilyService.getMany(), che valorizza
+		// anche pictograms/sizes: una ricostruzione manuale del bean (come prima) lasciava
+		// sizes vuoto e rompeva la tendina "Altezza" nella configurazione segnaletica.
+		var familyMap = ArrayLen( familyIds ) ? getFontFamilyService().getMany( familyIds ) : {};
 
 		// Precarica i testi in batch per tutti i font (1 query invece di N)
 		var textMap = getTextService().listByEntityIds( "font.id", arguments.ids );

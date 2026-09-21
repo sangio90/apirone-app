@@ -435,7 +435,9 @@ AP.signage.modal = ( function() {
                 lineHeightsDefined = signageConfigItem.lineHeights.some( function( v ) { return v !== null && v !== undefined; } );
             }
             viewModel.set( "lineHeightsWarning", !lineHeightsDefined );
-            const heightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel * 1.4 : 16 * 1.4;
+            const baseHeightPx = signageConfigItem && signageConfigItem.heightInPixel ? signageConfigItem.heightInPixel : 16;
+            const textHeightPx = baseHeightPx * 1.4;
+            const pictogramHeightPx = baseHeightPx * 1;
 
             // Calcola l'interlinea per la riga corrente dalla posizione
             // nell'array lineHeights del SignageConfigItem.
@@ -479,7 +481,7 @@ AP.signage.modal = ( function() {
                     // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
                     "<img src=\"/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg\" " +
                     "alt=\"" + pictogramName + "\" " +
-                    "style=\"height: " + heightPx + "px;\" " +
+                    "style=\"height: " + pictogramHeightPx + "px;\" " +
                     "class=\"pictogram px-2\">";
                 parts.push( imgHtml );
 
@@ -494,7 +496,7 @@ AP.signage.modal = ( function() {
             // Applica font, dimensione e interlinea al preview.
             contentSpanPreview.css( {
                 "font-family": fontFamilyName,
-                "font-size": heightPx + "px",
+                "font-size": textHeightPx + "px",
                 // Se l'interlinea è specificata in px, la usa direttamente.
                 // Altrimenti applica il valore unitless 1.5 (moltiplicatore CSS).
                 "line-height": rowLineHeight === null ? "1.5" : rowLineHeight + "px",
