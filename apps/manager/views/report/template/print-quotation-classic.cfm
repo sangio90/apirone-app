@@ -131,7 +131,7 @@
 											<td style="border: 0">
 												#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
 												#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
-												#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br>
+												<cfif !isNull(args.data.quotation.getShippingProfile().getCountry())>#args.data.quotation.getShippingProfile().getCountry().getIsoCode()#<br></cfif>
 											</td>
 										</tr>
 									</table>
