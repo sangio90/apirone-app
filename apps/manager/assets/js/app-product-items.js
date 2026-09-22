@@ -347,10 +347,16 @@ AP.product.items = ( function() {
                 } ) );
             }
 
-            // Attende il completamento di tutte le chiamate AJAX
+            // Attende il completamento di tutte le chiamate AJAX prima di
+            // ricaricare la pagina, altrimenti il reload parte in corsa con
+            // le POST ancora in volo e mostra i valori precedenti al salvataggio.
             $.when.apply( $, promises ).done( function() {
                 $( "#product-simulate-loading" ).html( "" );
+                window.location.reload();
             } );
+
+            return false;
+
         },
 
         save: function( event ) {
