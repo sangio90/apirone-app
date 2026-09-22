@@ -93,6 +93,11 @@
 	<cffunction name="insert" returntype="Numeric" output="false">
 		<cfargument name="signageConfigItem" type="com.apirone.core.model.bean.SignageConfigItem" required="true">
 
+		<!--- Interlinee per riga: array JSON di numeri (null = default 1.5). Va estratto
+		      in una variabile prima del controllo: IsNull() su una chiamata a funzione
+		      diretta non rileva in modo affidabile il null restituito dal getter. --->
+		<cfset var lineHeights = arguments.signageConfigItem.getLineHeights()>
+
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO signage_config_items (
 				signage_config_id,
@@ -114,9 +119,8 @@
 				<cfelse>
 					NULL
 				</cfif>,
-				<!--- Interlinee per riga: array JSON di numeri (null = default 1.5) --->
-				<cfif !IsNull( arguments.signageConfigItem.getLineHeights() ) && arguments.signageConfigItem.getLineHeights().len()>
-					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
+				<cfif !IsNull( lineHeights ) && ArrayLen( lineHeights )>
+					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( lineHeights )#">
 				<cfelse>
 					NULL
 				</cfif>
@@ -129,6 +133,9 @@
 	<cffunction name="update" returntype="Numeric" output="false">
 		<cfargument name="signageConfigItem" type="com.apirone.core.model.bean.SignageConfigItem" required="true">
 
+		<!--- vedi commento in insert() --->
+		<cfset var lineHeights = arguments.signageConfigItem.getLineHeights()>
+
 		<cfquery name="local.q" datasource="apirone">
 			UPDATE
 				signage_config_items
@@ -138,9 +145,8 @@
 				row_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getRowCount()#">,
 				char_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">,
 				font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">,
-				<!--- Interlinee per riga: array JSON di numeri --->
-				line_heights = <cfif !IsNull( arguments.signageConfigItem.getLineHeights() ) && arguments.signageConfigItem.getLineHeights().len()>
-					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
+				line_heights = <cfif !IsNull( lineHeights ) && ArrayLen( lineHeights )>
+					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( lineHeights )#">
 				<cfelse>
 					NULL
 				</cfif>
