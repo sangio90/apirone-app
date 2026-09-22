@@ -115,7 +115,7 @@
 					NULL
 				</cfif>,
 				<!--- Interlinee per riga: array JSON di numeri (null = default 1.5) --->
-				<cfif arguments.signageConfigItem.getLineHeights().len()>
+				<cfif !IsNull( arguments.signageConfigItem.getLineHeights() ) && arguments.signageConfigItem.getLineHeights().len()>
 					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
 				<cfelse>
 					NULL
@@ -139,7 +139,7 @@
 				char_count = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getCharCount()#">,
 				font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.signageConfigItem.getSize().getId()#">,
 				<!--- Interlinee per riga: array JSON di numeri --->
-				line_heights = <cfif arguments.signageConfigItem.getLineHeights().len()>
+				line_heights = <cfif !IsNull( arguments.signageConfigItem.getLineHeights() ) && arguments.signageConfigItem.getLineHeights().len()>
 					<cfqueryparam cfsqltype="Other" value="#SerializeJSON( arguments.signageConfigItem.getLineHeights() )#">
 				<cfelse>
 					NULL
