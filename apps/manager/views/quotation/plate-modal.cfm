@@ -253,6 +253,7 @@
                                                         <input class="form-control form-control-sm" name="position"
                                                             placeholder="Posizione"
                                                             id="qt-plate-position-suggest"
+                                                            maxlength="15"
                                                             data-text-field="code"
                                                             data-value-primitive="true"
                                                             data-bind="value: detailForm.data.position" />
