@@ -60,8 +60,8 @@
                                         required
                                         class="form-control"
                                         v-model="detailForm.data.product.line.id"
-                                        @change="loadModels(); handleLineChange()">
-                                        <!--- id="plate-line": identifica il select per eventuali selettori jQuery/CSS. required: validazione HTML5, la linea è obbligatoria. v-model: binding bidirezionale con l'ID linea. @change: due chiamate sequenziali — loadModels() carica i modelli della linea, handleLineChange() resetta i campi dipendenti (modello, finitura, attributi). --->
+                                        @change="handleLineChange">
+                                        <!--- id="plate-line": identifica il select per eventuali selettori jQuery/CSS. required: validazione HTML5, la linea è obbligatoria. v-model: binding bidirezionale con l'ID linea. @change: handleLineChange() carica i modelli della linea e mantiene modello/finitura equivalenti (per codice/descrizione), resettando attributi e frutti. --->
                                         <option value="">-- Seleziona la linea</option>
                                         <option v-for="line in lines" :value="line.id" :key="line.id">{{ line.name }}</option>
                                         <!--- lines: array di oggetti linea popolato da Vue al caricamento iniziale del modale. line.id: valore inviato al v-model. line.name: etichetta visualizzata. --->
@@ -74,8 +74,8 @@
                                         required
                                         class="form-control"
                                         v-model="detailForm.data.product.model.id"
-                                        @change="loadFinishes(); handleModelChange()">
-                                        <!--- id="plate-model": identificativo per CSS/jQuery. v-model: binding bidirezionale con l'ID modello. @change: due chiamate sequenziali — loadFinishes() carica le finiture del modello, handleModelChange() resetta i campi dipendenti (finitura, attributi). --->
+                                        @change="handleModelChange">
+                                        <!--- id="plate-model": identificativo per CSS/jQuery. v-model: binding bidirezionale con l'ID modello. @change: handleModelChange() carica le finiture e mantiene quella già scelta se esiste anche per il nuovo modello, resettando attributi e frutti. --->
                                         <option value="">-- Seleziona il modello</option>
                                         <option v-for="model in models" :value="model.id" :key="model.id">{{ model.code }}</option>
                                         <!--- models: array di modelli filtrato in base alla linea selezionata. model.code: codice del modello (es. "P100", "P200") visualizzato nell'elenco. --->

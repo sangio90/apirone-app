@@ -3245,38 +3245,104 @@ AP.plate.modal = ( function() {
                 },
 
                 /**
-                 * Gestisce il cambio di linea selezionata.
-                 * Resetta modello, finitura, product items, frutti e la placca.
-                 * Svuota il designer e cancella le preferenze utente di modello e finitura.
+                 * Cerca in una lista (modelli o finiture) la voce che corrisponde a quella
+                 * selezionata prima del cambio: stesso id, altrimenti stesso codice,
+                 * altrimenti stessa descrizione.
+                 * @param {Array} list - Lista caricata dall'ajax.
+                 * @param {Object|null} prev - { id, code, name } della voce precedente.
+                 * @returns {Object|null}
                  */
-                handleLineChange: function() {
-                    this.detailForm.data.product.model = { id: "", code: "" };
-                    this.detailForm.data.product.finish = { id: "" };
+                findEquivalent: function( list, prev ) {
+                    if ( !prev || !list || !list.length ) {
+                        return null;
+                    }
+                    const norm = ( v ) => { return String( v || "" ).trim().toUpperCase(); };
+                    return list.find( ( i ) => { return prev.id && i.id == prev.id; } )
+                        || list.find( ( i ) => { return prev.code && norm( i.code ) === norm( prev.code ); } )
+                        || list.find( ( i ) => { return prev.name && norm( i.name ) === norm( prev.name ); } )
+                        || null;
+                },
+
+                /**
+                 * Restituisce { id, code, name } della voce con l'id dato, letta dalla lista
+                 * grezza dell'ajax (il v-model contiene solo l'id).
+                 */
+                pickFromList: function( list, id ) {
+                    if ( !id || !list ) {
+                        return null;
+                    }
+                    const found = list.find( ( i ) => { return i.id == id; } );
+                    return found ? { id: found.id, code: found.code, name: found.name } : null;
+                },
+
+                /**
+                 * Reset dei campi che dipendono dal prodotto (attributi, frutti, placca disegnata).
+                 */
+                resetProductDependents: function() {
                     this.detailForm.data.product.items = [];
                     this.detailForm.data.fruits = [];
-                    this.models = [];
-                    this.finishes = [];
                     this.plate.blockOrientations = {};
                     this.isPlateDefined = false;
                     this.renderPlateWithFruits();
-                    AP.deleteUserPref( "plate.modelId" );
-                    AP.deleteUserPref( "plate.finishId" );
+                },
+
+                /**
+                 * Dopo il caricamento delle finiture, riseleziona quella equivalente alla
+                 * precedente (es. OTTONE ANTICATO SCURO passando da 503 a 2x3) e ricarica
+                 * il prodotto; se non esiste nel nuovo modello la finitura resta vuota.
+                 */
+                preserveFinish: async function( prevFinish ) {
+                    const matched = this.findEquivalent( this.finishes, prevFinish );
+                    if ( matched ) {
+                        this.detailForm.data.product.finish = { id: matched.id, name: matched.name || "" };
+                        await this.loadProduct();
+                    } else {
+                        AP.deleteUserPref( "plate.finishId" );
+                    }
+                },
+
+                /**
+                 * Gestisce il cambio di linea selezionata.
+                 * Carica i modelli della nuova linea e prova a mantenere modello e finitura
+                 * equivalenti (per codice/descrizione); resetta attributi, frutti e placca.
+                 */
+                handleLineChange: async function() {
+                    const prevModel = this.pickFromList( this.models, this.detailForm.data.product.model.id );
+                    const prevFinish = this.pickFromList( this.finishes, this.detailForm.data.product.finish.id );
+
+                    this.detailForm.data.product.model = { id: "", code: "" };
+                    this.detailForm.data.product.finish = { id: "" };
+                    this.models = [];
+                    this.finishes = [];
+                    this.resetProductDependents();
+
+                    await this.loadModels();
+
+                    const matchedModel = this.findEquivalent( this.models, prevModel );
+                    if ( !matchedModel ) {
+                        AP.deleteUserPref( "plate.modelId" );
+                        AP.deleteUserPref( "plate.finishId" );
+                        return;
+                    }
+                    this.detailForm.data.product.model = { id: matchedModel.id, code: matchedModel.code };
+                    await this.loadFinishes();
+                    await this.preserveFinish( prevFinish );
                 },
 
                 /**
                  * Gestisce il cambio di modello selezionato.
-                 * Resetta finitura, product items, frutti e la placca.
-                 * Svuota il designer e cancella la preferenza utente per la finitura.
+                 * Carica le finiture e mantiene quella già scelta se esiste anche per il nuovo
+                 * modello (per id/codice/descrizione); resetta attributi, frutti e placca.
                  */
-                handleModelChange: function() {
+                handleModelChange: async function() {
+                    const prevFinish = this.pickFromList( this.finishes, this.detailForm.data.product.finish.id );
+
                     this.detailForm.data.product.finish = { id: "" };
-                    this.detailForm.data.product.items = [];
-                    this.detailForm.data.fruits = [];
                     this.finishes = [];
-                    this.plate.blockOrientations = {};
-                    this.isPlateDefined = false;
-                    this.renderPlateWithFruits();
-                    AP.deleteUserPref( "plate.finishId" );
+                    this.resetProductDependents();
+
+                    await this.loadFinishes();
+                    await this.preserveFinish( prevFinish );
                 },
 
                 /**
