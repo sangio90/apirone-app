@@ -317,6 +317,11 @@ AP.signage.modal = ( function() {
                 ds.data().forEach( function( row, i ) {
                     row.set( "index", i + 1 );
                 } );
+
+                // Applica subito font-size/line-height alla nuova riga: senza questo,
+                // una riga aggiunta e mai toccata (nessun evento sull'input) resta priva
+                // di stile e collassa nell'anteprima finché l'utente non scrive qualcosa.
+                this.parsedLineContent( defaultSignageRow.content, defaultSignageRow.id );
             }
 
             this.setSelectedTextAlignIcon();
@@ -502,7 +507,10 @@ AP.signage.modal = ( function() {
                 "line-height": rowLineHeight === null ? "1.5" : rowLineHeight + "px",
             } );
 
-            contentSpanPreview.html( parts.join( "" ) );
+            // Uno span completamente vuoto non genera alcuna line box: la riga
+            // sparirebbe dall'anteprima. Un nbsp forza il rendering dell'altezza
+            // di riga configurata anche a contenuto vuoto.
+            contentSpanPreview.html( parts.length ? parts.join( "" ) : "&nbsp;" );
 
 
             return false;
