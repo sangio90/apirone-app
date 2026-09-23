@@ -456,6 +456,17 @@ AP.plate.modal = ( function() {
 
             computed: {
                 /**
+                 * Codice dello slot orientamento nel codice variante export (es. "HO"), letto
+                 * dall'anteprima del server: è l'unica parte senza attributeId. Vuoto se
+                 * l'anteprima non c'è ancora (nessun prodotto scelto).
+                 */
+                orientationExportCode: function() {
+                    const parts = ( this.exportCodePreview && this.exportCodePreview.variantParts ) || [];
+                    const part = parts.find( ( p ) => { return !p.attributeId; } );
+                    return part ? part.attributeCode : "";
+                },
+
+                /**
                  * Restituisce il numero totale di frutti presenti nel form.
                  * @returns {number} Conteggio dei frutti.
                  */
@@ -884,6 +895,9 @@ AP.plate.modal = ( function() {
                             },
                         },
                     } );
+                    // l'orientamento è noto solo ora: l'anteprima chiesta da
+                    // firstLoadProductItems() partiva senza e non aveva lo slot HO
+                    this.refreshExportCode();
                 },
 
                 /**
@@ -966,6 +980,8 @@ AP.plate.modal = ( function() {
                             },
                         },
                     } );
+                    // l'orientamento entra nel codice variante export
+                    this.refreshExportCode();
                 },
 
                 /**
@@ -1059,7 +1075,13 @@ AP.plate.modal = ( function() {
                             }
                         }
                     }
-                    AP.quotation.exportCode.preview( "plate", { productId: productId, productItemIds: productItemIds }, ( outcome ) => {
+                    const orientationId = ( this.detailForm.data.product.orientation && this.detailForm.data.product.orientation.id ) || "";
+                    if ( !orientationId ) {
+                        // placca non ancora caricata: la richiede loadPlate() appena
+                        // l'orientamento è noto (senza, il server risponderebbe con errore)
+                        return;
+                    }
+                    AP.quotation.exportCode.preview( "plate", { productId: productId, productItemIds: productItemIds, orientationId: orientationId }, ( outcome ) => {
                         this.exportCodePreview = outcome;
                         this.importantAttributes = ( outcome && outcome.importantAttributes ) || [];
                     } );

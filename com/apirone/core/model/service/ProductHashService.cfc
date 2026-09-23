@@ -287,6 +287,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 		jsonData['fruits'] = quotationItemFruits;
 
+		// L'orientamento (HOR/VER) fa parte del codice variante export delle placche:
+		// la stessa placca orizzontale e verticale sono articoli diversi.
+		var frame = quotationItem.getFrame();
+		if ( !IsNull( frame ) && !IsNull( frame.getOrientation() ) && Len( frame.getOrientation().getId() ) ) {
+			jsonData['orientationId'] = frame.getOrientation().getId();
+		}
+
 		return jsonData;
 	}
 

@@ -1654,6 +1654,11 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
+		// Placche: l'orientamento (HOR/VER) apre il codice variante, come nell'export
+		if ( Len( Trim( json.orientationId ?: "" ) ) ) {
+			quotationItemData[ "orientationId" ] = Trim( json.orientationId );
+		}
+
 		// Segnaletica: la variante è font + corpo, esattamente come nell'export
 		var isSignage = json.signage ?: false;
 		if ( IsBoolean( isSignage ) && isSignage ) {

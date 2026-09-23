@@ -8,6 +8,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	// nome del referente: vedi findReferentIds().
 	variables.REFERENT_SEARCH_MIN_LENGTH = 3;
 
+	// Codice export placche: prefisso dello slot orientamento nel codice variante ("HO" + HOR/VER)
+	variables.PLATE_ORIENTATION_CODE = "HO";
+
 	property name="dao" inject="QuotationDAO";
 
 	//Ho ordinato i DAO in ordine di cancellazione, se elimino in questo ordine non dovrei avere problemi con la cancellazione a cascata
@@ -332,7 +335,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * "importanti" del prodotto, riempiti di zeri fino a 10 - anche per la
 	 * segnaletica, il cui font e corpo NON occupano più caratteri del codice
 	 * variante (restano solo in outcome.fontName/fontSize, per nota export e
-	 * anteprima UI). È esattamente il valore che finisce in
+	 * anteprima UI). Per le placche il codice variante inizia con l'orientamento
+	 * ("HO" + HOR/VER, da quotationItemData.orientationId) seguito dagli
+	 * attributi importanti (BORDO). È esattamente il valore che finisce in
 	 * export_codes.export_code; il contatore (colCode) non c'entra ed è l'unica
 	 * parte che richiede una scrittura, quindi resta fuori da qui.
 	 *
@@ -424,6 +429,25 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			outcome.fontSize = signageConfigItem.getSize().getName();
 			outcome.fontName = signageConfig.getFont().getName();
+		}
+
+		// Placche: il codice variante inizia con l'orientamento ("HO" + HOR/VER),
+		// seguito dagli attributi importanti (per le placche: BORDO). Le impronte
+		// salvate prima dell'introduzione dell'orientamento non lo contengono:
+		// meglio fermarsi che produrre un codice senza orientamento.
+		var isPlate = !IsNull( category.getType() ) && category.getType().getId() == "PLA";
+		if ( isPlate ) {
+			var orientationId = Trim( data.orientationId ?: "" );
+			if ( !Len( orientationId ) ) {
+				outcome.error = "Orientamento della placca non disponibile: risalvare la placca (o usare ""Aggiorna tutti i prezzi"") per aggiornarne la configurazione.";
+				return outcome;
+			}
+			varCode &= variables.PLATE_ORIENTATION_CODE & orientationId;
+			ArrayAppend( outcome.variantParts, {
+				"attributeId"   = "",
+				"attributeCode" = variables.PLATE_ORIENTATION_CODE,
+				"valueCode"     = orientationId
+			} );
 		}
 
 		var importantAttributes = product.getImportantAttributes();

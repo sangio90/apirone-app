@@ -266,7 +266,7 @@
                                 <!--- Colonna centrale: area principale del modale. Contiene i comandi del designer (orientamento, ricerca frutti) e l'area di visualizzazione grafica della placca. --->
                                     <div id="plate-designer-header" class="mb-2 pb-2">
                                         <div class="row">
-                                            <div class="col-md-2 float-end">
+                                            <div class="col-md-2 float-end d-flex align-items-center">
                                                 <select id="plate-orientation"
                                                     required
                                                     class="form-control"
@@ -278,6 +278,8 @@
                                                     <option v-for="o in availableOrientations" :value="o.id" :key="o.id">{{ o.name }}</option>
                                                     <!--- availableOrientations: lista degli orientamenti disponibili per la linea/modello correnti. --->
                                                 </select>
+                                                <span v-if="orientationExportCode" class="badge rounded-pill bg-light text-secondary border ms-1 export-attr-badge" style="font-size: 9px; vertical-align: middle;" :title="'Da esportare: l\'orientamento (' + orientationExportCode + ' + HOR/VER) entra nel codice variante (10 caratteri)'"><i class="fas fa-file-export"></i> {{ orientationExportCode }}</span>
+                                                <!--- stesso chip degli attributi importanti: l'orientamento apre il codice variante export delle placche --->
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="fruit-suggest-wrapper" style="position: relative;">
