@@ -73,7 +73,7 @@
 						<div class="col-8 mt-2">Spese di trasporto</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="shippingCost" 
-								placeholder="%" data-bind="value: pricing.data.shippingCost, enabled: canEdit">
+								placeholder="€" data-bind="value: pricing.data.shippingCost, enabled: canEdit">
 								<span>&euro;</span>
 						</div>
 					</div>
@@ -87,7 +87,7 @@
 						<div class="col-8 mt-2">Sconto incondizionato</div>
 						<div class="col-4 d-flex align-items-center">
 							<input class="form-control text-end me-1" name="flatDiscount" 
-								placeholder="%" data-bind="value: pricing.data.flatDiscount, enabled: canEdit">
+								placeholder="€" data-bind="value: pricing.data.flatDiscount, enabled: canEdit">
 							<span>&euro;</span>
 						</div>
 					</div>
