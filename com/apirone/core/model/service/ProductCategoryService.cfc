@@ -215,12 +215,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * @return Struct mappato per productCategoryId -> ProductCategory
 	 */
 	public Struct function getMany( required Array ids ){
+		// Memo per request condivisa con get(): la categoria è configurazione statica
+		// (nome, tipo, status, testi) e il bean ricostruito è identico a ogni chiamata.
+		// Nel ricalcolo dei prezzi delle placche gemelle ogni prodotto riferisce
+		// una delle poche categorie della linea: senza memo ogni chiamata
+		// ricostruisce gli stessi bean con le relative query (categorie + tipi +
+		// testi). I bean sono di sola lettura nel pricing.
+		if ( !StructKeyExists( request, "_staticConfigCategoryMemo" ) ) {
+			request._staticConfigCategoryMemo = {};
+		}
+
+		// Cerca solo le categorie non ancora in memo (dedupe degli id richiesti)
+		var missingIds = [];
+		var seenIds    = {};
+		for ( var reqId in arguments.ids ) {
+			if ( !StructKeyExists( seenIds, reqId ) && !StructKeyExists( request._staticConfigCategoryMemo, reqId ) ) {
+				seenIds[ reqId ] = true;
+				missingIds.append( reqId );
+			}
+		}
+
+		var map = {};
+
+		if ( ArrayLen( missingIds ) ) {
+
 		// Carica tutti i record in una sola query
-		var records = getDao().readByIds( ids = arguments.ids );
-		var map     = {};
+		var records = getDao().readByIds( ids = missingIds );
+		var builtMap = {};
 
 		// Precarica i testi in batch per tutte le categorie (1 query invece di N)
-		var textMap = getTextService().listByEntityIds( "productCategory.id", arguments.ids );
+		var textMap = getTextService().listByEntityIds( "productCategory.id", missingIds );
 
 		// Raccoglie gli ID unici dei tipi per precaricarli in batch
 		var typeIds = [];
@@ -280,7 +304,21 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			bean.setName( bean.getName() );
 
-			map[ record.product_category_id ] = bean;
+			builtMap[ record.product_category_id ] = bean;
+			}
+
+			// Le categorie costruite entrano nella memo per le chiamate successive
+			for ( var catId in builtMap ) {
+				request._staticConfigCategoryMemo[ catId ] = builtMap[ catId ];
+			}
+		}
+
+		// Risultato: tutte le categorie richieste, dalla memo o dalla costruzione;
+		// le id senza riga su DB restano fuori dalla mappa (come prima)
+		for ( var outId in arguments.ids ) {
+			if ( StructKeyExists( request._staticConfigCategoryMemo, outId ) ) {
+				map[ outId ] = request._staticConfigCategoryMemo[ outId ];
+			}
 		}
 
 		return map;
