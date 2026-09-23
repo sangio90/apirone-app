@@ -287,7 +287,6 @@
     #view( "quotation/signage-modal" )#
     #view( "quotation/accessory-modal" )#
     #view( "quotation/posizione-in-pianta-modal" )#
-    <!--- #view( "quotation/plate-modal" )# --->
     #view( "quotation/plate-modal-vue" )#
     #view( "quotation/article-modal" )#
 

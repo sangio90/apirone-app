@@ -110,9 +110,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.jsFiles.add( "app-quotation-pricing" );
 
 		prc.jsFiles.add( "app-quotation-plate-designer" );
-		// prc.jsFiles.add( "app-quotation-plate-product-items" );
-		// prc.jsFiles.add( "app-quotation-plate-api" );
-		// prc.jsFiles.add( "app-quotation-plate" );
 		prc.jsFiles.add( "app-quotation-plate-vue" );
 		prc.jsFiles.add( "app-quotation-signage" );
 		prc.jsFiles.add( "app-quotation-accessory" );

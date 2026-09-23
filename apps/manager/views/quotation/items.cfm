@@ -191,6 +191,5 @@
         </div>
     </div>
     #view( "quotation/signage-modal" )#
-    <!--- #view( "quotation/plate-modal" )# --->
     #view( "quotation/plate-modal-vue" )#
 </cfoutput>

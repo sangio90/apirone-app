@@ -322,7 +322,6 @@
 		delete( "/ajax/frames" ).to( "FrameAjaxController.delete" ).end();
 		post( "/ajax/frames" ).to( "FrameAjaxController.save" ).end();
 		get( "/ajax/frames" ).to( "FrameAjaxController.list" ).end();
-		get( "/frames-legacy" ).to( "FrameController.list" ).end();
 		get( "/frames" ).to( "FrameController.builder" ).end();
 
 
