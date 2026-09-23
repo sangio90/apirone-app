@@ -358,6 +358,18 @@ h2 {
     margin-right: 70px !important;
 }
 
+/*
+	Il dropdown "Sincronizza" (#sync-dropdown-btn) mostra due caret della
+	select: Bootstrap disegna la propria tramite lo pseudo-elemento
+	`.dropdown-toggle::after`, mentre il tema Porto (theme.js -> theme.Nav.build)
+	inserisce nella pulsante un `<i class="fas fa-caret-down">`.
+	Quindi questo stile nasconde l'icona di Bootstrap, lasciando quella
+	di Font Awesome
+*/
+#sync-dropdown-btn::after {
+    display: none;
+}
+
 #user-other-roles {
     font-size: 11px;
     text-transform: uppercase;
