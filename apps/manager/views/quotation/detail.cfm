@@ -150,6 +150,9 @@
                                                 <button class="btn btn-primary btn-md" id="qt-update-prices" type="button" data-bind="click:updateAllPrices">
                                                     <i class="fas fa-sync"></i> Aggiorna tutti i prezzi
                                                 </button>
+                                                <button class="btn btn-outline-primary btn-md" id="qt-bulk-discount" type="button" data-bind="click:openBulkDiscount">
+                                                    <i class="fas fa-percent"></i> Sconto famiglia
+                                                </button>
                                                 #addButton( label="Aggiungi placca", id="qt-add-plate", bind="click:addPlate")#
                                                 #addButton( label="Aggiungi segnaletica", id="qt-add-signage", bind="click:addSignage", style="display: none" )#
                                                 #addButton( label="Aggiungi accessorio", id="qt-add-accessory", bind="click:addAccessory", style="display: none" )#
@@ -223,6 +226,39 @@
     </div>
 
     #view( "quotation/header-modal" )#
+
+    <div class="modal fade" id="bulk-discount-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-percent me-1"></i> Sconto su tutti gli articoli: <span class="bulk-discount-family"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning mb-3">
+                        <p class="mb-2">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Lo sconto sarà applicato a <strong>TUTTI</strong> gli articoli della famiglia
+                            <strong class="bulk-discount-family"></strong> di <strong>TUTTE le zone</strong> di questo preventivo.
+                        </p>
+                        <p class="mb-0">
+                            La percentuale indicata <strong>SOVRASCRIVE</strong> gli sconti già impostati sui singoli articoli
+                            (sconto 1 = percentuale indicata, sconto 2 azzerato). Gli articoli a prezzo fisso non vengono modificati.
+                        </p>
+                    </div>
+                    <label for="bulk-discount-value" class="form-label">Percentuale di sconto</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="bulk-discount-value" min="0" max="100" step="0.01">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-primary" id="bulk-discount-apply-btn">Applica sconto</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="item-duplicate-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">

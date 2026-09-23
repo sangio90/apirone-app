@@ -986,6 +986,60 @@ AP.quotation.detail = (function () {
 			});
 		},
 
+		// Sconto unico su tutti gli articoli della famiglia del tab corrente, in tutte le zone.
+		// Sovrascrive gli sconti di riga (vedi QuotationItemAjaxController.applyDiscountByType)
+		openBulkDiscount: function () {
+			var labels = { plate: "Placche", signage: "Segnaletiche", accessory: "Accessori", article: "Servizi" };
+			var typeId = viewModel.get("typeId");
+			var $modal = $("#bulk-discount-modal");
+
+			$modal.data("typeId", typeId);
+			$modal.find(".bulk-discount-family").text(labels[typeId] || typeId);
+			$("#bulk-discount-value").val("");
+			$modal.modal("show");
+		},
+
+		_applyBulkDiscount: function () {
+			var $modal = $("#bulk-discount-modal");
+			var typeId = $modal.data("typeId");
+			var raw = $("#bulk-discount-value").val();
+			var discount = parseFloat(String(raw).replace(",", "."));
+
+			if (raw === "" || isNaN(discount) || discount < 0 || discount > 100) {
+				AP.widget.notify("error", "Indicare uno sconto compreso tra 0 e 100.");
+				return;
+			}
+
+			AP.loading.show();
+			NM.util.ajax({
+				method: "POST",
+				url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/items/" + typeId + "/discount",
+				data: JSON.stringify({ discount: discount }),
+				callback: {
+					done: function (xhr) {
+						if (xhr.status == "INVALID") {
+							AP.loading.hide();
+							AP.widget.notify("error", (xhr.data && xhr.data.message) || "Sconto non applicato.");
+							return;
+						}
+						$modal.modal("hide");
+						var msg = "Sconto del " + discount + "% applicato a " + xhr.data.updated + " articoli.";
+						if (xhr.data.skippedFixed > 0) {
+							msg += " " + xhr.data.skippedFixed + " articoli a prezzo fisso non modificati.";
+						}
+						AP.widget.notify("success", msg);
+						// come "Aggiorna tutti i prezzi": ricarica per aggiornare righe e totali
+						setTimeout(function () {
+							window.location.reload();
+						}, 1500);
+					},
+					fail: function () {
+						AP.loading.hide();
+					}
+				}
+			});
+		},
+
 		openPlantPosition: function (e) {
 			e.preventDefault();
 			var zoneId = viewModel.get("detailForm.data.zone.id") || "";
@@ -1242,6 +1296,10 @@ AP.quotation.detail = (function () {
 		$("#item-duplicate-instance-btn").on("click", function () {
 			var itemId = $("#item-duplicate-modal").data("itemId");
 			viewModel._duplicateItem(itemId, true);
+		});
+
+		$("#bulk-discount-apply-btn").on("click", function () {
+			viewModel._applyBulkDiscount();
 		});
 	};
 

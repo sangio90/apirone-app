@@ -1348,6 +1348,44 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/**
+	 * Applica uno sconto a tutte le righe di una famiglia (placche, segnaletiche,
+	 * accessori, servizi) del preventivo, in tutte le zone. Sovrascrive gli sconti
+	 * di riga (discount1 = sconto, discount2 = 0); le righe a prezzo fisso restano invariate.
+	 */
+	function applyDiscountByType( event, rc, prc ){
+		var result = super.getResult();
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		var types  = { "plate" = "PLA", "accessory" = "ACC", "signage" = "SEG", "article" = "ART" };
+
+		var discount = !isNull( json.discount ) && IsNumeric( json.discount ) ? Val( json.discount ) : -1;
+
+		if ( !StructKeyExists( types, rc.typeId ) || discount LT 0 || discount GT 100 ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "message" = "Indicare uno sconto compreso tra 0 e 100." } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var quotation = super.fire( "Quotation.get", [ rc.id ] );
+
+		if ( isNull( quotation ) || ( quotation.getSentToClient() ?: false ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "message" = "Il preventivo non è modificabile." } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var outcome = super.fire( "QuotationItemPrice.applyDiscountByType", {
+			"quotationId" = rc.id,
+			"typeId"      = types[ rc.typeId ],
+			"discount"    = discount
+		} );
+
+		result.setData( outcome );
+		event.setValue( "result", result );
+	}
+
 	function productItems( event, rc, prc ){
 		var result = super.getResult();
 		var memny  = super.getMementify();

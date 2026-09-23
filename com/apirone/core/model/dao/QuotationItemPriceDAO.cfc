@@ -143,6 +143,55 @@
 	</cffunction>
 
 	<!---
+		Applica lo stesso sconto a tutte le righe di un preventivo di una famiglia
+		(PLA, ACC, SEG, ART), in tutte le zone. Lo sconto sovrascrive quelli esistenti:
+		discount1 = sconto, discount2 = 0. Le righe a prezzo fisso (F) sono escluse
+		perché il loro totale non considera gli sconti.
+		Restituisce { updated, skippedFixed }.
+	--->
+	<cffunction name="applyDiscountByQuotationAndType" returntype="Struct" access="public">
+		<cfargument name="quotationId" type="String" required="true">
+		<cfargument name="typeId" type="String" required="true">
+		<cfargument name="discount" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			WITH family_items AS (
+				SELECT quotation_items.quotation_item_id
+				FROM quotation_items
+				<cfif arguments.typeId EQ "ART">
+					WHERE quotation_items.article_id IS NOT NULL
+				<cfelse>
+					INNER JOIN products ON quotation_items.product_id = products.product_id
+					INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+					INNER JOIN product_categories ON catalog_bundles.product_category_id = product_categories.product_category_id
+					WHERE product_categories.product_category_type_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.typeId#">
+				</cfif>
+					AND quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+			),
+			updated AS (
+				UPDATE quotation_item_prices
+				SET
+					discount1 = <cfqueryparam cfsqltype="Numeric" scale="2" value="#arguments.discount#">,
+					discount2 = 0
+				WHERE quotation_item_id IN ( SELECT quotation_item_id FROM family_items )
+					AND price_method_id IS DISTINCT FROM 'F'
+				RETURNING quotation_item_price_id
+			)
+			SELECT
+				( SELECT COUNT(*) FROM updated ) AS updated_count,
+				( SELECT COUNT(*)
+				  FROM quotation_item_prices
+				  WHERE quotation_item_id IN ( SELECT quotation_item_id FROM family_items )
+					AND price_method_id = 'F' ) AS skipped_fixed_count
+		</cfquery>
+
+		<cfreturn {
+			"updated"      = Val( local.q.updated_count ),
+			"skippedFixed" = Val( local.q.skipped_fixed_count )
+		}>
+	</cffunction>
+
+	<!---
 		Recupera in batch i prezzi collegati a più quotation_item_id.
 		Utilizzato da QuotationItemService.getMany() per evitare N+1.
 	--->

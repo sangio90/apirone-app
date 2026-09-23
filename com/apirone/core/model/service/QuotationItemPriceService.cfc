@@ -106,6 +106,21 @@
 	}
 
 	/**
+	 * Applica lo stesso sconto a tutte le righe di una famiglia del preventivo
+	 * (tutte le zone), sovrascrivendo gli sconti di riga. Vedi DAO per i dettagli.
+	 *
+	 * @typeId PLA, ACC, SEG, ART
+	 * @return Struct { updated, skippedFixed }
+	 */
+	public Struct function applyDiscountByType(
+		required String quotationId,
+		required String typeId,
+		required Numeric discount
+	){
+		return getDao().applyDiscountByQuotationAndType( argumentCollection = arguments );
+	}
+
+	/**
 	 * Recupera in batch più QuotationItemPrice dato un array di ID.
 	 * Restituisce uno Struct chiave = quotationItemPriceId, valore = bean QuotationItemPrice.
 	 * Precarica le QuotationItemPriceLine in batch per evitare il problema N+1.
