@@ -47,10 +47,6 @@
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="quotationItemPriceLine" type="com.apirone.core.model.bean.QuotationItemPriceLine" required="true">
 
-		<cfscript>
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineDAO: before create line, quotationItemPriceLine: #quotationItemPriceLine.getQuotationItemPriceId()#, price: #quotationItemPriceLine.getAmount()#");
-		</cfscript>
-
 		<cfquery name="local.q" datasource="apirone">
 			INSERT INTO quotation_item_price_lines (
 				name,
@@ -65,10 +61,6 @@
 			)
 			RETURNING quotation_item_price_line_id
 		</cfquery>
-
-		<cfscript>
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineDAO: after create line: id: #local.q.quotation_item_price_line_id#");
-		</cfscript>
 
 		<cfreturn local.q.quotation_item_price_line_id>
 	</cffunction>
@@ -132,6 +124,40 @@
 		</cfquery>
 
 		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Inserisce più righe di prezzo in una sola INSERT multi-riga (un round trip per
+		tutte le righe invece di uno per riga). Usato da QuotationItemPriceService
+		quando aggiorna un prezzo ricalcolato: ogni prezzo ha alcune righe e nel
+		ricalcolo a catena dei gemelli le INSERT singole diventano centinaia.
+		Restituisce gli id generati, nell'ordine delle righe passate.
+	--->
+	<cffunction name="insertMany" returntype="Array" access="public">
+		<cfargument name="lines" type="Array" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			INSERT INTO quotation_item_price_lines (
+				name,
+				amount,
+				cost,
+				quotation_item_price_id
+			) VALUES
+			<cfloop array="#arguments.lines#" item="local.line" index="local.i"><cfif local.i GT 1>,</cfif>(
+				<cfqueryparam cfsqltype="Varchar" value="#local.line.getName()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#local.line.getAmount()#">,
+				<cfqueryparam cfsqltype="Numeric" value="#local.line.getCost()#">,
+				<cfqueryparam cfsqltype="Integer" value="#local.line.getQuotationItemPriceId()#">
+			)</cfloop>
+			RETURNING quotation_item_price_line_id
+		</cfquery>
+
+		<cfset var newIds = []>
+		<cfloop query="local.q">
+			<cfset ArrayAppend( newIds, local.q.quotation_item_price_line_id )>
+		</cfloop>
+
+		<cfreturn newIds>
 	</cffunction>
 
 </cfcomponent>

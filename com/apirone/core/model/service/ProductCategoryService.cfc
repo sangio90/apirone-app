@@ -7,7 +7,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="productCategoryTypeService" inject="ProductCategoryTypeService";
 
 	public com.apirone.core.model.bean.ProductCategory function get( required String productCategoryId ){
-		return build( arguments.productCategoryId );
+		// Memo per request: la categoria è configurazione statica (nome, tipo, status,
+		// testi) e il bean ricostruito è identico a ogni chiamata. Nel ricalcolo dei
+		// prezzi dei gemelli ogni prodotto riferisce una delle poche categorie della
+		// linea: senza memo si ricostruirebbe lo stesso bean per ogni gemello, con
+		// diverse query a giro (categoria + tipo + status + testi).
+		// Il bean è di sola lettura nel pricing; se la costruzione non trova la riga
+		// (null) la memo non viene riempita e si ritenta alla prossima chiamata.
+		if ( !StructKeyExists( request, "_staticConfigCategoryMemo" ) ) {
+			request._staticConfigCategoryMemo = {};
+		}
+		if ( StructKeyExists( request._staticConfigCategoryMemo, arguments.productCategoryId ) ) {
+			return request._staticConfigCategoryMemo[ arguments.productCategoryId ];
+		}
+		var bean = build( arguments.productCategoryId );
+		if ( !IsNull( bean ) ) {
+			request._staticConfigCategoryMemo[ arguments.productCategoryId ] = bean;
+		}
+		return bean;
 	}
 
 	public Array function list(

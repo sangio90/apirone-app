@@ -28,11 +28,24 @@
 
 
 	public Numeric function create( required com.apirone.core.model.bean.QuotationItemPriceLine quotationItemPriceLine ){
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceLineService: create line, productItemId: #quotationItemPriceLine.getQuotationItemPriceId()#, price: #quotationItemPriceLine.getAmount()#");
-
 		var newId = getDao().insert( arguments.quotationItemPriceLine );
 
 		return newId;
+	}
+
+	/**
+	 * Inserisce più righe di prezzo con una sola INSERT multi-riga (vedi
+	 * QuotationItemPriceLineDAO.insertMany): le righe devono già avere
+	 * quotationItemPriceId valorizzato.
+	 *
+	 * @param lines  array di bean QuotationItemPriceLine completi
+	 * @returns      array degli id generati, nell'ordine delle righe
+	 */
+	public Array function createMany( required Array lines ){
+		if ( !ArrayLen( arguments.lines ) ) {
+			return [];
+		}
+		return getDao().insertMany( arguments.lines );
 	}
 
 	public com.apirone.core.model.bean.Outcome function delete( required Numeric quotationItemPriceLineId ){

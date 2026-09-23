@@ -252,9 +252,16 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 			if ( !IsNull( arguments.quotationItem.getPrice() ) ) {
 
-				var current = getQuotationItemPriceService().getByQuotationItemId( arguments.quotationItem.getId() );
-
-				arguments.quotationItem.getPrice().setId( current.getId() );
+				// Il prezzo ricalcolato è un bean nuovo: se l'id della riga su DB è già noto
+				// (succede con i gemelli, il cui bean è stato caricato in batch con il prezzo
+				// esistente) si riusa quello e si salta la ricerca del prezzo corrente, che oggi
+				// costa 3 query a giro (find + lettura prezzo + lettura righe) solo per avere l'id.
+				// Se l'id non è noto (nel salvataggio normale il prezzo arriva dal client senza id)
+				// si fa la ricerca come prima.
+				if ( IsNull( arguments.quotationItem.getPrice().getId() ) || !Len( arguments.quotationItem.getPrice().getId() ) ) {
+					var current = getQuotationItemPriceService().getByQuotationItemId( arguments.quotationItem.getId() );
+					arguments.quotationItem.getPrice().setId( current.getId() );
+				}
 				arguments.quotationItem.getPrice().setQuotationItemId( arguments.quotationItem.getId() );
 
 				var price = arguments.quotationItem.getPrice();
@@ -2033,7 +2040,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			var price = getPricing( json, preloadedQuotation, quotationItem )
 		}
 
+		// Conserva l'id della riga prezzo esistente prima di sostituire il bean: il ricalcolo
+		// produce un prezzo nuovo e quindi la riga su DB va aggiornata, non duplicata.
+		// Con l'id già valorizzato update() salta la ricerca del prezzo corrente (3
+		// query per gemello). Gli item senza prezzo salvato (primo prezzo) seguono
+		// la ricerca come prima.
+		var existingPriceId = ( !IsNull( quotationItem.getPrice() ) && !IsNull( quotationItem.getPrice().getId() ) && Len( quotationItem.getPrice().getId() ) )
+			? quotationItem.getPrice().getId()
+			: NullValue();
 		quotationItem.setPrice( price )
+		if ( !IsNull( existingPriceId ) ) {
+			price.setId( existingPriceId );
+		}
 		update(quotationItem)
 	}
 

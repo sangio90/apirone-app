@@ -73,15 +73,9 @@
 	public String function create( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
 		var newId = getDao().insert( arguments.quotationItemPrice );
 
-		cffile( action="append", file="#ExpandPath('/debug.log')#", output="quotationItemPriceService: newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
-
 		if( !IsNull( quotationItemPrice.getLines() ) ) {
 
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: if !null before loop on lines newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
-			
 			for( var line in quotationItemPrice.getLines() ) {
-				cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: line newId:#newId#, lines: #quotationItemPrice.getLines().len()#");
-
 				line.setQuotationItemPriceId( newId );
 				getQuotationItemPriceLineService().create( line );
 			}
@@ -93,19 +87,19 @@
 	public String function update( required com.apirone.core.model.bean.QuotationItemPrice quotationItemPrice ){
 		getDao().update( arguments.quotationItemPrice );
 
-		//cancello le righe esistenti
+		// Cancella le righe esistenti: le righe del prezzo vengono riscritte da capo
+		// a ogni aggiornamento (il prezzo calcolato produce sempre la lista completa)
 		getQuotationItemPriceLineService().deleteByQuotationItemPriceId( quotationItemPriceId = arguments.quotationItemPrice.getId() )
 
 		if( !IsNull( quotationItemPrice.getLines() ) ) {
 
-			cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: if !null before loop on lines newId:#quotationItemPrice.getId()#, lines: #quotationItemPrice.getLines().len()#");
-			
+			// Inserisce tutte le righe in una sola INSERT multi-riga: nel ricalcolo dei
+			// prezzi dei gemelli ogni prezzo ha alcune righe e le INSERT singole
+			// diventano centinaia di round trip a preventivo completo
 			for( var line in quotationItemPrice.getLines() ) {
-				cffile( action="append", file="#ExpandPath('/debug.log')#", output="QuotationItemPriceService: line newId:#quotationItemPrice.getId()#, lines: #quotationItemPrice.getLines().len()#");
-
 				line.setQuotationItemPriceId( quotationItemPrice.getId() );
-				getQuotationItemPriceLineService().create( line );
 			}
+			getQuotationItemPriceLineService().createMany( quotationItemPrice.getLines() );
 		}
 
 		return arguments.quotationItemPrice.getId();
