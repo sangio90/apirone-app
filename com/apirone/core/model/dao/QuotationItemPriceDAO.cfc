@@ -73,7 +73,8 @@
 				quotation_item_id,
 				discount1,
 				discount2,
-				price_method_id
+				price_method_id,
+				missing_price
 			) VALUES (
 				<!--- <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getProductId()#">::uuid, --->
 				'',
@@ -81,7 +82,8 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getQuotationItemId()#">::uuid,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount1()#">,
 				<cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount2()#">,
-				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">,
+				<cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItemPrice.getMissingPrice()#">
 			)
 			RETURNING quotation_item_price_id
 		</cfquery>
@@ -105,7 +107,8 @@
 				quotation_item_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getQuotationItemId()#">::uuid,
 				discount1 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount1()#">,
 				discount2 = <cfqueryparam cfsqltype="Numeric" value="#arguments.quotationItemPrice.getDiscount2()#">,
-				price_method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">
+				price_method_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemPrice.getMethod().getId()#">,
+				missing_price = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItemPrice.getMissingPrice()#">
 			WHERE
 				quotation_item_price_id = <cfqueryparam cfsqltype="Integer" value="#arguments.quotationItemPrice.getId()#">
 		</cfquery>
@@ -206,6 +209,30 @@
 			WHERE quotation_item_id = ANY(
 				ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[]
 			)
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
+		Righe del preventivo salvate senza prezzo configurato (missing_price), raggruppate
+		per tipo di categoria (PLA/SEG/ACC): usato dall'avviso nella pagina del preventivo.
+	--->
+	<cffunction name="countMissingPriceByQuotationId" returntype="Query" access="public">
+		<cfargument name="quotationId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				product_categories.product_category_type_id AS type_id,
+				COUNT(*) AS items
+			FROM quotation_items
+				INNER JOIN quotation_item_prices ON quotation_item_prices.quotation_item_id = quotation_items.quotation_item_id
+				INNER JOIN products ON products.product_id = quotation_items.product_id
+				INNER JOIN catalog_bundles ON catalog_bundles.catalog_bundle_id = products.catalog_bundle_id
+				INNER JOIN product_categories ON product_categories.product_category_id = catalog_bundles.product_category_id
+			WHERE quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+				AND quotation_item_prices.missing_price
+			GROUP BY product_categories.product_category_type_id
 		</cfquery>
 
 		<cfreturn local.q>

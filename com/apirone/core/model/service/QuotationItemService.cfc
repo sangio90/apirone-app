@@ -559,6 +559,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				priceBean.setDiscount1( prr.discount1 );
 				priceBean.setDiscount2( prr.discount2 );
 				priceBean.setAmount( prr.amount );
+				priceBean.setMissingPrice( prr.missing_price );
 				priceBean.setMethod( methodBean.setId( prr.price_method_id ) );
 				// Mappa sia per quotation_item_id (lookup dal bean) che per price_id (aggiornamento linee)
 				priceMap[ prr.quotation_item_id ]             = priceBean;
@@ -1114,6 +1115,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var line = super.bean( "QuotationItemPriceLine" );
 
+		if ( platePrice.missingPrice ) pricing.setMissingPrice( true );
 		line.setName( "Prezzo placca" );
 		line.setAmount( platePrice.finalPrice );
 		line.setCost( platePrice.totalCost );
@@ -1150,6 +1152,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				doSkipPrewarm
 			);
 
+			if ( fruitPrice.missingPrice ) pricing.setMissingPrice( true );
 			line.setName( "#fruit.fruit?.name#" );
 			line.setAmount( fruitPrice.finalPrice );
 			line.setCost( fruitPrice.totalCost );
@@ -1175,6 +1178,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					plugProduct,
 					doSkipPrewarm
 				);
+				if ( plugPrice.missingPrice ) pricing.setMissingPrice( true );
 				var plugLine = super.bean( "QuotationItemPriceLine" );
 				plugLine.setName( plug.type == "tappo" ? "Tappo" : "Mezzo tappo" );
 				plugLine.setAmount( plugPrice.finalPrice );
@@ -1184,6 +1188,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		pricing.setLines( lines );
+		// A prezzo fisso il prezzo lo decide l'utente: nessun avviso di prezzo mancante
+		if ( pricing.isFixed() ) pricing.setMissingPrice( false );
 
 		return pricing;
 	}
@@ -1448,6 +1454,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		lines.add( line );
 
 		pricing.setLines( lines );
+		// Prodotto senza prezzo: riga a 0 marcata (a prezzo fisso decide l'utente, nessun avviso)
+		pricing.setMissingPrice( signagePrice.missingPrice && !pricing.isFixed() );
 
 		return pricing;
 	}
@@ -1555,6 +1563,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		lines.add( line );
 
 		pricing.setLines( lines );
+		// Prodotto senza prezzo: riga a 0 marcata (a prezzo fisso decide l'utente, nessun avviso)
+		pricing.setMissingPrice( price.missingPrice && !pricing.isFixed() );
 
 		return pricing;
 	}

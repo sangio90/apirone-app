@@ -9,5 +9,6 @@
         "method",
         "quantity",
         "total",
+        "missingPrice$Boolean",
     ],
 }

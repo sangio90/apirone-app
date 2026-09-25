@@ -1386,6 +1386,27 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/*
+		Riepilogo delle righe del preventivo salvate senza prezzo configurato, per tipo
+		(slug come nei tab: plate/signage/accessory): { total, byType: { signage: 2, ... } }.
+	*/
+	function missingPrices( event, rc, prc ){
+		var result  = super.getResult();
+		var slugs   = { "PLA" = "plate", "SEG" = "signage", "ACC" = "accessory" };
+		var byType  = {};
+		var total   = 0;
+
+		var records = super.service( "QuotationItemPrice" ).getDao().countMissingPriceByQuotationId( rc.id );
+		for ( var record in records ) {
+			var slug = StructKeyExists( slugs, record.type_id ) ? slugs[ record.type_id ] : LCase( record.type_id );
+			byType[ slug ] = record.items;
+			total += record.items;
+		}
+
+		result.setData( { "total" = total, "byType" = byType } );
+		event.setValue( "result", result );
+	}
+
 	function productItems( event, rc, prc ){
 		var result = super.getResult();
 		var memny  = super.getMementify();

@@ -1,5 +1,8 @@
 ﻿<cfoutput>
 <div class="pricing-box" id="#args.id#">
+	<div class="alert qt-missing-price-alert py-1 px-2 mb-2" style="font-size: 12px;" data-bind="visible: pricing.data.missingPrice">
+		<i class="fas fa-exclamation-triangle me-1"></i> Prezzo non configurato per questo prodotto: la riga verrà salvata a 0 &euro; e segnalata nel preventivo.
+	</div>
 	<div class="row mb-2">
 		<div class="col-12">
 			<table style="width: 100%" class="quotation-table-item-prices-totals">

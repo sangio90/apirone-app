@@ -1,11 +1,14 @@
 ﻿<cfprocessingdirective pageEncoding="UTF-8">
 
 <nmscript type="text/x-kendo-template" id="quotation-item-preview-tmpl">
-    <div class="quotation-item m-1 col-md-3" data-uid="#: uid #" data-id="#: id #">
+    <div class="quotation-item m-1 col-md-3 #= ( data.price && data.price.missingPrice ) ? 'qt-item-missing-price' : '' #" data-uid="#: uid #" data-id="#: id #">
         <div class="quotation-item-inner">
             <div class="row">
                 <div class="col-8 justify-content-start" style="margin-top: -15px; min-height: 2rem;">
                     <div style="font-size: 10px; margin-bottom: -10px;"> 
+                        # if ( data.price && data.price.missingPrice ) { #
+                            <i class="fas fa-exclamation-triangle qt-item-missing-price-icon" title="Prezzo non configurato per questo prodotto: la riga è stata salvata a 0 €"></i>
+                        # } #
                         <span data-bind="text: product.line.name"></span> - 
                         <span data-bind="text: product.model.code"></span> - 
                         <span data-bind="text: product.finish.code"></span> 

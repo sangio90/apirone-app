@@ -425,6 +425,9 @@
 
                                         <!--- pricing inlined --->
                                         <div class="pricing-box" id="plate-quotation-item-pricing-box">
+                                            <div class="alert qt-missing-price-alert py-1 px-2 mb-2" style="font-size: 12px;" v-if="pricing.data.missingPrice">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> Prezzo non configurato per questo prodotto: la riga verrà salvata a 0 &euro; e segnalata nel preventivo.
+                                            </div>
                                         <!--- Blocco prezzi: dettaglio costi calcolati, sconti, tipo prezzo e totale. I dati sono gestiti dal sotto-oggetto pricing dell'istanza Vue, separato da detailForm per chiarezza logica. pricing contiene: data (lines, discount1/2, method, total), priceTypes (tipi prezzo disponibili), isTotalEnabled (abilita/disabilita campo totale). --->
                                             <div class="row mb-2">
                                                 <div class="col-12">

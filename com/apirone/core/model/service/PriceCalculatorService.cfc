@@ -77,19 +77,27 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// skipPrewarm letto con StructKeyExists: un null passato posizionalmente non viene
 		// bindato da Lucee e la chiave non esisterebbe nell'arguments scope.
 		var doSkipPrewarm = StructKeyExists( arguments, "skipPrewarm" ) && !IsNull( arguments.skipPrewarm ) && arguments.skipPrewarm;
-		var price = simulate(
-			productId                      = arguments.productId,
-			quantity                       = arguments.quantity,
-			quotationItemZoneId            = arguments.quotationItemZoneId,
-			producItemtIds                 = arguments.producItemtIds,
-			lettersQuantity                = arguments.lettersQuantity,
-			simulationSignageConfigItemId  = arguments.simulationSignageConfigItemId,
-			quotation                      = arguments.quotation,
-			quotationItem                  = arguments.quotationItem,
-			preloadedProduct               = arguments.preloadedProduct,
-			skipPrewarm                    = doSkipPrewarm
-		);
-		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost };
+
+		// Prodotto senza prezzo configurato: non si blocca il salvataggio della riga, il
+		// prodotto vale 0 e il chiamante marca la riga (QuotationItemPrice.missingPrice).
+		// simulate() continua invece a lanciare l'eccezione (simulatore prezzi in admin).
+		try {
+			var price = simulate(
+				productId                      = arguments.productId,
+				quantity                       = arguments.quantity,
+				quotationItemZoneId            = arguments.quotationItemZoneId,
+				producItemtIds                 = arguments.producItemtIds,
+				lettersQuantity                = arguments.lettersQuantity,
+				simulationSignageConfigItemId  = arguments.simulationSignageConfigItemId,
+				quotation                      = arguments.quotation,
+				quotationItem                  = arguments.quotationItem,
+				preloadedProduct               = arguments.preloadedProduct,
+				skipPrewarm                    = doSkipPrewarm
+			);
+		} catch ( "ApirOne.NoPriceConfigured" e ) {
+			return { finalPrice: 0, totalCost: 0, missingPrice: true, missingPriceMessage: e.message };
+		}
+		return { finalPrice: price.values.finalPrice, totalCost: price.values.totalCost, missingPrice: false };
 	}
 
 	public Struct function simulate(

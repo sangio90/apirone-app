@@ -489,6 +489,7 @@
 		get( "/ajax/quotations/:id/updateallprices" ).to( "QuotationItemAjaxController.updateAllPrices" ).end();
 		post( "/ajax/quotations/:id/items/:typeId/discount" ).to( "QuotationItemAjaxController.applyDiscountByType" ).end();
 		get( "/ajax/quotations/:id/items/:typeId" ).to( "QuotationItemAjaxController.list" ).end();
+		get( "/ajax/quotations/:id/missing-prices" ).to( "QuotationItemAjaxController.missingPrices" ).end();
 		get( "/ajax/quotations/:id/itemsbyzone/:zoneId" ).to( "QuotationItemAjaxController.listByZone" ).end();
 		get( "/ajax/quotations/:id/plates-export3d" ).to( "QuotationItemAjaxController.plates3dExport" ).end();
 

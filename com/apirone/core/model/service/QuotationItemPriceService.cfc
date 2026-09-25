@@ -166,6 +166,7 @@
 			bean.setDiscount2( record.discount2 );
 			bean.setAmount( record.amount );
 			bean.setId( record.quotation_item_price_id );
+			bean.setMissingPrice( record.missing_price );
 
 			// Method (PriceMethod è un bean semplice senza FK)
 			bean.setMethod( method.setId( record.price_method_id ) );
@@ -204,6 +205,7 @@
 		bean.setDiscount2( record.discount2 );
 		bean.setAmount( record.amount );
 		bean.setId( record.quotation_item_price_id );
+		bean.setMissingPrice( record.missing_price );
 
 		// Entity collegate (caricate singolarmente)
 		bean.setMethod( method.setId( record.price_method_id ) );

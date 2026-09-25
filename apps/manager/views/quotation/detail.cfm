@@ -97,10 +97,20 @@
                                     </select>
                                 </div>
                                 <div class="col-8">
-                                    <div class="d-flex">
+                                    <div class="d-flex align-items-center">
                                         <span data-bind="visible: canEdit">
 				                            #button( type="button", bind="click:openZonesDialog", size="sm", label="Gestisci Zone" )#
                                         </span>
+                                        <!--- Avviso righe senza prezzo configurato (compatto, accanto a "Gestisci Zone"): riempito da refreshMissingPrices() in app-quotation-detail.js --->
+                                        <div id="qt-missing-prices-alert" class="d-none ms-3">
+                                            <div class="alert qt-missing-price-alert d-flex align-items-center py-1 px-2 mb-0" role="alert">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                <div>
+                                                    <strong>Articoli senza prezzo</strong> (salvati a 0 &euro;):
+                                                    <span id="qt-missing-prices-detail"></span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

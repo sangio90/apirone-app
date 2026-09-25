@@ -137,6 +137,52 @@ AP.quotation.detail = (function () {
 		}
 	};
 
+	/*
+		Avviso "articoli senza prezzo" (banner sopra i tab + icona sui tab): le righe si
+		caricano un tab alla volta, quindi il conteggio su tutto il preventivo arriva dal
+		server. Richiamata a ogni loadItems() (apertura pagina, salvataggi, eliminazioni,
+		"Aggiorna tutti i prezzi").
+	*/
+	var missingPriceTypeLabels = { plate: "Placche", signage: "Segnaletiche", accessory: "Accessori" };
+
+	var refreshMissingPrices = function () {
+		NM.util.ajax({
+			method: "GET",
+			url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/missing-prices",
+			callback: {
+				done: function (xhr) {
+					var data = xhr.data || {};
+					var byType = data.byType || {};
+
+					$("#nav-tab .qt-tab-missing-price-icon").remove();
+					var parts = [];
+					Object.keys(missingPriceTypeLabels).forEach(function (type) {
+						var count = byType[type];
+						if (!count) return;
+						$("#nav-" + type + "-tab").append('<i class="fas fa-exclamation-triangle qt-tab-missing-price-icon" title="Articoli senza prezzo"></i>');
+						parts.push('<a data-missing-price-type="' + type + '">' + missingPriceTypeLabels[type] + ": " + count + "</a>");
+					});
+
+					$("#qt-missing-prices-detail").html(parts.join(", "));
+					$("#qt-missing-prices-alert").toggleClass("d-none", !data.total);
+				}
+			}
+		});
+	};
+
+	// Click su una voce dell'avviso: apre il tab corrispondente.
+	// Non si può simulare il click sul tab con .click(): jQuery esegue prima l'handler
+	// Kendo (changeType -> loadItems), che disabilita subito i tab (setItemsLoading), e
+	// solo dopo il click nativo, che Bootstrap ignora sul bottone ormai disabilitato:
+	// cambiava la querystring ma il tab restava quello di prima. Quindi: prima si mostra
+	// il tab con l'API Bootstrap, poi si carica con changeType.
+	$(document).on("click", "#qt-missing-prices-alert [data-missing-price-type]", function () {
+		var tabButton = document.getElementById("nav-" + $(this).data("missing-price-type") + "-tab");
+		if (!tabButton || tabButton.disabled) return;
+		bootstrap.Tab.getOrCreateInstance(tabButton).show();
+		viewModel.changeType({ currentTarget: tabButton });
+	});
+
 	var setQuotationItems = function (items, typeId) {
 		if (!typeId) typeId = viewModel.get("typeId");
 
@@ -808,6 +854,7 @@ AP.quotation.detail = (function () {
 
 						setQuotationItems(xhr.data, requestTypeId);
 						setTimeout(initSortable, 150);
+						refreshMissingPrices();
 					}
 				}
 			}).always(function () {
