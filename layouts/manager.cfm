@@ -61,10 +61,13 @@
 
             <div class="header-right d-flex align-items-center">
 
-                <div id="search-widget-root" class="me-3 d-flex align-items-center d-none">
-                    <div id="search-widget-suggest-status" class="me-2"></div>
-                    <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto... (Ctrl + K)">
-                </div>
+                <!--- Ricerca prodotti: solo per Admin (senza il root, app-search.js non si inizializza, Ctrl+K incluso) --->
+                <cfif session.user.getRole().getId() == "ADM">
+                    <div id="search-widget-root" class="me-3 d-flex align-items-center d-none">
+                        <div id="search-widget-suggest-status" class="me-2"></div>
+                        <input type="text" id="search-widget-suggest-input" class="search-widget-input" placeholder="Cerca un prodotto... (Ctrl + K)">
+                    </div>
+                </cfif>
 
                 <div id="sync-widget" class="me-3 d-flex align-items-center">
                     <button id="sync-dropdown-btn" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle me-2" data-bs-toggle="dropdown" aria-expanded="false">
