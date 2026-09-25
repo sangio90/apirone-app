@@ -493,9 +493,16 @@ AP.signage.modal = ( function() {
                 // (larghezza e altezza), altrimenti solo altezza = altezza font.
                 // content-box: il padding di px-2 non deve erodere la larghezza configurata.
                 const dim = pictogramDimensions[ pictogramName ];
-                const imgSizeCss = dim && dim.width > 0 && dim.height > 0
+                const hasDim = dim && dim.width > 0 && dim.height > 0;
+                const imgHeightPx = hasDim ? dim.height : pictogramHeightPx;
+                // Centratura verticale sul testo: il centro del picto va a metà altezza
+                // delle maiuscole (~0.7em sopra la baseline), non a metà x-height come
+                // fa vertical-align: middle (che lo fa sembrare appoggiato in basso).
+                // vertical-align in lunghezza alza il bordo inferiore dell'img dalla baseline.
+                const imgSizeCss = ( hasDim
                     ? "box-sizing: content-box; width: " + dim.width + "px; height: " + dim.height + "px;"
-                    : "height: " + pictogramHeightPx + "px;";
+                    : "height: " + pictogramHeightPx + "px;" ) +
+                    " vertical-align: calc(0.35em - " + ( imgHeightPx / 2 ) + "px);";
                 const imgHtml =
                     // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
                     //      creare una mappa fontFamily -> esistenza pictogram
