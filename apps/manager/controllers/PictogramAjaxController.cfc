@@ -72,6 +72,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		pictogram.setCode( json.pictogram.id );
 		pictogram.setFontFamilyId( json.id );
 
+		// Controllo del contenuto dell'SVG prima di creare il pittogramma (lo stesso controllo
+		// è fatto nel browser alla scelta del file: qui è la garanzia lato server)
+		var svgError = checkPictogramSvg( json.pictogram.image ?: "" );
+		if ( Len( svgError ) ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "pictogramFileUpload" = [ { "message" = svgError } ] } );
+			event.setValue( "result", result );
+			return;
+		}
+
 		transaction {
 			var newId = super.fire( "pictogram.create", { pictogram = pictogram } )
 
@@ -106,6 +116,42 @@ component extends="com.apirone.core.controller.AbsController" {
 		result.setData( { "message" = message }, { "payload" = { "id" = newId } } );
 
 		event.setValue( "result", result );
+	}
+
+	/*
+		Rifiuta gli SVG che contengono solo un'immagine raster incorporata (<image>) e nessuna
+		forma vettoriale: tipico export sbagliato da Illustrator (tavola enorme con un PNG
+		minuscolo al centro), che nell'anteprima diventa un puntino e sgranato se ingrandito.
+		Restituisce "" se ok, altrimenti il messaggio d'errore.
+	*/
+	private String function checkPictogramSvg( required String dataUrl ){
+		var base64 = ListRest( arguments.dataUrl, "," );
+		if ( !Len( base64 ) ) {
+			return "File SVG mancante o vuoto.";
+		}
+
+		var svg = "";
+		try {
+			svg = CharsetEncode( ToBinary( base64 ), "utf-8" );
+		} catch ( any e ) {
+			return "File SVG non leggibile.";
+		}
+
+		if ( !ReFindNoCase( "<svg[\s>]", svg ) ) {
+			return "Il file non è un SVG valido.";
+		}
+
+		var hasVector = ReFindNoCase( "<(path|polygon|polyline|rect|circle|ellipse|line|text|use)[\s/>]", svg ) > 0;
+		var hasRaster = ReFindNoCase( "<image[\s/>]", svg ) > 0;
+
+		if ( !hasVector && hasRaster ) {
+			return "L'SVG contiene solo un'immagine raster incorporata, non forme vettoriali: riesportalo da Illustrator come vettoriale, con la tavola adattata al disegno.";
+		}
+		if ( !hasVector ) {
+			return "L'SVG non contiene alcun disegno.";
+		}
+
+		return "";
 	}
 
 	function get( event, rc, prc ){

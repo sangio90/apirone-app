@@ -160,6 +160,12 @@ AP.fontFamily.detail = ( function() {
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
+                            // es. file del font in formato non supportato (controllo lato server)
+                            if ( xhr.status == "INVALID" ) {
+                                status.html( "" );
+                                NM.form.showMessages( xhr.data );
+                                return;
+                            }
                             if ( xhr.status == "SUCCESS" ) {
 
                                 status.html( "" );
@@ -307,6 +313,70 @@ AP.fontFamily.pictogram = ( function() {
     var pub = {};
     var fields = AP.fontFamily.fields;
 
+    /*
+        Analisi dell'SVG del pittogramma scelto, prima del caricamento:
+        - solo immagine raster incorporata (<image>) senza forme vettoriali: rifiutato
+          (tipico export sbagliato da Illustrator: nell'anteprima diventa un puntino ed è
+          sgranato se ingrandito). Lo stesso controllo è fatto anche lato server.
+        - disegno che occupa una piccola parte della tavola (viewBox): verrà mostrato molto
+          più piccolo del previsto, si chiede conferma.
+        Il bounding box reale si misura rendendo l'SVG in un contenitore nascosto (getBBox).
+    */
+    var MIN_ARTWORK_FILL = 0.5; // quota minima della tavola occupata dal disegno (sul lato maggiore)
+
+    var analyzeSvg = function( svgText ) {
+        var doc = new DOMParser().parseFromString( svgText, "image/svg+xml" );
+        var svg = doc.documentElement;
+        if ( doc.getElementsByTagName( "parsererror" ).length || !svg || svg.nodeName.toLowerCase() !== "svg" ) {
+            return { error: "Il file non è un SVG valido." };
+        }
+
+        var hasVector = svg.querySelector( "path, polygon, polyline, rect, circle, ellipse, line, text, use" ) !== null;
+        var hasRaster = svg.querySelector( "image" ) !== null;
+        if ( !hasVector && hasRaster ) {
+            return { error: "L'SVG contiene solo un'immagine raster incorporata, non forme vettoriali: riesportalo da Illustrator come vettoriale, con la tavola adattata al disegno." };
+        }
+        if ( !hasVector ) {
+            return { error: "L'SVG non contiene alcun disegno." };
+        }
+
+        // tavola: viewBox, oppure width/height
+        var vb = ( svg.getAttribute( "viewBox" ) || "" ).trim().split( /[\s,]+/ ).map( Number );
+        var board = vb.length === 4 && vb[2] > 0 && vb[3] > 0
+            ? { width: vb[2], height: vb[3] }
+            : { width: parseFloat( svg.getAttribute( "width" ) ), height: parseFloat( svg.getAttribute( "height" ) ) };
+        if ( !( board.width > 0 && board.height > 0 ) ) {
+            return {}; // dimensioni tavola non determinabili: nessun controllo di riempimento
+        }
+
+        var host = document.createElement( "div" );
+        host.style.cssText = "position:absolute; left:-10000px; top:0; width:500px; height:500px; visibility:hidden;";
+        var live = document.importNode( svg, true );
+        live.setAttribute( "width", "500" );
+        live.setAttribute( "height", "500" );
+        host.appendChild( live );
+        document.body.appendChild( host );
+        var bbox = null;
+        try {
+            bbox = live.getBBox();
+        } catch ( e ) {
+            bbox = null;
+        }
+        document.body.removeChild( host );
+
+        if ( !bbox || !bbox.width || !bbox.height ) {
+            return {};
+        }
+        var fill = Math.max( bbox.width / board.width, bbox.height / board.height );
+        return { fill: fill, board: board, bbox: bbox };
+    };
+
+    var rejectPictogramFile = function( input, message ) {
+        $( input ).val( "" );
+        viewModel.set( "detailForm.data.pictogram.image", null );
+        AP.widget.notify( "error", message, "SVG non valido" );
+    };
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -439,6 +509,12 @@ AP.fontFamily.pictogram = ( function() {
                     data: JSON.stringify( viewModel.get( "detailForm.data" ) ),
                     callback: {
                         done: function( xhr ) {
+                            // controllo dell'SVG lato server (vedi PictogramAjaxController.checkPictogramSvg)
+                            if ( xhr.status == "INVALID" ) {
+                                status.html( "" );
+                                NM.form.showMessages( xhr.data );
+                                return;
+                            }
                             if ( xhr.status == "SUCCESS" ) {
                                 NM.util.autoHideMessage(
                                     status,
@@ -496,19 +572,60 @@ AP.fontFamily.pictogram = ( function() {
             },
         } );
 
-        $( "#pictogramFileUpload" ).on( "change", function( event ) {
-
+        // Listener ri-registrato a ogni apertura (pub.edit): off() per non accumularli
+        $( "#pictogramFileUpload" ).off( "change.pictogram" ).on( "change.pictogram", function( event ) {
+            const input = this;
             const file = event.target.files[0];
 
-            if ( file ) {
+            viewModel.set( "detailForm.data.pictogram.image", null );
+            if ( !file ) {
+                return;
+            }
+
+            const accept = function() {
                 const reader = new FileReader();
                 reader.readAsDataURL( file );
                 reader.onload = function( evt ) {
-                    const base64 = evt.target.result;
-                    viewModel.set( "detailForm.data.pictogram.image", base64 );
+                    viewModel.set( "detailForm.data.pictogram.image", evt.target.result );
                 };
+            };
 
-            }
+            file.text().then( function( svgText ) {
+                const check = analyzeSvg( svgText );
+
+                if ( check.error ) {
+                    rejectPictogramFile( input, check.error );
+                    return;
+                }
+
+                if ( check.fill !== undefined && check.fill < MIN_ARTWORK_FILL ) {
+                    const pct = Math.round( check.fill * 100 );
+                    bootbox.confirm( {
+                        title: "Tavola SVG troppo grande",
+                        message: "Il disegno occupa solo il " + pct + "% della tavola dell'SVG ("
+                            + Math.round( check.bbox.width ) + "×" + Math.round( check.bbox.height ) + " su "
+                            + Math.round( check.board.width ) + "×" + Math.round( check.board.height ) + "): "
+                            + "nell'anteprima il pittogramma risulterà molto più piccolo del previsto.<br><br>"
+                            + "Conviene riesportarlo con la tavola adattata al disegno. Caricarlo comunque?",
+                        buttons: {
+                            confirm: { label: "Carica comunque", className: "btn-primary" },
+                            cancel: { label: "Annulla", className: "btn-default" },
+                        },
+                        callback: function( ok ) {
+                            if ( ok ) {
+                                accept();
+                            } else {
+                                $( input ).val( "" );
+                            }
+                        },
+                    } );
+                    return;
+                }
+
+                accept();
+            } ).catch( function() {
+                rejectPictogramFile( input, "Impossibile leggere il file." );
+            } );
         } );
 
         viewModel.set( "detailForm.data.id", id );
