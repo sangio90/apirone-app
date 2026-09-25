@@ -86,6 +86,13 @@ component output="true" accessors="true" {
 						"default" = { "sizes" = [] }
 					}
 				},
+				// file del font (woff2/woff/ttf/otf) della font family: nessun ridimensionamento
+				"fontFamily" = {
+					"path"  = "font-families",
+					"types" = {
+						"default" = { "sizes" = [] }
+					}
+				},
 				"quotationStatusHistory" = {
 					"path"  = "quotation-status-history",
 					"types" = {

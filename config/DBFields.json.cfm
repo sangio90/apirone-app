@@ -206,6 +206,11 @@
         "type": "Integer"
     },
 
+    "fontFamily.id": {
+        "name": "font_family_id",
+        "type": "Integer"
+    },
+
     "quotation.id": {
         "name": "quotation_id",
         "type": "uuid"

@@ -1,7 +1,7 @@
 ﻿{
-	defaultIncludes = [ "id", "code", "name", "sizes" ],
+	defaultIncludes = [ "id", "code", "name", "sizes", "fontFile" ],
 	profiles        = {
-			list   = { defaultIncludes = [ "id", "code", "name", "sizes" ] },
-			detail = { defaultIncludes = [ "id", "code", "name", "sizes" ] }
+			list   = { defaultIncludes = [ "id", "code", "name", "sizes", "fontFile" ] },
+			detail = { defaultIncludes = [ "id", "code", "name", "sizes", "fontFile" ] }
 		}
 }

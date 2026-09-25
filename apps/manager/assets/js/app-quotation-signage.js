@@ -88,6 +88,33 @@ AP.signage.modal = ( function() {
     // catturarli lì.
     var pendingPreserveCodes = null;
 
+    /*
+        File del font caricato per la font family (Font family > File font): viene caricato
+        nel browser con la FontFace API sotto un alias riservato ("apirone-ff-<fileId>"),
+        così l'anteprima non dipende dai font installati sul computer né da fonts.css e non
+        si scontra con i nomi già dichiarati lì. Una promise per file: ogni font si scarica
+        una volta sola per pagina.
+    */
+    var loadedFontFaces = {};
+    var currentFontFamilyId = null;
+
+    function loadFontFamilyFile( fontFile ) {
+        var alias = "apirone-ff-" + fontFile.id;
+        if ( !loadedFontFaces[ alias ] ) {
+            loadedFontFaces[ alias ] = new FontFace( alias, "url(" + JSON.stringify( fontFile.uri ) + ")" ).load().then( function( face ) {
+                document.fonts.add( face );
+                return alias;
+            } );
+            // un errore (file mancante, CORS...) non deve restare in cache: si riprova la volta dopo
+            loadedFontFaces[ alias ].catch( function() { delete loadedFontFaces[ alias ]; } );
+        }
+        return loadedFontFaces[ alias ];
+    }
+
+    function cssFontName( name ) {
+        return "\"" + String( name ).replace( /"/g, "" ) + "\"";
+    }
+
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
         categories: new kendo.data.DataSource(),
@@ -101,6 +128,9 @@ AP.signage.modal = ( function() {
         backgroundImage: { url: "" },
         backgroundCustomImage: { url: "" },
         fontFamilyName: "",
+        // font-family CSS dell'anteprima: alias del file caricato (se c'è) + nome della famiglia
+        // come fallback. Vuoto = si usa fontFamilyName.
+        previewFontFamily: "",
         // Immagini dei pittogrammi caricati per la famiglia del font corrente:
         // { "man": "https://.../man.svg", ... } (chiave = codice senza <>)
         pictogramImages: {},
@@ -531,7 +561,7 @@ AP.signage.modal = ( function() {
 
             // Applica font, dimensione e interlinea al preview.
             contentSpanPreview.css( {
-                "font-family": fontFamilyName,
+                "font-family": viewModel.get( "previewFontFamily" ) || fontFamilyName,
                 "font-size": textHeightPx + "px",
                 // Se l'interlinea è specificata in px, la usa direttamente.
                 // Altrimenti applica il valore unitless 1.5 (moltiplicatore CSS).
@@ -1055,6 +1085,24 @@ AP.signage.modal = ( function() {
                                     }
                                 } );
                                 viewModel.set( "pictogramImages", images );
+
+                                // Font dell'anteprima: subito il nome della famiglia, poi (se è stato
+                                // caricato un file) l'alias del file appena il browser l'ha scaricato.
+                                const fontFamilyId = xhr.data.id;
+                                const fontFile = xhr.data.fontFile;
+                                currentFontFamilyId = fontFamilyId;
+                                viewModel.set( "previewFontFamily", cssFontName( xhr.data.name ) );
+                                if ( fontFile && fontFile.uri ) {
+                                    loadFontFamilyFile( fontFile ).then( function( alias ) {
+                                        // nel frattempo l'utente potrebbe aver cambiato font
+                                        if ( currentFontFamilyId === fontFamilyId ) {
+                                            viewModel.set( "previewFontFamily", cssFontName( alias ) + ", " + cssFontName( xhr.data.name ) );
+                                        }
+                                    } ).catch( function() {
+                                        AP.widget.notify( "warning", "Impossibile caricare il file del font " + xhr.data.name + ": l'anteprima usa il font di sistema." );
+                                    } );
+                                }
+
                                 viewModel.set( "fontFamilyName", xhr.data.name );
                             }
                         }
@@ -2109,7 +2157,7 @@ AP.signage.modal = ( function() {
         // viene aggiornato - il preview si aggiorna sempre, a prescindere da quale passaggio
         // della cascata l'ha effettivamente cambiato.
         viewModel.bind( "change", function( e ) {
-            if ( e.field === "fontFamilyName" ) {
+            if ( e.field === "fontFamilyName" || e.field === "previewFontFamily" ) {
                 viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( function( signageRow ) {
                     viewModel.parsedLineContent( signageRow.content, signageRow.id );
                 } );

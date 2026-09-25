@@ -33,6 +33,25 @@
                             <label class="col-sm-2 col-form-label"></label>
                         </div>
 
+                        <!--- File del font usato dall'anteprima segnaletica (caricato nel browser, non serve installarlo) --->
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-start">File font</label>
+                            <div class="col-sm-10">
+                                <div class="d-flex align-items-center mb-2" data-bind="visible: hasFontFile">
+                                    <i class="fas fa-font me-2"></i>
+                                    <a target="_blank" data-bind="attr: { href: detailForm.data.fontFile.uri }, text: detailForm.data.fontFile.name"></a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm ms-3" data-bind="click: removeFontFile" title="Rimuovi il file del font">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <input type="file" class="form-control" id="fontFamilyFileUpload" name="fontFamilyFileUpload" accept=".woff2,.woff,.ttf,.otf">
+                                <div class="form-text">Formati: woff2 (consigliato), woff, ttf, otf. Il nuovo file sostituisce quello attuale al salvataggio.</div>
+                                <div id="font-family-file-preview" class="mt-2 p-2 border rounded" style="font-size: 26px; display: none;">
+                                    ABCDEFGHIJKLM abcdefghijklm 0123456789
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-start">Dimensioni Font</label>
                             <div class="col-sm-12">

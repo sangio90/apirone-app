@@ -25,5 +25,8 @@
     },
     {
         id: "pictogram",
+    },
+    {
+        id: "fontFamily",
     }
 ]

@@ -34,9 +34,31 @@ AP.fontFamily.detail = ( function() {
             id: "",
             code: "",
             name: "",
-            sizes: new kendo.data.DataSource()
+            sizes: new kendo.data.DataSource(),
+            // file del font già salvato (dal server) e, se scelto, quello nuovo da caricare
+            fontFile: { uri: "", name: "" },
+            fontFileUpload: null, // { fileName, content (data URL) }
+            removeFontFile: false
         },
         title: "Carica Font Family",
+    };
+
+    // Anteprima del file del font nella modale: lo carica nel browser con la FontFace API
+    // (stesso meccanismo dell'anteprima segnaletica), senza bisogno di installarlo.
+    var previewFontFile = function( url ) {
+        var preview = $( "#font-family-file-preview" );
+        if ( !url ) {
+            preview.hide();
+            return;
+        }
+        var alias = "apirone-ff-preview-" + Date.now();
+        new FontFace( alias, "url(" + JSON.stringify( url ) + ")" ).load().then( function( face ) {
+            document.fonts.add( face );
+            preview.css( "font-family", "\"" + alias + "\"" ).show();
+        } ).catch( function() {
+            preview.hide();
+            AP.widget.notify( "error", "Impossibile leggere il file del font." );
+        } );
     };
 
     var viewModel = kendo.observable( {
@@ -55,6 +77,23 @@ AP.fontFamily.detail = ( function() {
             NM.form.clearMessages( fields.detailForm );
 
             viewModel.set( "detailForm", defaultDetailForm );
+            viewModel.set( "detailForm.data.fontFile", { uri: "", name: "" } );
+            viewModel.set( "detailForm.data.fontFileUpload", null );
+            viewModel.set( "detailForm.data.removeFontFile", false );
+            $( "#fontFamilyFileUpload" ).val( "" );
+            previewFontFile( null );
+        },
+
+        hasFontFile: function() {
+            return !!this.get( "detailForm.data.fontFile.uri" );
+        },
+
+        removeFontFile: function() {
+            viewModel.set( "detailForm.data.fontFile", { uri: "", name: "" } );
+            viewModel.set( "detailForm.data.fontFileUpload", null );
+            viewModel.set( "detailForm.data.removeFontFile", true );
+            $( "#fontFamilyFileUpload" ).val( "" );
+            previewFontFile( null );
         },
 
         addSize: function( event ) {
@@ -172,6 +211,8 @@ AP.fontFamily.detail = ( function() {
                         viewModel.set( "detailForm.data.code", xhr.data.code );
                         viewModel.set( "detailForm.data.name", xhr.data.name );
                         viewModel.get( "detailForm.data.sizes" ).data( xhr.data.sizes );
+                        viewModel.set( "detailForm.data.fontFile", xhr.data.fontFile && xhr.data.fontFile.uri ? xhr.data.fontFile : { uri: "", name: "" } );
+                        previewFontFile( viewModel.get( "detailForm.data.fontFile.uri" ) );
 
                         viewModel.set( "detailForm.title", "Modifica Font Family < " + xhr.data.name + " >" );
 
@@ -188,6 +229,29 @@ AP.fontFamily.detail = ( function() {
 
         var detailForm = fields.detailForm;
 
+        // File del font scelto: letto come data URL, inviato con il save della famiglia
+        $( "#fontFamilyFileUpload" ).on( "change", function( event ) {
+            var file = event.target.files[0];
+            if ( !file ) {
+                viewModel.set( "detailForm.data.fontFileUpload", null );
+                previewFontFile( viewModel.get( "detailForm.data.fontFile.uri" ) );
+                return;
+            }
+            var ext = file.name.split( "." ).pop().toLowerCase();
+            if ( [ "woff2", "woff", "ttf", "otf" ].indexOf( ext ) === -1 ) {
+                AP.widget.notify( "error", "Formato non supportato: usare woff2, woff, ttf o otf." );
+                $( this ).val( "" );
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function( evt ) {
+                viewModel.set( "detailForm.data.fontFileUpload", { fileName: file.name, content: evt.target.result } );
+                viewModel.set( "detailForm.data.removeFontFile", false );
+                previewFontFile( evt.target.result );
+            };
+            reader.readAsDataURL( file );
+        } );
+
         detailForm.validate( {
             onfocusout: function( element ) {
                 $( element ).valid();
@@ -195,6 +259,14 @@ AP.fontFamily.detail = ( function() {
             rules: {
                 name: {
                     required: true,
+                },
+                // jQuery Validate trasforma l'attributo accept=".woff2,..." dell'input nella
+                // regola "accept", che controlla il MIME type: per i font i browser riportano
+                // tipi vuoti o non standard e la validazione fallisce appena si sceglie il file
+                // ("Please enter a value with a valid mimetype"). false = regola disattivata;
+                // il formato è già controllato dall'handler change e lato server.
+                fontFamilyFileUpload: {
+                    accept: false,
                 },
                 code: {
                     required: true,

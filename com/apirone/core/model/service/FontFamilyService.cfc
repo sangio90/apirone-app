@@ -4,6 +4,7 @@
 	property name="textService" inject="TextService";
 	property name="pictogramService" inject="PictogramService";
 	property name="fontFamilySizeService" inject="FontFamilySizeService";
+	property name="fileService" inject="FileService";
 
 	public com.apirone.core.model.bean.FontFamily function get( required String fontFamilyId ){
 		return build( arguments.fontFamilyId );
@@ -121,6 +122,8 @@
 		// (il numero di famiglie è limitato dal search(), quindi U <= limit)
 		var pictogramMap = {};
 		var sizeMap      = {};
+		// File del font: una sola query per tutte le famiglie
+		var fontFileMap  = ArrayLen( arguments.ids ) ? getFileService().listByEntityIds( "fontFamily.id", arguments.ids ) : {};
 		for ( var fid in arguments.ids ) {
 			if ( !StructKeyExists( pictogramMap, fid ) ) {
 				pictogramMap[ fid ] = getPictogramService().list( fontFamilyId = fid );
@@ -151,6 +154,11 @@
 				bean.setSizes( sizeMap[ record.font_family_id ] );
 			} else {
 				bean.setSizes( [] );
+			}
+
+			// File del font: dalla mappa pre-caricata
+			if ( StructKeyExists( fontFileMap, record.font_family_id ) ) {
+				bean.setFontFile( latestFile( fontFileMap[ record.font_family_id ] ) );
 			}
 
 			map[ record.font_family_id ] = bean;
@@ -196,7 +204,20 @@
 
 		bean.setSizes( sizes );
 
+		var fontFiles = getFileService().listByEntityIds( "fontFamily.id", [ record.font_family_id ] );
+		if ( StructKeyExists( fontFiles, record.font_family_id ) ) {
+			bean.setFontFile( latestFile( fontFiles[ record.font_family_id ] ) );
+		}
+
 		return bean;
+	}
+
+	/**
+	 * File attivo del font di una famiglia: il save soft-elimina sempre i precedenti,
+	 * quindi ce n'è al massimo uno (in caso contrario si prende l'ultimo letto).
+	 */
+	private function latestFile( required Array files ){
+		return arguments.files[ ArrayLen( arguments.files ) ];
 	}
 
 }
