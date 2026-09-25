@@ -54,6 +54,7 @@ AP.quotation.plantPositions = (function () {
                 selectedItem: {},
                 selectedItemPositionId: null,
                 selectedItemPosition: {},
+                selectedQuotationItemId: null, // card evidenziata nell'elenco (anche senza posizioni)
                 dragging: false,
                 draggedPosition: null,
                 isLoading: false,
@@ -244,14 +245,63 @@ AP.quotation.plantPositions = (function () {
                         self.isLoading = false;
                     }
                 },
-                selectPosition: function (position) {
+                selectPosition: function (position, source) {
                     if (this.selectedItemPositionId === position.id) {
-                        this.selectedItemPositionId = null;
-                        this.selectedItemPosition = {};
+                        this.clearSelection();
                         return;
                     }
                     this.selectedItemPosition = position;
                     this.selectedItemPositionId = position.id;
+                    this.selectedQuotationItemId = position.quotationItemId;
+
+                    // Click sul marker: porta in vista il box corrispondente nell'elenco
+                    // ("nearest" non scrolla se è già visibile).
+                    if (source === 'marker') {
+                        this.$nextTick(() => {
+                            const card = document.getElementById('position-card-' + position.id);
+                            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        });
+                    }
+                },
+                // Click sulla card dell'articolo (fuori da checkbox/cestino/matita/box posizione):
+                // seleziona la card e il suo marker (la prima posizione, se presente).
+                // Un secondo click sulla card già selezionata deseleziona.
+                selectItemCard(quotationItem) {
+                    if (this.isItemSelected(quotationItem)) {
+                        this.clearSelection();
+                        return;
+                    }
+                    const positions = quotationItem.positions || [];
+                    if (positions.length) {
+                        this.selectPosition(positions[0], 'list');
+                    } else {
+                        this.clearSelection();
+                        this.selectedQuotationItemId = quotationItem.id;
+                    }
+                },
+                clearSelection() {
+                    this.selectedItemPositionId = null;
+                    this.selectedItemPosition = {};
+                    this.selectedQuotationItemId = null;
+                    this.multiplierPos = null;
+                },
+                isItemSelected(quotationItem) {
+                    if (this.selectedQuotationItemId && this.selectedQuotationItemId == quotationItem.id) return true;
+                    return !!this.selectedItemPositionId
+                        && (quotationItem.positions || []).some(p => p.id == this.selectedItemPositionId);
+                },
+                // Click "fuori": vale solo se sia il mousedown che il click avvengono fuori da
+                // marker/controlli/elenco, così la fine di un trascinamento non deseleziona.
+                isOutsideSelectionTarget(target) {
+                    return !(target instanceof Element) || !target.closest(
+                        '.pin, .selection-ring, .rotation-arrow, .delete-icon, .plant-action-btn, ' +
+                        '.plant-multiplier-panel, .position-full-text, .draft-configure-btn, .quotation-item, ' +
+                        '.modal, .k-animation-container, .k-window'
+                    );
+                },
+                // Versione chiara (trasparente) del colore del tipo articolo, per gli sfondi evidenziati
+                getLightColor(quotationItem, alpha) {
+                    return this.getColor(quotationItem).replace(/^rgb\((.*)\)$/, 'rgba($1, ' + alpha + ')');
                 },
                 getPinStyle(pos) {
                     let quotationItem = this.quotationItems.find(
@@ -891,6 +941,19 @@ AP.quotation.plantPositions = (function () {
 				}
 
 				var self = this;
+
+				// Deselezione con click fuori dal marker (listener in capture: i @click.stop dei figli non lo bloccano)
+				var mouseDownOutside = false;
+				document.addEventListener('mousedown', function(e) {
+					mouseDownOutside = self.isOutsideSelectionTarget(e.target);
+				}, true);
+				document.addEventListener('click', function(e) {
+					if (mouseDownOutside && self.isOutsideSelectionTarget(e.target)) {
+						self.clearSelection();
+						self.selectedDraftId = null;
+					}
+				}, true);
+
 				document.getElementById('item-duplicate-copy-btn').addEventListener('click', function() {
 					self.executeDuplicate(false);
 				});

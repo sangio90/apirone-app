@@ -81,7 +81,7 @@
 															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length, 'pin-instance': quotationItem.instanceGroupId }"
                                                             class="pin"
                                                             :style="getPinStyle(p)"
-                                                            @click="selectPosition(p)"
+                                                            @click="selectPosition(p, 'marker')"
                                                             @mousedown="startDrag($event, p)"
                                                             :key="'pin-' + p.id"
                                                         >
@@ -112,7 +112,7 @@
                                                                 :key="'arrow-' + p.id"
                                                             />
                                                             <img
-                                                                src="/assets/main/img/delete-icon.jpg"
+                                                                src="/assets/main/img/delete-icon.png"
                                                                 alt="Elimina Pin"
                                                                 class="delete-icon"
                                                                 :style="getDeleteIconStyle(p)"
@@ -140,6 +140,7 @@
                                                             ><i class="fas fa-pencil-alt"></i></div>
                                                             <div
                                                                 v-if="multiplierPos && multiplierPos.id === p.id"
+                                                                class="plant-multiplier-panel"
                                                                 :style="getMultiplierPanelStyle(p)"
                                                                 :key="'mulpanel-' + p.id"
                                                                 @click.stop
@@ -175,7 +176,7 @@
                                                         :key="'darrow-' + draft.id"
                                                     />
                                                     <img
-                                                        src="/assets/main/img/delete-icon.jpg"
+                                                        src="/assets/main/img/delete-icon.png"
                                                         alt="Elimina"
                                                         class="delete-icon"
                                                         :style="getDraftDeleteStyle(draft)"
@@ -202,7 +203,8 @@
 												v-for="quotationItem in quotationItemByType"
 												:key="quotationItem.id"
 												class="quotation-item"
-												:style="{ border: '2px solid', borderColor: getColor(quotationItem), backgroundColor: 'white'}"
+												:style="{ border: '2px solid', borderColor: getColor(quotationItem), backgroundColor: isItemSelected(quotationItem) ? getLightColor(quotationItem, 0.12) : 'white' }"
+												@click="selectItemCard(quotationItem)"
 												>
 													<div style="display:flex; align-items:center; justify-content:space-between;">
 														<span>
@@ -212,7 +214,7 @@
 															class="fas fa-pencil-alt"
 															style="cursor:pointer; color:##555;"
 															title="Modifica articolo"
-															@click="editItem(quotationItem)"
+															@click.stop="editItem(quotationItem)"
 														></i>
 										</div>
 													<!-- HEADER ITEM -->
@@ -234,21 +236,22 @@
 															style="display: flex; float: left; cursor: pointer;"
 															v-for="p in quotationItem.positions"
 															:key="p.id"
+															:id="'position-card-' + p.id"
 															class="position-card"
-															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length, 'with-margin': quotationItem.quantity < quotationItem.positions.length }"
-															@click="selectPosition(p)"
+															:class="{ 'red-border': quotationItem.quantity < quotationItem.positions.length, 'with-margin': quotationItem.quantity < quotationItem.positions.length, 'position-card-selected': p.id == selectedItemPositionId }"
+															@click.stop="selectPosition(p, 'list')"
 														>
 															<div style="margin-top: .3em;">
-																<input type="checkbox" class="form-check-input" v-model="p.visible" @change="onVisibleChange(p, quotationItem)">
+																<input type="checkbox" class="form-check-input" v-model="p.visible" @click.stop @change="onVisibleChange(p, quotationItem)">
 															</div>
 															<div class="position-title" style="margin-right: .3em;">
 																{{ quotationItem.position ? quotationItem.position.code : 'N/A' }}
 															</div>
 															<img
-																src="/assets/main/img/delete-icon.jpg"
+																src="/assets/main/img/delete-icon.png"
 																style="width: 20px; height: 20px; margin-top: .3em;"
 																alt="Elimina Pin"
-																@click="deletePosition(p)"
+																@click.stop="deletePosition(p)"
 																:key="`deletearrow-${p.id}`"
 															/>
 														</div>
@@ -385,6 +388,15 @@
         padding: .3em;
     }
 
+    /* Box della posizione selezionata (sincronizzato con il marker in pianta) */
+    .position-card {
+        border-radius: 6px;
+        transition: background-color .15s ease-in-out;
+    }
+    .position-card-selected .position-title {
+        font-weight: bold;
+    }
+
     /* Elenco articoli sotto la pianta: la lista non deve allargarsi oltre la
        colonna (è figlia di un flex) e ogni gruppo per tipo va a capo invece di
        schiacciare le card in un'unica riga che sforava dal contenitore. */
@@ -399,6 +411,7 @@
         margin-right: 20px;
     }
     .quotation-item {
+    	cursor: pointer;
     	display: inline-block;
     	flex: 0 0 auto;
         margin-top: .3em;
