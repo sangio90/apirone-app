@@ -1,1 +1,1 @@
-﻿{ defaultIncludes = [ "id", "name", "enabledPictograms$Boolean", "fontFamilyId" ] }
+﻿{ defaultIncludes = [ "id", "name", "enabledPictograms$Boolean", "fontFamilyId", "pictogramDimensions" ] }

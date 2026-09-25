@@ -36,7 +36,25 @@
 		</cfquery>
 
 		<cfreturn local.q>
-	</cffunction>	
+	</cffunction>
+
+	<cffunction returntype="Query" name="findByFontFamilySize">
+		<cfargument name="fontFamilySizeId" type="Numeric" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				pictograms.code,
+				pictogram_dimensions.width,
+				pictogram_dimensions.height
+			FROM
+				pictogram_dimensions
+					INNER JOIN pictograms USING (pictogram_id)
+			WHERE
+				pictogram_dimensions.font_family_size_id = <cfqueryparam cfsqltype="Integer" value="#arguments.fontFamilySizeId#">
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
 
 	<cffunction name="insert" returntype="Numeric">
 		<cfargument name="pictogramDimension" type="com.apirone.core.model.bean.PictogramDimension" required="true">

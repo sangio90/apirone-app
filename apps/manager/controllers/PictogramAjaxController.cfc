@@ -169,7 +169,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			for ( var dimension in dimensions ) {
 				if ( size.getId() == dimension.getFontFamilySizeId() ) {
-					dump( "trovato" );
 					row                               = memy.convert( dimension );
 					row[ "pictogram" ][ "id" ]        = rc.id;
 					row[ "fontFamilySize" ][ "id" ]   = size.getId();
@@ -211,9 +210,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			// dimension.setHeight( IsNumeric( item.height ) ? item.height : 0 );
 			dimension.setWidth( IsNumeric( item.width ) ? item.width : 0 );
 			dimension.setHeight( IsNumeric( item.height ) ? item.height : 0 );
-
-			dump( item.fontFamilySize.id );
-			// dump(dimension.getFontFamilySizeId());
 
 			dimension.setFontFamilySizeId( item.fontFamilySize.id );
 			dimension.setPictogramId( item.pictogram.id );

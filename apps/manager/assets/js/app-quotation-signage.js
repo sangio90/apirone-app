@@ -444,6 +444,15 @@ AP.signage.modal = ( function() {
             const textHeightPx = baseHeightPx * 1.4;
             const pictogramHeightPx = baseHeightPx * 1;
 
+            // Dimensioni (px) dei pittogrammi configurate per l'altezza font corrente
+            // (tabella pictogram_dimensions). Chiave: nome senza <> (es. "man").
+            const pictogramDimensions = {};
+            ( signageConfigItem?.size?.pictogramDimensions || [] ).forEach( function( dim ) {
+                if ( dim && dim.code ) {
+                    pictogramDimensions[ String( dim.code ).replace( /[<>]/g, "" ) ] = dim;
+                }
+            } );
+
             // Calcola l'interlinea per la riga corrente dalla posizione
             // nell'array lineHeights del SignageConfigItem.
             // null = non configurato (usa 1.5 unitless), numero = px.
@@ -480,13 +489,20 @@ AP.signage.modal = ( function() {
                     parts.push( this.escapeHtml( valore.substring( lastIndex, match.index ) ) );
                 }
                 const pictogramName = match[1]; // es. "man"
+                // Se per questa altezza il pittogramma ha dimensioni configurate le usa
+                // (larghezza e altezza), altrimenti solo altezza = altezza font.
+                // content-box: il padding di px-2 non deve erodere la larghezza configurata.
+                const dim = pictogramDimensions[ pictogramName ];
+                const imgSizeCss = dim && dim.width > 0 && dim.height > 0
+                    ? "box-sizing: content-box; width: " + dim.width + "px; height: " + dim.height + "px;"
+                    : "height: " + pictogramHeightPx + "px;";
                 const imgHtml =
                     // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
                     //      creare una mappa fontFamily -> esistenza pictogram
                     // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
                     "<img src=\"/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg\" " +
                     "alt=\"" + pictogramName + "\" " +
-                    "style=\"height: " + pictogramHeightPx + "px;\" " +
+                    "style=\"" + imgSizeCss + "\" " +
                     "class=\"pictogram px-2\">";
                 parts.push( imgHtml );
 

@@ -1,6 +1,7 @@
 ﻿component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 	property name="dao" inject="FontFamilySizeDAO";
+	property name="pictogramDimensionDAO" inject="PictogramDimensionDAO";
 
 	public com.apirone.core.model.bean.FontFamilySize function get( required String fontFamilySizeId ){
 		return build( arguments.fontFamilySizeId );
@@ -80,7 +81,17 @@
 		var record = getDao().read( arguments.fontFamilySizeId );
 
 		if ( record.recordCount ) {
-			return buildFromFindRow( record );
+			var bean = buildFromFindRow( record );
+
+			// Dimensioni dei pittogrammi per questa altezza (usate dall'anteprima segnaletica).
+			// Solo nel get(): le liste (tendine altezze) non ne hanno bisogno.
+			var dimensions = [];
+			for ( var dim in getPictogramDimensionDAO().findByFontFamilySize( bean.getId() ) ) {
+				dimensions.append( { "code" = dim.code, "width" = dim.width, "height" = dim.height } );
+			}
+			bean.setPictogramDimensions( dimensions );
+
+			return bean;
 		}
 
 		return NullValue();
