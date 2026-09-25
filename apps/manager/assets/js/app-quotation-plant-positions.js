@@ -303,6 +303,25 @@ AP.quotation.plantPositions = (function () {
                 getLightColor(quotationItem, alpha) {
                     return this.getColor(quotationItem).replace(/^rgb\((.*)\)$/, 'rgba($1, ' + alpha + ')');
                 },
+                // Versione scurita del colore del tipo articolo (factor < 1), per il bordo della card selezionata
+                getDarkColor(quotationItem, factor) {
+                    return this.getColor(quotationItem).replace(/^rgb\((.*)\)$/, function(m, rgb) {
+                        return 'rgb(' + rgb.split(',').map(c => Math.round(parseInt(c, 10) * factor)).join(', ') + ')';
+                    });
+                },
+                // Card selezionata: bordo più spesso e colori più scuri. Il padding compensa
+                // il bordo più largo così il contenuto non si sposta.
+                getItemCardStyle(quotationItem) {
+                    if (this.isItemSelected(quotationItem)) {
+                        return {
+                            border: '3px solid',
+                            borderColor: this.getDarkColor(quotationItem, 0.8),
+                            backgroundColor: this.getLightColor(quotationItem, 0.22),
+                            padding: '9px'
+                        };
+                    }
+                    return { border: '2px solid', borderColor: this.getColor(quotationItem), backgroundColor: 'white' };
+                },
                 getPinStyle(pos) {
                     let quotationItem = this.quotationItems.find(
                         quotationItem => quotationItem.id == pos.quotationItemId

@@ -203,7 +203,7 @@
 												v-for="quotationItem in quotationItemByType"
 												:key="quotationItem.id"
 												class="quotation-item"
-												:style="{ border: '2px solid', borderColor: getColor(quotationItem), backgroundColor: isItemSelected(quotationItem) ? getLightColor(quotationItem, 0.12) : 'white' }"
+												:style="getItemCardStyle(quotationItem)"
 												@click="selectItemCard(quotationItem)"
 												>
 													<div style="display:flex; align-items:center; justify-content:space-between;">
