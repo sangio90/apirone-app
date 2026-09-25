@@ -930,15 +930,13 @@ AP.signage.modal = ( function() {
                 for ( var font of xhr.data ) {
                     fonts.push( font.font );
                 }
+                // Font "reali" contati PRIMA di aggiungere il placeholder: serve per la
+                // selezione automatica quando ce n'è uno solo (vedi in fondo al blocco).
+                const singleFont = fonts.length === 1 ? fonts[0] : null;
                 fonts.unshift( { id: "", name: "-- Seleziona il Font" } );
                 viewModel.get( "fonts" ).data( fonts );
                 xhr.data.unshift( { id: "", name: "" } );
                 viewModel.get( "signageConfigs" ).data( xhr.data );
-
-                if ( fonts.length === 1 ) {
-                    viewModel.set( "detailForm.data.signageConfig.font.id", fonts[0].id );
-                    viewModel.get( "fontSizes" ).data( xhr.data[0].items );
-                }
                 if ( viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) != "" ) {
                     const xhr2 = await NM.util.ajax( {
                         method: "GET",
@@ -985,6 +983,15 @@ AP.signage.modal = ( function() {
                         } );
                     }
                 }
+
+                // Un solo font disponibile (es. "Nessun font" della segnaletica emergenza):
+                // lo seleziona e carica le altezze come se l'utente l'avesse scelto. Solo se
+                // non c'è già un font (articolo esistente: il font arriva dai dati salvati).
+                // Va fatto dopo aver impostato il prodotto: loadFontSizes ne carica gli items.
+                if ( singleFont && !viewModel.get( "detailForm.data.signageConfig.font.id" ) ) {
+                    viewModel.set( "detailForm.data.signageConfig.font", { id: singleFont.id, name: singleFont.name } );
+                    await viewModel.loadFontSizes();
+                }
             }
 
             this.checkCanSave();
@@ -1014,8 +1021,16 @@ AP.signage.modal = ( function() {
                     }
                 } );
 
-                if ( viewModel.get( "detailForm.data.quotationItem.id" ) == "" && viewModel.get( "detailForm.data.signageConfig.items" ).length >= 2 && viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" ) == "" ) {
-                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem", viewModel.get( "detailForm.data.signageConfig.items" )[1] );
+                // Selezione automatica dell'altezza (items[0] è il placeholder "-- Altezza font"),
+                // solo se non ce n'è già una scelta:
+                // - una sola altezza disponibile: sempre, anche su un articolo esistente;
+                // - articolo nuovo: la prima della lista, come prima.
+                const sizeItems = viewModel.get( "detailForm.data.signageConfig.items" );
+                const realSizesCount = sizeItems.length - 1;
+                const isNewItem = !viewModel.get( "detailForm.data.quotationItem.id" );
+                const noSizeSelected = !viewModel.get( "detailForm.data.quotationItem.signageConfigItem.id" );
+                if ( noSizeSelected && ( realSizesCount === 1 || ( isNewItem && realSizesCount >= 1 ) ) ) {
+                    viewModel.set( "detailForm.data.quotationItem.signageConfigItem", sizeItems[1] );
                     this.parseLines();
                 }
             }
@@ -1673,8 +1688,12 @@ AP.signage.modal = ( function() {
             this.checkCanSave();
         },
 
+        // Chiamata a ogni apertura della modale (new/edit): i listener vanno prima rimossi
+        // (namespace .signageCascade), altrimenti si accumulano e dal secondo in poi leggono
+        // i campi già azzerati dal primo, sovrascrivendo pendingPreserveCodes con codici
+        // null (la finitura/modello non veniva più mantenuta cambiando modello/linea).
         handleSelectChanges: function() {
-            $( "#signangeProductCategory" ).on( "change", function( e ) {
+            $( "#signangeProductCategory" ).off( "change.signageCascade" ).on( "change.signageCascade", function( e ) {
                 pendingPreserveCodes = {
                     lineCode: viewModel.getCodeFromList( viewModel.get( "lines" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) ),
                     modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
@@ -1693,7 +1712,7 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageLine" ).on( "change", function( e ) {
+            $( "#signageLine" ).off( "change.signageCascade" ).on( "change.signageCascade", function( e ) {
                 pendingPreserveCodes = {
                     modelCode: viewModel.getCodeFromList( viewModel.get( "models" ).data(), viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
                     finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
@@ -1709,7 +1728,7 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageModel" ).on( "change", function( e ) {
+            $( "#signageModel" ).off( "change.signageCascade" ).on( "change.signageCascade", function( e ) {
                 pendingPreserveCodes = {
                     finishCode: viewModel.getCodeFromList( viewModel.get( "finishes" ).data(), viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) ),
                 };
@@ -1722,7 +1741,7 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageFinish" ).on( "change", function( e ) {
+            $( "#signageFinish" ).off( "change.signageCascade" ).on( "change.signageCascade", function( e ) {
                 viewModel.set( "detailForm.data.signageConfig.font", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.product.items", [] );
@@ -1730,7 +1749,7 @@ AP.signage.modal = ( function() {
                 AP.deleteUserPref( "signage.signageConfigId" );
                 AP.deleteUserPref( "signage.product.items" );
             } );
-            $( "#signageFont" ).on( "change", function( e ) {
+            $( "#signageFont" ).off( "change.signageCascade" ).on( "change.signageCascade", function( e ) {
                 viewModel.set( "detailForm.data.quotationItem.signageConfigItem", { "id":"" } );
                 viewModel.set( "detailForm.data.quotationItem.product.items", [] );
                 AP.deleteUserPref( "signage.signageConfigId" );
@@ -1797,13 +1816,13 @@ AP.signage.modal = ( function() {
                                 viewModel.set( "detailForm.data.signageConfig.catalogBundle.model", model );
                                 await viewModel.loadFinishes();
                                 if ( signageFinishId ) {
-                                    let finish = viewModel.finishes.data().find( f => f.id = signageFinishId );
+                                    let finish = viewModel.finishes.data().find( f => f.id == signageFinishId );
                                     if ( finish ) {
                                         finish = { id: finish.id, name: finish.name };
                                         viewModel.set( "detailForm.data.quotationItem.product.finish", finish );
                                         await viewModel.loadSignageConfigs();
                                         if ( signageFontId ) {
-                                            let font = viewModel.fonts.data().find( f => f.id = signageFontId );
+                                            let font = viewModel.fonts.data().find( f => f.id == signageFontId );
                                             if ( font ) {
                                                 font = { id: font.id, name: font.name };
                                                 viewModel.set( "detailForm.data.signageConfig.font", font );
