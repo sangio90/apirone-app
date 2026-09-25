@@ -273,6 +273,11 @@ input#input-item-total[readonly] {
 	cursor: pointer;
 }
 
+/* Testo dell'anteprima segnaletica: nero pieno invece del grigio ereditato dal tema */
+#signage-preview-container {
+	color: #000;
+}
+
 #quotation-signage-preview-background {
     min-width: 500px;
 	background-repeat: no-repeat !important;

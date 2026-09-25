@@ -32,7 +32,12 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function getBySignageConfigId( event, rc, prc ){
 
-		var result = super.fire( "fontFamily.getFontFamilyBySignageConfigId", { signageConfigId = rc.signageConfigId } );
+		var fontFamily = super.fire( "fontFamily.getFontFamilyBySignageConfigId", { signageConfigId = rc.signageConfigId } );
+
+		// Include i pittogrammi caricati (con l'immagine): l'anteprima segnaletica li usa
+		// al posto degli SVG statici in /assets/main/pictograms/.
+		var result = super.getResult();
+		result.setData( super.getMementify().convert( target = fontFamily, includes = "pictograms" ) );
 
 		event.setValue( "result", result );
 	}

@@ -101,6 +101,9 @@ AP.signage.modal = ( function() {
         backgroundImage: { url: "" },
         backgroundCustomImage: { url: "" },
         fontFamilyName: "",
+        // Immagini dei pittogrammi caricati per la famiglia del font corrente:
+        // { "man": "https://.../man.svg", ... } (chiave = codice senza <>)
+        pictogramImages: {},
         maxRows: 0,
         // Mostra un warning nell'anteprima quando il SignageConfigItem selezionato
         // non ha interlinee definite. Viene aggiornato in parsedLineContent().
@@ -263,11 +266,19 @@ AP.signage.modal = ( function() {
         parsedPictograms: function() {
             return this.pictogramNames.map( p => {
                 const name = p.replace( /[<>]/g, "" );
+                const src = this.getPictogramSrc( name, "Arial" );
                 return {
                     label: name,
-                    image: `<img src="/assets/main/pictograms/Arial/${name}.svg" alt="${name}" class="pictogram px-2" style="height: 30px; width: 30px;">`
+                    image: `<img src="${this.escapeHtml( src )}" alt="${name}" class="pictogram px-2" style="height: 30px; width: 30px;">`
                 };
             } );
+        },
+
+        // URL dell'immagine del pittogramma: quella caricata dall'utente per la famiglia del
+        // font corrente (Font family > Pittogrammi); se manca, l'SVG statico negli assets.
+        getPictogramSrc: function( pictogramName, fontFamilyName ) {
+            const uploaded = this.get( "pictogramImages" ) ? this.get( "pictogramImages" )[ pictogramName ] : null;
+            return uploaded || "/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg";
         },
         pictogramHelper: false,
 
@@ -504,10 +515,7 @@ AP.signage.modal = ( function() {
                     : "height: " + pictogramHeightPx + "px;" ) +
                     " vertical-align: calc(0.35em - " + ( imgHeightPx / 2 ) + "px);";
                 const imgHtml =
-                    // TODO: usare il font selezionato quando avremo i pictogram in tutti i font,
-                    //      creare una mappa fontFamily -> esistenza pictogram
-                    // "<img src=\"/assets/main/pictograms/" + fontFamily + "/" + pictogramName + ".png\" " +
-                    "<img src=\"/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg\" " +
+                    "<img src=\"" + this.escapeHtml( this.getPictogramSrc( pictogramName, fontFamilyName ) ) + "\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"" + imgSizeCss + "\" " +
                     "class=\"pictogram px-2\">";
@@ -1023,6 +1031,15 @@ AP.signage.modal = ( function() {
                     callback: {
                         done: function( xhr ) {
                             if ( xhr.data ) {
+                                // Prima le immagini, poi il nome: il listener su fontFamilyName
+                                // ridisegna le anteprime e deve già trovare le immagini nuove.
+                                const images = {};
+                                ( xhr.data.pictograms || [] ).forEach( function( pictogram ) {
+                                    if ( pictogram && pictogram.code && pictogram.image && pictogram.image.uri ) {
+                                        images[ String( pictogram.code ).replace( /[<>]/g, "" ) ] = pictogram.image.uri;
+                                    }
+                                } );
+                                viewModel.set( "pictogramImages", images );
                                 viewModel.set( "fontFamilyName", xhr.data.name );
                             }
                         }
