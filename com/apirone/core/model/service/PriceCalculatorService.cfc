@@ -41,6 +41,19 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId(argumentCollection = arguments);
 	}
 
+	private function getQuantitaTotaleAltreRigheByQuotationLineIdAndModelId(quotation, quotationItemId, lineId, modelId) {
+		if ( IsNull( quotation ) ) {
+			return 0;
+		}
+		arguments['quotationId'] = quotation.getId();
+		// Stessa memo di batch del wrapper linea+finitura, chiave "|lm|"
+		var memoKey = arguments.quotationId & "|lm|" & arguments.quotationItemId;
+		if ( StructKeyExists( request, "_pricingSiblingTotals" ) && StructKeyExists( request._pricingSiblingTotals, memoKey ) ) {
+			return request._pricingSiblingTotals[ memoKey ];
+		}
+		return getQuotationItemDAO().getQuantitaTotaleAltreRigheByQuotationLineIdAndModelId(argumentCollection = arguments);
+	}
+
 	private function getQuantitaTotaleAltreRigheByQuotationAndProduct(quotation, quotationItemId) {
 		if ( IsNull( quotation ) ) {
 			return 0;
@@ -275,6 +288,38 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				quantitaTotale += quantity;
 				unitFixedCost = fixedCost / quantitaTotale;
 			}
+
+			// Costo fisso linea/modello (qualsiasi finitura): si somma a quello linea/finitura
+			// ed è ripartito sul suo gruppo, cioè le righe del preventivo con stessa linea+modello
+			if ( !IsNull( product.getModel() ) ) {
+				var lmKey = product.getLine().getId() & "|" & product.getModel().getId();
+				if ( !StructKeyExists( request, "_pricingLineModelCostMemo" ) ) {
+					request._pricingLineModelCostMemo = {};
+				}
+				if ( !StructKeyExists( request._pricingLineModelCostMemo, lmKey ) ) {
+					request._pricingLineModelCostMemo[ lmKey ] = super.service( "LineModelCost" ).list(
+						lineId  = product.getLine().getId(),
+						modelId = product.getModel().getId()
+					);
+				}
+				var lineModelCostRecords = request._pricingLineModelCostMemo[ lmKey ];
+
+				if ( ArrayLen( lineModelCostRecords ) ) {
+					var lineModelFixedCost = Val( lineModelCostRecords[ 1 ].getCost() );
+					var quantitaTotaleLineaModello = getQuantitaTotaleAltreRigheByQuotationLineIdAndModelId(
+						quotation,
+						IsNull(quotationItem) ? "" : quotationItem.getId(),
+						product.getLine().getId(),
+						product.getModel().getId()
+					) + quantity;
+
+					appendLog(
+						message = "Costo fisso linea/modello per #quantitaTotaleLineaModello# pezzi. Costo fisso #lineModelFixedCost# / #quantitaTotaleLineaModello#;Costo fisso unitario: #formatExtended( lineModelFixedCost / quantitaTotaleLineaModello )#"
+					);
+
+					unitFixedCost += lineModelFixedCost / quantitaTotaleLineaModello;
+				}
+			}
 		} else {
 			fixedCost     = product.getPrice( "COST_FIXED" )?.getAmount() ?: 0;
 			quantitaTotale = getQuantitaTotaleAltreRigheByQuotationAndProduct(
@@ -286,8 +331,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			unitFixedCost = fixedCost / quantitaTotale;
 		}
 
+		// per PLA/SEG fixedCost/quantitaTotale sono quelli linea/finitura; unitFixedCost
+		// include anche l'eventuale quota linea/modello (loggata a parte sopra)
 		appendLog(
-			message = "Costo fisso per #quantitaTotale# pezzi. Costo fisso #fixedCost# / #quantitaTotale#;Costo fisso unitario: #formatExtended( unitFixedCost )#"
+			message = "Costo fisso per #quantitaTotale# pezzi. Costo fisso #fixedCost# / #quantitaTotale#;Costo fisso unitario totale: #formatExtended( unitFixedCost )#"
 		);
 
 		addCost( "Costo fisso", unitFixedCost, "P" ); // sommerò gli "P" per il costo finale

@@ -55,6 +55,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					if ( isNull( quotationItem.getArticle() ) ) {
 						var lineId   = quotationItem.getProduct().getLine().getId();
 						var finishId = quotationItem.getProduct().getFinish().getId();
+						var modelId  = !IsNull( quotationItem.getProduct().getModel() ) ? quotationItem.getProduct().getModel().getId() : "";
 						var productId = quotationItem.getProduct().getId();
 					}
 
@@ -76,7 +77,8 @@ component extends="com.apirone.core.controller.AbsController" {
 								"quotationId" = quotationId,
 								"quotationItemId" = quotationItem.getId(),
 								"lineId" = lineId,
-								"finishId" = finishId
+								"finishId" = finishId,
+								"modelId" = modelId
 								}
 							);
 						} else {

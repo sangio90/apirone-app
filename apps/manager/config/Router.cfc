@@ -414,6 +414,15 @@
 		get( "/lines/costs" ).to( "LineCostController.list" ).end();
 
 		/*
+			line/model costs
+		*/
+		get( "/ajax/lines_model_costs" ).to( "LineModelCostAjaxController.list" ).end();
+		post( "/ajax/lines_model_costs" ).to( "LineModelCostAjaxController.save" ).end();
+		delete( "/ajax/lines_model_costs" ).to( "LineModelCostAjaxController.delete" ).end();
+
+		get( "/lines/model-costs" ).to( "LineModelCostController.list" ).end();
+
+		/*
 			lines
 		*/
 		post( "/ajax/lines/clone" ).to( "LineAjaxController.clone" ).end();

@@ -128,6 +128,11 @@
 				title: "Costi per linea/finitura",
 			},
 			{
+				href: "/manager/lines/model-costs",
+				icon: "fas fa-cogs",
+				title: "Costi per linea/modello",
+			},
+			{
 				href: "/manager/metadata-types",
 				icon: "fas fa-fan",
 				title: "Metadata",

@@ -1573,7 +1573,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		required String quotationItemId,
 		required String quotationId,
 		required String lineId,
-		required String finishId
+		required String finishId,
+		String modelId = ""
 	){
 		if ( IsNull( quotationId ) ) {
 			return [];
@@ -1618,13 +1619,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			request._pricingSiblingTotals = {};
 		}
 
-		// Per ogni item la memo contiene due chiavi: "|lf|" = totale di quantità delle righe
-		// con la stessa linea+finitura (esclusa l'item stessa), "|p|" = totale delle righe
-		// con lo stesso prodotto. I wrapper di PriceCalculatorService leggono queste chiavi
-		// al posto di eseguire una SUM per ogni item gemello.
+		// Per ogni item la memo contiene tre chiavi: "|lf|" = totale di quantità delle righe
+		// con la stessa linea+finitura (esclusa l'item stessa), "|lm|" = totale delle righe
+		// con la stessa linea+modello, "|p|" = totale delle righe con lo stesso prodotto.
+		// I wrapper di PriceCalculatorService leggono queste chiavi al posto di eseguire
+		// una SUM per ogni item gemello.
 		var totalRows = getDao().getQuantitaTotaliBatchByQuotationItemIds( arguments.itemIds );
 		for ( var totalRow in totalRows ) {
 			request._pricingSiblingTotals[ arguments.quotationId & "|lf|" & totalRow.quotation_item_id ] = Val( totalRow.total_by_line_finish ?: 0 );
+			request._pricingSiblingTotals[ arguments.quotationId & "|lm|" & totalRow.quotation_item_id ] = Val( totalRow.total_by_line_model ?: 0 );
 			request._pricingSiblingTotals[ arguments.quotationId & "|p|" & totalRow.quotation_item_id ] = Val( totalRow.total_by_product ?: 0 );
 		}
 
@@ -1654,17 +1657,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getComponentService().priceCalculatorSearchByProductItemIds( batchProductItemIds );
 	}
 
+	/*
+		Ricalcola le righe del preventivo che condividono un costo fisso con l'item:
+		stessa linea+finitura (costo linea/finitura) e, se passato modelId, stessa
+		linea+modello (costo linea/modello).
+	*/
 	public function aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId(
 		required String quotationItemId,
 		required String quotationId,
 		required String lineId,
-		required String finishId
+		required String finishId,
+		String modelId = ""
 	){
 		var rows = this.getAltreRigheByQuotationLineIdAndFinishId(
 			"quotationItemId" = quotationItemId,
 			"quotationId" = quotationId,
 			"lineId" = lineId,
-			"finishId" = finishId
+			"finishId" = finishId,
+			"modelId" = modelId
 		);
 
 		// Precarica tutti i QuotationItem in batch per evitare N+1

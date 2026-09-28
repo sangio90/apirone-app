@@ -302,11 +302,12 @@
 					COALESCE(quotation_items.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
 				) AS total_quantity
 			FROM quotation_items
-				LEFT JOIN products ON quotation_items.product_id = products.product_id
+				JOIN products ON quotation_items.product_id = products.product_id
+				JOIN catalog_bundles cb ON cb.catalog_bundle_id = products.catalog_bundle_id
 				LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = quotation_items.quotation_zone_id
 				LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
 			WHERE
-				products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
+				cb.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
 				products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid AND
 				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
 
@@ -314,6 +315,40 @@
 					AND quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
 				</cfif>
 
+		</cfquery>
+		<cfreturn local.q.total_quantity ?: 0>
+	</cffunction>
+
+	<!---
+		Come getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId, ma per il costo fisso
+		linea/modello: righe con stessa linea+modello (qualsiasi finitura).
+		Linea e modello si leggono da catalog_bundles: products.line_id/model_id sono
+		colonne legacy, NULL per i prodotti creati dopo l'introduzione dei bundle.
+	--->
+	<cffunction name="getQuantitaTotaleAltreRigheByQuotationLineIdAndModelId" returntype="Numeric">
+		<cfargument name="quotationId" type="String" required="true">
+		<cfargument name="quotationItemId" type="String" required="true">
+		<cfargument name="lineId" type="String" required="true">
+		<cfargument name="modelId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				SUM(
+					COALESCE(quotation_items.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
+				) AS total_quantity
+			FROM quotation_items
+				JOIN products ON quotation_items.product_id = products.product_id
+				JOIN catalog_bundles cb ON cb.catalog_bundle_id = products.catalog_bundle_id
+				LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = quotation_items.quotation_zone_id
+				LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
+			WHERE
+				cb.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
+				cb.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid AND
+				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid
+
+				<cfif arguments.quotationItemId != "" >
+					AND quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+				</cfif>
 		</cfquery>
 		<cfreturn local.q.total_quantity ?: 0>
 	</cffunction>
@@ -345,8 +380,9 @@
 
 	<!---
 		Calcola in una sola query i totali di quantità ("altre righe") per più item dello
-		stesso preventivo: per ogni item restituisce sia il totale delle righe con la stessa
-		linea+finitura sia quello delle righe con lo stesso prodotto, sempre escludendo
+		stesso preventivo: per ogni item restituisce il totale delle righe con la stessa
+		linea+finitura, quello delle righe con la stessa linea+modello (linea e modello da
+		catalog_bundles) e quello delle righe con lo stesso prodotto, sempre escludendo
 		l'item stesso (stessa semantica delle due funzioni singole getQuantitaTotaleAltreRighe).
 		Serve all'aggregatore dei prezzi dei gemelli per pre-calcolare i totali in batch:
 		due query di gruppo al posto di una SUM per sibling.
@@ -365,15 +401,32 @@
 							COALESCE(o.quantity, 0) * COALESCE(qz.quantity, 1) * COALESCE(qzo.quantity, 1)
 						)
 					FROM quotation_items o
-						LEFT JOIN products po ON o.product_id = po.product_id
+						JOIN products po ON o.product_id = po.product_id
+						JOIN catalog_bundles cbo ON cbo.catalog_bundle_id = po.catalog_bundle_id
 						LEFT JOIN quotation_zones qz ON qz.quotation_zone_id = o.quotation_zone_id
 						LEFT JOIN quotation_zones qzo ON qzo.quotation_zone_id = qz.origin_id
 					WHERE
 						o.quotation_id = i.quotation_id AND
-						po.line_id = pi.line_id AND
+						cbo.line_id = cbi.line_id AND
 						po.finish_id = pi.finish_id AND
 						o.quotation_item_id <> i.quotation_item_id
 				) AS total_by_line_finish,
+				(
+					SELECT
+						SUM(
+							COALESCE(o3.quantity, 0) * COALESCE(qz3.quantity, 1) * COALESCE(qzo3.quantity, 1)
+						)
+					FROM quotation_items o3
+						JOIN products po3 ON o3.product_id = po3.product_id
+						JOIN catalog_bundles cbo3 ON cbo3.catalog_bundle_id = po3.catalog_bundle_id
+						LEFT JOIN quotation_zones qz3 ON qz3.quotation_zone_id = o3.quotation_zone_id
+						LEFT JOIN quotation_zones qzo3 ON qzo3.quotation_zone_id = qz3.origin_id
+					WHERE
+						o3.quotation_id = i.quotation_id AND
+						cbo3.line_id = cbi.line_id AND
+						cbo3.model_id = cbi.model_id AND
+						o3.quotation_item_id <> i.quotation_item_id
+				) AS total_by_line_model,
 				(
 					SELECT
 						SUM(
@@ -389,6 +442,7 @@
 				) AS total_by_product
 			FROM quotation_items i
 				JOIN products pi ON i.product_id = pi.product_id
+				LEFT JOIN catalog_bundles cbi ON cbi.catalog_bundle_id = pi.catalog_bundle_id
 			WHERE
 				i.quotation_item_id = ANY( ARRAY[<cfqueryparam value="#idsList#" list="true" cfsqltype="varchar">]::uuid[] )
 		</cfquery>
@@ -396,20 +450,31 @@
 		<cfreturn local.q>
 	</cffunction>
 
+	<!---
+		Righe del preventivo che condividono un costo fisso con l'item: stessa linea e
+		(stessa finitura oppure, se passato modelId, stesso modello).
+	--->
 	<cffunction name="getAltreRigheByQuotationLineIdAndFinishId" returntype="Query">
 		<cfargument name="quotationId" type="String" required="true">
 		<cfargument name="quotationItemId" type="String" required="true">
 		<cfargument name="lineId" type="String" required="true">
 		<cfargument name="finishId" type="String" required="true">
+		<cfargument name="modelId" type="String" required="false" default="">
 
 		<cfquery name="local.q" datasource="apirone" result="result">
 			SELECT
 				quotation_items.*
 			FROM quotation_items
-			LEFT JOIN products ON quotation_items.product_id = products.product_id
+			JOIN products ON quotation_items.product_id = products.product_id
+			JOIN catalog_bundles cb ON cb.catalog_bundle_id = products.catalog_bundle_id
 			WHERE
-				products.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
-				products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid AND
+				cb.line_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.lineId#">::uuid AND
+				(
+					products.finish_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.finishId#">::uuid
+					<cfif Len( arguments.modelId )>
+						OR cb.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+					</cfif>
+				) AND
 				quotation_items.quotation_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationId#">::uuid AND
 				quotation_items.quotation_item_id <> <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
 		</cfquery>

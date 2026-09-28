@@ -136,6 +136,16 @@
         "type": "Numeric"
     },
 
+    "linemodelcost.line_code": {
+        "name": "lines.code",
+        "type": "Varchar"
+    },
+
+    "linemodelcost.model_code": {
+        "name": "models.code",
+        "type": "Varchar"
+    },
+
     "listCost.id": {
         "name": "line_cost_id",
         "type": "Integer"

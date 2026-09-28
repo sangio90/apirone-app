@@ -933,7 +933,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				"quotationId" = json.quotationId, 
 				"quotationItemId" = thisId, 
 				"lineId" = json.signageConfig.catalogBundle.line.id,
-				"finishId" = json.quotationItem.product.finish.id 
+				"finishId" = json.quotationItem.product.finish.id,
+				"modelId" = json.signageConfig.catalogBundle.model.id
 				} 
 			);
 			message = completeMessage( messageId );
@@ -1217,7 +1218,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				"quotationId" = json.quotationId, 
 				"quotationItemId" = thisId, 
 				"lineId" = json.item.product.line.id,
-				"finishId" = json.item.product.finish.id 
+				"finishId" = json.item.product.finish.id,
+				"modelId" = json.item.product.model.id
 				} 
 			);
 			
@@ -1280,6 +1282,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		if (isNull(quotationItem.getArticle())) {
 			var lineId = quotationItem.getProduct().getLine().getId()
 			var finishId = quotationItem.getProduct().getFinish().getId()
+			var modelId = !IsNull( quotationItem.getProduct().getModel() ) ? quotationItem.getProduct().getModel().getId() : ""
 			var productId = quotationItem.getProduct().getId()
 		}
 
@@ -1302,7 +1305,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					"quotationId" = quotationId,
 					"quotationItemId" = id, 
 					"lineId" = lineId,
-					"finishId" = finishId
+					"finishId" = finishId,
+					"modelId" = modelId
 					} 
 				);
 			} elseif (isNull(quotationItem.getArticle())) {
