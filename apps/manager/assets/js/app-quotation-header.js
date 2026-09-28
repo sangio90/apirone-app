@@ -29,6 +29,11 @@ AP.quotation.header = ( function() {
         return label ? label + (name ? " / " + name : "") : name;
     }
 
+    // Sigla nazione da mostrare: ISO, o la sigla Verticale/CRM se l'ISO manca (es. UK)
+    function countryDisplay(country) {
+        return country ? ( country.isoCode || country.code || "" ) : "";
+    }
+
     var defaultDetailForm = {
         data: {
             id: "",
@@ -475,7 +480,7 @@ AP.quotation.header = ( function() {
         $("#sp-street").val(p.street || "");
         $("#sp-city").val(p.city || "");
         $("#sp-postal-code").val(p.postalCode || "");
-        $("#sp-country-iso").val(p.country ? (p.country.isoCode || "") : "");
+        $("#sp-country-iso").val(countryDisplay(p.country));
         $("#sp-state").val(p.state || "");
     }
 
@@ -518,6 +523,12 @@ AP.quotation.header = ( function() {
                     if ( !xhr.data.customer.shippingProfiles ) {
                         xhr.data.customer.shippingProfiles = [];
                     }
+                    // Il cliente caricato dal DB non ha displayLabel (lo aggiunge solo lo
+                    // schema.parse della ricerca CRM): senza, l'autocomplete Cliente appare vuoto
+                    if ( xhr.data.customer.id ) {
+                        xhr.data.customer.displayLabel = buildCustomerDisplay( xhr.data.customer );
+                        xhr.data.customer.countryLabel = countryDisplay( xhr.data.customer.country );
+                    }
                     if ( !xhr.data.shippingProfile ) {
                         xhr.data.shippingProfile = {};
                     }
@@ -555,6 +566,11 @@ AP.quotation.header = ( function() {
 
                     setTimeout( function() {
                         syncAgentiEnabled();
+
+                        if ( xhr.data.customer.id ) {
+                            var customerAc = $( "#qt-customer" ).data( "kendoAutoComplete" );
+                            if ( customerAc ) customerAc.value( xhr.data.customer.displayLabel );
+                        }
 
                         // Fix DropDownList display in edit mode.
                         // Items loaded from DB don't have displayName (only CRM schema.parse adds it).
@@ -648,6 +664,9 @@ AP.quotation.header = ( function() {
 
 			if (e.field === "detailForm.data.customer") {
 				var customer = viewModel.get("detailForm.data.customer");
+				if (customer && typeof customer === "object") {
+					viewModel.set("detailForm.data.customer.countryLabel", countryDisplay(customer.country));
+				}
 				var lingua = customer && typeof customer === "object" ? customer.lingua : null;
 				if (lingua) {
 					var lang = AP.page.languages.find(function(l) { return l.id === lingua; });
