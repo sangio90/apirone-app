@@ -322,6 +322,26 @@ component extends="com.apirone.core.controller.AbsController" {
 		};
 	}
 
+	/**
+	 * Categoria, linea, modello e finitura di un prodotto per l'export 3D, con codice e nome
+	 * (nella lingua del preventivo) in campi separati. Stringa vuota se il dato manca.
+	 */
+	private Struct function build3dClassificationJson( required product, String langId = "IT" ){
+		var p = arguments.product;
+		var l = arguments.langId;
+
+		return {
+			"codiceCategoria" = !isNull( p.getCategory() ) ? p.getCategory().getCode()  : "",
+			"nomeCategoria"   = !isNull( p.getCategory() ) ? p.getCategory().getName( l ) : "",
+			"codiceLinea"     = !isNull( p.getLine() )     ? p.getLine().getCode()      : "",
+			"nomeLinea"       = !isNull( p.getLine() )     ? p.getLine().getName( l )     : "",
+			"codiceModello"   = !isNull( p.getModel() )    ? p.getModel().getCode()     : "",
+			"nomeModello"     = !isNull( p.getModel() )    ? p.getModel().getName( l )    : "",
+			"codiceFinitura"  = !isNull( p.getFinish() )   ? p.getFinish().getCode()    : "",
+			"nomeFinitura"    = !isNull( p.getFinish() )   ? p.getFinish().getName( l )   : ""
+		};
+	}
+
 	private Struct function build3dItemJson( required item, String langId = "IT" ){
 		var codiceArticolo = "";
 		var codiceVariante = "";
@@ -359,11 +379,8 @@ component extends="com.apirone.core.controller.AbsController" {
 			});
 		}
 
-		var placca = {
-			"modello"   = !isNull( product.getModel() )  ? product.getModel().getCode()  & " – " & product.getModel().getName( arguments.langId )  : "",
-			"finitura"  = !isNull( product.getFinish() ) ? product.getFinish().getCode() & " – " & product.getFinish().getName( arguments.langId ) : "",
-			"attributi" = attributiPlacca
-		};
+		var placca = build3dClassificationJson( product, arguments.langId );
+		placca[ "attributi" ] = attributiPlacca;
 
 		var placcaOrientationId = "";
 
@@ -451,15 +468,13 @@ component extends="com.apirone.core.controller.AbsController" {
 					ArrayAppend( attributiFrutto, attributoFrutto );
 				}
 			}
-			ArrayAppend( frutti, {
-				"ordine"       = fruitOrder,
-				"codice"       = fruttoProdotto.getCode(),
-				"modello"      = !isNull( fruttoProdotto.getModel() )  ? fruttoProdotto.getModel().getCode()  & " – " & fruttoProdotto.getModel().getName( arguments.langId )  : "",
-				"finitura"     = !isNull( fruttoProdotto.getFinish() ) ? fruttoProdotto.getFinish().getCode() & " – " & fruttoProdotto.getFinish().getName( arguments.langId ) : "",
-				"slots"        = slots,
-				"orientamento" = orientamentoFrutto,
-				"attributi"    = attributiFrutto
-			});
+			var frutto = build3dClassificationJson( fruttoProdotto, arguments.langId );
+			frutto[ "ordine" ]       = fruitOrder;
+			frutto[ "codice" ]       = fruttoProdotto.getCode();
+			frutto[ "slots" ]        = slots;
+			frutto[ "orientamento" ] = orientamentoFrutto;
+			frutto[ "attributi" ]    = attributiFrutto;
+			ArrayAppend( frutti, frutto );
 			fruitOrder++;
 		}
 
