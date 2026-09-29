@@ -142,6 +142,9 @@ AP.signage.modal = ( function() {
         // Mostra un warning nell'anteprima quando il SignageConfigItem selezionato
         // non ha interlinee definite. Viene aggiornato in parsedLineContent().
         lineHeightsWarning: false,
+        // Picto usati nelle righe ma con dimensione 0 per l'altezza scelta (es. "<su>, <dx>"):
+        // non vengono disegnati, l'avviso sopra l'anteprima lo segnala. "" = nessun avviso.
+        zeroPictogramsWarning: "",
         modelConfig: {
             height: null,
             width: null
@@ -267,6 +270,7 @@ AP.signage.modal = ( function() {
             viewModel.set( "jsonExportText", "" );
             viewModel.set( "jsonExportLoading", false );
             viewModel.set( "savedExportCode", "" );
+            viewModel.set( "zeroPictogramsWarning", "" );
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageLine" ).prop( "disabled", false );
@@ -497,6 +501,9 @@ AP.signage.modal = ( function() {
             // Dimensioni (px) dei pittogrammi configurate per l'altezza font corrente
             // (tabella pictogram_dimensions). Chiave: nome senza <> (es. "man").
             const pictogramDimensions = {};
+            // Pittogrammi disabilitati per questa altezza (Font family > Dimensioni):
+            // la riga si può salvare lo stesso, ma al posto dei picto non si disegna nulla.
+            const pictogramsEnabled = signageConfigItem?.size?.enabledPictograms !== false;
             ( signageConfigItem?.size?.pictogramDimensions || [] ).forEach( function( dim ) {
                 if ( dim && dim.code ) {
                     pictogramDimensions[ String( dim.code ).replace( /[<>]/g, "" ) ] = dim;
@@ -546,7 +553,14 @@ AP.signage.modal = ( function() {
                 // e con content-box il padding verrebbe contato due volte, allargando i
                 // pittogrammi fino a farli uscire dalla placca.
                 const dim = pictogramDimensions[ pictogramName ];
-                const hasDim = dim && dim.width > 0 && dim.height > 0;
+                // Dimensione configurata a 0 = picto non disponibile per questa altezza:
+                // non si disegna (nessun fallback all'altezza del font). Senza record
+                // di dimensione resta invece il fallback all'altezza del font.
+                if ( !pictogramsEnabled || ( dim && !( dim.width > 0 && dim.height > 0 ) ) ) {
+                    lastIndex = pictogramRegex.lastIndex;
+                    continue;
+                }
+                const hasDim = !!dim;
                 const imgHeightPx = hasDim ? dim.height : pictogramHeightPx;
                 // Centratura verticale sul testo: il centro del picto va a metà altezza
                 // delle maiuscole (~0.7em sopra la baseline), non a metà x-height come
@@ -585,8 +599,32 @@ AP.signage.modal = ( function() {
             // di riga configurata anche a contenuto vuoto.
             contentSpanPreview.html( parts.length ? parts.join( "" ) : "&nbsp;" );
 
+            this.updateZeroPictogramsWarning();
 
             return false;
+        },
+
+        // Avviso sopra l'anteprima: altezza con pittogrammi abilitati ma qualche picto
+        // usato nelle righe ha dimensione 0 (non viene disegnato, vedi parsedLineContent).
+        // Ricalcolato su tutte le righe, così resta coerente anche dopo l'eliminazione di una riga.
+        updateZeroPictogramsWarning: function() {
+            const size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
+            const rows = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+            const zeroCodes = [];
+            if ( size && size.enabledPictograms !== false && rows ) {
+                ( size.pictogramDimensions || [] ).forEach( function( dim ) {
+                    if ( dim && dim.code && !( dim.width > 0 && dim.height > 0 ) ) {
+                        const code = "<" + String( dim.code ).replace( /[<>]/g, "" ) + ">";
+                        const used = rows.data().some( function( row ) {
+                            return row.content && row.content.indexOf( code ) !== -1;
+                        } );
+                        if ( used ) {
+                            zeroCodes.push( code );
+                        }
+                    }
+                } );
+            }
+            viewModel.set( "zeroPictogramsWarning", zeroCodes.join( ", " ) );
         },
 
         getSignageConfigItemSize: function() {
@@ -739,6 +777,7 @@ AP.signage.modal = ( function() {
                                             isNewRow = row.hasOwnProperty( "newRow" ) ? row.newRow : null;
                                             if ( row ) {
                                                 ds.remove( row );
+                                                viewModel.updateZeroPictogramsWarning();
                                             }
                                             if ( ds ) {
                                                 ds.data().forEach( ( row, i ) => {
@@ -760,6 +799,7 @@ AP.signage.modal = ( function() {
                 const row = ds.getByUid( uid );
                 if ( row ) {
                     ds.remove( row );
+                    viewModel.updateZeroPictogramsWarning();
                 }
                 return false;
             }
@@ -1828,6 +1868,7 @@ AP.signage.modal = ( function() {
         // Un articolo nuovo non è mai stato esportato: nessun badge "Esportato" residuo
         // da una precedente modifica aperta nella stessa modale.
         viewModel.set( "savedExportCode", "" );
+        viewModel.set( "zeroPictogramsWarning", "" );
 
         pricingApp().init( "signage", undefined );
 

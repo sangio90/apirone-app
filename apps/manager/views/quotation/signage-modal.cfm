@@ -146,6 +146,9 @@
                                 <div data-bind="visible: lineHeightsWarning">
                                     <span style="color: red">Attenzione: per questa combinazione non sono state specificate le interlinee</span>
                                 </div>
+                                <div data-bind="visible: zeroPictogramsWarning">
+                                    <span style="color: red">Attenzione: per questa altezza font i pittogrammi <strong data-bind="text: zeroPictogramsWarning"></strong> hanno dimensione 0 e non vengono stampati</span>
+                                </div>
                                 <div id="quotation-signage-preview-background"
                                     class="col-3 d-flex justify-content-center align-items-center"
                                     data-bind="visible:detailForm.data.signageConfig.font.id"
