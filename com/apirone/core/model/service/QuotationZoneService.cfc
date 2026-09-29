@@ -9,6 +9,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationItemSignageRowService" inject="QuotationItemSignageRowService";
 	property name="FileService" inject="FileService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
+	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
 	property name="ProductHashService" inject="ProductHashService";
 
 	public com.apirone.core.model.bean.QuotationZone function get( required String zoneId ){
@@ -122,7 +123,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		transaction {
-			messageId = "quotationZone.created";
+			messageId = "zone.duplicated";
 			thisId    = create( quotationZone )
 
 			if ( !isNull( zoneToDuplicate.getImage() ) ) {
@@ -155,11 +156,31 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId, required quotation ) {
 		var items = getQuotationItemService().list( quotationZoneId = arguments.duplicatedZoneId );
 		var newZone = getQuotationZoneService().get( arguments.newZoneId )
+		// codice posizione -> id della posizione ricreata nella nuova zona (una per codice)
+		var newPositionIds = {};
 
 		for (var quotationItem in items) {
 			var duplicatedItem = Duplicate( quotationItem );
 			duplicatedItem.setQuotationZone( newZone )
 			duplicatedItem.setQuotation( quotation )
+
+			// La posizione appartiene alla zona: la copia non può puntare a quella della zona
+			// di origine, si ricrea nella nuova zona con lo stesso codice.
+			if ( !IsNull( duplicatedItem.getPosition() ) ) {
+				var position = duplicatedItem.getPosition();
+				if ( Len( position.getCode() ) ) {
+					if ( !StructKeyExists( newPositionIds, position.getCode() ) ) {
+						var newPosition = super.bean( "QuotationZonePosition" );
+						newPosition.setCode( position.getCode() );
+						newPosition.setZoneId( arguments.newZoneId );
+						newPositionIds[ position.getCode() ] = getQuotationZonePositionService().create( newPosition );
+					}
+					position.setId( newPositionIds[ position.getCode() ] );
+					position.setZoneId( arguments.newZoneId );
+				} else {
+					duplicatedItem.setPosition( NullValue() );
+				}
+			}
 			var newItemId = getQuotationItemService().create( duplicatedItem );
 			var newItem = getQuotationItemService().get( newItemId );
 

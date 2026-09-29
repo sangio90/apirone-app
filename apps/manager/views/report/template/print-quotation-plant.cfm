@@ -30,16 +30,7 @@
                     <tr>
                         <td>
                             #quotationItem.getProduct().getCategory().getName()# #quotationItem.getProduct().getLine().getName()# #quotationItem.getProduct().getModel().getName()# #quotationItem.getProduct().getFinish().getCode()# <br>
-                            - Qtà: #quotationItem.getQuantity()# <br>
-                            <cfloop array="#quotationItem.getPositions()#" item="position">
-                                <div>
-                                    <cfif !isNull(quotationItem.getPosition()) && quotationItem.getPosition().getCode() NEQ "">
-                                        - Posizione: #quotationItem.getPosition().getCode()#
-                                    <cfelse>
-                                        - Posizione: senza posizione
-                                    </cfif>
-                                </div>
-                            </cfloop>
+                            - Qtà: #quotationItem.getQuantity()#
                         </td>
                     </tr>
                 </cfloop>

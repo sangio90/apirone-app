@@ -95,11 +95,11 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		if ( isNull( json.id ) ) {
-			messageId = "quotationZone.created";
+			messageId = "zone.created";
 			thisId    = super.fire( "quotationZone.create", [ quotationZone ] )
 		} else {
 			quotationZone.setId( json.id )
-			messageId = "quotationZone.updated";
+			messageId = "zone.updated";
 			thisId    = super.fire( "quotationZone.update", [ quotationZone ] )
 		}
 

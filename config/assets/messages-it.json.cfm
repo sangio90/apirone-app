@@ -79,7 +79,9 @@
         "existInQuotation": "Combinazione zona già esistente in questo preventivo",
         "notDeleted": "Impossibile eliminare questa zona",
         "deleted": "Zona cancellata",
-        "created": "Zona aggiunta"
+        "created": "Zona aggiunta",
+        "updated": "Zona aggiornata",
+        "duplicated": "Zona duplicata"
     },
 
     "finish": {

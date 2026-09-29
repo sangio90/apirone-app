@@ -198,11 +198,13 @@
 				custom_image = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getCustomImage()#">,
 				bozza = <cfqueryparam cfsqltype="Boolean" value="#arguments.quotationItem.getBozza()#">,
 				status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getStatus().getId()#">,
+				<!--- Un articolo ha sempre una zona (almeno "Non assegnato"): un bean arrivato
+					  senza zona non deve azzerarla, si mantiene quella già salvata. --->
 				quotation_zone_id =
 					<cfif NOT IsNull( arguments.quotationItem.getQuotationZone() )>
 						<cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItem.getQuotationZone().getId()#">::uuid
 					<cfelse>
-						NULL
+						quotation_zone_id
 					</cfif>,
 				quotation_zone_position_id =
 					<cfif NOT IsNull( arguments.quotationItem.getPosition() )>
