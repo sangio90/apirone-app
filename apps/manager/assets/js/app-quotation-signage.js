@@ -227,12 +227,17 @@ AP.signage.modal = ( function() {
 
         pictogramNames: [
             "<dx>",
+            "<fas>",
             "<giu>",
+            "<gru>",
             "<lift>",
             "<man>",
             "<pmr>",
+            "<sdx>",
+            "<ssx>",
             "<su>",
             "<sx>",
+            "<val>",
             "<wom>"
         ],
 
