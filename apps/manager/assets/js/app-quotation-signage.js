@@ -102,6 +102,10 @@ AP.signage.modal = ( function() {
         var alias = "apirone-ff-" + fontFile.id;
         if ( !loadedFontFaces[ alias ] ) {
             loadedFontFaces[ alias ] = new FontFace( alias, "url(" + JSON.stringify( fontFile.uri ) + ")" ).load().then( function( face ) {
+                // snapdom (immagine salvata della preview) incorpora i font aggiunti via
+                // FontFace API solo se trova l'url in _snapdomSrc: senza, l'immagine usa
+                // un font di fallback più largo e i pittogrammi escono dalla placca.
+                face._snapdomSrc = fontFile.uri;
                 document.fonts.add( face );
                 return alias;
             } );
@@ -532,7 +536,10 @@ AP.signage.modal = ( function() {
                 const pictogramName = match[1]; // es. "man"
                 // Se per questa altezza il pittogramma ha dimensioni configurate le usa
                 // (larghezza e altezza), altrimenti solo altezza = altezza font.
-                // content-box: il padding di px-2 non deve erodere la larghezza configurata.
+                // Spaziatura con margine (mx-2) e non padding: snapdom, generando l'immagine
+                // salvata, fissa min-width sul clone pari al bordo esterno (padding incluso)
+                // e con content-box il padding verrebbe contato due volte, allargando i
+                // pittogrammi fino a farli uscire dalla placca.
                 const dim = pictogramDimensions[ pictogramName ];
                 const hasDim = dim && dim.width > 0 && dim.height > 0;
                 const imgHeightPx = hasDim ? dim.height : pictogramHeightPx;
@@ -541,14 +548,14 @@ AP.signage.modal = ( function() {
                 // fa vertical-align: middle (che lo fa sembrare appoggiato in basso).
                 // vertical-align in lunghezza alza il bordo inferiore dell'img dalla baseline.
                 const imgSizeCss = ( hasDim
-                    ? "box-sizing: content-box; width: " + dim.width + "px; height: " + dim.height + "px;"
+                    ? "width: " + dim.width + "px; height: " + dim.height + "px;"
                     : "height: " + pictogramHeightPx + "px;" ) +
                     " vertical-align: calc(0.35em - " + ( imgHeightPx / 2 ) + "px);";
                 const imgHtml =
                     "<img src=\"" + this.escapeHtml( this.getPictogramSrc( pictogramName, fontFamilyName ) ) + "\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"" + imgSizeCss + "\" " +
-                    "class=\"pictogram px-2\">";
+                    "class=\"pictogram mx-2\">";
                 parts.push( imgHtml );
 
                 lastIndex = pictogramRegex.lastIndex;
@@ -1609,7 +1616,9 @@ AP.signage.modal = ( function() {
                     }
                 } );
             }
-            const imgElement = await snapdom.toPng( preview );
+            // embedFonts: l'SVG che snapdom rasterizza non vede i font della pagina;
+            // senza incorporarli il testo cambia larghezza rispetto all'anteprima.
+            const imgElement = await snapdom.toPng( preview, { embedFonts: true } );
 
             const imgData = await scaleDataUrlToBase64( imgElement.src, 800 );
 
