@@ -548,7 +548,14 @@ AP.line.products = ( function() {
     pub.init = function() {
 
         var $table = $( ".table-header-fixed" );
-        $table.floatThead( { top: 94 } );
+        // la tabella sta in un contenitore a scroll orizzontale ( .line-products-scroll ):
+        // senza responsiveContainer l'intestazione fissa non seguirebbe lo scroll
+        $table.floatThead( {
+            top: 94,
+            responsiveContainer: function( $t ) {
+                return $t.closest( ".line-products-scroll" );
+            }
+        } );
 
         generateTableStyles();
 

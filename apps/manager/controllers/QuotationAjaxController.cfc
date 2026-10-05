@@ -54,6 +54,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			params[ "catalogBundleCategoryId" ] = rc.catalogBundleCategoryId;
 		}
 
+		// nei configuratori si propongono solo modelli con prodotti attivi: un bundle
+		// vuoto ( es. CARBON / COMPOSIZIONE ) comparirebbe senza portare a nessuna finitura
+		params[ "withActiveProducts" ] = true;
+
 		var rows = super.fire( "model.list", params );
 
 		var data = mem.convertList( rows, "list" );
@@ -74,6 +78,15 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "lineId" ]            = rc.lineId;
 		params[ "productCategoryId" ] = rc.categoryId;
+
+		// Con il modello si propongono solo le finiture che per quel modello hanno un
+		// prodotto attivo: filtrando per sola linea comparivano finiture che per il
+		// modello scelto non esistono ( la ricerca del prodotto poi non trovava nulla ).
+		param rc.modelId = "";
+		if ( Len( rc.modelId ) ) {
+			params[ "modelId" ] = rc.modelId;
+		}
+		params[ "withActiveProducts" ] = true;
 
 		var rows = super.fire( "finish.list", params );
 		var data = mem.convertList( rows, "list" );

@@ -254,6 +254,8 @@ AP.signage.modal = ( function() {
                 AP.page.canEdit &&
                 vm.get( "detailForm.data.quotationItem.quantity" ) > 0 &&
                 vm.get( "detailForm.data.quotationItem.product.finish.id" ) != "" &&
+                // senza prodotto per categoria/linea/modello/finitura non si salva
+                !!vm.get( "detailForm.data.quotationItem.product.id" ) &&
                 vm.get( "detailForm.data.quotationItem.signageConfigItem.id" ) != "" &&
                 vm.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) != "" &&
                 vm.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" &&
@@ -1078,7 +1080,8 @@ AP.signage.modal = ( function() {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) != "" ) {
                 await NM.util.ajax( {
                     method: "GET",
-                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ),
+                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
+                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona" } );
@@ -1137,6 +1140,13 @@ AP.signage.modal = ( function() {
                             }
                         }
                     } );
+                    if ( !xhr2.data.productId ) {
+                        // Combinazione senza prodotto: si azzera, altrimenti resterebbe il
+                        // prodotto della selezione precedente ( altro modello o finitura ) e
+                        // la riga verrebbe salvata su quello.
+                        viewModel.set( "detailForm.data.quotationItem.product.id", "" );
+                        AP.widget.notify( "warning", "Nessun prodotto attivo per questa combinazione di linea, modello e finitura." );
+                    }
                     if ( xhr2.data.productId ) {
                         viewModel.set( "detailForm.data.quotationItem.product.id", xhr2.data.productId );
                         viewModel.set( "detailForm.data.quotationItem.product.plateWidth", xhr2.data.plateWidth );

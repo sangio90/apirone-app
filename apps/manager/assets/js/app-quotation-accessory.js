@@ -234,7 +234,8 @@ AP.accessory.modal = ( function() {
             if ( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) && viewModel.get( "detailForm.data.quotationItem.product.model.id" ) != "" ) {
                 await NM.util.ajax( {
                     method: "GET",
-                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ),
+                    url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
+                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona la Finitura" } );

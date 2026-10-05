@@ -65,6 +65,10 @@
 		<cfargument name="categoryId" type="Numeric">
 		<cfargument name="productCategoryId" type="Numeric">
 		<cfargument name="lineId" type="String">
+		<!--- configuratori del preventivo: solo finiture che per quel modello hanno un
+		      prodotto attivo, non tutte quelle della linea --->
+		<cfargument name="modelId" type="String">
+		<cfargument name="withActiveProducts" type="Boolean" default="false">
 		<cfargument name="langId" type="String" default="IT">
 		<cfargument name="orderBy" type="String" default="finishes.code asc, finishes.finish_id">
 
@@ -81,7 +85,7 @@
 				finishes
 					INNER JOIN texts USING ( finish_id )
 
-				<cfif !IsNull( arguments.lineId )>
+				<cfif !IsNull( arguments.lineId ) OR !IsNull( arguments.modelId )>
 					INNER JOIN products USING ( finish_id )
 						LEFT JOIN catalog_bundles USING ( catalog_bundle_id )
 				</cfif>
@@ -103,6 +107,14 @@
 
 				<cfif !IsNull( arguments.productCategoryId )>
 					AND catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.productCategoryId#">
+				</cfif>
+
+				<cfif !IsNull( arguments.modelId )>
+					AND catalog_bundles.model_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.modelId#">::uuid
+				</cfif>
+
+				<cfif arguments.withActiveProducts AND ( !IsNull( arguments.lineId ) OR !IsNull( arguments.modelId ) )>
+					AND products.status_id = 'ACT'
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>

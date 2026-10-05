@@ -28,6 +28,11 @@
 
                         <form name="line-products-form" id="line-products-form" method="post">
 
+                            <!--- le colonne ( modelli ) sono dinamiche: con molti modelli la tabella
+                                  esce dalla card, qui scorre in orizzontale. floatThead tiene
+                                  l'intestazione fissa anche dentro a questo contenitore
+                                  ( responsiveContainer in app-line.js ) --->
+                            <div class="table-responsive line-products-scroll">
                             <table class="table table-hover table-header-fixed">
                                 <thead>
                                 <tr>
@@ -100,6 +105,7 @@
                                     </cfloop>
                                 </tbody>
                             </table>
+                            </div>
 
                         </form>
 

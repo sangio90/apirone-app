@@ -664,7 +664,7 @@ AP.plate.modal = ( function() {
                     }
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/quotations/finishes/22/" + lineId,
+                        url: BASE + "/quotations/finishes/22/" + lineId + "?modelId=" + encodeURIComponent( modelId ),
                         callback: {
                             done: ( xhr ) => {
                                 this.finishes = xhr.data;

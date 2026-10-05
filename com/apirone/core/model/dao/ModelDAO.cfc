@@ -58,6 +58,9 @@
 		<cfargument name="lineId" type="String">
 		<cfargument name="typeId" type="String">
 		<cfargument name="statusId" type="String">
+		<!--- solo modelli il cui bundle ha almeno un prodotto attivo ( configuratori del
+		      preventivo: un bundle senza prodotti non porta a nessuna finitura ) --->
+		<cfargument name="withActiveProducts" type="Boolean" default="false">
 
 		<cfargument name="orderby" required="true" type="String" default="models.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -94,6 +97,14 @@
 
 				<cfif !IsNull( arguments.catalogBundleCategoryId )>
 					AND catalog_bundles.product_category_id = <cfqueryparam cfsqltype="Integer" value="#arguments.catalogBundleCategoryId#">
+				</cfif>
+
+				<cfif arguments.withActiveProducts AND ( !IsNull( arguments.lineId ) OR !IsNull( arguments.catalogBundleCategoryId ) OR !IsNull( arguments.catalogBundleLineId ) )>
+					AND EXISTS (
+						SELECT 1 FROM products
+						WHERE products.catalog_bundle_id = catalog_bundles.catalog_bundle_id
+							AND products.status_id = 'ACT'
+					)
 				</cfif>
 
 				<cfif !IsNull( arguments.str )>
