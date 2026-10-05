@@ -1636,12 +1636,12 @@ AP.quotation.printModal = (function () {
 			options: {images: true, note: true, discounts: false, plants: false, hideTotal: false}
 		},
 		// Le voci sono organizzate per ambiente: il raggruppamento per categorie
-		// non si applica, quindi il secondo livello resta nascosto. Il template
-		// non disegna le piante, per questo l'opzione non compare.
+		// non si applica, quindi il secondo livello resta nascosto. Con "Piante"
+		// ogni zona stampa la sua pianta prima dei propri articoli.
 		zone: {
 			grouping: "none",
 			hideGrouping: true,
-			options: {images: true, note: true, discounts: false, hideTotal: false}
+			options: {images: true, note: true, discounts: false, plants: false, hideTotal: false}
 		},
 		photo: {
 			grouping: "categories",

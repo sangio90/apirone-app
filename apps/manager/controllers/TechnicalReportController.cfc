@@ -313,6 +313,25 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
 		quoteObj.plateImages    = buildPlateCrops( allItems, quoteObj.modelConfigMap );
 
+		// Piante: ogni zona stampa la propria prima dei suoi articoli. Nella stampa
+		// raggruppata la zona padre porta anche quelle delle sue sottozone, i cui
+		// articoli confluiscono già nel suo elenco.
+		for ( var z in sortedZones ) {
+			z.plants = [];
+		}
+
+		if ( printParams.plants ?: false ) {
+			var allPlants = buildPlants( idPreventivo, allItems );
+
+			for ( var z in sortedZones ) {
+				for ( var plant in allPlants ) {
+					if ( plant.zoneId == z.getId() || ( printParams.grouped && plant.originId == z.getId() ) ) {
+						ArrayAppend( z.plants, plant );
+					}
+				}
+			}
+		}
+
 		return quoteObj;
 	}
 
@@ -761,6 +780,8 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 
 				ArrayAppend( plants, {
+					'zoneId'    = zone.getId(),
+					'originId'  = IsNull( zone.getOrigin() ) ? "" : zone.getOrigin().getId(),
 					'zoneName'  = zone.getName(),
 					'imagePath' = plantImagePath( zone.getImage() ),
 					'boxWidth'  = NumberFormat( boxWidth, "9.99" ),

@@ -166,6 +166,10 @@
 				#stanza.getName()#:
 				</cfif>
 				</div>
+				<!--- piante della zona ( vedi printZone ), prima dei suoi articoli --->
+				<cfloop array="#stanza.plants#" index="plant">
+					#printPlant( plant = plant, langId = langId )#
+				</cfloop>
 				<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
 					<thead>
 						<tr>
