@@ -159,19 +159,19 @@ component extends="AbsService" accessors="true" {
 		var body      = getRecoveryPwdEmailContent( resetUrl );
 
 		try {
+			// invio sincrono (spoolEnable = false): con lo spool un errore SMTP finisce solo nel
+			// mail.log di Lucee e il catch qui sotto non lo vede mai
 			cfmail(
-				to       = account.getEmail(),
-				from     = fromEmail,
-				subject  = "Recupero password",
-				type     = "html",
-				server   = mailHost,
-				port     = mailPort,
-				username = mailUser,
-				password = mailPwd,
-				useSSL   = mailSSL,
-				useTLS   = mailTLS,
-				// invio sincrono: con lo spool un errore SMTP finisce solo nel mail.log di Lucee
-				// e il catch qui sotto non lo vede mai
+				to          = account.getEmail(),
+				from        = fromEmail,
+				subject     = "Recupero password",
+				type        = "html",
+				server      = mailHost,
+				port        = mailPort,
+				username    = mailUser,
+				password    = mailPwd,
+				useSSL      = mailSSL,
+				useTLS      = mailTLS,
 				spoolEnable = false
 			) {
 				writeOutput( body );
