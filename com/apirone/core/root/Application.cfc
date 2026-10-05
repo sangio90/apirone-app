@@ -21,8 +21,9 @@ component {
 			port         = variables.settings.get( "mailserver.port" ),
 			username     = variables.settings.get( "mailserver.username" ),
 			password     = variables.settings.get( "mailserver.pwd" ),
-			ssl          = false,
-			tls          = true,
+			// porta 465 (es. smtps.aruba.it): ssl=true, tls=false. Porta 587: ssl=false, tls=true (STARTTLS)
+			ssl          = variables.settings.get( "mailserver.ssl", "false" ) == "true",
+			tls          = variables.settings.get( "mailserver.tls", "true" ) == "true",
 			lifeTimespan = CreateTimespan( 0, 0, 1, 0 ),
 			idleTimespan = CreateTimespan( 0, 0, 0, 10 )
 		}

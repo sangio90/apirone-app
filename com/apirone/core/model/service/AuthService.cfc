@@ -153,6 +153,8 @@ component extends="AbsService" accessors="true" {
 		var mailPort  = Val( sys.getProperty( "mailserver.port" ) );
 		var mailUser  = sys.getProperty( "mailserver.username" );
 		var mailPwd   = sys.getProperty( "mailserver.pwd" );
+		var mailSSL   = ( sys.getProperty( "mailserver.ssl" ) ?: "false" ) == "true";
+		var mailTLS   = ( sys.getProperty( "mailserver.tls" ) ?: "true" ) == "true";
 		var resetUrl  = "#siteMain#/manager/login/reset-password?token=#rawToken#";
 		var body      = getRecoveryPwdEmailContent( resetUrl );
 
@@ -165,7 +167,9 @@ component extends="AbsService" accessors="true" {
 				server   = mailHost,
 				port     = mailPort,
 				username = mailUser,
-				password = mailPwd
+				password = mailPwd,
+				useSSL   = mailSSL,
+				useTLS   = mailTLS
 			) {
 				writeOutput( body );
 			}
