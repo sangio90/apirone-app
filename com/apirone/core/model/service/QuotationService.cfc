@@ -466,8 +466,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				var attributeValue = productItem.getAttributeValue();
 				// Lettura individuale: l'attributeId arriva dal ProductItem già
-				// caricato, non è pre-raccoglibile in batch.
-				var attribute = getAttributeService().get( attributeId = attributeValue.getAttributeId() );
+				// caricato, non è pre-raccoglibile in batch. Se il chiamante passa
+				// maps.attributeMap la lettura si fa una volta sola per attributo.
+				var attributeId = attributeValue.getAttributeId();
+				var attribute   = NullValue();
+				if ( StructKeyExists( arguments.maps, "attributeMap" ) && StructKeyExists( arguments.maps.attributeMap, attributeId ) ) {
+					attribute = arguments.maps.attributeMap[ attributeId ];
+				} else {
+					attribute = getAttributeService().get( attributeId = attributeId );
+					if ( StructKeyExists( arguments.maps, "attributeMap" ) && !IsNull( attribute ) ) {
+						arguments.maps.attributeMap[ attributeId ] = attribute;
+					}
+				}
 				if ( IsNull( attribute ) ) {
 					outcome.error = "Attributo Prodotto non trovato.";
 					return outcome;
@@ -538,10 +548,23 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 		var jsonDataMap = getProductHashService().mapJsonDataByHashes( arguments.hashes );
 
+		// Le entità si caricano tutte insieme prima di comporre i codici: senza mappe
+		// composeExportCode legge prodotto, categoria, linea, modello, finitura e
+		// productItem con una get() a testa, per ogni voce (~10 s su 60 voci).
+		var dataByHash = {};
 		for ( var hash in jsonDataMap ) {
 			try {
-				var data    = DeserializeJson( jsonDataMap[ hash ] );
-				var outcome = composeExportCode( quotationItemData = data );
+				dataByHash[ hash ] = DeserializeJson( jsonDataMap[ hash ] );
+			} catch ( any error ) {
+				// json non leggibile: la voce resta senza codice
+			}
+		}
+
+		var maps = loadExportMaps( StructValueArray( dataByHash ) );
+
+		for ( var hash in dataByHash ) {
+			try {
+				var outcome = composeExportCode( quotationItemData = dataByHash[ hash ], maps = maps );
 
 				if ( outcome.success ) {
 					map[ hash ] = outcome.name;
@@ -552,6 +575,64 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return map;
+	}
+
+	/**
+	 * Mappe batch per composeExportCode, dai dati json delle voci: stesse entità e
+	 * stessi getMany() della fase 2 di exportProducts. attributeMap parte vuota e
+	 * la riempie composeExportCode man mano ( l'id attributo si conosce solo dopo
+	 * aver letto il productItem ).
+	 */
+	private Struct function loadExportMaps( required Array dataList ){
+		var ids = {
+			"product"        = [],
+			"category"       = [],
+			"line"           = [],
+			"model"          = [],
+			"finish"         = [],
+			"productItem"    = [],
+			"signConfigItem" = []
+		};
+
+		for ( var data in arguments.dataList ) {
+			if ( StructKeyExists( data, "productId" ) )  ArrayAppend( ids.product, data.productId );
+			if ( StructKeyExists( data, "categoryId" ) ) ArrayAppend( ids.category, data.categoryId );
+			if ( StructKeyExists( data, "lineId" ) )     ArrayAppend( ids.line, data.lineId );
+			if ( StructKeyExists( data, "modelId" ) )    ArrayAppend( ids.model, data.modelId );
+			if ( StructKeyExists( data, "finishId" ) )   ArrayAppend( ids.finish, data.finishId );
+
+			if ( StructKeyExists( data, "productItems" ) ) {
+				for ( var entry in data.productItems ) {
+					ArrayAppend( ids.productItem, entry.productItemId );
+				}
+			}
+
+			if ( StructKeyExists( data, "signageRows" ) && StructKeyExists( data, "signageConfigItemId" ) ) {
+				ArrayAppend( ids.signConfigItem, data.signageConfigItemId );
+			}
+		}
+
+		var maps = {
+			"productMap"        = ArrayLen( ids.product )        ? getProductService().getMany( ids.product )                   : {},
+			"categoryMap"       = ArrayLen( ids.category )       ? getProductCategoryService().getMany( ids.category )          : {},
+			"lineMap"           = ArrayLen( ids.line )           ? getLineService().getMany( ids.line )                         : {},
+			"modelMap"          = ArrayLen( ids.model )          ? getModelService().getMany( ids.model )                       : {},
+			"finishMap"         = ArrayLen( ids.finish )         ? getFinishService().getMany( ids.finish )                     : {},
+			"productItemMap"    = ArrayLen( ids.productItem )    ? getProductItemService().getMany( ids.productItem )           : {},
+			"signConfigItemMap" = ArrayLen( ids.signConfigItem ) ? getSignageConfigItemService().getMany( ids.signConfigItem ) : {},
+			"signConfigMap"     = {},
+			"attributeMap"      = {}
+		};
+
+		var signConfigIds = [];
+		for ( var signConfigItemId in maps.signConfigItemMap ) {
+			ArrayAppend( signConfigIds, maps.signConfigItemMap[ signConfigItemId ].getSignageConfigId() );
+		}
+		if ( ArrayLen( signConfigIds ) ) {
+			maps.signConfigMap = getSignageConfigService().getMany( signConfigIds );
+		}
+
+		return maps;
 	}
 
 	/**

@@ -26,12 +26,16 @@ component extends="com.apirone.core.controller.AbsController" {
 	// misure della placca intera: le placche hanno di norma 2-3 cm di corpo attorno ai frutti.
 	variables.PLATE_BORDER_FALLBACK_MM = 25;
 
+	// Lato lungo, in px, della copia di stampa delle planimetrie ( vedi printSizedImagePath ).
+	variables.PLANT_PRINT_MAX_PX = 1600;
+
 	// Tipologie generabili anche su un preventivo non ancora calcolato, perché il
 	// loro template non riporta prezzi né totali e quindi non legge quotationPrice.
 	// Tenere allineato REPORTS_WITHOUT_PRICE in app-quotation-detail.js.
 	variables.REPORTS_WITHOUT_PRICE = [ 'photo' ];
 
 	function print(event, rc, prc) {
+		request.printMarks = [ { "l" = "start", "t" = GetTickCount() } ]; // PERF-TMP
 
 		var idPreventivo = rc.id;
 		var printParams = {
@@ -84,9 +88,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Preventivo";
 
+		perfMark( "prima di Quotation.get" ); // PERF-TMP
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
 		var quotationPrice = service("QuotationPrice").getByQuotationId(quotationId = idPreventivo);
 
+		perfMark( "Quotation + QuotationPrice caricati" ); // PERF-TMP
 		var quoteObj = {
 			quotation      = quotation,
 			quotationPrice = quotationPrice,
@@ -115,6 +121,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			quoteObj = printClassic( quoteObj, printParams );
 		}
 
+		perfMark( "printClassic/printZone fatto" ); // PERF-TMP
 		var customerShippingProfile = {
 			'name' = '',
 			'via' = '',
@@ -164,7 +171,13 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
+		// PERF-TMP: cfdocument scrive il PDF e interrompe la richiesta, quindi il log va scritto nel finally
+		try {
+			event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
+		} finally {
+			perfMark( "conversione PDF (cfdocument)" ); // PERF-TMP
+			perfWrite( idPreventivo, printParams ); // PERF-TMP
+		}
 	}
 
 	/**
@@ -318,6 +331,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = quoteObj.quotation;
 		var idPreventivo = quotation.getId();
 		var items = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo ]);
+		perfMark( "classic: QuotationItem.list" ); // PERF-TMP
 		var productItems = items.filter(function(item) {
 			return !isNull(item.getProduct())
 		});
@@ -328,6 +342,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.items = items;
 		quoteObj.itemGroups = groupByCategoryType( items, printParams.groupByCategory ?: false );
 		quoteObj.articleItems = articleItems;
+		perfMark( "classic: groupItems + groupByCategoryType" ); // PERF-TMP
 
 		// Codici export delle voci, risolti qui in una sola query: i template ne
 		// hanno bisogno riga per riga e non devono interrogare il database.
@@ -342,6 +357,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 		quoteObj.exportCodes = super.fire( "ExportCode.mapByHashes", [ hashes ] );
+		perfMark( "classic: ExportCode.mapByHashes" ); // PERF-TMP
 
 		// Preventivo non ancora esportato: il codice si ricompone al volo con la
 		// stessa logica dell'esportazione (Quotation.composeExportCode), senza
@@ -360,6 +376,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
+		perfMark( "classic: codici export calcolati al volo" ); // PERF-TMP
 		// Piante: in testa al documento quando le voci sono in elenco unico,
 		// dentro ogni sezione quando sono separate per categoria.
 		quoteObj.plants = [];
@@ -367,24 +384,47 @@ component extends="com.apirone.core.controller.AbsController" {
 			group.plants = [];
 		}
 
+		// Le piante si costruiscono una volta sola dalle voci già lette; le sezioni per
+		// categoria ne prendono solo i marker del proprio tipo.
 		if ( printParams.plants ?: false ) {
+			var allPlants = buildPlants( idPreventivo, productItems );
+
 			if ( printParams.groupByCategory ?: false ) {
 				for ( var group in quoteObj.itemGroups ) {
-					group.plants = buildPlants( idPreventivo, group.id );
+					group.plants = plantsOfCategoryType( allPlants, group.id );
 				}
 			} else {
-				quoteObj.plants = buildPlants( idPreventivo );
+				quoteObj.plants = allPlants;
 			}
 		}
 
+		perfMark( "classic: piante (buildPlants)" ); // PERF-TMP
 		var allItems = [];
 		for ( var hashKey in quoteObj.items ) {
 			arrayAppend( allItems, quoteObj.items[hashKey].item );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
+		perfMark( "classic: buildModelConfigMap" ); // PERF-TMP
 		quoteObj.plateImages    = buildPlateCrops( allItems, quoteObj.modelConfigMap );
+		perfMark( "classic: buildPlateCrops" ); // PERF-TMP
 
 		return quoteObj;
+	}
+
+	// PERF-TMP: misura temporanea dei tempi di stampa, da rimuovere
+	private void function perfMark( required String label ){
+		if ( IsDefined( "request.printMarks" ) ) ArrayAppend( request.printMarks, { "l" = arguments.label, "t" = GetTickCount() } );
+	}
+
+	// PERF-TMP
+	private void function perfWrite( required String quotationId, required Struct printParams ){
+		var marks = request.printMarks;
+		var lines = [ "=== #DateTimeFormat( Now(), 'yyyy-mm-dd HH:nn:ss' )# #arguments.quotationId# #SerializeJSON( arguments.printParams )#" ];
+		for ( var i = 2; i <= ArrayLen( marks ); i++ ) {
+			lines.append( NumberFormat( marks[ i ].t - marks[ i - 1 ].t, "999999" ) & " ms  " & marks[ i ].l );
+		}
+		lines.append( NumberFormat( marks[ ArrayLen( marks ) ].t - marks[ 1 ].t, "999999" ) & " ms  TOTALE" );
+		FileAppend( ExpandPath( "/print-timing.log" ), ArrayToList( lines, Chr( 10 ) ) & Chr( 10 ) );
 	}
 
 	private Boolean function printFlag( required Struct rc, required String key ){
@@ -677,31 +717,43 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	/**
 	 * Piante da stampare: una per ogni zona che ha una planimetria e almeno un marker
-	 * visibile. Con categoryTypeId valorizzato tiene solo i marker di quel tipo, così
-	 * ogni sezione di categoria ha le sue piante dedicate.
+	 * visibile. Ogni marker porta il tipo di categoria della sua voce, così le sezioni
+	 * per categoria si ricavano con plantsOfCategoryType() senza rileggere niente.
+	 *
+	 * Le voci sono quelle già lette dalla stampa ( con la loro zona ): rileggerle zona
+	 * per zona, e per ogni sezione, costava più di un secondo.
 	 *
 	 * Il disegno è ricostruito dai dati ( coordinate 0-1, angolo, moltiplicatore ) e non
 	 * dalla cattura html2canvas della pagina Posizioni in pianta, che vive nel browser.
 	 *
-	 * @return Array di { zoneName, imagePath, markers = [ { x, y, size, angle, color, label } ] }
+	 * @return Array di { zoneName, imagePath, markers = [ { x, y, size, angle, color, label, typeId } ] }
 	 */
-	private Array function buildPlants( required String quotationId, String categoryTypeId = "" ){
-		var plants = [];
-		var zones  = super.fire( 'QuotationZone.list', [ 'quotationId' = arguments.quotationId ] );
+	private Array function buildPlants( required String quotationId, required Array items ){
+		var plants      = [];
+		var zones       = super.fire( 'QuotationZone.list', [ 'quotationId' = arguments.quotationId ] );
+		var itemsByZone = {};
+
+		for ( var thisItem in arguments.items ) {
+			var thisZone = thisItem.getQuotationZone();
+			if ( IsNull( thisZone ) ) continue;
+
+			if ( !StructKeyExists( itemsByZone, thisZone.getId() ) ) {
+				itemsByZone[ thisZone.getId() ] = [];
+			}
+			ArrayAppend( itemsByZone[ thisZone.getId() ], thisItem );
+		}
 
 		for ( var zone in zones ) {
 			if ( IsNull( zone.getImage() ) ) continue;
+			if ( !StructKeyExists( itemsByZone, zone.getId() ) ) continue;
 
-			var items   = super.fire( 'QuotationItem.list', [ 'quotationId' = arguments.quotationId, 'quotationZoneId' = zone.getId() ] );
 			var markers = [];
 
-			for ( var item in items ) {
+			for ( var item in itemsByZone[ zone.getId() ] ) {
 				if ( IsNull( item.getProduct() ) || IsNull( item.getPositions() ) ) continue;
 
 				var type   = categoryTypeOf( item );
 				var typeId = IsNull( type ) ? "" : type.getId();
-
-				if ( Len( arguments.categoryTypeId ) && typeId != arguments.categoryTypeId ) continue;
 
 				for ( var pos in item.getPositions() ) {
 					if ( IsNull( pos.getVisible() ) || !pos.getVisible() ) continue;
@@ -718,8 +770,9 @@ component extends="com.apirone.core.controller.AbsController" {
 						'size'  = size,
 						'angle' = angle,
 						'color' = color,
-						'pin'   = pinImagePath( size, angle, color ),
-						'label' = markerLabel( item )
+						'pin'    = pinImagePath( size, angle, color ),
+						'label'  = markerLabel( item ),
+						'typeId' = typeId
 					} );
 				}
 			}
@@ -753,6 +806,32 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	/**
+	 * Piante di una sezione di categoria: stesse piante, solo i marker di quel tipo.
+	 * Le zone senza marker del tipo spariscono.
+	 */
+	private Array function plantsOfCategoryType( required Array plants, required String categoryTypeId ){
+		var result = [];
+
+		for ( var plant in arguments.plants ) {
+			var markers = [];
+
+			for ( var marker in plant.markers ) {
+				if ( marker.typeId == arguments.categoryTypeId ) {
+					ArrayAppend( markers, marker );
+				}
+			}
+
+			if ( ArrayLen( markers ) ) {
+				var copy = StructCopy( plant );
+				copy.markers = markers;
+				ArrayAppend( result, copy );
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * Percorso su disco della planimetria, per cfdocument.
 	 *
 	 * Non si usa File.getPath() perché applica ExpandPath due volte e finisce per
@@ -768,11 +847,95 @@ component extends="com.apirone.core.controller.AbsController" {
 			var candidate = root & relative;
 
 			if ( FileExists( candidate ) ) {
-				return candidate;
+				return printSizedImagePath( candidate );
 			}
 		}
 
 		return arguments.file.getUri();
+	}
+
+	/**
+	 * Copia ridotta della planimetria per la stampa.
+	 *
+	 * La pianta occupa al massimo 17 cm: l'originale ( spesso 3000 px e oltre, più di
+	 * un MB ) finiva intero nel PDF, appesantendo documento e conversione. A
+	 * PLANT_PRINT_MAX_PX sul lato lungo restano circa 240 dpi, più che sufficienti.
+	 *
+	 * La copia sta nella cartella temporanea, con nome ricavato da percorso, data di
+	 * modifica e misura: si rigenera da sola se la planimetria cambia, e fra una
+	 * stampa e l'altra si riusa. Ridimensionamento con Graphics2D e non con
+	 * ImageResize, per lo stesso problema JAI descritto in pinImagePath().
+	 *
+	 * @return percorso della copia ridotta; l'originale se è già abbastanza piccolo
+	 *         o se la copia non si riesce a generare
+	 */
+	private String function printSizedImagePath( required String sourcePath ){
+		try {
+			var source   = CreateObject( "java", "java.io.File" ).init( arguments.sourcePath );
+			var maxPx    = variables.PLANT_PRINT_MAX_PX;
+			var dir      = GetTempDirectory() & "apirone-plant-images";
+			var name     = "plant_" & Hash( arguments.sourcePath & "|" & source.lastModified(), "MD5" ) & "_" & maxPx & ".jpg";
+			var path     = dir & "/" & name;
+
+			if ( FileExists( path ) ) {
+				return path;
+			}
+
+			var imageIO  = CreateObject( "java", "javax.imageio.ImageIO" );
+			var original = imageIO.read( source );
+
+			if ( IsNull( original ) ) {
+				return arguments.sourcePath;
+			}
+
+			var width  = original.getWidth();
+			var height = original.getHeight();
+			var scale  = maxPx / Max( width, height );
+
+			if ( scale GTE 1 ) {
+				return arguments.sourcePath;
+			}
+
+			var newWidth  = Max( 1, Round( width * scale ) );
+			var newHeight = Max( 1, Round( height * scale ) );
+
+			var resized = CreateObject( "java", "java.awt.image.BufferedImage" ).init(
+				JavaCast( "int", newWidth ),
+				JavaCast( "int", newHeight ),
+				JavaCast( "int", 1 )   // TYPE_INT_RGB: il JPEG non ha trasparenza
+			);
+
+			var gfx   = resized.createGraphics();
+			var hints = CreateObject( "java", "java.awt.RenderingHints" );
+
+			gfx.setRenderingHint( hints.KEY_INTERPOLATION, hints.VALUE_INTERPOLATION_BILINEAR );
+			gfx.setRenderingHint( hints.KEY_RENDERING, hints.VALUE_RENDER_QUALITY );
+			// fondo bianco: un PNG con trasparenza diventerebbe nero in JPEG
+			gfx.setColor( CreateObject( "java", "java.awt.Color" ).WHITE );
+			gfx.fillRect( 0, 0, JavaCast( "int", newWidth ), JavaCast( "int", newHeight ) );
+			gfx.drawImage( original, 0, 0, JavaCast( "int", newWidth ), JavaCast( "int", newHeight ), JavaCast( "null", "" ) );
+			gfx.dispose();
+
+			if ( !DirectoryExists( dir ) ) {
+				DirectoryCreate( dir, true );
+			}
+
+			// scrittura su nome temporaneo e rinomina, come per i pin
+			var tmpPath = path & "." & CreateUUID() & ".tmp";
+
+			imageIO.write( resized, "jpg", CreateObject( "java", "java.io.File" ).init( tmpPath ) );
+
+			if ( FileExists( path ) ) {
+				FileDelete( tmpPath );
+			} else {
+				FileMove( tmpPath, path );
+			}
+
+			return path;
+		} catch ( any error ) {
+			// meglio la planimetria intera che una pianta mancante
+			return arguments.sourcePath;
+		}
 	}
 
 	/**
