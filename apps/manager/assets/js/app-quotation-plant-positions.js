@@ -74,6 +74,15 @@ AP.quotation.plantPositions = (function () {
 				selectedDraftId: null,
 				multiplierPos: null,
 				lastSizeMultiplier: null,
+				// Istantanea delle posizioni all'ultimo caricamento/salvataggio: la barra di
+				// salvataggio diventa gialla quando lo stato corrente se ne discosta.
+				savedPositionsSignature: null,
+				isSaving: false,
+				// La barra di salvataggio è position: fixed ( sticky non regge dentro il
+				// layout ): larghezza e posizione si copiano dalla card della pagina, e lo
+				// spaziatore ne occupa l'altezza così il contenuto non ci finisce sotto.
+				saveBarStyle: {},
+				saveBarHeight: 0,
             },
 
 			watch: {
@@ -83,6 +92,14 @@ AP.quotation.plantPositions = (function () {
 			},
 
 			computed: {
+				// Stesso contenuto inviato da savePositions: qualunque modifica salvabile
+				// ( spostamento, rotazione, dimensione, visibilità ) cambia la firma.
+				positionsSignature() {
+					return JSON.stringify(this.getPositions());
+				},
+				hasUnsavedChanges() {
+					return this.savedPositionsSignature !== null && this.positionsSignature !== this.savedPositionsSignature;
+				},
 				filteredQuotationItemsGroupedByType() {
 					let quotationItemsGroupedByType = {...this.quotationItemsGroupedByType}
 					if (!this.showAccessori) {
@@ -161,6 +178,44 @@ AP.quotation.plantPositions = (function () {
 						doDelete();
 					}
 				},
+				// Cestino del riquadro articolo: elimina la riga dell'articolo dal preventivo
+				// e con lei, in cascata, tutte le sue posizioni. Stesso endpoint del
+				// cestino nel dettaglio preventivo (QuotationItemAjaxController.delete),
+				// che ricalcola anche il prezzo degli articoli dello stesso scaglione.
+				deleteItem(quotationItem) {
+					const self = this;
+					const count = quotationItem.positions.length;
+
+					bootbox.confirm({
+						title: "Conferma eliminazione articolo",
+						message: "L'articolo verrà rimosso dal preventivo"
+							+ (count ? " insieme a tutte le sue " + count + " posizioni in pianta" : "")
+							+ ". Continuare?",
+						buttons: {
+							confirm: { label: "Si, elimina l'articolo", className: "btn-danger" },
+							cancel: { label: "Annulla", className: "btn-outline-secondary" }
+						},
+						callback: function (result) {
+							if (!result) return;
+
+							NM.util.ajax({
+								method: "DELETE",
+								url: "/manager/ajax/quotation-items",
+								data: quotationItem.id,
+								callback: {
+									done: function (xhr) {
+										if (xhr.status == "INVALID") {
+											NM.form.showMessages(xhr.data);
+											return;
+										}
+										AP.widget.notify("success", "Articolo eliminato dal preventivo.");
+										self.getItems();
+									}
+								}
+							});
+						}
+					});
+				},
 				getBackgroundColor: function(type) {
 					let backgroundColor = 'rgb(232, 93, 68)';
 					if (type === 'placche') {
@@ -205,6 +260,7 @@ AP.quotation.plantPositions = (function () {
                         // AP.widget.notify( "warning", "Selezionare una zona.");
                         self.quotationItems = [];
                         self.selectedZone = {};
+                        self.markPositionsSaved();
                         return;
                     }
 
@@ -237,6 +293,7 @@ AP.quotation.plantPositions = (function () {
                             });
                         }
                         self.quotationItems = res.data;
+                        self.markPositionsSaved();
                         await self.getDrafts();
 
                     } catch (err) {
@@ -253,15 +310,8 @@ AP.quotation.plantPositions = (function () {
                     this.selectedItemPosition = position;
                     this.selectedItemPositionId = position.id;
                     this.selectedQuotationItemId = position.quotationItemId;
-
-                    // Click sul marker: porta in vista il box corrispondente nell'elenco
-                    // ("nearest" non scrolla se è già visibile).
-                    if (source === 'marker') {
-                        this.$nextTick(() => {
-                            const card = document.getElementById('position-card-' + position.id);
-                            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        });
-                    }
+                    // Il box corrispondente nell'elenco si evidenzia ( position-card-selected )
+                    // ma la pagina non scorre: spostando un marker si perdeva di vista la pianta.
                 },
                 // Click sulla card dell'articolo (fuori da checkbox/cestino/matita/box posizione):
                 // seleziona la card e il suo marker (la prima posizione, se presente).
@@ -536,12 +586,28 @@ AP.quotation.plantPositions = (function () {
                     return fullText;
                 },
 
+                updateSaveBarLayout() {
+                    const bar = this.$refs.saveBar;
+                    if (!bar) return;
+                    const container = this.$el.closest('.card') || this.$el;
+                    const rect = container.getBoundingClientRect();
+                    this.saveBarStyle = { left: rect.left + 'px', width: rect.width + 'px' };
+                    this.saveBarHeight = bar.offsetHeight;
+                },
+                markPositionsSaved() {
+                    this.savedPositionsSignature = this.positionsSignature;
+                },
                 savePositions: async function () {
                     var self = this;
                     let quotationItemPositions = this.getPositions();
                     if (quotationItemPositions.length == 0) {
                         return;
                     }
+
+                    // la firma va presa ora: se l'utente sposta altro mentre la
+                    // richiesta è in corso, quelle modifiche restano da salvare
+                    const sentSignature = JSON.stringify(quotationItemPositions);
+                    self.isSaving = true;
 
                     await $.ajax({
                         url: "/manager/ajax/quotation-item-positions/",
@@ -552,15 +618,21 @@ AP.quotation.plantPositions = (function () {
                         contentType: "application/json"
                     })
                     .done(function (res) {
-                        if (res.status && res.status.toLowerCase() === "ERROR") {
-                            AP.widget.notify( "error", res.data.message || "Errore.");
+                        // il controller risponde "ERRORE" se il salvataggio fallisce
+                        var status = (res.status || "").toUpperCase();
+                        if (status === "ERROR" || status === "ERRORE" || status === "INVALID") {
+                            AP.widget.notify( "error", (res.data && (res.data.message || res.data.error)) || "Errore.");
                         } else {
-                            AP.widget.notify( "success", res.data.message || "Successo.");
+                            self.savedPositionsSignature = sentSignature;
+                            AP.widget.notify( "success", (res.data && res.data.message) || "Successo.");
                         }
                     })
                     .fail(function (err) {
                         AP.widget.notify( "error", "Errore sconosciuto durante il salvataggio.");
                     })
+                    .always(function () {
+                        self.isSaving = false;
+                    });
                 },
                 async printPlant() {
                     this.selectedItemPositionId = null;
@@ -960,6 +1032,23 @@ AP.quotation.plantPositions = (function () {
 				}
 
 				var self = this;
+
+				// Barra di salvataggio: si riallinea quando cambia la finestra, la card
+				// ( apertura/chiusura sidebar ) o la barra stessa ( messaggio su due righe )
+				self.$nextTick(function () { self.updateSaveBarLayout(); });
+				window.addEventListener('resize', function () { self.updateSaveBarLayout(); });
+				if (window.ResizeObserver) {
+					var saveBarObserver = new ResizeObserver(function () { self.updateSaveBarLayout(); });
+					saveBarObserver.observe(self.$el.closest('.card') || self.$el);
+					if (self.$refs.saveBar) saveBarObserver.observe(self.$refs.saveBar);
+				}
+
+				// Uscendo dalla pagina con posizioni non salvate il browser chiede conferma
+				window.addEventListener('beforeunload', function (e) {
+					if (!self.hasUnsavedChanges) return;
+					e.preventDefault();
+					e.returnValue = '';
+				});
 
 				// Deselezione con click fuori dal marker (listener in capture: i @click.stop dei figli non lo bloccano)
 				var mouseDownOutside = false;

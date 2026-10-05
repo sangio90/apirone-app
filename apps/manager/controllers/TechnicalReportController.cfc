@@ -35,7 +35,6 @@ component extends="com.apirone.core.controller.AbsController" {
 	variables.REPORTS_WITHOUT_PRICE = [ 'photo' ];
 
 	function print(event, rc, prc) {
-		request.printMarks = [ { "l" = "start", "t" = GetTickCount() } ]; // PERF-TMP
 
 		var idPreventivo = rc.id;
 		var printParams = {
@@ -88,11 +87,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		prc.title = "Preventivo";
 
-		perfMark( "prima di Quotation.get" ); // PERF-TMP
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
 		var quotationPrice = service("QuotationPrice").getByQuotationId(quotationId = idPreventivo);
 
-		perfMark( "Quotation + QuotationPrice caricati" ); // PERF-TMP
 		var quoteObj = {
 			quotation      = quotation,
 			quotationPrice = quotationPrice,
@@ -121,7 +118,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			quoteObj = printClassic( quoteObj, printParams );
 		}
 
-		perfMark( "printClassic/printZone fatto" ); // PERF-TMP
 		var customerShippingProfile = {
 			'name' = '',
 			'via' = '',
@@ -171,13 +167,7 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		// PERF-TMP: cfdocument scrive il PDF e interrompe la richiesta, quindi il log va scritto nel finally
-		try {
-			event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
-		} finally {
-			perfMark( "conversione PDF (cfdocument)" ); // PERF-TMP
-			perfWrite( idPreventivo, printParams ); // PERF-TMP
-		}
+		event.renderData( data = view( view = templatePath, args = params ), type = "PDF" );
 	}
 
 	/**
@@ -331,7 +321,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		var quotation = quoteObj.quotation;
 		var idPreventivo = quotation.getId();
 		var items = super.fire('QuotationItem.list', [ 'quotationId' = idPreventivo ]);
-		perfMark( "classic: QuotationItem.list" ); // PERF-TMP
 		var productItems = items.filter(function(item) {
 			return !isNull(item.getProduct())
 		});
@@ -342,7 +331,6 @@ component extends="com.apirone.core.controller.AbsController" {
 		quoteObj.items = items;
 		quoteObj.itemGroups = groupByCategoryType( items, printParams.groupByCategory ?: false );
 		quoteObj.articleItems = articleItems;
-		perfMark( "classic: groupItems + groupByCategoryType" ); // PERF-TMP
 
 		// Codici export delle voci, risolti qui in una sola query: i template ne
 		// hanno bisogno riga per riga e non devono interrogare il database.
@@ -357,7 +345,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 		quoteObj.exportCodes = super.fire( "ExportCode.mapByHashes", [ hashes ] );
-		perfMark( "classic: ExportCode.mapByHashes" ); // PERF-TMP
 
 		// Preventivo non ancora esportato: il codice si ricompone al volo con la
 		// stessa logica dell'esportazione (Quotation.composeExportCode), senza
@@ -376,7 +363,6 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		perfMark( "classic: codici export calcolati al volo" ); // PERF-TMP
 		// Piante: in testa al documento quando le voci sono in elenco unico,
 		// dentro ogni sezione quando sono separate per categoria.
 		quoteObj.plants = [];
@@ -398,34 +384,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			}
 		}
 
-		perfMark( "classic: piante (buildPlants)" ); // PERF-TMP
 		var allItems = [];
 		for ( var hashKey in quoteObj.items ) {
 			arrayAppend( allItems, quoteObj.items[hashKey].item );
 		}
 		quoteObj.modelConfigMap = buildModelConfigMap( allItems );
-		perfMark( "classic: buildModelConfigMap" ); // PERF-TMP
 		quoteObj.plateImages    = buildPlateCrops( allItems, quoteObj.modelConfigMap );
-		perfMark( "classic: buildPlateCrops" ); // PERF-TMP
 
 		return quoteObj;
 	}
 
-	// PERF-TMP: misura temporanea dei tempi di stampa, da rimuovere
-	private void function perfMark( required String label ){
-		if ( IsDefined( "request.printMarks" ) ) ArrayAppend( request.printMarks, { "l" = arguments.label, "t" = GetTickCount() } );
-	}
-
-	// PERF-TMP
-	private void function perfWrite( required String quotationId, required Struct printParams ){
-		var marks = request.printMarks;
-		var lines = [ "=== #DateTimeFormat( Now(), 'yyyy-mm-dd HH:nn:ss' )# #arguments.quotationId# #SerializeJSON( arguments.printParams )#" ];
-		for ( var i = 2; i <= ArrayLen( marks ); i++ ) {
-			lines.append( NumberFormat( marks[ i ].t - marks[ i - 1 ].t, "999999" ) & " ms  " & marks[ i ].l );
-		}
-		lines.append( NumberFormat( marks[ ArrayLen( marks ) ].t - marks[ 1 ].t, "999999" ) & " ms  TOTALE" );
-		FileAppend( ExpandPath( "/print-timing.log" ), ArrayToList( lines, Chr( 10 ) ) & Chr( 10 ) );
-	}
 
 	private Boolean function printFlag( required Struct rc, required String key ){
 		return StructKeyExists( arguments.rc, arguments.key ) && arguments.rc[ arguments.key ] == 'true';

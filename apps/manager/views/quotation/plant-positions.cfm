@@ -1,6 +1,35 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <cfoutput>
     <div id="quotation-plant-positions-root">
+		<style>
+			/* fixed sotto intestazione + barra blu del layout ( 90px, vedi html.fixed .inner-wrapper );
+			   left e width arrivano da updateSaveBarLayout() in app-quotation-plant-positions.js */
+			.plant-save-bar {
+				position: fixed;
+				top: 90px;
+				z-index: 1020;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				padding: .75rem 1rem;
+				background: var(--bs-white, white);
+				border-bottom: 1px solid rgba(0, 0, 0, .1);
+				box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+				transition: background-color .2s ease;
+			}
+			.plant-save-bar-dirty {
+				background: var(--bs-warning, rgb(255, 193, 7));
+				border-bottom-color: rgba(0, 0, 0, .2);
+			}
+			.plant-save-bar-message {
+				font-size: 1.05rem;
+				font-weight: 600;
+			}
+			.plant-save-bar-actions {
+				white-space: nowrap;
+			}
+		</style>
 
         <div class="row mb-2">
             <div class="col-12 pt-2">
@@ -16,16 +45,37 @@
 				<section class="card">
 					<div class="card-body">
                         <div id="vue-plant-positions-app" data-quotation-id="#prc.quotation.getId()#" data-base-url="#prc.baseUrl#">
+							<!--- Barra di salvataggio: resta in vista sotto l'intestazione mentre si scorre
+							      la pagina, e diventa gialla appena le posizioni differiscono da quelle salvate
+							      ( vedi hasUnsavedChanges in app-quotation-plant-positions.js ) --->
+							<div class="plant-save-bar" ref="saveBar" :style="saveBarStyle" :class="{ 'plant-save-bar-dirty': hasUnsavedChanges }">
+								<div class="plant-save-bar-message">
+									<template v-if="!selectedZoneId">
+										<i class="fas fa-info-circle me-2"></i>Seleziona una zona per posizionare gli articoli
+									</template>
+									<template v-else-if="hasUnsavedChanges">
+										<i class="fas fa-exclamation-triangle me-2"></i>Ci sono modifiche alle posizioni non ancora salvate
+									</template>
+									<template v-else>
+										<i class="fas fa-check-circle me-2"></i>Tutte le posizioni sono salvate
+									</template>
+								</div>
+								<div class="plant-save-bar-actions">
+									<button class="btn btn-lg" :class="hasUnsavedChanges ? 'btn-dark' : 'btn-primary'" @click="savePositions" :disabled="!selectedZoneId || isSaving">
+										<i class="fas" :class="isSaving ? 'fa-spinner fa-spin' : 'fa-save'"></i> Salva posizioni
+									</button>
+								</div>
+							</div>
+							<div :style="{ height: saveBarHeight + 'px' }" class="mb-3"></div>
                             <div class="loadingOverlay" v-if="isLoading">
                                 <i class="fas fa-spinner fa-spin fa-3x"></i>
                             </div>
 							<div class="row" style="font-size: .9em; font-style: italic;">
-								<div class="col-11">
+								<div class="col-10">
 									Quando si ruota un oggetto, è possibile usare gli "scatti" di rotazione oppure tenere premuto "shift" per una rotazione libera. Per spostare un oggetto, è sufficiente trascinarlo con il mouse.
 								</div>
-								<div class="col-1 d-flex align-items-center justify-content-end">
-									<button class="btn btn-primary" @click="savePositions" :disabled="!selectedZoneId">Salva posizioni <i class="fas fa-save"></i></button>
-									<button class="btn btn-primary" style="margin-left: 10px;" @click="printPlant" :disabled="!selectedZoneId">Stampa pianta <i class="fas fa-print"></i></button>
+								<div class="col-2 d-flex align-items-center justify-content-end">
+									<button class="btn btn-primary" @click="printPlant" :disabled="!selectedZoneId">Stampa pianta <i class="fas fa-print"></i></button>
 								</div>
 							</div>
                             <div class="row">
@@ -210,12 +260,20 @@
 														<span>
 											{{ quotationItem.type }}<span v-if="quotationItem.instanceGroupId" :title="'Istanza (' + quotationItem.instanceGroupCount + ')'" style="margin-left:.4em; color:##888; font-size:.8em;"><i class="fas fa-link"></i></span>
 														</span>
-														<i
-															class="fas fa-pencil-alt"
-															style="cursor:pointer; color:##555;"
-															title="Modifica articolo"
-															@click.stop="editItem(quotationItem)"
-														></i>
+														<span style="white-space:nowrap;">
+															<i
+																class="fas fa-pencil-alt"
+																style="cursor:pointer; color:##555;"
+																title="Modifica articolo"
+																@click.stop="editItem(quotationItem)"
+															></i>
+															<i
+																class="fas fa-trash-alt"
+																style="cursor:pointer; color:##c0392b; margin-left:.6em;"
+																title="Elimina articolo dal preventivo"
+																@click.stop="deleteItem(quotationItem)"
+															></i>
+														</span>
 										</div>
 													<!-- HEADER ITEM -->
 													<div class="quotation-item-header">

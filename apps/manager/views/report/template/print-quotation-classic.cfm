@@ -11,7 +11,7 @@
 			? LSNumberFormat( proformaAmount, "9,999.99", "it_IT" ) & " &euro; " & printLabel( 'advancePayment', langId )
 			: ( proformaPercent EQ Int( proformaPercent ) ? Int( proformaPercent ) : LSNumberFormat( proformaPercent, "9.99" ) ) & "% " & printLabel( 'advancePayment', langId )>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="2.6" marginLeft="0.1" marginRight="0.1">
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: inizio corpo cfdocument", "t" = GetTickCount() } )><!--- PERF-TMP --->		#printStyle()#
+		#printStyle()#
 		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
 			<style>
 				@page {
@@ -149,10 +149,10 @@
 				<!--- fattore unico per le placche ritagliate: la piu' grande riempie il box,
 				      le altre le restano proporzionate --->
 				<cfset imgScale = printImageScale( data = args.data, boxWidthCm = 5, boxHeightCm = 5 )>
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: intestazione e cliente fatti", "t" = GetTickCount() } )><!--- PERF-TMP --->				<cfloop array="#args.data.plants#" index="plant">
+				<cfloop array="#args.data.plants#" index="plant">
 					#printPlant(plant = plant, langId = langId)#
 				</cfloop>
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: piante in testa fatte", "t" = GetTickCount() } )><!--- PERF-TMP --->				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
+				<cfloop array="#args.data.itemGroups#" index="categoryGroup">
 					<cfset groupItemsCount = ArrayLen( categoryGroup.items )>
 					<cfset groupPlantsCount = ArrayLen( categoryGroup.plants )>
 					<cfset sectionTitle = Len( categoryGroup.id ) ? printCategoryType(categoryGroup.id, categoryGroup.name, langId) : "">
@@ -335,7 +335,7 @@
 						</table>
 					</cfif>
 				</cfloop>
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: gruppi voci fatti", "t" = GetTickCount() } )><!--- PERF-TMP --->				<div style="width: 100%; height: 5mm;"></div>
+				<div style="width: 100%; height: 5mm;"></div>
 				<cfif ArrayLen( args.data.articleItems ) GT 0>
 					<!--- come per le voci: una tabella sola, intestazione nel <thead> --->
 					<table style="border-collapse: collapse; width: 100%; -fs-table-paginate: paginate;">
@@ -467,8 +467,8 @@
 				<cfif isProforma>
 					<div class="not-fiscal">#printLabel('notFiscalDocument', langId)#</div>
 				</cfif>
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: servizi e totali fatti", "t" = GetTickCount() } )><!--- PERF-TMP --->				#getFinalForm( langId, isProforma )#
-<cfset ArrayAppend( request.printMarks, { "l" = "tpl: fine corpo (inizia conversione PDF)", "t" = GetTickCount() } )><!--- PERF-TMP --->			</cfoutput>
+				#getFinalForm( langId, isProforma )#
+			</cfoutput>
 		</div>
     </cfdocument>
 
