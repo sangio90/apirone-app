@@ -739,6 +739,36 @@ AP.signage.modal = ( function() {
             }
         },
 
+        /*
+            Drag & drop delle righe ( kendoSortable su #signage-rows-container, vedi
+            initSignageRowsSortable ). Si riordina il DataSource invece di fidarsi del DOM
+            spostato dal Sortable: con data( nuovoArray ) il binding "source" ridisegna da
+            capo sia l'elenco sia l'anteprima nel nuovo ordine. "index" diventa l'orderby
+            al salvataggio ( QuotationItemAjaxController ), quindi l'ordine resta.
+        */
+        moveSignageRow: function( oldIndex, newIndex ) {
+            const ds = viewModel.get( "detailForm.data.quotationItem.signageRows" );
+            if ( !ds || oldIndex === newIndex ) { return; }
+
+            const rows  = ds.data().map( function( row ) { return row.toJSON(); } );
+            const moved = rows.splice( oldIndex, 1 )[0];
+            rows.splice( newIndex, 0, moved );
+            rows.forEach( function( row, i ) { row.index = i + 1; } );
+
+            ds.data( rows );
+
+            // stessi passaggi del caricamento: anteprima ( interlinea per posizione
+            // compresa ), contatori caratteri e icona di allineamento selezionata
+            ds.data().forEach( function( signageRow ) {
+                viewModel.parsedLineContent( signageRow.content, signageRow.id );
+                viewModel.updateCharCounter( {
+                    currentTarget: document.getElementById( signageRow.uid + "_contentInput" )
+                } );
+            } );
+            viewModel.setSelectedTextAlignIcon();
+            viewModel.checkCanSave();
+        },
+
         setSelectedTextAlignIcon: function() {
             var rows = $( "#signage-rows-container" ).find( ".signage-row" );
             rows.each( function( index, row ) {
@@ -2205,8 +2235,44 @@ AP.signage.modal = ( function() {
         viewModel.set( "detailForm.data.quotationItem.product.plateSizeAndMarginNotFilled", marginLeft <= 0 || marginTop <= 0 || plateWidth <= 0 || plateHeight <= 0 );
     };
 
+    // Il Sortable sta sul contenitore, che resta lo stesso per tutta la vita della
+    // pagina: le righe dentro vengono ridisegnate dal binding, ma il filter le trova
+    // comunque. Si trascina solo dalla maniglia, così nei campi testo si seleziona normalmente.
+    var initSignageRowsSortable = function() {
+        var container = $( "#signage-rows-container" );
+        if ( !container.length || container.data( "kendoSortable" ) ) { return; }
+
+        container.kendoSortable( {
+            axis: "y",
+            filter: ">.signage-row",
+            handler: ".signage-row-handle",
+            cursor: "move",
+            container: container,
+            // niente .sortable-hint / .sortable-placeholder di style.css: sono pensati
+            // per le righe di tabella e deformerebbero il riquadro della riga
+            hint: function( element ) {
+                return element.clone().css( {
+                    width: element.outerWidth(),
+                    background: "white",
+                    opacity: 0.9,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, .25)"
+                } );
+            },
+            placeholder: function( element ) {
+                return element.clone().css( {
+                    opacity: 0.35,
+                    borderStyle: "dashed"
+                } );
+            },
+            change: function( e ) {
+                viewModel.moveSignageRow( e.oldIndex, e.newIndex );
+            }
+        } );
+    };
+
     pub.init = function() {
         kendo.bind( AP.signage.fields.modalRoot, viewModel );
+        initSignageRowsSortable();
 
         // Il preview di ogni riga (parsedLineContent) dipende da fontFamilyName. Cambiando
         // Linea/Modello/Finitura il font può cambiare a cascata senza che l'utente tocchi mai

@@ -4,8 +4,8 @@
     <nmscript type="text/x-kendo-template" id="signage-line-row-tmpl" data-id="##: id ##">
         <div class="border rounded p-3 mb-3 signage-row">
             <div class="mb-3 row">
-                <div class="col-2 text-start">
-                    Riga N°<span data-bind="text: index"></span>
+                <div class="col-2 text-start text-nowrap">
+                    <i class="fas fa-grip-vertical signage-row-handle text-muted me-2" title="Trascina per spostare la riga" style="cursor: move;"></i>Riga N°<span data-bind="text: index"></span>
                 </div>
                 <div class="col-6 pl-0-ml-3">
                     <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignageRow">
