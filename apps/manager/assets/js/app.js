@@ -20,6 +20,53 @@ $( document ).ready( function() {
 
 } );
 
+/*
+    ESC chiude la modale aperta.
+
+    Bootstrap lo fa da sé solo se la modale prende il focus, cioè se ha tabindex="-1":
+    la maggior parte delle modali del manager non lo ha, il focus resta sulla pagina e
+    l'ESC non arriva mai alla modale. Invece di toccare ogni vista, qui un gestore unico:
+    - chiude solo la modale aperta per ultima ( pila aggiornata da shown/hidden ), così
+      con due modali sovrapposte si chiude quella sopra;
+    - non interviene quando Bootstrap gestisce già l'ESC ( modale con tabindex e focus
+      dentro: es. le conferme bootbox, che hanno una loro logica sull'ESC );
+    - rispetta keyboard: false / data-bs-keyboard="false";
+    - lascia l'ESC ai popup Kendo aperti ( tendine, calendari ): prima si chiude quello;
+    - usa hide() di Bootstrap, quindi gli handler su hide.bs.modal valgono come sempre.
+*/
+( function() {
+    var openModals = [];
+
+    $( document )
+        .on( "shown.bs.modal", ".modal", function() {
+            openModals = openModals.filter( function( el ) { return el !== this; }, this );
+            openModals.push( this );
+        } )
+        .on( "hidden.bs.modal", ".modal", function() {
+            openModals = openModals.filter( function( el ) { return el !== this; }, this );
+        } )
+        .on( "keydown.apModalEsc", function( e ) {
+            if ( e.key !== "Escape" || e.isDefaultPrevented() ) { return; }
+
+            // popup Kendo aperto: l'ESC è suo
+            if ( $( ".k-animation-container:visible" ).length ) { return; }
+
+            var top = null;
+            for ( var i = openModals.length - 1; i >= 0; i-- ) {
+                if ( $( openModals[ i ] ).hasClass( "show" ) ) { top = openModals[ i ]; break; }
+            }
+            if ( !top || typeof bootstrap === "undefined" ) { return; }
+
+            // con tabindex e focus dentro la modale ci pensa già Bootstrap
+            if ( top.hasAttribute( "tabindex" ) && top.contains( e.target ) ) { return; }
+
+            var modal = bootstrap.Modal.getInstance( top );
+            if ( !modal || ( modal._config && modal._config.keyboard === false ) ) { return; }
+
+            modal.hide();
+        } );
+}() );
+
 AP.core = ( function() {
 
     var pub = {};
