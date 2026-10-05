@@ -675,8 +675,37 @@ AP.signage.modal = ( function() {
             return { totalOccurrences, totalChars };
         },
 
+        /*
+            Riporta le sigle dei pittogrammi al codice ufficiale a prescindere da maiuscole
+            e minuscole: "<MAN>" o "<Man>" diventano "<man>". Tutto il resto ( anteprima,
+            conteggio caratteri, avviso pittogrammi a dimensione 0, testo salvato ) confronta
+            il codice esatto, quindi basta normalizzare qui all'ingresso. Le sigle non
+            riconosciute restano come sono.
+        */
+        normalizePictogramCodes: function( text ) {
+            if ( !text ) { return text; }
+
+            const canonical = {};
+            ( viewModel.get( "pictogramNames" ) || [] ).forEach( function( name ) {
+                canonical[ String( name ).toLowerCase() ] = name;
+            } );
+
+            return String( text ).replace( /<[^<>]+>/g, function( code ) {
+                return canonical[ code.toLowerCase() ] || code;
+            } );
+        },
+
         updateCharCounter: function( e ) {
             const signageConfig = viewModel.getSignageConfig();
+
+            // sigle in maiuscolo: si normalizzano prima di contare e disegnare
+            if ( e.currentTarget && e.currentTarget.value ) {
+                const normalized = viewModel.normalizePictogramCodes( e.currentTarget.value );
+                if ( normalized !== e.currentTarget.value ) {
+                    e.currentTarget.value = normalized;
+                }
+            }
+
             let charCount = e.currentTarget.value.length;
             const realContent = e.currentTarget?.value || 0;
             const pictogramNames = viewModel.get( "pictogramNames" );
@@ -2246,6 +2275,9 @@ AP.signage.modal = ( function() {
             axis: "y",
             filter: ">.signage-row",
             handler: ".signage-row-handle",
+            // senza ignore il Sortable intercetta la pressione del mouse su tutta la riga
+            // ( anche fuori dalla maniglia ) e i campi non prendono più il focus
+            ignore: "input, textarea, select, button, .btn, [data-bind*='click']",
             cursor: "move",
             container: container,
             // niente .sortable-hint / .sortable-placeholder di style.css: sono pensati
