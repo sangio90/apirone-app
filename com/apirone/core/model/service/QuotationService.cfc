@@ -1144,6 +1144,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						quotationData["MMUTECOM"] = salesAgentId;
 						quotationData["MMUTETEC"] = graphicTechnicianId;
 					}
+					// Nota della riga del preventivo (campo "Note"), sia per articoli che per prodotti
+					quotationData["MMANNDET"] = quotationItem.getNote() ?: "";
 					ArrayAppend( quotationItemsToExport, quotationData );
 					index = index + 1;
 				}
