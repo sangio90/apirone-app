@@ -279,6 +279,7 @@ AP.signage.modal = ( function() {
             viewModel.set( "disabledPictogramsWarning", "" );
             // immagini della famiglia dell'articolo aperto prima: non devono restare
             viewModel.set( "pictogramImages", {} );
+            $( "#signage-preview-attribute-layers" ).empty();
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageLine" ).prop( "disabled", false );
@@ -1144,6 +1145,7 @@ AP.signage.modal = ( function() {
                         viewModel.set( "detailForm.data.quotationItem.product.marginLeft", xhr2.data.marginLeft );
                     }
                     viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
+                    viewModel.renderAttributePreview();
                     if ( xhr2.data.file ) {
                         viewModel.set( "backgroundImage", xhr2.data.file );
                         viewModel.set( "backgroundImage.url", xhr2.data.file.uri );
@@ -1303,7 +1305,9 @@ AP.signage.modal = ( function() {
                                             parent_attribute_id: null,
                                             parent_item_id: null,
                                             level: 0,
-                                            selected: false
+                                            selected: false,
+                                            horizontalImage: item.horizontalImage,
+                                            verticalImage: item.verticalImage
                                         } );
                                         productItems.trigger( "change" );
                                     }
@@ -1318,7 +1322,9 @@ AP.signage.modal = ( function() {
                                             {
                                                 attributeValue: item.attributeValue,
                                                 product_item_id: item.id,
-                                                selected: false
+                                                selected: false,
+                                                horizontalImage: item.horizontalImage,
+                                                verticalImage: item.verticalImage
                                             }
                                         ]
                                     };
@@ -1478,7 +1484,9 @@ AP.signage.modal = ( function() {
                                     attribute.values.push( {
                                         attributeValue: item.attributeValue,
                                         product_item_id: item.id,
-                                        selected: false
+                                        selected: false,
+                                        horizontalImage: item.horizontalImage,
+                                        verticalImage: item.verticalImage
                                     } );
                                     lastAttributeId = item.attribute.id;
                                 } );
@@ -1700,6 +1708,41 @@ AP.signage.modal = ( function() {
                     }
                     subContainer.append( inputNote );
                 }
+            } );
+
+            viewModel.renderAttributePreview();
+        },
+
+        /*
+            Immagini dei valori di attributo selezionati ( es. FISSAGGIO = VITI A VISTA +
+            BORCHIE ), sovrapposte all'immagine del prodotto nell'anteprima: stesso
+            meccanismo di renderProductPreview nella modale accessori. Prima l'immagine del
+            product item, poi quella del valore di attributo. Stanno nel livello
+            #signage-preview-attribute-layers, tra lo sfondo e il testo, così finiscono anche
+            nell'immagine salvata generata dall'anteprima.
+        */
+        renderAttributePreview: function() {
+            const layers = $( "#signage-preview-attribute-layers" );
+            layers.empty();
+
+            const productItems = viewModel.get( "detailForm.data.quotationItem.product.items" );
+            if ( !productItems || typeof productItems.data !== "function" ) { return; }
+
+            productItems.data().forEach( function( item ) {
+                ( item.values || [] ).forEach( function( value ) {
+                    if ( !value.selected ) { return; }
+
+                    const image = value.horizontalImage || ( value.attributeValue && value.attributeValue.horizontalImage );
+                    if ( image && image.uri ) {
+                        layers.append( $( "<img>" ).attr( "src", image.uri ).css( {
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "500px",
+                            height: "auto"
+                        } ) );
+                    }
+                } );
             } );
         },
 

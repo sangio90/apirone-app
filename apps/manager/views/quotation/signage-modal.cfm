@@ -161,6 +161,9 @@
                                     style="position: relative"
                                     >
                                     <img style="width: 500px!important; height: auto!important;" data-bind="attr: { src: backgroundImage.url }, visible: backgroundImage.url" />
+                                    <!--- immagini dei valori di attributo selezionati ( renderAttributePreview ): sopra
+                                          lo sfondo, sotto il testo che segue nel DOM --->
+                                    <div id="signage-preview-attribute-layers" style="position: absolute; top: 0; left: 0; width: 500px; pointer-events: none;"></div>
                                     <div id="signage-preview-container"
                                         class="d-flex flex-column justify-content-center"
                                         style="position: absolute; top: 0; left: 0;"
