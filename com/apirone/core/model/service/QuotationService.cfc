@@ -1483,6 +1483,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFSTAISO" = customer.getCountry()?.getIsoCode(),
 			"CFPARIVA" = customer.getVatNumber(),
 			"CFTELEFO" = customer.getPhone(),
+			"CFEMAIL"  = customer.getEmail() ?: "", // email del cliente dal CRM ( CrmMapper.extractEmail )
 			"CFBLOCCO" = "N",
 			"CFMOROSO" = "N",
 			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",

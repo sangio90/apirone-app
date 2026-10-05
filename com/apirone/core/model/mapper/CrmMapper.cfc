@@ -53,10 +53,10 @@
 			customer.setShippingProfiles( addressesList );
 		}
 
-		// Email del cliente ("Indirizzo Email" primario nel CRM).
-		// ATTENZIONE: ad oggi l'endpoint /accounts non la espone in nessuna forma, quindi
-		// resta vuota; leggiamo tutte le chiavi standard SuiteCRM così si popola da sola
-		// non appena l'API inizierà a restituirla.
+		// Email del cliente ("Indirizzo Email" primario nel CRM). Arriva nella chiave
+		// "email" come testo semplice ( al 2026-09-21 valorizzata su ~16.000 account su
+		// ~24.600 ); le altre chiavi standard SuiteCRM restano come fallback. Va anche
+		// nell'export ordini verso Verticale ( ORDINI_APIR.CFEMAIL ).
 		customer.setEmail( extractEmail( data ) );
 
 		// Email del referente: campo custom referente_email, distinto da quello del cliente.
