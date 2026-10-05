@@ -101,7 +101,11 @@ component extends="com.apirone.core.controller.AbsController" {
 
 			Location( "/manager/dashboard", false );
 		} else {
-			setMessage( "Login e/o password errate.", "warning" );
+			if ( !IsNull( access.getError() ) && access.getError().getType() == "TooManyAttempts" ) {
+				setMessage( "Troppi tentativi di accesso. Riprova tra qualche minuto.", "danger" );
+			} else {
+				setMessage( "Login e/o password errate.", "warning" );
+			}
 
 			// TODO: Report Ortus:
 			// - only with "/manager/login" it location to "index.cfm?/manager/login"

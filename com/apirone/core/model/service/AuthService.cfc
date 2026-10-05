@@ -2,6 +2,18 @@ component extends="AbsService" accessors="true" {
 
 	property name="AccountService" inject="AccountService";
 	property name="AccountRememberTokenDAO" inject="AccountRememberTokenDAO";
+	property name="AuthAttemptDAO" inject="AuthAttemptDAO";
+
+	/*
+		Rate limit (tabella auth_attempts). Tre contatori per finestra:
+		- account+IP: il caso normale di chi sbaglia/indovina la password di un account;
+		- IP: un IP che prova molti account diversi (l'ufficio condivide un solo IP: soglia larga);
+		- account: un account attaccato da più IP. Soglia larga perché un attaccante può usarla
+		  per bloccare il legittimo proprietario: il blocco dura al massimo la finestra.
+		I tentativi respinti dal limite non vengono contati, così il blocco scade comunque.
+	*/
+	variables.LOGIN_LIMITS   = { minutes = 15, byPair = 5, byIp = 30, byIdentifier = 30 };
+	variables.RECOVER_LIMITS = { minutes = 60, byPair = 3, byIp = 10, byIdentifier = 3 };
 
 	public com.apirone.core.model.bean.LoginResult function login( required String email, required String pwd ){
 		
@@ -10,6 +22,28 @@ component extends="AbsService" accessors="true" {
 		var hasError = false;
 
 		result.setStatus( false );
+
+		var identifier = attemptIdentifier( arguments.email );
+		var ipAddress  = new com.apirone.core.util.ClientIP().get();
+
+		if ( isThrottled( "LOGIN", identifier, ipAddress, variables.LOGIN_LIMITS ) ) {
+			error.setType( "TooManyAttempts" );
+			error.setMessage( "Too many failed attempts" );
+			result.setError( error );
+
+			super.logEvent(
+				payload = {
+					"email" = arguments.email,
+					"error" = { "type" = error.getType(), "message" = error.getMessage() }
+				},
+				event          = "auth.failed",
+				message        = "Email [#arguments.email#] failed to log in. Type: [#error.getType()#] message: #error.getMessage()#",
+				severity       = "WARNING",
+				allowAnonymous = true
+			);
+
+			return result;
+		}
 
 		var account = getAccountService().getByEmail( arguments.email );
 
@@ -39,6 +73,8 @@ component extends="AbsService" accessors="true" {
 		if ( hasError ) {
 			result.setError( error )
 
+			getAuthAttemptDAO().insert( "LOGIN", identifier, ipAddress );
+
 			super.logEvent(
 				payload = {
 					"email" = arguments.email,
@@ -52,6 +88,8 @@ component extends="AbsService" accessors="true" {
 		} else {
 			result.setAccount( account );
 			result.setStatus( true );
+
+			getAuthAttemptDAO().deleteByIdentifier( "LOGIN", identifier );
 
 			super.logEvent(
 				payload = {
@@ -87,6 +125,15 @@ component extends="AbsService" accessors="true" {
 	}
 
 	public void function sendRecoveryEmail( required String email ){
+		// Ogni richiesta conta, anche per email non registrate: il controller risponde comunque
+		// con lo stesso messaggio generico, quindi il blocco non rivela se l'account esiste.
+		var identifier = attemptIdentifier( arguments.email );
+		var ipAddress  = new com.apirone.core.util.ClientIP().get();
+
+		if ( isThrottled( "RECOVER", identifier, ipAddress, variables.RECOVER_LIMITS ) ) return;
+
+		getAuthAttemptDAO().insert( "RECOVER", identifier, ipAddress );
+
 		var account = getAccountService().getByEmail( arguments.email );
 		if ( isNull( account ) ) return;
 
@@ -167,6 +214,23 @@ component extends="AbsService" accessors="true" {
 			<p><a href=""#arguments.resetUrl#"">Cambia password</a></p>
 			<p>Se non hai richiesto il recupero della password, ignora questa email.</p>
 		";
+	}
+
+	private Boolean function isThrottled( required String kind, required String identifier, required String ipAddress, required Struct limits ){
+		var counts = getAuthAttemptDAO().countRecent(
+			kind       = arguments.kind,
+			identifier = arguments.identifier,
+			ipAddress  = arguments.ipAddress,
+			minutes    = arguments.limits.minutes
+		);
+
+		return counts.by_pair >= arguments.limits.byPair
+			|| counts.by_ip >= arguments.limits.byIp
+			|| counts.by_identifier >= arguments.limits.byIdentifier;
+	}
+
+	private String function attemptIdentifier( required String email ){
+		return Hash( LCase( Trim( arguments.email ) ), "SHA-256" );
 	}
 
 }

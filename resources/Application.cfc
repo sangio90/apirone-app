@@ -32,19 +32,8 @@
     }
 
 	private function getRealIP(){
-
-        var headers = GetHTTPRequestData().headers;
-
-        if ( StructKeyExists( headers, "x-cluster-client-ip" ) ) {
-			return headers[ "x-cluster-client-ip" ];
-		}
-		if ( StructKeyExists( headers, "X-Forwarded-For" ) ) {
-			return headers[ "X-Forwarded-For" ];
-		}
-
-		return Len( CGI.REMOTE_ADDR ) ? Trim( listFirst( CGI.REMOTE_ADDR ) ) : "999.999.999.999";
-
-    }
+		return new com.apirone.core.util.ClientIP().get();
+	}
 
 	private Void function loadColdbox(){
 		
