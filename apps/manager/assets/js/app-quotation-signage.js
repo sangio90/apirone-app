@@ -145,6 +145,10 @@ AP.signage.modal = ( function() {
         // Picto usati nelle righe ma con dimensione 0 per l'altezza scelta (es. "<su>, <dx>"):
         // non vengono disegnati, l'avviso sopra l'anteprima lo segnala. "" = nessun avviso.
         zeroPictogramsWarning: "",
+        // picto usati nelle righe ma non disegnati: senza immagine caricata per la
+        // famiglia del font, oppure con i pittogrammi disattivati per l'altezza scelta
+        missingPictogramsWarning: "",
+        disabledPictogramsWarning: "",
         modelConfig: {
             height: null,
             width: null
@@ -271,6 +275,10 @@ AP.signage.modal = ( function() {
             viewModel.set( "jsonExportLoading", false );
             viewModel.set( "savedExportCode", "" );
             viewModel.set( "zeroPictogramsWarning", "" );
+            viewModel.set( "missingPictogramsWarning", "" );
+            viewModel.set( "disabledPictogramsWarning", "" );
+            // immagini della famiglia dell'articolo aperto prima: non devono restare
+            viewModel.set( "pictogramImages", {} );
 
             $( "#signangeProductCategory" ).prop( "disabled", false );
             $( "#signageLine" ).prop( "disabled", false );
@@ -306,22 +314,27 @@ AP.signage.modal = ( function() {
             return false;
         },
 
+        // Elenco dell'helper: solo i pittogrammi che per la famiglia del font corrente
+        // hanno un'immagine, cioè quelli che verranno davvero disegnati.
         parsedPictograms: function() {
             return this.pictogramNames.map( p => {
                 const name = p.replace( /[<>]/g, "" );
-                const src = this.getPictogramSrc( name, "Arial" );
+                const src = this.getPictogramSrc( name );
+                if ( !src ) { return null; }
                 return {
                     label: name,
                     image: `<img src="${this.escapeHtml( src )}" alt="${name}" class="pictogram px-2" style="height: 30px; width: 30px;">`
                 };
-            } );
+            } ).filter( Boolean );
         },
 
-        // URL dell'immagine del pittogramma: quella caricata dall'utente per la famiglia del
-        // font corrente (Font family > Pittogrammi); se manca, l'SVG statico negli assets.
-        getPictogramSrc: function( pictogramName, fontFamilyName ) {
-            const uploaded = this.get( "pictogramImages" ) ? this.get( "pictogramImages" )[ pictogramName ] : null;
-            return uploaded || "/assets/main/pictograms/" + fontFamilyName + "/" + pictogramName + ".svg";
+        // URL dell'immagine del pittogramma caricata per la famiglia del font corrente
+        // (Font family > Pittogrammi), null se non c'è. Niente fallback sugli SVG statici
+        // di /assets/main/pictograms/: un picto senza immagine non si disegna, come quelli
+        // con dimensione 0 o con i pittogrammi disattivati per l'altezza.
+        getPictogramSrc: function( pictogramName ) {
+            const images = this.get( "pictogramImages" );
+            return images && images[ pictogramName ] ? images[ pictogramName ] : null;
         },
         pictogramHelper: false,
 
@@ -556,7 +569,8 @@ AP.signage.modal = ( function() {
                 // Dimensione configurata a 0 = picto non disponibile per questa altezza:
                 // non si disegna (nessun fallback all'altezza del font). Senza record
                 // di dimensione resta invece il fallback all'altezza del font.
-                if ( !pictogramsEnabled || ( dim && !( dim.width > 0 && dim.height > 0 ) ) ) {
+                const pictogramSrc = this.getPictogramSrc( pictogramName );
+                if ( !pictogramsEnabled || !pictogramSrc || ( dim && !( dim.width > 0 && dim.height > 0 ) ) ) {
                     lastIndex = pictogramRegex.lastIndex;
                     continue;
                 }
@@ -576,7 +590,7 @@ AP.signage.modal = ( function() {
                     : "height: " + pictogramHeightPx + "px;" ) +
                     " vertical-align: calc(0.35em - " + ( imgHeightPx / 2 ) + "px);";
                 const imgHtml =
-                    "<img src=\"" + this.escapeHtml( this.getPictogramSrc( pictogramName, fontFamilyName ) ) + "\" " +
+                    "<img src=\"" + this.escapeHtml( pictogramSrc ) + "\" " +
                     "alt=\"" + pictogramName + "\" " +
                     "style=\"" + imgSizeCss + "\" " +
                     "class=\"pictogram mx-2\">";
@@ -616,6 +630,28 @@ AP.signage.modal = ( function() {
             const size = viewModel.get( "detailForm.data.quotationItem.signageConfigItem.size" );
             const rows = viewModel.get( "detailForm.data.quotationItem.signageRows" );
             const zeroCodes = [];
+            const missingCodes = [];
+            const disabledCodes = [];
+
+            // picto usati nelle righe che non vengono disegnati per immagine mancante o
+            // pittogrammi disattivati ( vedi parsedLineContent )
+            if ( rows ) {
+                const enabled = !size || size.enabledPictograms !== false;
+                ( viewModel.get( "pictogramNames" ) || [] ).forEach( function( code ) {
+                    const used = rows.data().some( function( row ) {
+                        return row.content && row.content.indexOf( code ) !== -1;
+                    } );
+                    if ( !used ) { return; }
+                    if ( !enabled ) {
+                        disabledCodes.push( code );
+                    } else if ( !viewModel.getPictogramSrc( String( code ).replace( /[<>]/g, "" ) ) ) {
+                        missingCodes.push( code );
+                    }
+                } );
+            }
+            viewModel.set( "missingPictogramsWarning", missingCodes.join( ", " ) );
+            viewModel.set( "disabledPictogramsWarning", disabledCodes.join( ", " ) );
+
             if ( size && size.enabledPictograms !== false && rows ) {
                 ( size.pictogramDimensions || [] ).forEach( function( dim ) {
                     if ( dim && dim.code && !( dim.width > 0 && dim.height > 0 ) ) {
@@ -1933,6 +1969,9 @@ AP.signage.modal = ( function() {
         // da una precedente modifica aperta nella stessa modale.
         viewModel.set( "savedExportCode", "" );
         viewModel.set( "zeroPictogramsWarning", "" );
+        viewModel.set( "missingPictogramsWarning", "" );
+        viewModel.set( "disabledPictogramsWarning", "" );
+        viewModel.set( "pictogramImages", {} );
 
         pricingApp().init( "signage", undefined );
 
@@ -2315,7 +2354,9 @@ AP.signage.modal = ( function() {
         // viene aggiornato - il preview si aggiorna sempre, a prescindere da quale passaggio
         // della cascata l'ha effettivamente cambiato.
         viewModel.bind( "change", function( e ) {
-            if ( e.field === "fontFamilyName" || e.field === "previewFontFamily" ) {
+            // anche pictogramImages: arrivano via ajax, e se la famiglia non cambia
+            // fontFamilyName resta uguale e le anteprime non verrebbero ridisegnate
+            if ( e.field === "fontFamilyName" || e.field === "previewFontFamily" || e.field === "pictogramImages" ) {
                 viewModel.get( "detailForm.data.quotationItem.signageRows" ).data().forEach( function( signageRow ) {
                     viewModel.parsedLineContent( signageRow.content, signageRow.id );
                 } );
