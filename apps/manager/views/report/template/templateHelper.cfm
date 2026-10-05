@@ -69,6 +69,22 @@
 </cffunction>
 
 <!---
+	Filigrana "bozza" sulle stampe dei preventivi non ancora approvati: in lavorazione
+	( LAV ) e in attesa di approvazione ( PEN ). Prima valeva solo per LAV, e un
+	preventivo in attesa di approvazione si poteva stampare pulito e mandare al cliente
+	prima del via libera. Soglia = ordine dello stato APR ( Approvato, orderby 35 ).
+--->
+<cffunction name="isQuotationDraftForPrint" returntype="boolean">
+	<cfargument name="quotation" required="true">
+
+	<cfif IsNull( arguments.quotation.getStatusHistory() ) OR IsNull( arguments.quotation.getStatusHistory().getStatus() )>
+		<cfreturn true>
+	</cfif>
+
+	<cfreturn arguments.quotation.getStatusHistory().getStatus().getOrderBy() LT 35>
+</cffunction>
+
+<!---
 	Pianta di una zona con i marker delle posizioni.
 
 	Il centraggio del marker è fatto con margini negativi e non con translate(-50%,-50%):

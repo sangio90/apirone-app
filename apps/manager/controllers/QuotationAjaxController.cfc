@@ -259,7 +259,7 @@ component extends="com.apirone.core.controller.AbsController" {
 					return;
 				}
 
-				if (!ArrayContains(['ADM', 'CMA'], userRole)) {
+				if ( !super.isQuotationApprover() ) {
 					var totals = getTotals(quotationId).pricing
 					var totalPrice = totals.total
 
@@ -343,6 +343,19 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		try {
 			var quotation = super.fire( 'quotation.get', [ rc.id ] );
+
+			// Solo un preventivo approvato ( APR o stati successivi ) può andare al
+			// cliente: in lavorazione o in attesa di approvazione no, nemmeno
+			// chiamando l'endpoint direttamente.
+			var approved = super.fire( 'status.get', [ 'APR' ] );
+			if ( IsNull( quotation.getStatusHistory() ) || IsNull( quotation.getStatusHistory().getStatus() )
+				|| quotation.getStatusHistory().getStatus().getOrderBy() < approved.getOrderBy() ) {
+				result.setData( { "message" = "Il preventivo non è ancora approvato: non può essere contrassegnato come inviato al cliente.", "error" = {} } );
+				result.setStatus( 'error' );
+				event.setValue( "result", result );
+				return;
+			}
+
 			quotation.setSentToClient( true );
 			super.fire( 'quotation.update', [ quotation ] );
 			result.setData( { "message" = "Preventivo contrassegnato come inviato al cliente.", "error" = {} } );

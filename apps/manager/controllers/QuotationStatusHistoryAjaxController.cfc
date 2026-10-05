@@ -41,6 +41,12 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 
 		var result = super.getResult();
+
+		if ( !super.isQuotationApprover() ) {
+			rejectNotApprover( event );
+			return;
+		}
+
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		
 		var bean = super.bean( "QuotationStatusHistory" );
@@ -71,6 +77,14 @@ component extends="com.apirone.core.controller.AbsController" {
 	}
 
 	function delete( event, rc, prc ){
+		// cancellare una voce dello storico riporta il preventivo allo stato
+		// precedente ( es. da "In approvazione" a "In lavorazione" ): stessa regola
+		// del cambio di stato
+		if ( !super.isQuotationApprover() ) {
+			rejectNotApprover( event );
+			return;
+		}
+
 		var json       = DeserializeJSON( GetHTTPRequestData().content );
 		
 		var validation = super.getValidationResult();
@@ -96,6 +110,15 @@ component extends="com.apirone.core.controller.AbsController" {
 	/*
 		private methods
 	*/
+
+	private void function rejectNotApprover( required any event ){
+		var validation = super.getValidationResult();
+		validation.addError( super.getValidationError(
+			message = "Solo Admin e Commerciale admin possono cambiare lo stato del preventivo.",
+			field   = "general"
+		) );
+		arguments.event.setValue( "result", validation );
+	}
 
 	private String function storeFile( base64String, quotationStatusHistoryId ){
 		var tmpDir = getTempDir();

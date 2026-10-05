@@ -261,6 +261,12 @@ AP.quotation.status = ( function() {
 
                             status.html( "" );
 
+                            // il server rifiuta il cambio di stato a chi non è ADM/CMA
+                            if ( xhr.status == "INVALID" ) {
+                                NM.form.showMessages( xhr.data );
+                                return;
+                            }
+
                             AP.widget.notify( "success", "Stato salvato correttamente." );
 
                             setTimeout( function() {

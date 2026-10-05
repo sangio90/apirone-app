@@ -47,6 +47,18 @@
 	}
 
 	/*
+		Ruoli che approvano i preventivi: concludono senza massimali e sono gli unici
+		che possono cambiarne lo stato a mano. Il pulsante "Status" del dettaglio è
+		limitato agli stessi ruoli ( data-role-list ), ma quello è solo lato client:
+		gli endpoint lo verificano qui.
+	*/
+	public Boolean function isQuotationApprover(){
+		return StructKeyExists( session, "user" )
+			&& !IsNull( session.user.getRole() )
+			&& ArrayContains( [ "ADM", "CMA" ], session.user.getRole().getId() );
+	}
+
+	/*
 		shorthands validation result
 	*/
 	public Any function getValidationResult(){

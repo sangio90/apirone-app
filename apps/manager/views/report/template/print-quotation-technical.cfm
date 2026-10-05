@@ -2,7 +2,7 @@
 	<cfset langId = (!isNull(args.data.quotation.getLang()) ? UCase(args.data.quotation.getLang().getId()) : "IT")>
 	<cfdocument attributeCollection="#args.pdfArgs#" marginTop="1" marginLeft="0.1" marginRight="0.1">
 		#printStyle()#
-		<cfif args.data.quotation.getStatusHistory().getStatus().getOrderBy() < 20>
+		<cfif isQuotationDraftForPrint( args.data.quotation )>
 			<style>
 				@page {
 					background-image: url('/assets/main/img/quotation-watermark-2.jpg');

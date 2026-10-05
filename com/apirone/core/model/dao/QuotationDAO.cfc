@@ -858,6 +858,20 @@
 		<cfreturn local.q.nextval>
 	</cffunction>
 
+	<!---
+		Lock per numero di preventivo fino alla fine della transazione corrente: chi
+		calcola la prossima versione ( max + 1 ) e la inserisce lo fa sotto questo lock,
+		così due richieste ravvicinate non ottengono lo stesso numero. Va chiamato dentro
+		una transazione: fuori si rilascerebbe subito.
+	--->
+	<cffunction name="lockVersionNumbering" access="public" returntype="void">
+		<cfargument name="quotationNumber" type="String" required="true">
+
+		<cfquery datasource="apirone">
+			SELECT pg_advisory_xact_lock( hashtext( 'quotation_version:' || <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationNumber#"> ) )
+		</cfquery>
+	</cffunction>
+
 	<cffunction name="readMaxVersionNumber" access="public" returntype="numeric">
 		<cfargument name="quotationNumber" type="String" required="true">
 

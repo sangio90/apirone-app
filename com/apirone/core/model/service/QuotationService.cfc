@@ -1563,8 +1563,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		clonedQuotation.setId( "" );
 		clonedQuotation.setActive( 1 );
 		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
-		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
-		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+
+		transaction {
+			clonedQuotation.setVersionNumber( nextVersionNumber( originalQuotation.getQuotationNumber() ) );
+			var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+		}
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
 
@@ -1573,6 +1576,18 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return clonedQuotationId;
+	}
+
+	/**
+	 * Prossimo numero di versione di un preventivo ( max + 1 ), sotto lock per numero
+	 * preventivo: va chiamato dentro la stessa transazione che inserisce la nuova
+	 * versione, così il lock copre lettura e scrittura. Senza, due richieste
+	 * ravvicinate leggevano lo stesso massimo e producevano due versioni uguali.
+	 * Il vincolo UNIQUE ( quotation_number, version_number ) resta come ultima difesa.
+	 */
+	private Numeric function nextVersionNumber( required String quotationNumber ){
+		getDao().lockVersionNumbering( arguments.quotationNumber );
+		return getDao().readMaxVersionNumber( arguments.quotationNumber ) + 1;
 	}
 
 	public Void function markAsSent( required String quotationId ){
@@ -1586,8 +1601,11 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		clonedQuotation.setActive( 1 );
 		clonedQuotation.setSentToClient( false );
 		clonedQuotation.setQuotationNumber( originalQuotation.getQuotationNumber() );
-		clonedQuotation.setVersionNumber( getDao().readMaxVersionNumber( originalQuotation.getQuotationNumber() ) + 1 );
-		var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+
+		transaction {
+			clonedQuotation.setVersionNumber( nextVersionNumber( originalQuotation.getQuotationNumber() ) );
+			var clonedQuotationId = create( clonedQuotation, session.user.getId(), false, true );
+		}
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
 		for ( var quotationZone in quotationZones ) {
