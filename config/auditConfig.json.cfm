@@ -29,6 +29,7 @@
 		"MULTI_DELETED": {},
 		"LOGIN": {},
 		"FAILED": {},
+		"RECOVERY_EMAIL_FAILED": {},
 		"LOGOUT": {},
 		"VIEWED": {},
 		"PAID": {},

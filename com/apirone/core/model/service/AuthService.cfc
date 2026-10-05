@@ -169,12 +169,24 @@ component extends="AbsService" accessors="true" {
 				username = mailUser,
 				password = mailPwd,
 				useSSL   = mailSSL,
-				useTLS   = mailTLS
+				useTLS   = mailTLS,
+				// invio sincrono: con lo spool un errore SMTP finisce solo nel mail.log di Lucee
+				// e il catch qui sotto non lo vede mai
+				spoolEnable = false
 			) {
 				writeOutput( body );
 			}
 		} catch ( any e ) {
-			super.logEvent( event = "auth.RECOVERY_EMAIL_FAILED", message = e.message, payload = { accountId = account.getId() } );
+			super.logEvent(
+				event          = "auth.RECOVERY_EMAIL_FAILED",
+				message        = "Recovery email to [#account.getEmail()#] failed: #e.message#",
+				payload        = {
+					"accountId" = account.getId(),
+					"error"     = { "type" = e.type, "message" = e.message, "detail" = e.detail }
+				},
+				severity       = "ERROR",
+				allowAnonymous = true
+			);
 		}
 	}
 
