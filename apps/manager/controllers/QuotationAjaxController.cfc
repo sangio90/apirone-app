@@ -571,16 +571,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "id" ] = rc.id;
 
-		// si esporta una volta sola: per cambiare un ordine già esportato serve una revisione
-		var exportingQuotation = super.fire( "Quotation.get", [ rc.id ] );
-		if ( exportingQuotation.getExported() ?: false ) {
-			event.setValue( "result", {
-				"success" = false,
-				"error"   = "Il preventivo è già stato esportato. Per modificarlo crea una revisione ( Modifica preventivo ) ed esporta quella."
-			} );
-			return;
-		}
-
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 		var result         = exportProductsAndQuotation( quotationItems );
 
