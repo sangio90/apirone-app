@@ -150,6 +150,9 @@ component extends="com.apirone.core.controller.AbsController" {
 	 * righe e zona insieme. Le zone con sottozone restano non cancellabili.
 	 */
 	function delete( event, rc, prc ){
+		// con molte righe ( cancellazione + ricalcolo prezzi delle righe collegate )
+		// i 30 secondi di default non bastano
+		setting requestTimeout=300;
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var result = super.getResult();
 		var zone   = json.zone ?: NullValue();
@@ -173,13 +176,14 @@ component extends="com.apirone.core.controller.AbsController" {
 			return;
 		}
 
-		var zoneItems = super.fire( "quotationItem.list", { quotationZoneId = zone.id } );
+		// solo per contare: la cancellazione vera la fa quotationItem.deleteByZone
+		var itemsCount = super.fire( "quotationItem.listForZoneDeletion", [ zone.id ] ).recordCount;
 
-		if ( ArrayLen( zoneItems ) && !force ) {
+		if ( itemsCount && !force ) {
 			result.setData( {
 				"status"     = "confirm",
-				"itemsCount" = ArrayLen( zoneItems ),
-				"message"    = "La zona contiene #ArrayLen( zoneItems )# #ArrayLen( zoneItems ) == 1 ? 'riga' : 'righe'# del preventivo: eliminando la zona verranno eliminate anche queste."
+				"itemsCount" = itemsCount,
+				"message"    = "La zona contiene #itemsCount# #itemsCount == 1 ? 'riga' : 'righe'# del preventivo: eliminando la zona verranno eliminate anche queste."
 			} );
 			event.setValue( "result", result );
 			return;
@@ -187,52 +191,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		transaction {
 			try {
-				// stesse operazioni della cancellazione di una singola riga
-				// ( QuotationItemAjaxController.delete ): prima tutte le righe, poi
-				// il ricalcolo dei prezzi delle righe rimaste che condividono costi
-				// fissi ( linea / finitura / modello o prodotto ), una volta per gruppo
-				var repricings = {};
-
-				for ( var item in zoneItems ) {
-					var outcome = super.fire( "quotationItem.delete", [ item.getId() ] );
-					if ( outcome.getStatus() == "ERROR" ) {
-						throw( message = outcome.getMessage(), detail = outcome.getError().message ?: "" );
-					}
-
-					var quotationId = item.getQuotation().getId();
-
-					if ( IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemPlate" ) || IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
-						var modelId = !IsNull( item.getProduct().getModel() ) ? item.getProduct().getModel().getId() : "";
-						var key = "lfm|" & item.getProduct().getLine().getId() & "|" & item.getProduct().getFinish().getId() & "|" & modelId;
-						repricings[ key ] = {
-							"action" = "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId",
-							"args"   = {
-								"quotationId"     = quotationId,
-								"quotationItemId" = item.getId(),
-								"lineId"          = item.getProduct().getLine().getId(),
-								"finishId"        = item.getProduct().getFinish().getId(),
-								"modelId"         = modelId
-							}
-						};
-					} else if ( IsNull( item.getArticle() ) ) {
-						repricings[ "p|" & item.getProduct().getId() ] = {
-							"action" = "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId",
-							"args"   = {
-								"quotationId"     = quotationId,
-								"quotationItemId" = item.getId(),
-								"productId"       = item.getProduct().getId()
-							}
-						};
-					}
+				// righe in blocco ( con ricalcolo prezzi delle righe collegate ), poi la zona
+				if ( itemsCount ) {
+					super.fire( "quotationItem.deleteByZone", [ zone.id ] );
 				}
 
 				var zoneOutcome = super.fire( "quotationZone.delete", [ zone.id ] );
 				if ( zoneOutcome.getStatus() == "ERROR" ) {
 					throw( message = zoneOutcome.getMessage(), detail = zoneOutcome.getError().message ?: "" );
-				}
-
-				for ( var key in repricings ) {
-					super.fire( repricings[ key ].action, repricings[ key ].args );
 				}
 			} catch ( any e ) {
 				transaction action="rollback";
@@ -244,8 +210,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var message = getMessage( "zone.deleted" );
-		if ( ArrayLen( zoneItems ) ) {
-			message &= " insieme a #ArrayLen( zoneItems )# #ArrayLen( zoneItems ) == 1 ? 'riga' : 'righe'#";
+		if ( itemsCount ) {
+			message &= " insieme a #itemsCount# #itemsCount == 1 ? 'riga' : 'righe'#";
 		}
 
 		result.setData( { "message" = message, "status" = "success" } );

@@ -96,6 +96,65 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 	}
 
+	public Query function listForZoneDeletion( required String quotationZoneId ){
+		return getDao().listForZoneDeletion( arguments.quotationZoneId );
+	}
+
+	/**
+	 * Cancella tutte le righe di una zona con una sola DELETE e poi ricalcola i
+	 * prezzi delle righe rimaste che condividevano costi fissi con quelle
+	 * cancellate, una volta per gruppo: stesso effetto della cancellazione riga
+	 * per riga ( QuotationItemAjaxController.delete ) senza caricare i bean.
+	 * Va chiamato dentro la transazione del chiamante.
+	 *
+	 * @return numero di righe cancellate
+	 */
+	public Numeric function deleteByZone( required String quotationZoneId ){
+		var rows       = getDao().listForZoneDeletion( arguments.quotationZoneId );
+		var repricings = {};
+
+		for ( var row in rows ) {
+			if ( Len( row.article_id ) || !Len( row.product_id ) ) continue;
+
+			if ( row.is_plate || row.is_signage ) {
+				// senza linea o finitura non c'è un gruppo di costi fissi da ricalcolare
+				if ( !Len( row.line_id ) || !Len( row.finish_id ) ) continue;
+				var key = "lfm|" & row.line_id & "|" & row.finish_id & "|" & row.model_id;
+				repricings[ key ] = {
+					"lfm"  = true,
+					"args" = {
+						"quotationId"     = row.quotation_id,
+						"quotationItemId" = row.quotation_item_id,
+						"lineId"          = row.line_id,
+						"finishId"        = row.finish_id,
+						"modelId"         = row.model_id
+					}
+				};
+			} else {
+				repricings[ "p|" & row.product_id ] = {
+					"lfm"  = false,
+					"args" = {
+						"quotationId"     = row.quotation_id,
+						"quotationItemId" = row.quotation_item_id,
+						"productId"       = row.product_id
+					}
+				};
+			}
+		}
+
+		var deleted = getDao().deleteByZone( arguments.quotationZoneId );
+
+		for ( var key in repricings ) {
+			if ( repricings[ key ].lfm ) {
+				aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId( argumentCollection = repricings[ key ].args );
+			} else {
+				aggiornaPrezzoAltriArticoliByQuotationIdAndProductId( argumentCollection = repricings[ key ].args );
+			}
+		}
+
+		return deleted;
+	}
+
 	public com.apirone.core.model.bean.Outcome function delete( required String quotationItemId ){
 		var outcome = super.bean( "Outcome" );
 

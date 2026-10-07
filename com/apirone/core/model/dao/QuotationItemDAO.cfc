@@ -292,6 +292,51 @@
 		<cfreturn true>
 	</cffunction>
 
+	<!---
+		Righe di una zona con i soli dati che servono a cancellarle in blocco
+		( QuotationItemService.deleteByZone ): tipo di riga e chiavi dei gruppi di
+		ricalcolo prezzi. Linea e modello dal catalog_bundle ( fonte di verità ).
+		is_plate segue la stessa regola del build: ha frutti o categoria placca.
+	--->
+	<cffunction name="listForZoneDeletion" returntype="Query">
+		<cfargument name="quotationZoneId" type="String" required="true">
+
+		<cfquery name="local.q" datasource="apirone">
+			SELECT
+				qi.quotation_item_id::varchar,
+				qi.quotation_id::varchar,
+				qi.article_id::varchar,
+				qi.product_id::varchar,
+				cb.line_id::varchar,
+				p.finish_id::varchar,
+				cb.model_id::varchar,
+				(
+					EXISTS ( SELECT 1 FROM quotation_item_fruits f WHERE f.quotation_item_id = qi.quotation_item_id )
+					OR pc.product_category_type_id = 'PLA'
+				) AS is_plate,
+				( qi.signage_config_item_id IS NOT NULL ) AS is_signage
+			FROM quotation_items qi
+				LEFT JOIN products p ON p.product_id = qi.product_id
+				LEFT JOIN catalog_bundles cb ON cb.catalog_bundle_id = p.catalog_bundle_id
+				LEFT JOIN product_categories pc ON pc.product_category_id = cb.product_category_id
+			WHERE qi.quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!--- Cancella tutte le righe di una zona: i figli ( prezzi, frutti, attributi, posizioni, file ) vanno in cascata --->
+	<cffunction name="deleteByZone" returntype="Numeric">
+		<cfargument name="quotationZoneId" type="String" required="true">
+
+		<cfquery datasource="apirone" result="local.r">
+			DELETE FROM quotation_items
+			WHERE quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationZoneId#">::uuid
+		</cfquery>
+
+		<cfreturn local.r.recordCount>
+	</cffunction>
+
 	<cffunction name="getQuantitaTotaleAltreRigheByQuotationLineIdAndFinishId" returntype="Numeric">
 		<cfargument name="quotationId" type="String" required="true">
 		<cfargument name="quotationItemId" type="String" required="true">
