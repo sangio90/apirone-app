@@ -16,9 +16,6 @@
                     <div style="font-size: 10px; margin-bottom: -2px;" data-bind="visible: position.code"> 
                         <span>Posizione: </span><span data-bind="text: position.code"></span> 
                     </div>
-                    <div style="font-size: 10px;"> 
-                        <i data-bind="text: note_short, attr: { title: note }"></i>
-                    </div>
                 </div>
                 <div class="col-3"  style="margin-top: -15px;" data-bind="visible: canEdit">
                     <div class="d-flex justify-content-end mb-3">
@@ -45,6 +42,11 @@
                             <i class="fas fa-grip-vertical"></i>
                         </div>
                     </div>
+                </div>
+                <!--- nota su una riga sua, sotto l'intestazione: dentro la colonna di
+                      sinistra finiva sotto ai pulsanti, che sbordano dalla col-3 --->
+                <div class="col-12" style="font-size: 10px; margin-top: -16px;" data-bind="visible: note_short">
+                    <i data-bind="text: note_short, attr: { title: note }"></i>
                 </div>
                 <div class="col-12 d-flex justify-content-center">
                     <div class="qt-item-image-container">

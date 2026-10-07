@@ -337,11 +337,97 @@
 
 </cfsavecontent>
 
-<div>
-    <cfoutput>#report#</cfoutput>
-</div>
+<!---
+	I dettagli dell'errore restano per l'admin: si salvano su error_logs
+	( consultabili da /manager/error-logs ) e all'utente si mostra solo una pagina
+	generica con il codice, da citare quando segnala il problema.
+	Se il salvataggio sul DB non riesce ( es. è il DB stesso a essere giù ) il
+	report si scrive su file come si faceva prima, per non perderlo.
+	In locale ( host *.local ) si continua a vedere il report completo.
+--->
+<cfset isLocalHost = Right( cgi.SERVER_NAME, 5 ) IS "local">
 
-<cfset path = ExpandPath("/../repository/private/errors/#dayPath#")>
-<cfset DirectoryCreate( path, true, true )>
+<cftry>
+	<cfset errorData = {
+		"code"       = code,
+		"errorType"  = "",
+		"message"    = "",
+		"detail"     = "",
+		"template"   = "",
+		"line"       = "",
+		"event"      = "",
+		"routedUrl"  = "",
+		"httpMethod" = cgi.REQUEST_METHOD,
+		"userId"     = "",
+		"userName"   = "",
+		"ipAddress"  = cgi.REMOTE_ADDR,
+		"userAgent"  = cgi.HTTP_USER_AGENT,
+		"reportHtml" = report
+	}>
+	<cftry>
+		<cfset errorData.errorType = oException.getType()>
+		<cfset errorData.message   = oException.getMessage()>
+		<cfset errorData.detail    = oException.getDetail()>
+		<cfif ArrayLen( oException.getTagContext() )>
+			<cfset errorData.template = oException.getTagContext()[1].template ?: "">
+			<cfset errorData.line     = oException.getTagContext()[1].line ?: "">
+		</cfif>
+		<cfcatch></cfcatch>
+	</cftry>
+	<cftry>
+		<cfset errorData.event     = event.getCurrentEvent()>
+		<cfset errorData.routedUrl = event.getCurrentRoutedURL()>
+		<cfcatch></cfcatch>
+	</cftry>
+	<cftry>
+		<cfif !IsNull( session.user ) && session.user.isLogged()>
+			<cfset errorData.userId   = session.user.getId()>
+			<cfset errorData.userName = session.user.getName()>
+		</cfif>
+		<cfcatch></cfcatch>
+	</cftry>
 
-<cffile action="write" file="#path#/#code#.html" output="#report#">
+	<cfset server[ "wirebox-apirone" ].getInstance( "ErrorLogService" ).log( errorData )>
+
+	<cfcatch>
+		<cfset path = ExpandPath("/../repository/private/errors/#dayPath#")>
+		<cfset DirectoryCreate( path, true, true )>
+		<cffile action="write" file="#path#/#code#.html" output="#report#">
+		<cflog file="application" type="error" text="errorReport: salvataggio su error_logs non riuscito ( #cfcatch.message# ), report scritto su file #code#.html">
+	</cfcatch>
+</cftry>
+
+<!--- il codice arriva anche alle chiamate AJAX ( NM.util.ajax lo mostra nella notifica ) --->
+<cfheader name="X-Error-Code" value="#code#">
+
+<cfif isLocalHost>
+	<div>
+		<cfoutput>#report#</cfoutput>
+	</div>
+<cfelse>
+	<cfoutput>
+	<!DOCTYPE html>
+	<html lang="it">
+	<head>
+		<meta charset="utf-8">
+		<title>Errore</title>
+		<style>
+			body { font-family: Verdana, Helvetica, sans-serif; background: ##f4f6f9; color: ##333; margin: 0; }
+			.box { max-width: 520px; margin: 12vh auto 0; background: ##fff; border-radius: 8px; padding: 32px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+			h1 { font-size: 20px; margin: 0 0 12px; }
+			p { font-size: 14px; line-height: 1.5; margin: 0 0 12px; }
+			.code { display: inline-block; background: ##FFD700; padding: 4px 10px; border-radius: 5px; font-size: 13px; }
+			a { color: ##0088cc; }
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<h1>Si è verificato un errore</h1>
+			<p>Non è stato possibile completare l'operazione. Se il problema si ripete, contatta l'assistenza indicando questo codice:</p>
+			<p><span class="code"><b>#code#</b></span></p>
+			<p><a href="/manager/">Torna alla home</a></p>
+		</div>
+	</body>
+	</html>
+	</cfoutput>
+</cfif>

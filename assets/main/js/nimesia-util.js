@@ -62,7 +62,9 @@ NM.util.ajax = function( setup ) {
                     AP.loading?.hide?.();
 
                     if ( xhr.status == 500 ) {
-                        AP.widget.notify( "error", "Qualcosa è andato storto", "Ops!" );
+                        // codice dell'errore salvato su error_logs ( apps/utils/errorReport.cfm )
+                        var errorCode = xhr.getResponseHeader( "X-Error-Code" );
+                        AP.widget.notify( "error", "Qualcosa è andato storto" + ( errorCode ? " (codice " + errorCode + ")" : "" ), "Ops!" );
                         return;
                     }
 

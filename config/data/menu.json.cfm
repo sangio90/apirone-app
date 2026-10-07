@@ -228,6 +228,12 @@
 				title: "Audit log",
 			},
 			{
+				href: "/manager/error-logs",
+				icon: "fas fa-bug",
+				title: "Log errori",
+				roles: "ADM",
+			},
+			{
 				href: "/manager/system",
 				icon: "fas fa-cogs",
 				title: "Impostazioni",

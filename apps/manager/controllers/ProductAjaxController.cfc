@@ -125,6 +125,89 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		param rc.items = "_";
 
+		// La DELETE cancella in cascata anche i figli (origin_id): il controllo
+		// sugli utilizzi deve coprire tutto il sotto-albero degli item selezionati.
+		```
+		<cfquery name="usedInQuotations" datasource="apirone">
+			WITH RECURSIVE tree AS (
+				SELECT product_item_id FROM product_items
+				WHERE product_item_id IN ( <cfqueryparam value="#rc.items#" list="true" cfsqltype="integer"> )
+				UNION
+				SELECT pi.product_item_id FROM product_items pi
+				JOIN tree t ON pi.origin_id = t.product_item_id
+			)
+			SELECT
+				q.quotation_id::varchar AS quotation_id,
+				q.quotation_number,
+				q.version_number,
+				qi.quotation_zone_id::varchar AS zone_id,
+				z.quotation_zone,
+				CASE WHEN qi.article_id IS NOT NULL THEN 'ART' ELSE pc.product_category_type_id END AS type_id,
+				COUNT( DISTINCT qi.quotation_item_id ) AS item_count,
+				STRING_AGG( DISTINCT qi.quotation_item_id::varchar, ',' ) AS item_ids
+			FROM quotation_item_product_items qipi
+			LEFT JOIN quotation_item_fruits qif ON qif.quotation_item_fruit_id = qipi.quotation_item_fruit_id
+			JOIN quotation_items qi ON qi.quotation_item_id = COALESCE( qipi.quotation_item_id, qif.quotation_item_id )
+			JOIN quotations q ON q.quotation_id = qi.quotation_id
+			LEFT JOIN quotation_zones z ON z.quotation_zone_id = qi.quotation_zone_id
+			LEFT JOIN products p ON p.product_id = qi.product_id
+			LEFT JOIN catalog_bundles cb ON cb.catalog_bundle_id = p.catalog_bundle_id
+			LEFT JOIN product_categories pc ON pc.product_category_id = cb.product_category_id
+			WHERE qipi.product_item_id IN ( SELECT product_item_id FROM tree )
+			   OR qipi.origin_id IN ( SELECT product_item_id FROM tree )
+			GROUP BY q.quotation_id, q.quotation_number, q.version_number, qi.quotation_zone_id, z.quotation_zone, 6
+			ORDER BY q.quotation_number, q.version_number, z.quotation_zone, 6
+		</cfquery>
+
+		<cfquery name="usedInCombinations" datasource="apirone">
+			WITH RECURSIVE tree AS (
+				SELECT product_item_id FROM product_items
+				WHERE product_item_id IN ( <cfqueryparam value="#rc.items#" list="true" cfsqltype="integer"> )
+				UNION
+				SELECT pi.product_item_id FROM product_items pi
+				JOIN tree t ON pi.origin_id = t.product_item_id
+			)
+			SELECT COUNT( DISTINCT combination_id ) AS total
+			FROM combination_product_items
+			WHERE product_item_id IN ( SELECT product_item_id FROM tree )
+		</cfquery>
+		```
+
+		if ( usedInQuotations.recordCount || usedInCombinations.total ) {
+			// Raggruppa le righe per preventivo mantenendo l'ordinamento della query
+			var quotations = [];
+			var byId       = {};
+
+			for ( var row in usedInQuotations ) {
+				if ( !byId.keyExists( row.quotation_id ) ) {
+					byId[ row.quotation_id ] = {
+						"id"      = row.quotation_id,
+						"number"  = row.quotation_number,
+						"version" = row.version_number ?: "",
+						"items"   = []
+					};
+					quotations.append( byId[ row.quotation_id ] );
+				}
+
+				byId[ row.quotation_id ].items.append( {
+					"zoneId"   = row.zone_id,
+					"zoneName" = row.quotation_zone ?: "",
+					"type"     = row.type_id ?: "",
+					"count"    = row.item_count,
+					"itemIds"  = ListToArray( row.item_ids )
+				} );
+			}
+
+			result.setStatus( "INVALID" );
+			result.setData( {
+				"quotations"   = quotations,
+				"combinations" = usedInCombinations.total
+			} );
+
+			event.setValue( "result", result );
+			return;
+		}
+
 		```
 		<!--- TODO: better than this --->
 		<cfquery datasource="apirone">

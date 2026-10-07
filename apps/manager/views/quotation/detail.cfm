@@ -7,52 +7,49 @@
             </div>
 
             <div class="col-7 mt-1">
-                <div class="row g-2 mb-2">
-                    <div class="col-2">#button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit", class="w-100" )#</div>
-                    <div class="col-2">#button( bind="click:exportProducts, enabled: canEdit", size="sm", label="Esporta articoli", icon="file-export", class="w-100 export-button qt-draft-block" )#</div>
-                    <div class="col-2">#button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="w-100 export-button qt-draft-block" )#</div>
-                    <div class="col-2">#button( bind="click:exportProvisional, enabled: canEdit", size="sm", label="Esporta provvisorio", icon="file-export", class="w-100 qt-draft-block", variant="outline-primary" )#</div>
-                    <div class="col-4">
-                        <cfif prc.quotation.getSentToClient() ?: false>
-                            <button type="button" class="btn btn-primary btn-sm w-100" disabled>
-                                <i class="fas fa-check-circle"></i>
-                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
-                            </button>
-                        <cfelse>
-                            <button type="button"
-                                    id="qt-status-btn"
-                                    class="btn btn-sm w-100 qt-draft-block #(prc.quotation.getStatusHistory().getStatus().getId() == 'PEN' ? 'btn-outline-primary' : 'btn-primary')#"
-                                    data-role-list="ADM/CMA"
-                                    data-bind="click: openStatusModal, roleEnable: this">
-                                <i class="fas fa-check-circle"></i>
-                                Status: #prc.quotation.getStatusHistory().getStatus().getName()#
-                            </button>
-                        </cfif>
+                <!---
+                    pulsanti tutti della stessa larghezza ( qt-actions in style.css ),
+                    affiancati senza colonne: niente buchi dove un pulsante è nascosto
+                --->
+                <div class="qt-actions d-flex flex-wrap justify-content-end gap-2 mb-2">
+                    #button( bind="click:showHeader", size="sm", label="Dettaglio", icon="edit" )#
+                    #button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open" )#
+                    #button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print" )#
+                    <div class="position-relative">
+                        #button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map" )#
+                        <span id="plant-draft-badge" class="badge bg-danger position-absolute top-0 start-100 translate-middle" style="display:none;font-size:10px;"></span>
                     </div>
+                    <!--- nascosto: la funzione resta ( export3dPlates ), basta togliere d-none --->
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm d-none"
+                            data-email-list="guido.sangiovanni@gslabs.it"
+                            data-bind="click:export3dPlates, email: this">
+                        <i class="fas fa-cube"></i> JSON 3D placche
+                    </button>
                 </div>
-                <div class="row g-2">
-                    <div class="col-2">#button( bind="click:openDocumentsModal", size="sm", label="Documenti", icon="folder-open", class="w-100" )#</div>
-                    <div class="col-2">#button( bind="click:openPrintModal", size="sm", label="Stampe", icon="print", class="w-100" )#</div>
-                    <div class="col-2" style="position:relative;">
-                        #button( bind="click:openPlantPosition", size="sm", label="Posizioni in pianta", icon="map", class="w-100" )#
-                        <span id="plant-draft-badge" class="badge bg-danger position-absolute top-0 end-0 mt-1 me-1" style="display:none;font-size:10px;"></span>
-                    </div>
-                    <div class="col-3">
+                <div class="qt-actions d-flex flex-wrap justify-content-end gap-2">
+                    <cfif prc.quotation.getSentToClient() ?: false>
+                        <button type="button" class="btn btn-primary btn-sm" disabled>
+                            <i class="fas fa-check-circle"></i>
+                            Status: #prc.quotation.getStatusHistory().getStatus().getName()#
+                        </button>
+                    <cfelse>
                         <button type="button"
-                                class="btn btn-outline-secondary btn-sm w-100"
-                                data-email-list="guido.sangiovanni@gslabs.it"
-                                data-bind="click:export3dPlates, email: this">
-                            <i class="fas fa-cube"></i> JSON 3D placche
+                                id="qt-status-btn"
+                                class="btn btn-sm qt-draft-block #(prc.quotation.getStatusHistory().getStatus().getId() == 'PEN' ? 'btn-outline-primary' : 'btn-primary')#"
+                                data-role-list="ADM/CMA"
+                                data-bind="click: openStatusModal, roleEnable: this">
+                            <i class="fas fa-check-circle"></i>
+                            Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                         </button>
-                    </div>
-                    <div class="col-3">
-                        <button type="button" class="btn btn-outline-primary btn-sm w-100" data-bind="click:markAsSent, visible:canEdit">
-                            <i class="fas fa-paper-plane"></i> Inviato a cliente
-                        </button>
-                        <button type="button" class="btn btn-warning btn-sm w-100" data-bind="click:createRevision, visible:canRevise">
-                            <i class="fas fa-pencil-alt"></i> Modifica preventivo
-                        </button>
-                    </div>
+                    </cfif>
+                    #button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button qt-draft-block" )#
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bind="click:markAsSent, visible:canEdit">
+                        <i class="fas fa-paper-plane"></i> Inviato a cliente
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm" data-bind="click:createRevision, visible:canRevise">
+                        <i class="fas fa-pencil-alt"></i> Modifica preventivo
+                    </button>
                 </div>
             </div>
 
@@ -304,7 +301,7 @@
     #view( "quotation/print-modal" )#
     #view( "quotation/status-modal" )#
     #view( "quotation/documents-modal" )#
-    #view( "quotation/export-products-result-modal" )#
+    #view( "quotation/export-result-modal" )#
 
     <div class="modal fade" id="qt-export3d-modal" tabindex="-1">
         <div class="modal-dialog modal-lg">

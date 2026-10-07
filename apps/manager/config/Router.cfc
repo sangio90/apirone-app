@@ -107,6 +107,13 @@
 		get( "/ajax/audit-entries" ).to( "AuditEntryAjaxController.list" ).end();
 		get( "/audit-entries" ).to( "AuditEntryController.list" ).end();
 
+		/*
+			error log ( errori registrati da apps/utils/errorReport.cfm )
+		*/
+		get( "/error-logs/:id/report" ).to( "ErrorLogController.report" ).end();
+		get( "/error-logs/:id" ).to( "ErrorLogController.detail" ).end();
+		get( "/error-logs" ).to( "ErrorLogController.list" ).end();
+
 
 		/*
 			fruits
@@ -473,8 +480,6 @@
 			quotations
 		*/
 		get( "/ajax/quotations-export/:id" ).to( "QuotationAjaxController.export" ).end();
-		get( "/ajax/quotations-export-provisional/:id" ).to( "QuotationAjaxController.exportProvisional" ).end();
-		get( "/ajax/quotations-export-products/:id" ).to( "QuotationAjaxController.exportProducts" ).end();
 		get( "/ajax/quotations/categories" ).to( "QuotationAjaxController.listCategories" ).end();
 		get( "/ajax/quotations/lines/:categoryId" ).to( "QuotationAjaxController.listLines" ).end();
 		get( "/ajax/quotations/models/:lineId" ).to( "QuotationAjaxController.listModels" ).end();

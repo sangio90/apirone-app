@@ -452,6 +452,11 @@ AP.product.items = ( function() {
                     data: { items: ids },
                     callback: {
                         done: function( xhr ) {
+                            if ( xhr.status == "INVALID" ) {
+                                showItemsInUse( xhr.data );
+                                return;
+                            }
+
                             AP.widget.notify( "success", xhr.data.message.text );
                             refreshDatasources();
                         },
@@ -958,6 +963,58 @@ AP.product.items = ( function() {
 
     var refreshDatasources = function() {
         viewModel.get( "items" ).read();
+    };
+
+    // Elenca i preventivi/combinazioni che usano gli item (o i loro figli) che si voleva eliminare
+    var showItemsInUse = function( data ) {
+        var quotations = data.quotations || [];
+        var combinations = Number( data.combinations ) || 0;
+        var html = "<p>Impossibile eliminare: gli elementi selezionati (o i loro figli) sono in uso.</p>";
+
+        if ( quotations.length ) {
+            html += "<p class='mb-1'>Usati " + ( quotations.length == 1 ? "nel preventivo" : "nei preventivi" ) + ":</p><ul>";
+
+            // Tipo categoria -> ?tab= gestito da AP.quotation.detail.checkUrlTab
+            var tabByType = { PLA: "plate", SEG: "signage", ACC: "accessory", ART: "article" };
+            var labelByType = { PLA: "Placca", SEG: "Segnaletica", ACC: "Accessorio", ART: "Articolo" };
+
+            quotations.forEach( function( q ) {
+                var url = "/manager/quotations/" + encodeURIComponent( q.id );
+                var label = "n. " + kendo.htmlEncode( q.number ) + ( q.version !== "" && q.version != null ? " (rev. " + kendo.htmlEncode( q.version ) + ")" : "" );
+
+                html += "<li><a href='" + url + "' target='_blank'>" + label + "</a>";
+
+                if ( q.items && q.items.length ) {
+                    html += "<ul>";
+
+                    q.items.forEach( function( item ) {
+                        var params = new URLSearchParams();
+
+                        if ( tabByType[ item.type ] ) params.set( "tab", tabByType[ item.type ] );
+                        if ( item.zoneId ) params.set( "zone", item.zoneId );
+                        if ( item.itemIds && item.itemIds.length ) params.set( "highlight", item.itemIds.join( "," ) );
+
+                        var itemLabel = kendo.htmlEncode( item.zoneName || "Zona senza nome" )
+                            + " – " + ( labelByType[ item.type ] || "Riga" )
+                            + ( item.count > 1 ? " (" + item.count + " righe)" : "" );
+
+                        html += "<li><a href='" + url + "?" + params.toString() + "' target='_blank'>" + itemLabel + "</a></li>";
+                    } );
+
+                    html += "</ul>";
+                }
+
+                html += "</li>";
+            } );
+
+            html += "</ul>";
+        }
+
+        if ( combinations ) {
+            html += "<p>Usati in " + combinations + ( combinations == 1 ? " combinazione" : " combinazioni" ) + " del prodotto.</p>";
+        }
+
+        bootbox.alert( { title: "Elementi in uso", message: html } );
     };
 
     var sortableChanged = function( entity, widget ) {

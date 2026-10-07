@@ -8,7 +8,7 @@ Object.assign(AP.quotation.fields, {
 	printModalRoot: $("#print-modal-root"),
 	statusModalRoot: $("#qt-status-modal-root"),
 	documentsModalRoot: $("#qt-documents-modal-root"),
-	exportProductsResultModalRoot: $("#qt-export-products-result-modal-root"),
+	exportResultModalRoot: $("#qt-export-result-modal-root"),
 	totalItemBox: $("#quotation-totals-item"),
 
 	addPlateBtn: $("#qt-add-plate"),
@@ -183,6 +183,26 @@ AP.quotation.detail = (function () {
 		viewModel.changeType({ currentTarget: tabButton });
 	});
 
+	/*
+		?highlight=<quotationItemId>,<quotationItemId> (es. link "elementi in uso" dal prodotto):
+		dopo il caricamento delle righe scorre alla prima indicata e le evidenzia. Si applica
+		una volta sola, al primo caricamento in cui almeno una delle righe è nel DOM.
+	*/
+	var pendingHighlightIds = [];
+
+	var applyPendingHighlight = function () {
+		if (!pendingHighlightIds.length) return;
+
+		var cards = $(".quotation-item").filter(function () {
+			return pendingHighlightIds.includes(String($(this).data("id")));
+		});
+		if (!cards.length) return;
+
+		pendingHighlightIds = [];
+		cards.addClass("qt-item-highlight");
+		cards.get(0).scrollIntoView({ behavior: "smooth", block: "center" });
+	};
+
 	var setQuotationItems = function (items, typeId) {
 		if (!typeId) typeId = viewModel.get("typeId");
 
@@ -324,59 +344,25 @@ AP.quotation.detail = (function () {
 			headerApp().edit(AP.page.quotation.id);
 		},
 
-		exportProducts: function () {
-			AP.loading.show();
-			NM.util.ajax({
-				method: "GET",
-				url: "/manager/ajax/quotations-export-products/" + AP.page.quotation.id,
-				callback: {
-					done: function (xhr) {
-						AP.loading.hide();
-						if (xhr.status == "INVALID") {
-							NM.form.showMessages(xhr.data);
-							return;
-						}
-						if (xhr.data.error || xhr.data.success == false) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione articoli.");
-							return;
-						}
-						var exported = xhr.data.exportedItems || [];
-						var skipped  = xhr.data.skippedItems  || [];
-
-						var $exported = $("#qt-export-products-exported");
-						var $skipped  = $("#qt-export-products-skipped");
-
-						if (exported.length) {
-							$exported.html(
-								"<p class='mb-1'><strong>Esportati (" + exported.length + "):</strong></p>" +
-								"<ul class='mb-0'>" + exported.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
-							);
-						} else {
-							$exported.html("<p class='text-muted mb-0'>Nessun nuovo articolo esportato.</p>");
-						}
-
-						if (skipped.length) {
-							$skipped.html(
-								"<hr class='my-3'>" +
-								"<p class='mb-1'><strong>Già presenti (" + skipped.length + "):</strong></p>" +
-								"<ul class='mb-0'>" + skipped.map(function(c) { return "<li>" + c + "</li>"; }).join("") + "</ul>"
-							);
-						} else {
-							$skipped.html("");
-						}
-
-						AP.widget.notify("success", "Esportazione articoli completata.");
-						NM.util.openModal(AP.quotation.fields.exportProductsResultModalRoot);
-					}
-				}
-			});
-		},
-
 		export: function () {
+			viewModel.runExport({
+				url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
+				title: "Risultato esportazione preventivo",
+				errorMessage: "Errore durante l'esportazione del preventivo.",
+				onSuccess: function () {
+					$(".export-button").hide();
+					AP.widget.notify("success", "Preventivo esportato correttamente.");
+				}
+			});
+		},
+
+		// Esportazione verso Verticale: il server esporta prima gli articoli e poi
+		// il preventivo, e restituisce entrambi i risultati per la modale di riepilogo.
+		runExport: function (options) {
 			AP.loading.show();
 			NM.util.ajax({
 				method: "GET",
-				url: "/manager/ajax/quotations-export/" + AP.page.quotation.id,
+				url: options.url,
 				callback: {
 					done: function (xhr) {
 						AP.loading.hide();
@@ -384,37 +370,104 @@ AP.quotation.detail = (function () {
 							NM.form.showMessages(xhr.data);
 							return;
 						}
-						if (xhr.data.error || xhr.data.success == false) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione del preventivo.");
-							return;
+						var failed = !!(xhr.data.error || xhr.data.success == false);
+						if (failed) {
+							AP.widget.notify("error", xhr.data.error ? xhr.data.error : options.errorMessage);
+							// senza il risultato degli articoli non c'è niente da riepilogare
+							if (!xhr.data.products) {
+								return;
+							}
+						} else {
+							options.onSuccess();
 						}
-						$(".export-button").hide();
-						AP.widget.notify("success", "Preventivo esportato correttamente.");
+						viewModel.renderExportResult(xhr.data, options.title);
+						NM.util.openModal(AP.quotation.fields.exportResultModalRoot);
+					},
+					fail: function () {
+						AP.loading.hide();
 					}
 				}
 			});
 		},
 
-		exportProvisional: function () {
-			AP.loading.show();
-			NM.util.ajax({
-				method: "GET",
-				url: "/manager/ajax/quotations-export-provisional/" + AP.page.quotation.id,
-				callback: {
-					done: function (xhr) {
-						AP.loading.hide();
-						if (xhr.status == "INVALID") {
-							NM.form.showMessages(xhr.data);
-							return;
-						}
-						if (xhr.data.error || xhr.data.success == false) {
-							AP.widget.notify("error", xhr.data.error ? xhr.data.error : "Errore durante l'esportazione provvisoria.");
-							return;
-						}
-						AP.widget.notify("success", "Ordine provvisorio esportato correttamente.");
-					}
+		renderExportResult: function (data, title) {
+			var esc = function (value) {
+				return $("<div>").text(value == null ? "" : String(value)).html();
+			};
+			var num = function (value) {
+				return kendo.toString(Number(value) || 0, "n2");
+			};
+
+			$("#qt-export-result-title").text(title);
+
+			// Preventivo: testata e righe scritte su ORDINI_APIR
+			var $quotation = $("#qt-export-quotation");
+			if (data.success == false) {
+				$quotation.html("<div class='alert alert-danger mb-0'>Preventivo non scritto su Verticale: " + esc(data.error || "errore sconosciuto") + "</div>");
+			} else {
+				var header = data.header || {};
+				var rows   = data.rows || [];
+				var fields = [
+					["Numero documento", header.number],
+					["Seriale", header.serial],
+					["Cliente", header.company],
+					["Codice cliente", header.customerId],
+					["Partita IVA", header.vatNumber],
+					["Indirizzo fatturazione", header.billingAddress],
+					["Destinazione", header.shippingCompany],
+					["Indirizzo spedizione", header.shippingAddress],
+					["Referente spedizione", header.shippingContact],
+					["Riferimento", header.reference],
+					["Data evasione", header.deliveryDate],
+					["Agente", header.agent],
+					["Pagamento", header.paymentMethod],
+					["Sconti testata", num(header.discount1) + " + " + num(header.discount2) + " %"],
+					["Spese trasporto", num(header.shippingCost)]
+				];
+				var html = "<table class='table table-sm mb-3'><tbody>" + fields.map(function (f) {
+					return "<tr><th style='width: 30%;'>" + f[0] + "</th><td>" + esc(f[1]) + "</td></tr>";
+				}).join("") + "</tbody></table>";
+
+				html += "<p class='mb-1'><strong>Righe scritte (" + rows.length + "):</strong></p>";
+				if (rows.length) {
+					html += "<table class='table table-sm table-striped mb-0'><thead><tr>" +
+						"<th>Riga</th><th>Articolo</th><th>Variante</th><th>Colore</th>" +
+						"<th class='text-end'>Qtà</th><th class='text-end'>Prezzo</th><th class='text-end'>Sc. 1</th><th class='text-end'>Sc. 2</th><th>Note</th>" +
+						"</tr></thead><tbody>" + rows.map(function (r) {
+							return "<tr><td>" + esc(r.row) + "</td><td>" + esc(r.code) + "</td><td>" + esc(r.variant) + "</td><td>" + esc(r.color) + "</td>" +
+								"<td class='text-end'>" + num(r.quantity) + "</td><td class='text-end'>" + num(r.price) + "</td>" +
+								"<td class='text-end'>" + num(r.discount1) + "</td><td class='text-end'>" + num(r.discount2) + "</td>" +
+								"<td>" + esc(r.note) + "</td></tr>";
+						}).join("") + "</tbody></table>";
+				} else {
+					html += "<p class='text-muted mb-0'>Nessuna riga.</p>";
 				}
-			});
+				$quotation.html(html);
+			}
+
+			// Articoli: esportati in questo giro o già presenti su Verticale
+			var products = data.products || {};
+			var exported = products.exportedItems || [];
+			var skipped  = products.skippedItems  || [];
+
+			if (exported.length) {
+				$("#qt-export-products-exported").html(
+					"<p class='mb-1'><strong>Esportati (" + exported.length + "):</strong></p>" +
+					"<ul class='mb-0'>" + exported.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ul>"
+				);
+			} else {
+				$("#qt-export-products-exported").html("<p class='text-muted mb-0'>Nessun nuovo articolo esportato.</p>");
+			}
+
+			if (skipped.length) {
+				$("#qt-export-products-skipped").html(
+					"<hr class='my-3'>" +
+					"<p class='mb-1'><strong>Già presenti (" + skipped.length + "):</strong></p>" +
+					"<ul class='mb-0'>" + skipped.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ul>"
+				);
+			} else {
+				$("#qt-export-products-skipped").html("");
+			}
 		},
 
 		export3dPlates: function () {
@@ -854,6 +907,7 @@ AP.quotation.detail = (function () {
 
 						setQuotationItems(xhr.data, requestTypeId);
 						setTimeout(initSortable, 150);
+						setTimeout(applyPendingHighlight, 200);
 						refreshMissingPrices();
 					}
 				}
@@ -1208,6 +1262,22 @@ AP.quotation.detail = (function () {
 		kendo.culture("it-IT");
 
 		$('#quotation-totals-flat-discount-row').prop('hidden', !['ADM', 'CMA', 'TCD'].includes(AP.page.userRole.id));
+
+		// ?zone=<quotationZoneId> (es. link "elementi in uso" dal prodotto): preseleziona la zona
+		// salvandola nelle preferenze, come se l'utente l'avesse scelta dal selettore.
+		// Va fatto prima di checkUrlTab/getZones, che caricano subito le righe filtrate per zona.
+		var zonePrefKey = "quotation." + (AP.page.quotation?.id || "") + ".zone";
+		var zoneParam = AP.page.quotation?.id ? new URLSearchParams(window.location.search).get("zone") : null;
+		if (zoneParam) {
+			AP.setUserPref(zonePrefKey + ".id", zoneParam);
+			AP.setUserPref(zonePrefKey + ".name", "");
+		}
+
+		var highlightParam = new URLSearchParams(window.location.search).get("highlight");
+		if (highlightParam) {
+			pendingHighlightIds = highlightParam.split(",").filter(Boolean);
+		}
+
 		// Controlla se c'è un parametro tab nell'URL
 		pub.checkUrlTab();
 
@@ -1227,6 +1297,26 @@ AP.quotation.detail = (function () {
 			await viewModel.getZones();
 
 			const zones = viewModel.get("detailForm.data.zones");
+
+			// Completa la preferenza impostata da ?zone= con il nome della zona e pulisce l'URL
+			if (zoneParam) {
+				const urlZone = (zones || []).find(zone => zone.id == zoneParam);
+				if (urlZone) {
+					AP.setUserPref(zonePrefKey + ".name", urlZone.name);
+				} else {
+					AP.deleteUserPref(zonePrefKey + ".id");
+					AP.deleteUserPref(zonePrefKey + ".name");
+					viewModel.loadItems();
+				}
+			}
+
+			// zone/highlight servono solo all'apertura: un reload non deve riapplicarli
+			if (zoneParam || highlightParam) {
+				var cleanParams = new URLSearchParams(window.location.search);
+				cleanParams.delete("zone");
+				cleanParams.delete("highlight");
+				window.history.replaceState(null, null, window.location.pathname + (cleanParams.toString() ? "?" + cleanParams.toString() : "") + window.location.hash);
+			}
 
 			if (zones && zones.length > 0) {
 				const defaultZone = zones.find(zone => zone.name == '-- Tutte le zone');

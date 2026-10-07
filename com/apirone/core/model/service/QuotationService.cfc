@@ -1078,10 +1078,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
-	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems, boolean provisional = false ){
+	public Struct function export( required com.apirone.core.model.bean.QuotationItem[] quotationItems ){
 		var result = {
 			'success' = false,
-			'error' = null
+			'error' = null,
+			'header' = {},
+			'rows' = []
 		};
 
 		transaction {
@@ -1089,12 +1091,13 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				var quotation = quotationItems[1].getQuotation();
 
 				getDao().deleteExport( quotationNumber = quotation.getQuotationNumber() );
-				quotationDataResult = prepareExportData(quotation, arguments.provisional);
+				quotationDataResult = prepareExportData(quotation);
 				if (!isNull(quotationDataResult.error)) {
 					result.error = quotationDataResult.error;
 					return result;
 				}
 				quotationDataHead = quotationDataResult.data;
+				result.header = exportHeaderSummary( quotationDataHead );
 			}
 
 			quotationItemsToExport = [];
@@ -1233,6 +1236,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 
 				for ( quotationItemToExport in quotationItemsToExport ) {
 					getDao().export( quotationItemToExport );
+					ArrayAppend( result.rows, exportRowSummary( quotationItemToExport ) );
 				}
 
 				var quotationPrice = getQuotationPriceService().calculate( quotation.getId() );
@@ -1251,6 +1255,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					quotationPriceData["MMUTECOM"] = salesAgentId;
 					quotationPriceData["MMUTETEC"] = graphicTechnicianId;
 					getDao().export( quotationPriceData );
+					ArrayAppend( result.rows, exportRowSummary( quotationPriceData ) );
 				}
 			}
 		}
@@ -1260,6 +1265,48 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// notifyOrdersVerticale();
 
 		return result;
+	}
+
+	/**
+	 * Dati di testata scritti su ORDINI_APIR, da mostrare nel riepilogo
+	 * dell'esportazione.
+	 */
+	private Struct function exportHeaderSummary( required Struct data ){
+		return {
+			"serial"           = arguments.data.MMSERIAL ?: "",
+			"number"           = arguments.data.MMNUMDOC ?: "",
+			"customerId"       = arguments.data.CF_IDCLI ?: "",
+			"company"          = arguments.data.CFDESCR1 ?: "",
+			"vatNumber"        = arguments.data.CFPARIVA ?: "",
+			"billingAddress"   = Trim( ( arguments.data.CFINDIRI ?: "" ) & " " & ( arguments.data.CF___CAP ?: "" ) & " " & ( arguments.data.CFLOCALI ?: "" ) & " " & ( arguments.data.CFPROVIN ?: "" ) & " " & ( arguments.data.CFSTAISO ?: "" ) ),
+			"shippingCompany"  = arguments.data.DEDESMER ?: "",
+			"shippingAddress"  = Trim( ( arguments.data.DEINDMER ?: "" ) & " " & ( arguments.data.DECAPDES ?: "" ) & " " & ( arguments.data.DELOCMER ?: "" ) & " " & ( arguments.data.DEPROMER ?: "" ) & " " & ( arguments.data.DENAZMER ?: "" ) ),
+			"shippingContact"  = arguments.data.MMRIFSPE ?: "",
+			"reference"        = arguments.data.MMRIFORD ?: "",
+			"agent"            = arguments.data.MMCODAGE ?: "",
+			"paymentMethod"    = arguments.data.MMCODPAG ?: "",
+			"deliveryDate"     = ( !IsNull( arguments.data.MMDATEVA ) && IsDate( arguments.data.MMDATEVA ) ) ? DateFormat( arguments.data.MMDATEVA, "dd/mm/yyyy" ) : "",
+			"discount1"        = arguments.data.MMSCOCF1 ?: 0,
+			"discount2"        = arguments.data.MMSCOCF2 ?: 0,
+			"shippingCost"     = arguments.data.MMSPETRA ?: 0
+		};
+	}
+
+	/**
+	 * Riga scritta su ORDINI_APIR, da mostrare nel riepilogo dell'esportazione.
+	 */
+	private Struct function exportRowSummary( required Struct data ){
+		return {
+			"row"       = arguments.data.CPROWNUM ?: 0,
+			"code"      = arguments.data.MMCODART ?: "",
+			"variant"   = arguments.data.MMCODVAR ?: "",
+			"color"     = arguments.data.MMCODCOL ?: "",
+			"quantity"  = arguments.data.MMQTAMOV ?: 0,
+			"price"     = arguments.data.MMVALUNI ?: 0,
+			"discount1" = arguments.data.MMSCOAR1 ?: 0,
+			"discount2" = arguments.data.MMSCOAR2 ?: 0,
+			"note"      = arguments.data.MMANNDET ?: ""
+		};
 	}
 
 	function getOriginalPrice(required numeric finalPrice, required numeric discount1, required numeric discount2) {
@@ -1440,7 +1487,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return componente;
 	}
 
-	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation, boolean provisional = false ){
+	private function prepareExportData( required com.apirone.core.model.bean.Quotation quotation ){
 		var result = {
 			"data" = {},
 			"error" = null
@@ -1506,7 +1553,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"INDUSTRY" = quotation.getIndustry() ?: "",
 			"MMORDFOR" = "",
 			"CFCODDES" = quotation.getCodiceSdi() ?: "",
-			"MMORDPRO" = arguments.provisional ? "S" : "N",
+			"MMORDPRO" = "N",
 			"MMSCOCF1" = quotationPrice.getDiscount1(),
 			"MMSCOCF2" = quotationPrice.getDiscount2(),
 			"MMSPETRA" = quotationPrice.getShippingCost(),

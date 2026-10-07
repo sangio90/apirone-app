@@ -97,7 +97,7 @@
 										</tr>
 										<tr style="border: 0">
 											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">#printLabel('address', langId)#: </td>
-											<td style="border: 0">
+											<td style="border: 0; padding-left: 0.05in;">
 												#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
 												#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
 												<cfif !isNull(args.data.quotation.getCustomer().getCountry())><cfset custCountry = args.data.quotation.getCustomer().getCountry()>#Len( Trim( custCountry.getIsoCode() ?: '' ) ) ? custCountry.getIsoCode() : ( custCountry.getCode() ?: '' )#<br></cfif>

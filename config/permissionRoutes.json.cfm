@@ -11,4 +11,8 @@
         "roles": ["ADM", "CMS"],
     },
 
+    "ErrorLogController.*": {
+        "roles": ["ADM"],
+    },
+
 }

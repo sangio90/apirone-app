@@ -1814,9 +1814,35 @@ AP.signage.modal = ( function() {
                     }
                 } );
             }
+            // Senza immagine di sfondo il contenitore è alto 0: testo e immagini degli attributi
+            // (pittogrammi) sono position:absolute, anche annidati, e non gli danno dimensione,
+            // e snapdom salvava un'immagine vuota (es. 800x2). Per lo scatto lo allargo quanto
+            // serve a contenere tutti i discendenti visibili (immagini caricate, altrimenti misurano 0).
+            await Promise.all( Array.from( preview.querySelectorAll( "img[src]" ) ).map( function( img ) {
+                return img.complete ? null : img.decode().catch( function() {} );
+            } ) );
+            const previewBox = preview.getBoundingClientRect();
+            let neededWidth = 0;
+            let neededHeight = 0;
+            preview.querySelectorAll( "*" ).forEach( function( element ) {
+                const box = element.getBoundingClientRect();
+                if ( !box.width || !box.height ) { return; }
+                neededWidth = Math.max( neededWidth, box.right - previewBox.left );
+                neededHeight = Math.max( neededHeight, box.bottom - previewBox.top );
+            } );
+            const previousMinSize = { minWidth: preview.style.minWidth, minHeight: preview.style.minHeight };
+            if ( neededWidth > previewBox.width ) { preview.style.minWidth = Math.ceil( neededWidth ) + "px"; }
+            if ( neededHeight > previewBox.height ) { preview.style.minHeight = Math.ceil( neededHeight ) + "px"; }
+
             // embedFonts: l'SVG che snapdom rasterizza non vede i font della pagina;
             // senza incorporarli il testo cambia larghezza rispetto all'anteprima.
-            const imgElement = await snapdom.toPng( preview, { embedFonts: true } );
+            let imgElement;
+            try {
+                imgElement = await snapdom.toPng( preview, { embedFonts: true } );
+            } finally {
+                preview.style.minWidth = previousMinSize.minWidth;
+                preview.style.minHeight = previousMinSize.minHeight;
+            }
 
             const imgData = await scaleDataUrlToBase64( imgElement.src, 800 );
 

@@ -1086,3 +1086,8 @@ h2 {
 .untranslated {
     background-color: Red;
 }
+
+/* Pulsanti azione nel dettaglio preventivo: stessa larghezza per tutti, testo lungo permesso */
+.qt-actions .btn {
+    min-width: 150px;
+}

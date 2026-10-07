@@ -558,19 +558,6 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	}
 
-	function exportProducts( event, rc, prc ){
-		setting requestTimeout=300;
-		var data = [];
-
-		var result = super.getResult();
-
-		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
-
-		var result         = super.fire( "Quotation.exportProducts", [ quotationItems ] );
-
-		event.setValue( "result", result );
-	}
-
 	function export( event, rc, prc ){
 		setting requestTimeout=300;
 		var data = [];
@@ -581,7 +568,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		params[ "id" ] = rc.id;
 
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
-		var result         = super.fire( "Quotation.export", [ quotationItems, false ] );
+		var result         = exportProductsAndQuotation( quotationItems );
 
 		if (result.success) {
 			var quotation = super.fire( "Quotation.get",[ rc.id ]);
@@ -593,15 +580,28 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
-	function exportProvisional( event, rc, prc ){
-		setting requestTimeout=300;
+	/**
+	 * Esportazione unica verso Verticale: prima gli articoli ( il preventivo non
+	 * si può scrivere finché i suoi articoli non hanno un codice esportato ), poi
+	 * il preventivo. Il risultato del preventivo porta con sé quello degli
+	 * articoli in "products", così la modale di riepilogo li mostra entrambi
+	 * anche quando il secondo passo fallisce.
+	 */
+	private Struct function exportProductsAndQuotation( required Array quotationItems ){
+		var productsResult = super.fire( "Quotation.exportProducts", [ arguments.quotationItems ] );
 
-		var result = super.getResult();
+		if ( !productsResult.success || !IsNull( productsResult.error ) ) {
+			return {
+				"success"  = false,
+				"error"    = productsResult.error ?: "Errore durante l'esportazione articoli.",
+				"products" = productsResult
+			};
+		}
 
-		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
-		var result         = super.fire( "Quotation.export", [ quotationItems, true ] );
+		var result = super.fire( "Quotation.export", [ arguments.quotationItems ] );
+		result[ "products" ] = productsResult;
 
-		event.setValue( "result", result );
+		return result;
 	}
 
 
