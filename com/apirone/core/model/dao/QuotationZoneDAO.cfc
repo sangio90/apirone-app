@@ -119,6 +119,20 @@
 
 	<cffunction name="delete" returntype="Boolean">
 		<cfargument name="zoneId" type="String" required="true">
+		<!---
+			Le posizioni ( P1, P2... ) le creano le righe ( ensurePosition ) e restano
+			anche quando le righe vengono cancellate o spostate: senza toglierle la
+			chiave esterna ( senza ON DELETE CASCADE ) impedisce di cancellare la zona.
+			Si tolgono solo quelle che nessuna riga usa più.
+		--->
+		<cfquery datasource="apirone">
+			DELETE FROM quotation_zone_positions zp
+			WHERE zp.quotation_zone_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.zoneId#">::uuid
+				AND NOT EXISTS (
+					SELECT 1 FROM quotation_items qi
+					WHERE qi.quotation_zone_position_id = zp.quotation_zone_position_id
+				)
+		</cfquery>
 		<cfquery name="local.q" datasource="apirone">
 			DELETE
 			FROM

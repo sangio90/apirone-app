@@ -196,7 +196,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				for ( var item in zoneItems ) {
 					var outcome = super.fire( "quotationItem.delete", [ item.getId() ] );
 					if ( outcome.getStatus() == "ERROR" ) {
-						throw( message = outcome.getMessage() );
+						throw( message = outcome.getMessage(), detail = outcome.getError().message ?: "" );
 					}
 
 					var quotationId = item.getQuotation().getId();
@@ -228,7 +228,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 				var zoneOutcome = super.fire( "quotationZone.delete", [ zone.id ] );
 				if ( zoneOutcome.getStatus() == "ERROR" ) {
-					throw( message = zoneOutcome.getMessage() );
+					throw( message = zoneOutcome.getMessage(), detail = zoneOutcome.getError().message ?: "" );
 				}
 
 				for ( var key in repricings ) {
@@ -236,6 +236,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				}
 			} catch ( any e ) {
 				transaction action="rollback";
+				writeLog( type = "error", file = "application", text = "Cancellazione zona #zone.id# non riuscita: #e.message# #e.detail#" );
 				result.setData( { "message" = getMessage( "zone.notDeleted" ), "status" = "error" } );
 				event.setValue( "result", result );
 				return;
