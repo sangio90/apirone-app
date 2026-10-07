@@ -439,6 +439,8 @@ AP.quotation.detail = (function () {
 					["Data evasione", header.deliveryDate],
 					["Agente", header.agent],
 					["Pagamento", header.paymentMethod],
+					// TODO-MMCODIVA: riattivare quando MMCODIVA viene scritto su ORDINI_APIR (QuotationDAO.export)
+					// ["Aliquota IVA", header.vatCode],
 					["Sconti testata", num(header.discount1) + " + " + num(header.discount2) + " %"],
 					["Spese trasporto", num(header.shippingCost)]
 				];

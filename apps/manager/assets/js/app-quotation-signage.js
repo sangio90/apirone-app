@@ -618,8 +618,10 @@ AP.signage.modal = ( function() {
 
             // Uno span completamente vuoto non genera alcuna line box: la riga
             // sparirebbe dall'anteprima. Un nbsp forza il rendering dell'altezza
-            // di riga configurata anche a contenuto vuoto.
-            contentSpanPreview.html( parts.length ? parts.join( "" ) : "&nbsp;" );
+            // di riga configurata anche a contenuto vuoto. Il nbsp è disegnato in Arial e non
+            // col font della segnaletica: alcuni font hanno un glifo visibile su U+00A0
+            // (Microgramma D Medium Extended ci mappa "®", che finiva anche nell'immagine salvata).
+            contentSpanPreview.html( parts.length ? parts.join( "" ) : "<span style=\"font-family: Arial, sans-serif;\">&nbsp;</span>" );
 
             this.updateZeroPictogramsWarning();
 

@@ -1285,6 +1285,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"reference"        = arguments.data.MMRIFORD ?: "",
 			"agent"            = arguments.data.MMCODAGE ?: "",
 			"paymentMethod"    = arguments.data.MMCODPAG ?: "",
+			"vatCode"          = arguments.data.MMCODIVA ?: "",
 			"deliveryDate"     = ( !IsNull( arguments.data.MMDATEVA ) && IsDate( arguments.data.MMDATEVA ) ) ? DateFormat( arguments.data.MMDATEVA, "dd/mm/yyyy" ) : "",
 			"discount1"        = arguments.data.MMSCOCF1 ?: 0,
 			"discount2"        = arguments.data.MMSCOCF2 ?: 0,
@@ -1521,6 +1522,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMPERPR5" = !isNull(quotation.getCommission5()) ? quotation.getCommission5() : 0,
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
+			"MMCODIVA" = !isNull( quotation.getVatCode() ) ? quotation.getVatCode().getId() : "", // aliquota IVA = ivacod di verticale_vat_codes. TODO-MMCODIVA: per ora non scritto su ORDINI_APIR (vedi QuotationDAO.export)
 			"CF_IDCLI" = customer.getId(),
 			"CF___CAP" = customer.getPostalCode(),
 			"CFDESCR1" = customer.getCompany(),
