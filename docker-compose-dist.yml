@@ -32,6 +32,8 @@ services:
       - "7112:80"
     volumes:
       - commandbox_repo:/usr/share/nginx/html:ro
-      - ./nginx_foto.conf:/etc/nginx/nginx_foto.conf:ro
+      # deve sostituire la configurazione principale, altrimenti nginx usa quella di default
+      # (senza mime.types i file vengono serviti come text/plain e Chrome scarta le SVG)
+      - ./nginx_foto.conf:/etc/nginx/nginx.conf:ro
 volumes:
   commandbox_repo:
