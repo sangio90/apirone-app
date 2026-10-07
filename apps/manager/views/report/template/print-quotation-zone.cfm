@@ -100,6 +100,7 @@
 											<td style="border: 0">
 												#args.data.quotation.getCustomer().getStreet()# #args.data.quotation.getCustomer().getPostalCode()#<br>
 												#args.data.quotation.getCustomer().getCity()# #args.data.quotation.getCustomer().getState()#
+												<cfif !isNull(args.data.quotation.getCustomer().getCountry())><cfset custCountry = args.data.quotation.getCustomer().getCountry()>#Len( Trim( custCountry.getIsoCode() ?: '' ) ) ? custCountry.getIsoCode() : ( custCountry.getCode() ?: '' )#<br></cfif>
 											</td>
 										</tr>
 									</table>
@@ -129,8 +130,8 @@
 										<tr style="border: 0">
 											<td style="border: 0; vertical-align: top; font-weight: bold; padding-left: 0.05in;">#printLabel('address', langId)#: </td>
 											<td style="border: 0">
-												#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#<br>
-												#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#
+												#args.data.quotation.getShippingProfile().getStreet()# #args.data.quotation.getShippingProfile().getPostalCode()#<br>
+												#args.data.quotation.getShippingProfile().getCity()# #args.data.quotation.getShippingProfile().getState()#
 												<cfif !isNull(args.data.quotation.getShippingProfile().getCountry())><cfset spCountry = args.data.quotation.getShippingProfile().getCountry()>#Len( Trim( spCountry.getIsoCode() ?: '' ) ) ? spCountry.getIsoCode() : ( spCountry.getCode() ?: '' )#<br></cfif>
 											</td>
 										</tr>
@@ -202,7 +203,7 @@
 													Condizionato perché senza immagine non serve rientro.
 												--->
 												<td style="<cfif args.params.images>padding-left: 0.25cm;</cfif>">
-													<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+													#printItemDescription( oggetto, args.data, langId )#
 													<cfif !isNull(oggetto.getPosition())>
 														<div style="font-size: 7pt; margin-top: 3px; text-transform: lowecase">#printLabel('position', langId)#: #oggetto.getPosition().getCode()#</div>
 													</cfif>

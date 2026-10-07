@@ -55,7 +55,7 @@
 													<i class="fa fa-ruler"></i>
 												</button>
 												<div class="model-size">
-													#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#<cfif !isNull(model.modelConfig.getLength()) && model.modelConfig.getLength() GT 0> x #model.modelConfig.getLength()#</cfif>
+													<cfif !isNull(model.modelConfig.getLength()) && model.modelConfig.getLength() GT 0>#model.modelConfig.getWidth()# x #model.modelConfig.getLength()# x h #model.modelConfig.getHeight()#<cfelse>#model.modelConfig.getWidth()# x #model.modelConfig.getHeight()#</cfif>
 												</div>
 											<cfelse>
 												<button class="btn btn-default btn-xs" data-bind="click:showModelConfigModal"

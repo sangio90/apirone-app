@@ -33,22 +33,6 @@
                             </div>
                         </div>
 
-                        <div class="mb-3 row">
-                            <label class="col-sm-2 col-form-label text-end">Altezza</label>
-                            <div class="col-sm-10">
-                                <div class="input-group">
-                                    <input type="text" required class="form-control col-sm-4" name="height"
-                                        data-msg-required="height"
-                                        maxlength="125"
-                                        data-bind="value: modelConfigModal.data.height">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">#local.unit#</span>
-                                    </div>
-                                </div>
-                                <span id="height-error"></span>
-                            </div>
-                        </div>
-
                         <cfif !local.isPlaSeg>
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label text-end">Lunghezza</label>
@@ -65,6 +49,22 @@
                             </div>
                         </div>
                         </cfif>
+
+                        <div class="mb-3 row">
+                            <label class="col-sm-2 col-form-label text-end">Altezza</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <input type="text" required class="form-control col-sm-4" name="height"
+                                        data-msg-required="height"
+                                        maxlength="125"
+                                        data-bind="value: modelConfigModal.data.height">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">#local.unit#</span>
+                                    </div>
+                                </div>
+                                <span id="height-error"></span>
+                            </div>
+                        </div>
 
 					</div>
 

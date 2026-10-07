@@ -148,10 +148,9 @@
 </cffunction>
 
 <!---
-	Riga dimensioni dell'articolo, sempre sotto al nome: legenda tutta
-	maiuscola e senza parentesi, seguita dalle misure ( es. "LUNG X LARG X ALT
-	100x20x30 cm" ). Con la lunghezza valorizzata stampa le tre quote, altrimenti
-	solo larghezza e altezza.
+	Riga dimensioni dell'articolo, sempre sotto al nome: "Dimensioni: 20 x 30 cm"
+	( larghezza x altezza ). Quando c'è anche la terza quota ( accessori ecc. )
+	l'altezza va in fondo marcata con la "h": "Dimensioni: 20 x 100 x h 30 cm".
 	L'unità cambia col tipo di articolo: mm per placche e segnaletica, cm per
 	tutto il resto.
 --->
@@ -160,15 +159,51 @@
 	<cfargument name="langId" required="true">
 	<cfargument name="unit" required="false" default="cm">
 
-	<cfset local.hasLength = !IsNull( arguments.modelConfig.getLength() )>
-	<cfset local.legend = local.hasLength
-		? printLabel( 'dimLegend3', arguments.langId )
-		: printLabel( 'dimLegend2', arguments.langId )>
-	<cfset local.sizes = local.hasLength
-		? arguments.modelConfig.getLength() & " x " & arguments.modelConfig.getWidth() & " x " & arguments.modelConfig.getHeight()
+	<cfset local.sizes = !IsNull( arguments.modelConfig.getLength() )
+		? arguments.modelConfig.getWidth() & " x " & arguments.modelConfig.getLength() & " x h " & arguments.modelConfig.getHeight()
 		: arguments.modelConfig.getWidth() & " x " & arguments.modelConfig.getHeight()>
 
-	<cfsavecontent variable="local.html"><cfoutput><div style="font-size: 7pt; margin-top: 2px;"><span style="white-space: nowrap;">#local.legend#</span> <span style="white-space: nowrap;">#local.sizes# #arguments.unit#</span></div></cfoutput></cfsavecontent>
+	<cfsavecontent variable="local.html"><cfoutput><div style="font-size: 7pt;">#printLabel( 'dimensions', arguments.langId )#: <span style="white-space: nowrap;">#local.sizes# #arguments.unit#</span></div></cfoutput></cfsavecontent>
+
+	<cfreturn local.html>
+</cffunction>
+
+<!---
+	Descrizione di una voce di stampa. Per i prodotti composti da linea, modello
+	e finitura: linea e modello sulla prima riga, poi "Finitura: ..." e
+	"Dimensioni: ..." ognuna su una riga sua. Gli altri prodotti stampano il
+	nome, seguito dalle dimensioni se il modello le ha.
+	Le dimensioni arrivano dalla modelConfigMap preparata dal controller.
+--->
+<cffunction name="printItemDescription" output="false">
+	<cfargument name="item" required="true">
+	<cfargument name="data" required="true">
+	<cfargument name="langId" required="true">
+
+	<cfset local.product = arguments.item.getProduct()>
+	<cfset local.isComplex = IsInstanceOf( local.product, "com.apirone.core.model.bean.ProductComplex" )>
+
+	<cfset local.dimHtml = "">
+	<cfif StructKeyExists( arguments.data, "modelConfigMap" ) && StructKeyExists( arguments.data.modelConfigMap, local.product.getId() )>
+		<cfset local.typeId = ( !IsNull( local.product.getCategory() ) && !IsNull( local.product.getCategory().getType() ) ) ? local.product.getCategory().getType().getId() : "">
+		<cfset local.dimHtml = printDimensions(
+			arguments.data.modelConfigMap[ local.product.getId() ],
+			arguments.langId,
+			( local.typeId EQ "PLA" OR local.typeId EQ "SEG" ) ? "mm" : "cm"
+		)>
+	</cfif>
+
+	<cfsavecontent variable="local.html"><cfoutput>
+		<cfif local.isComplex>
+			<span style="font-size: 7pt; text-transform: lowecase">#local.product.getLine().getName()# #local.product.getModel().getName()# (#local.product.getModel().getCode()#)</span><br>
+			<cfif !IsNull( local.product.getFinish() )>
+				<div style="font-size: 7pt;">#printLabel( 'finish', arguments.langId )#: #local.product.getFinish().getName()#</div>
+			</cfif>
+		<cfelse>
+			<span style="font-size: 7pt; text-transform: lowecase">#local.product.getDescription()#</span><br>
+		</cfif>
+		#local.dimHtml#
+	</cfoutput></cfsavecontent>
 
 	<cfreturn local.html>
 </cffunction>
@@ -410,8 +445,8 @@
 			"offer":          "Offerta",
 			"technicalPrint": "Stampa Tecnica",
 			"photoPrint":     "Stampa Foto",
-			"dimLegend2":     "LARG X ALT",
-			"dimLegend3":     "LUNG X LARG X ALT"
+			"finish":         "Finitura",
+			"dimensions":     "Dimensioni"
 		},
 		"EN": {
 			"quotation":      "Quotation",
@@ -453,8 +488,8 @@
 			"offer":          "Offer",
 			"technicalPrint": "Technical Print",
 			"photoPrint":     "Photo Print",
-			"dimLegend2":     "W X H",
-			"dimLegend3":     "L X W X H"
+			"finish":         "Finish",
+			"dimensions":     "Dimensions"
 		},
 		"FR": {
 			"quotation":      "Devis",
@@ -496,8 +531,8 @@
 			"offer":          "Offre",
 			"technicalPrint": "Impression Technique",
 			"photoPrint":     "Impression Photo",
-			"dimLegend2":     "LARG X HAUT",
-			"dimLegend3":     "LONG X LARG X HAUT"
+			"finish":         "Finition",
+			"dimensions":     "Dimensions"
 		},
 		"ES": {
 			"quotation":      "Presupuesto",
@@ -539,8 +574,8 @@
 			"offer":          "Oferta",
 			"technicalPrint": "Impresión Técnica",
 			"photoPrint":     "Impresión Fotográfica",
-			"dimLegend2":     "ANCH X ALT",
-			"dimLegend3":     "LONG X ANCH X ALT"
+			"finish":         "Acabado",
+			"dimensions":     "Dimensiones"
 		},
 		"DE": {
 			"quotation":      "Angebot",
@@ -582,8 +617,8 @@
 			"offer":          "Angebot",
 			"technicalPrint": "Technischer Druck",
 			"photoPrint":     "Fotodruck",
-			"dimLegend2":     "B X H",
-			"dimLegend3":     "L X B X H"
+			"finish":         "Ausführung",
+			"dimensions":     "Abmessungen"
 		}
 	}>
 	<cfif !structKeyExists(local.labels, local.lang)>

@@ -1488,6 +1488,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"CFMOROSO" = "N",
 			"CFREFAMM" = quotation.getReferenteAmministrativo() ?: "",
 			"MMRIFSPE"  = quotation.getReferenteSpedizione() ?: "",
+			"MMANNTES"  = quotation.getReferenteSpedizione() ?: "", // referente spedizione anche nelle annotazioni di testata
 			"MMNOTPOS"  = quotation.getNote() ?: "",
 			"CFTIPCLF" = (function(){
 				var crmToErp = {

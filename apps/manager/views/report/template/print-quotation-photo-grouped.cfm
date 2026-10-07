@@ -80,7 +80,7 @@
 								<!--- descrizione appesa in alto: senza, con le foto alte finiva a meta' cella,
 								     staccata dal titolo della voce --->
 								<td style="vertical-align: top; padding-right: 0; padding-bottom: 6px; border-left: 0; border-bottom: 1px solid black; line-height: 12px; width: <cfif args.params.images> 5cm <cfelse> 10.99cm </cfif> !important;">
-									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
+									#printItemDescription( oggetto, args.data, langId )#
 									<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 										<cfloop from="1"  to="#itemsCount#" index="item">

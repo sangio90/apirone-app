@@ -87,9 +87,6 @@
 								<cfset zones = oggetto.zones>
 								<cfset quantity = oggetto.quantity>
 								<cfset oggetto = oggetto.item>
-								<cfset hasDim = StructKeyExists(args.data, "modelConfigMap") && StructKeyExists(args.data.modelConfigMap, oggetto.getProduct().getId())>
-								<cfif hasDim><cfset thisDimMC = args.data.modelConfigMap[oggetto.getProduct().getId()]></cfif>
-								<cfset thisDimType = hasDim && !isNull(oggetto.getProduct().getCategory()) && !isNull(oggetto.getProduct().getCategory().getType()) ? oggetto.getProduct().getCategory().getType().getId() : "">
 								<tr style="page-break-inside: avoid;">
 								<cfif args.params.images>
 									<td style="margin: 0 !important; padding: 3px; align-items: center; border-right: 0; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; width: 6cm !important;">
@@ -117,15 +114,11 @@
 									<cfif Len( thisExportCode )>
 										<span style="font-size: 7pt; font-weight: bold;">#thisExportCode#</span><br>
 									</cfif>
-									<span style="font-size: 7pt; text-transform: lowecase">#oggetto.getProduct().getDescription()#</span><br>
 									<!---
-										Dimensioni sempre qui sotto al nome, anche per placche e
-										segnaletica: prima finivano nella colonna di destra.
-										L'unità la decide il tipo di articolo.
+										Nome, finitura e dimensioni ( sempre qui sotto al nome, anche
+										per placche e segnaletica ): vedi printItemDescription.
 									--->
-									<cfif hasDim>
-										#printDimensions( thisDimMC, langId, ( thisDimType EQ "PLA" OR thisDimType EQ "SEG" ) ? "mm" : "cm" )#
-									</cfif>
+									#printItemDescription( oggetto, args.data, langId )#
 									<cfif !isNull(oggetto.getItems()) && oggetto.getItems().len() GT 0>
 										<cfset itemsCount = ArrayLen( oggetto.getItems() )>
 										<cfloop from="1"  to="#itemsCount#" index="item">
