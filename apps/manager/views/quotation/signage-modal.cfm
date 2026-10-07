@@ -111,7 +111,7 @@
                         <div class="row mb-2 pb-2 bb-1">
                             <div class="col-8 small" id="signage-export-code"></div>
                             <div class="col-4 text-end">
-                                <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
+                                <a class="underline hand qt-edit-only" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
                         </div>
 
@@ -128,7 +128,7 @@
 
                                 <div class="flex justify-content-between mb-3">
                                     <span class="me-2">Righe</span>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
+                                    <button type="button" class="btn btn-primary btn-sm qt-edit-only" data-bind="click:addSignageRow, enabled:detailForm.data.quotationItem.signageConfigItem.id">Aggiungi Riga</button>
                                 </div>
 
                                 <div id="signage-rows-container" style="max-height: 600px; overflow-y: auto" data-template="signage-line-row-tmpl" data-bind="source: detailForm.data.quotationItem.signageRows, visible:detailForm.data.signageConfig.font.id">
@@ -195,17 +195,17 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-6 fs-10">
-                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" data-bind="click:toggleJsonExport, visible:detailForm.data.quotationItem.id">
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2 qt-edit-only" data-bind="click:toggleJsonExport, visible:detailForm.data.quotationItem.id">
                                     <i class="fas fa-code"></i> JSON
                                 </button>
-                                <button type="button" class="btn btn-primary btn-sm" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci configurazione</button>
+                                <button type="button" class="btn btn-primary btn-sm qt-edit-only" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci configurazione</button>
                             </div>
 
                             <div class="col-md-6 float-end">
-                                <button id="save-button" type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
+                                <button id="save-button" type="button" class="btn btn-primary btn-sm float-end qt-edit-only" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
-                                <button id="clone-button" type="button" class="btn btn-warning btn-sm float-end" style="display: none" data-bind="click:save, enabled:canSave">
+                                <button id="clone-button" type="button" class="btn btn-warning btn-sm float-end qt-edit-only" style="display: none" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Clona
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>

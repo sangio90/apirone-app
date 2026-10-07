@@ -19,7 +19,7 @@
 							name="customImage" 
 							data-bind="checked: detailForm.data.quotationItem.customImage, events: { change: toggleCustomImage }"
 						>
-						<a type="button" class="btn btn-primary btn-sm"
+						<a type="button" class="btn btn-primary btn-sm qt-edit-only"
 							data-type="quotationItem"
 							data-bind="click:openImagesList, visible: showCustomImage"
 							style="font-size: 10px;"

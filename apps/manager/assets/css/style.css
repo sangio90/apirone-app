@@ -1091,3 +1091,30 @@ h2 {
 .qt-actions .btn {
     min-width: 150px;
 }
+
+/*
+   Preventivo non modificabile ( AP.page.canEdit false ): le modali dei prodotti
+   restano consultabili ma in sola lettura. La classe qt-readonly sulla modale la
+   mette app-quotation-detail.js; qt-edit-only marca i pulsanti che modificano.
+*/
+.qt-readonly .qt-edit-only {
+    display: none !important;
+}
+.qt-readonly input,
+.qt-readonly select,
+.qt-readonly textarea,
+.qt-readonly .k-picker,
+.qt-readonly .k-input,
+.qt-readonly .k-dropdownlist,
+.qt-readonly .k-combobox,
+.qt-readonly .k-multiselect,
+.qt-readonly .k-numerictextbox,
+.qt-readonly .k-autocomplete {
+    pointer-events: none;
+}
+.qt-readonly .form-control,
+.qt-readonly .form-select,
+.qt-readonly .k-picker,
+.qt-readonly .k-input {
+    background-color: #e9ecef;
+}

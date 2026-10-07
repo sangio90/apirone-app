@@ -98,9 +98,20 @@ component extends="com.apirone.core.controller.AbsController" {
 				quotation.getStatusHistory().getStatus().getOrderBy() < 20
 			)
 		);
-		var isSentToClient = quotation.getSentToClient() ?: false;
-		prc.page[ "canEdit" ] = baseCanEdit && !isSentToClient;
-		prc.page[ "canRevise" ] = baseCanEdit && isSentToClient;
+		// Inviato al cliente, esportato o convertito in ordine: non si modifica più,
+		// si crea una revisione ( Quotation.lockReason ). La revisione la può creare
+		// anche il proprietario / commerciale, che a stato avanzato perde baseCanEdit.
+		var isLocked = quotation.isLocked();
+		var isOwnerOrAgent = quotation.getOwner().getId() == user.getId()
+			|| ( !IsNull( quotation.getSalesAgent() ) && quotation.getSalesAgent().getId() == user.getId() );
+		prc.page[ "canEdit" ] = baseCanEdit && !isLocked;
+		prc.page[ "canRevise" ] = isLocked && (
+			ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || isOwnerOrAgent
+		);
+		prc.page[ "lockReason" ] = quotation.lockReason();
+		// L'esportazione non dipende dal blocco ( un ordine convertito va esportato ):
+		// si fa una volta sola, poi per cambiare l'ordine serve una revisione.
+		prc.page[ "canExport" ] = baseCanEdit && !( quotation.getExported() ?: false );
 		prc.page[ "canSee" ] = user.getRole().getId() == 'CMS' || prc.page[ "canEdit" ] == false || user.getRole().getId() == 'PRO';
 
 		prc.jsFiles.add( "app-quotation-header" );

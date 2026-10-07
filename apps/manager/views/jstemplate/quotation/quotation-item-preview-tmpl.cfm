@@ -44,8 +44,10 @@
                     </div>
                 </div>
                 <!--- nota su una riga sua, sotto l'intestazione: dentro la colonna di
-                      sinistra finiva sotto ai pulsanti, che sbordano dalla col-3 --->
-                <div class="col-12" style="font-size: 10px; margin-top: -16px;" data-bind="visible: note_short">
+                      sinistra finiva sotto ai pulsanti, che sbordano dalla col-3.
+                      Rialzata a ridosso del titolo, ma non quando c'è la riga
+                      "Posizione", che altrimenti coprirebbe --->
+                <div class="col-12" style="font-size: 10px; margin-top: #= ( data.position && data.position.code ) ? '2px' : '-16px' #;" data-bind="visible: note_short">
                     <i data-bind="text: note_short, attr: { title: note }"></i>
                 </div>
                 <div class="col-12 d-flex justify-content-center">

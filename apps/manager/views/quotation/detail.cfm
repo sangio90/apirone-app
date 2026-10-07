@@ -43,7 +43,7 @@
                             Status: #prc.quotation.getStatusHistory().getStatus().getName()#
                         </button>
                     </cfif>
-                    #button( bind="click:export, enabled: canEdit", size="sm", label="Esporta preventivo", icon="file-export", class="export-button qt-draft-block" )#
+                    #button( bind="click:export, enabled: canExport", size="sm", label="Esporta preventivo", icon="file-export", class="export-button qt-draft-block" )#
                     <button type="button" class="btn btn-outline-primary btn-sm" data-bind="click:markAsSent, visible:canEdit">
                         <i class="fas fa-paper-plane"></i> Inviato a cliente
                     </button>

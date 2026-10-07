@@ -125,6 +125,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function save( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		if ( super.rejectIfQuotationLocked( event, json.id ?: "" ) ) return;
+
 		var thisId    = "";
 		var messageId = "";
 		var result    = super.getResult();
@@ -530,6 +532,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function updateTotals( event, rc, prc ){
 
+		if ( super.rejectIfQuotationLocked( event, rc.id ) ) return;
+
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
 		var pricing = super.bean( "QuotationPrice" );
@@ -566,6 +570,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var params = super.paramsFromUrl();
 
 		params[ "id" ] = rc.id;
+
+		// si esporta una volta sola: per cambiare un ordine già esportato serve una revisione
+		var exportingQuotation = super.fire( "Quotation.get", [ rc.id ] );
+		if ( exportingQuotation.getExported() ?: false ) {
+			event.setValue( "result", {
+				"success" = false,
+				"error"   = "Il preventivo è già stato esportato. Per modificarlo crea una revisione ( Modifica preventivo ) ed esporta quella."
+			} );
+			return;
+		}
 
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 		var result         = exportProductsAndQuotation( quotationItems );

@@ -102,7 +102,7 @@
                                 <div class="col-8 small" v-html="exportCodeHtml"></div>
                                 <!--- Anteprima del codice export (articolo + variante a 10 caratteri) composta dal server con la stessa logica dell'esportazione; si aggiorna a ogni cambio di attributo. --->
                                 <div class="col-4 text-end">
-                                    <a class="underline hand" @click="clearFilters" v-if="visibleUpperClearButton">Pulisci configurazione</a>
+                                    <a class="underline hand qt-edit-only" @click="clearFilters" v-if="visibleUpperClearButton">Pulisci configurazione</a>
                                     <!--- v-if="visibleUpperClearButton": mostra il link solo quando ci sono selezioni attive da resettare. visibleUpperClearButton: proprietà computata Vue, true quando id è vuoto (nuova placca). @click="clearFilters": resetta tutte le selezioni (linea, modello, finitura, attributi, designer). --->
                                 </div>
                             </div>
@@ -357,7 +357,7 @@
                                                     <div>
                                                         <input class="form-check-input me-4" type="checkbox" name="customImage" v-model="detailForm.data.customImage" @change="toggleCustomImage">
                                                         <!--- detailForm.data.customImage: flag per attivare/disattivare l'immagine personalizzata. @change="toggleCustomImage": gestisce il passaggio tra designer tecnico e immagine personalizzata. --->
-                                                        <a type="button" class="btn btn-primary btn-sm" data-type="quotationItem" @click="openImagesList" v-if="detailForm.data.customImage" style="font-size: 10px;">
+                                                        <a type="button" class="btn btn-primary btn-sm qt-edit-only" data-type="quotationItem" @click="openImagesList" v-if="detailForm.data.customImage" style="font-size: 10px;">
                                                         <!--- Pulsante visibile solo quando la checkbox "Immagine Custom" è attiva. openImagesList: apre la galleria di selezione immagini. data-type="quotationItem": identifica il tipo di entità per il gestore della galleria. --->
                                                             Aggiungi <i class="fas fa-image"></i>
                                                         </a>
@@ -478,7 +478,7 @@
                                             </div>
                                             <div class="row mb-2 mt-2">
                                                 <div class="col-12 d-flex align-items-center">
-                                                    <button type="button" class="btn btn-primary btn-sm mt-3" @click="updatePricing">
+                                                    <button type="button" class="btn btn-primary btn-sm mt-3 qt-edit-only" @click="updatePricing">
                                                     <!--- updatePricing: ricalcola i prezzi chiamando il servizio di pricing via AJAX. --->
                                                         <i class="fas fa-sync"></i> Aggiorna prezzi
                                                     </button>
@@ -508,11 +508,11 @@
                         <!--- Footer del modale: informazioni sull'articolo (ID/data creazione) e pulsanti di azione. --->
                             <div class="row">
                                 <div class="col-md-6 fs-10">
-                                    <button v-if="detailForm.data.id && canSeeJsonDebugButtons" type="button" class="btn btn-outline-secondary btn-sm me-2" @click="toggleJsonExport" :disabled="jsonExportLoading">
+                                    <button v-if="detailForm.data.id && canSeeJsonDebugButtons" type="button" class="btn btn-outline-secondary btn-sm me-2 qt-edit-only" @click="toggleJsonExport" :disabled="jsonExportLoading">
                                         <i class="fas fa-code"></i> JSON
                                         <span v-if="jsonExportLoading" class="spinner-border spinner-border-sm ms-1"></span>
                                     </button>
-                                    <button v-if="detailForm.data.id && canSeeJsonDebugButtons" type="button" class="btn btn-outline-secondary btn-sm me-2" @click="toggle3dExport" :disabled="json3dLoading">
+                                    <button v-if="detailForm.data.id && canSeeJsonDebugButtons" type="button" class="btn btn-outline-secondary btn-sm me-2 qt-edit-only" @click="toggle3dExport" :disabled="json3dLoading">
                                         <i class="fas fa-cube"></i> JSON 3D
                                         <span v-if="json3dLoading" class="spinner-border spinner-border-sm ms-1"></span>
                                     </button>
@@ -524,17 +524,17 @@
                                 </div>
                                 <div class="col-md-6 float-end">
                                 <!--- Colonna destra del footer: pulsanti di azione allineati a destra. --->
-                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end" v-show="!detailForm.isClone && canEdit" @click="save">
+                                    <button id="saveButton" type="button" class="btn btn-primary btn-sm float-end qt-edit-only" v-show="!detailForm.isClone && canEdit" @click="save">
                                     <!--- save: salva l'articolo (creazione o aggiornamento) tramite chiamata AJAX. btn-primary: stile Bootstrap pulsante primario (blu). --->
                                         <i class="fas fa-save"></i> Salva
                                     </button>
-                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end" v-show="detailForm.isClone && canEdit" @click="save">
+                                    <button id="cloneButton" type="button" class="btn btn-warning btn-sm float-end qt-edit-only" v-show="detailForm.isClone && canEdit" @click="save">
                                     <!--- cloneButton: pulsante per clonare l'articolo. v-show: nascosto di default, mostrato da Vue in contesto clone. btn-warning: stile Bootstrap giallo. @click="save": anche il clone usa la stessa funzione save. --->
                                         <i class="fas fa-save"></i> Clona
                                     </button>
                                     <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal">Chiudi</button>
                                     <!--- data-bs-dismiss="modal": chiude il modale Bootstrap 5 senza JavaScript Vue. btn-default: stile Bootstrap pulsante neutro. --->
-                                    <button type="button" class="btn btn-primary btn-sm me-2 float-end" @click="clearFilters" v-if="visibleLowerClearButton">Pulisci Configurazione</button>
+                                    <button type="button" class="btn btn-primary btn-sm me-2 float-end qt-edit-only" @click="clearFilters" v-if="visibleLowerClearButton">Pulisci Configurazione</button>
                                     <!--- clearFilters: stesso comportamento del pulsante "Pulisci configurazione" superiore. v-if="visibleLowerClearButton": variante inferiore dello stesso pulsante logico. --->
                                     <img src="/assets/main/img/ajax-loading.svg" width="20" height="20" v-if="smallLoading" class="mt-1 float-end me-3">
                                     <!--- Indicatore di salvataggio, visibile solo durante la richiesta AJAX. --->

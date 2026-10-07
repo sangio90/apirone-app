@@ -59,6 +59,34 @@
 	}
 
 	/*
+		Blocca le modifiche a un preventivo non più modificabile ( inviato al
+		cliente, esportato, convertito in ordine: Quotation.lockReason ). La pagina
+		le disabilita già ( canEdit ), ma quello è solo lato client.
+		Se è bloccato imposta la risposta di errore e torna true: il chiamante deve
+		solo uscire.
+	*/
+	public Boolean function rejectIfQuotationLocked( required any event, required String quotationId ){
+		if ( !Len( arguments.quotationId ) ) {
+			return false;
+		}
+
+		var quotation = fire( "Quotation.get", [ arguments.quotationId ] );
+
+		if ( IsNull( quotation ) || !quotation.isLocked() ) {
+			return false;
+		}
+
+		var validation = getValidationResult();
+		validation.addError( getValidationError(
+			message = "Il preventivo non è modificabile perché #quotation.lockReason()#. Per modificarlo crea una revisione ( Modifica preventivo ).",
+			field   = "general"
+		) );
+		arguments.event.setValue( "result", validation );
+
+		return true;
+	}
+
+	/*
 		shorthands validation result
 	*/
 	public Any function getValidationResult(){

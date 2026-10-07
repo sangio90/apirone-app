@@ -79,7 +79,7 @@
                         <div class="row mb-2 pb-2 bb-1">
                             <div class="col-8 small" id="accessory-export-code"></div>
                             <div class="col-4 text-end">
-                                <a class="underline hand" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
+                                <a class="underline hand qt-edit-only" data-bind="click:clearFilters, visible:visibleUpperClearButton">Pulisci configurazione</a>
                             </div>
                         </div>
 
@@ -120,14 +120,14 @@
                     <footer class="card-footer">
                         <div class="row">
                             <div class="col-md-12 float-end">
-                                <button id="save-accessory-button" type="button" class="btn btn-primary btn-sm float-end" data-bind="click:save, enabled:canSave">
+                                <button id="save-accessory-button" type="button" class="btn btn-primary btn-sm float-end qt-edit-only" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Salva
                                 </button>
-                                <button id="clone-accessory-button" type="button" class="btn btn-warning btn-sm float-end" style="display: none" data-bind="click:save, enabled:canSave">
+                                <button id="clone-accessory-button" type="button" class="btn btn-warning btn-sm float-end qt-edit-only" style="display: none" data-bind="click:save, enabled:canSave">
                                     <i class="fas fa-save"></i> Clona
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm me-2 float-end" data-bs-dismiss="modal" data-bind="click:resetForm">Chiudi</button>
-                                <button type="button" class="btn btn-primary btn-sm me-2 float-end" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
+                                <button type="button" class="btn btn-primary btn-sm me-2 float-end qt-edit-only" data-bind="click:clearFilters, visible:visibleLowerClearButton">Pulisci Configurazione</button>
                                 <div class="status errors-counter mt-1 float-end me-3"></div>
                             </div>
                         </div>

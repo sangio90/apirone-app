@@ -35,6 +35,23 @@ $(document).ready(function () {
 			$('#quotation-total-pricing-box').hide()
 		});
 	});
+
+	// Preventivo non modificabile: le modali dei prodotti si aprono in sola lettura.
+	// Il CSS ( .qt-readonly in style.css ) nasconde i pulsanti che modificano e blocca
+	// il mouse su campi e widget; qui si blocca anche la tastiera ( readonly e niente
+	// tab ), a ogni apertura perché parte del contenuto viene ridisegnato.
+	if (AP.page.canEdit === false) {
+		["signage-modal", "plate-modal-root", "accessory-modal", "article-modal-root"].forEach(id => {
+			var modal = document.getElementById(id);
+			if (!modal) return;
+			modal.classList.add("qt-readonly");
+			modal.addEventListener("shown.bs.modal", () => {
+				var $modal = $(modal);
+				$modal.find("input:not([type=hidden]), textarea").attr("readonly", true);
+				$modal.find("input, select, textarea, .k-picker, .k-input, [role=combobox], [role=listbox]").attr("tabindex", -1);
+			});
+		});
+	}
 });
 
 AP.quotation.detail = (function () {
@@ -260,6 +277,7 @@ AP.quotation.detail = (function () {
 		canEdit: AP.page.canEdit,
 		canSee: AP.page.canSee,
 		canRevise: AP.page.canRevise || false,
+		canExport: AP.page.canExport || false,
 
 		target: null,
 		zones: new kendo.data.DataSource(),
@@ -714,7 +732,7 @@ AP.quotation.detail = (function () {
 			bootbox.confirm({
 				size: 'large',
 				title: "Modifica preventivo",
-				message: "Questo preventivo è già stato inviato al cliente. Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?",
+				message: "Questo preventivo " + (AP.page.lockReason || "non è più modificabile") + ". Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?",
 				buttons: {
 					confirm: { label: "Sì, crea revisione", className: "btn-warning" },
 					cancel: { label: "Annulla", className: "btn-secondary" },

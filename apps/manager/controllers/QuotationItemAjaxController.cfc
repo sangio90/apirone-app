@@ -69,6 +69,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function saveArticle( event, rc, prc ){
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
+		if ( super.rejectIfQuotationLocked( event, json.id ?: "" ) ) return;
 		var thisId    = "";
 		var messageId = "";
 
@@ -621,6 +622,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function saveAccessory( event, rc, prc ){
 		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
+		if ( super.rejectIfQuotationLocked( event, json.quotationId ?: "" ) ) return;
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
@@ -784,6 +786,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function saveSignage( event, rc, prc ){
 		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
+		if ( super.rejectIfQuotationLocked( event, json.quotationId ?: "" ) ) return;
 		var thisId    = "";
 		var messageId = "";
 		var texts     = [];
@@ -970,6 +973,7 @@ component extends="com.apirone.core.controller.AbsController" {
 	function savePlate( event, rc, prc ){
 		setting requestTimeout=120;
 		var json      = DeserializeJSON( GetHTTPRequestData().content );
+		if ( super.rejectIfQuotationLocked( event, json.quotationId ?: "" ) ) return;
 		var thisId    = "";
 		var messageId = "";
 
@@ -1258,6 +1262,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var id     = rc.id;
 		var asInstance = IsBoolean( json.asInstance ?: false ) ? json.asInstance : false;
+		if ( super.rejectIfQuotationLocked( event, quotationIdOfItem( id ) ) ) return;
 
 		try {
 			var newId = super.fire( "QuotationItem.clone", { quotationItemId = id, asInstance = asInstance } );
@@ -1294,6 +1299,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var quotationItem = super.fire( "quotationItem.get", [ id ]);
 		var quotationId = quotationItem.getQuotation().getId()
+		if ( super.rejectIfQuotationLocked( event, quotationId ) ) return;
 		if (isNull(quotationItem.getArticle())) {
 			var lineId = quotationItem.getProduct().getLine().getId()
 			var finishId = quotationItem.getProduct().getFinish().getId()
@@ -1344,6 +1350,8 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var id = rc.id;
 
+		if ( !IsNull( id ) && super.rejectIfQuotationLocked( event, id ) ) return;
+
 		if (!IsNull(id)) {
 			var quotationItems = super.fire( "quotationItem.list", { quotationId = id } );
 
@@ -1388,9 +1396,9 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var quotation = super.fire( "Quotation.get", [ rc.id ] );
 
-		if ( isNull( quotation ) || ( quotation.getSentToClient() ?: false ) ) {
+		if ( isNull( quotation ) || quotation.isLocked() ) {
 			result.setStatus( "INVALID" );
-			result.setData( { "message" = "Il preventivo non è modificabile." } );
+			result.setData( { "message" = "Il preventivo non è modificabile" & ( !isNull( quotation ) ? " perché " & quotation.lockReason() : "" ) & "." } );
 			event.setValue( "result", result );
 			return;
 		}
@@ -1519,6 +1527,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		o se questa esatta configurazione non è mai stata esportata: la modale mostra in quel
 		caso solo il codice calcolato al volo (AP.quotation.exportCode), senza quello salvato.
 	*/
+	/**
+	 * Id del preventivo di una riga, per rejectIfQuotationLocked ( "" se la riga non esiste ).
+	 */
+	private String function quotationIdOfItem( required String quotationItemId ){
+		if ( !Len( arguments.quotationItemId ) ) return "";
+		var item = super.fire( "QuotationItem.get", [ arguments.quotationItemId ] );
+		return ( !IsNull( item ) && !IsNull( item.getQuotation() ) ) ? item.getQuotation().getId() : "";
+	}
+
 	private String function getSavedExportCode( required quotationItem ){
 		var itemHash = arguments.quotationItem.getHash();
 		if ( IsNull( itemHash ) || !Len( itemHash ) ) {
@@ -1621,6 +1638,8 @@ component extends="com.apirone.core.controller.AbsController" {
 	function reorder( event, rc, prc ){
 		var result = super.getResult();
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
+
+		if ( IsArray( json.ids ?: "" ) && ArrayLen( json.ids ) && super.rejectIfQuotationLocked( event, quotationIdOfItem( json.ids[ 1 ] ) ) ) return;
 
 		super.fire( "QuotationItem.reorder", { ids = json.ids } );
 

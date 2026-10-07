@@ -8,7 +8,7 @@
                     <i class="fas fa-grip-vertical signage-row-handle text-muted me-2" title="Trascina per spostare la riga" style="cursor: move;"></i>Riga N°<span data-bind="text: index"></span>
                 </div>
                 <div class="col-6 pl-0-ml-3">
-                    <button type="button" class="btn btn-danger btn-sm" data-bind="click:removeSignageRow">
+                    <button type="button" class="btn btn-danger btn-sm qt-edit-only" data-bind="click:removeSignageRow">
                         <i class="fas fa-trash"></i> Elimina
                     </button>
                 </div>

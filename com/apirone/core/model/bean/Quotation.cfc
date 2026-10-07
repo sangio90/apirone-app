@@ -75,4 +75,27 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return "Nessun referente"
 	}
 
+	/**
+	 * Perché il preventivo non è più modificabile ( stringa vuota se lo è ):
+	 * inviato al cliente, esportato verso Verticale o convertito in ordine.
+	 * Da bloccato si modifica solo creando una revisione ( createRevision ).
+	 */
+	public String function lockReason(){
+		if ( getSentToClient() ?: false ) {
+			return "è stato inviato al cliente";
+		}
+		if ( getExported() ?: false ) {
+			return "è stato esportato verso Verticale";
+		}
+		if ( !IsNull( getStatusHistory() ) && !IsNull( getStatusHistory().getStatus() )
+			&& getStatusHistory().getStatus().getId() == "CON" ) {
+			return "è stato convertito in ordine";
+		}
+		return "";
+	}
+
+	public Boolean function isLocked(){
+		return Len( lockReason() ) > 0;
+	}
+
 }

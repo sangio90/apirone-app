@@ -9,7 +9,7 @@
                     <b data-bind="text:fruit.name"></b>
                     <span class="small-code">(<span data-bind="text: fruit.code"></span>)</span>
                 </div>
-                <div data-bind="click:removeFruit" class="quotation-fruit-row-remove flex-shrink-1" style="cursor: pointer;">
+                <div data-bind="click:removeFruit" class="quotation-fruit-row-remove flex-shrink-1 qt-edit-only" style="cursor: pointer;">
                     #iconButton(icon="trash")#
                 </div>
             </div>
