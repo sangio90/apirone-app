@@ -1840,7 +1840,18 @@ AP.signage.modal = ( function() {
             // senza incorporarli il testo cambia larghezza rispetto all'anteprima.
             let imgElement;
             try {
-                imgElement = await snapdom.toPng( preview, { embedFonts: true } );
+                // filter: le <img> senza src o nascoste (es. sfondo prodotto assente) restano
+                // fuori dallo scatto. Altrimenti snapdom prova a scaricarle (src vuoto = URL
+                // della pagina) e, se fallisce, le sostituisce con un segnaposto grigio "img"
+                // visibile anche se l'originale era display:none (successo in produzione).
+                imgElement = await snapdom.toPng( preview, {
+                    embedFonts: true,
+                    filterMode: "remove",
+                    filter: function( element ) {
+                        if ( element.tagName !== "IMG" ) { return true; }
+                        return !!element.getAttribute( "src" ) && getComputedStyle( element ).display !== "none";
+                    }
+                } );
             } finally {
                 preview.style.minWidth = previousMinSize.minWidth;
                 preview.style.minHeight = previousMinSize.minHeight;

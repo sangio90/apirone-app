@@ -1500,20 +1500,57 @@ AP.quotation.zonesModal = (function () {
 			deleteZone: function (e) {
 				var item = e.data;
 				var self = this;
-				bootbox.confirm("Eliminare la zona " + item.name + "?", function (result) {
-					if (result) {
-						NM.util.ajax({
-							method: "DELETE",
-							url: "/manager/ajax/quotations/zones/",
-							data: JSON.stringify({zone: {id: item.id}}),
-							callback: {
-								done: function (xhr) {
-									AP.widget.notify(xhr.data.status.toLowerCase(), xhr.data.message)
-									AP.quotation.detail.getZones().then(() => self.refreshGrids());
+
+				// force = false: se la zona contiene righe il server non cancella e
+				// risponde "confirm"; dopo l'avviso si ripete con force = true, che
+				// elimina zona e righe insieme
+				var sendDelete = function (force) {
+					AP.loading.show();
+					NM.util.ajax({
+						method: "DELETE",
+						url: "/manager/ajax/quotations/zones/",
+						data: JSON.stringify({zone: {id: item.id}, force: force}),
+						callback: {
+							done: function (xhr) {
+								AP.loading.hide();
+								if (xhr.status == "INVALID") {
+									NM.form.showMessages(xhr.data);
+									return;
+								}
+								if (xhr.data.status == "confirm") {
+									bootbox.confirm({
+										title: "Attenzione",
+										message: xhr.data.message + "<br><br>Procedere con l'eliminazione?",
+										buttons: {
+											confirm: { label: "Sì, elimina tutto", className: "btn-danger" },
+											cancel: { label: "Annulla", className: "btn-secondary" }
+										},
+										callback: function (confirmed) {
+											if (confirmed) sendDelete(true);
+										}
+									});
+									return;
+								}
+								AP.widget.notify(xhr.data.status.toLowerCase(), xhr.data.message);
+								AP.quotation.detail.getZones().then(() => self.refreshGrids());
+								if (xhr.data.status == "success") {
+									// le righe eliminate cambiano i totali e le liste per tipo
+									// filtro della lista sulla zona appena eliminata: si torna a tutte
+									var prefKey = "quotation." + AP.page.quotation.id + ".zone";
+									if (AP.getUserPref(prefKey + ".id") == item.id) {
+										AP.setUserPref(prefKey + ".id", "");
+										AP.setUserPref(prefKey + ".name", "");
+									}
+									AP.quotation.detail.methods().loadItems();
+									AP.quotation.detail.showTotals();
 								}
 							}
-						});
-					}
+						}
+					});
+				};
+
+				bootbox.confirm("Eliminare la zona " + item.name + "?", function (result) {
+					if (result) sendDelete(false);
 				});
 			},
 

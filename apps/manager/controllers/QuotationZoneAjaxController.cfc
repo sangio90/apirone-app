@@ -143,45 +143,111 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	/**
+	 * Cancella una zona. Se contiene righe di preventivo la prima chiamata non
+	 * cancella nulla e risponde status "confirm" con il numero di righe: il client
+	 * chiede conferma all'utente e ripete la chiamata con force = true, che cancella
+	 * righe e zona insieme. Le zone con sottozone restano non cancellabili.
+	 */
 	function delete( event, rc, prc ){
-		var json       = DeserializeJSON( GetHTTPRequestData().content );
-		
-		var validation = super.getValidationResult();
-		var result     = super.getResult();
-		
-		var payload    = {};
-		var zone       = json.zone;
+		var json   = DeserializeJSON( GetHTTPRequestData().content );
+		var result = super.getResult();
+		var zone   = json.zone ?: NullValue();
+		var force  = IsBoolean( json.force ?: false ) && ( json.force ?: false );
 
-		if ( !IsNull( zone ) ) {
-
-			var zoneInUse = super.fire( "quotationItem.search", [ quotationZoneId = zone.id ] );
-
-			if( Len( zoneInUse.getData() ) ) {
-				result.setData( { "message" = getMessage( "zone.notDeletedWithQuotationItem" ), "status" = 'error' } );
-				event.setValue( "result", result );
-				return;
-			}
-
-			var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
-
-			if ( Len( zoneWithSubzone.getData() ) ) {
-				result.setData( { "message" = getMessage( "zone.notDeletedWithSubZone" ), "status" = 'error' } );
-				event.setValue( "result", result );
-				return;
-			}
-				
-			if ( validation.hasErrors() ) {
-				result.setData( { "message" = "Errore generico durante la cancellazione della Zona.", "status" = 'error' } );
-				event.setValue( "result", result );
-				return;
-			}
-
+		if ( IsNull( zone ) || !Len( zone.id ?: "" ) ) {
+			result.setData( { "message" = getMessage( "zone.notDeleted" ), "status" = "error" } );
+			event.setValue( "result", result );
+			return;
 		}
 
-		var outcome = super.fire( "quotationZone.delete", [ zone.id ] );
+		var zoneBean = super.fire( "quotationZone.get", [ zone.id ] );
+		if ( !IsNull( zoneBean ) && !IsNull( zoneBean.getQuotation() )
+			&& super.rejectIfQuotationLocked( event, zoneBean.getQuotation().getId() ) ) return;
 
-		result.setData( { "message" = getMessage( "zone.deleted" ), "status" = "success"  } );
+		var zoneWithSubzone = super.fire( "quotationZone.search", [ originId = zone.id ] );
 
+		if ( Len( zoneWithSubzone.getData() ) ) {
+			result.setData( { "message" = getMessage( "zone.notDeletedWithSubZone" ), "status" = "error" } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var zoneItems = super.fire( "quotationItem.list", { quotationZoneId = zone.id } );
+
+		if ( ArrayLen( zoneItems ) && !force ) {
+			result.setData( {
+				"status"     = "confirm",
+				"itemsCount" = ArrayLen( zoneItems ),
+				"message"    = "La zona contiene #ArrayLen( zoneItems )# #ArrayLen( zoneItems ) == 1 ? 'riga' : 'righe'# del preventivo: eliminando la zona verranno eliminate anche queste."
+			} );
+			event.setValue( "result", result );
+			return;
+		}
+
+		transaction {
+			try {
+				// stesse operazioni della cancellazione di una singola riga
+				// ( QuotationItemAjaxController.delete ): prima tutte le righe, poi
+				// il ricalcolo dei prezzi delle righe rimaste che condividono costi
+				// fissi ( linea / finitura / modello o prodotto ), una volta per gruppo
+				var repricings = {};
+
+				for ( var item in zoneItems ) {
+					var outcome = super.fire( "quotationItem.delete", [ item.getId() ] );
+					if ( outcome.getStatus() == "ERROR" ) {
+						throw( message = outcome.getMessage() );
+					}
+
+					var quotationId = item.getQuotation().getId();
+
+					if ( IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemPlate" ) || IsInstanceOf( item, "com.apirone.core.model.bean.QuotationItemSignage" ) ) {
+						var modelId = !IsNull( item.getProduct().getModel() ) ? item.getProduct().getModel().getId() : "";
+						var key = "lfm|" & item.getProduct().getLine().getId() & "|" & item.getProduct().getFinish().getId() & "|" & modelId;
+						repricings[ key ] = {
+							"action" = "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdLineIdFinishId",
+							"args"   = {
+								"quotationId"     = quotationId,
+								"quotationItemId" = item.getId(),
+								"lineId"          = item.getProduct().getLine().getId(),
+								"finishId"        = item.getProduct().getFinish().getId(),
+								"modelId"         = modelId
+							}
+						};
+					} else if ( IsNull( item.getArticle() ) ) {
+						repricings[ "p|" & item.getProduct().getId() ] = {
+							"action" = "quotationItem.aggiornaPrezzoAltriArticoliByQuotationIdAndProductId",
+							"args"   = {
+								"quotationId"     = quotationId,
+								"quotationItemId" = item.getId(),
+								"productId"       = item.getProduct().getId()
+							}
+						};
+					}
+				}
+
+				var zoneOutcome = super.fire( "quotationZone.delete", [ zone.id ] );
+				if ( zoneOutcome.getStatus() == "ERROR" ) {
+					throw( message = zoneOutcome.getMessage() );
+				}
+
+				for ( var key in repricings ) {
+					super.fire( repricings[ key ].action, repricings[ key ].args );
+				}
+			} catch ( any e ) {
+				transaction action="rollback";
+				result.setData( { "message" = getMessage( "zone.notDeleted" ), "status" = "error" } );
+				event.setValue( "result", result );
+				return;
+			}
+		}
+
+		var message = getMessage( "zone.deleted" );
+		if ( ArrayLen( zoneItems ) ) {
+			message &= " insieme a #ArrayLen( zoneItems )# #ArrayLen( zoneItems ) == 1 ? 'riga' : 'righe'#";
+		}
+
+		result.setData( { "message" = message, "status" = "success" } );
 		event.setValue( "result", result );
 	}
 
