@@ -10,6 +10,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="FileService" inject="FileService";
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationZonePositionService" inject="QuotationZonePositionService";
+	property name="QuotationItemPositionService" inject="QuotationItemPositionService";
+	property name="QuotationItemDraftService" inject="QuotationItemDraftService";
 	property name="ProductHashService" inject="ProductHashService";
 
 	public com.apirone.core.model.bean.QuotationZone function get( required String zoneId ){
@@ -159,6 +161,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		// codice posizione -> id della posizione ricreata nella nuova zona (una per codice)
 		var newPositionIds = {};
 
+		// Tutti i codici posizione della zona, anche quelli non ancora usati da un articolo
+		for ( var zonePosition in getQuotationZonePositionService().list( zoneId = arguments.duplicatedZoneId ) ) {
+			if ( IsNull( zonePosition.getCode() ) || !Len( zonePosition.getCode() ) || StructKeyExists( newPositionIds, zonePosition.getCode() ) ) {
+				continue;
+			}
+			var newZonePosition = super.bean( "QuotationZonePosition" );
+			newZonePosition.setCode( zonePosition.getCode() );
+			newZonePosition.setZoneId( arguments.newZoneId );
+			newPositionIds[ zonePosition.getCode() ] = getQuotationZonePositionService().create( newZonePosition );
+		}
+
+		// Segnaposto in pianta non ancora configurati
+		for ( var draft in getQuotationItemDraftService().listByZone( arguments.duplicatedZoneId ) ) {
+			var newDraft = super.bean( "QuotationItemDraft" );
+			newDraft.setQuotationId( arguments.quotation.getId() );
+			newDraft.setQuotationZoneId( arguments.newZoneId );
+			newDraft.setItemType( draft.getItemType() );
+			newDraft.setCoordinateX( draft.getCoordinateX() );
+			newDraft.setCoordinateY( draft.getCoordinateY() );
+			newDraft.setAngle( draft.getAngle() ?: 0 );
+			getQuotationItemDraftService().create( newDraft );
+		}
+
 		for (var quotationItem in items) {
 			var duplicatedItem = Duplicate( quotationItem );
 			duplicatedItem.setQuotationZone( newZone )
@@ -183,6 +208,24 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			}
 			var newItemId = getQuotationItemService().create( duplicatedItem );
 			var newItem = getQuotationItemService().get( newItemId );
+
+			// Posizionamento in pianta: create() genera una posizione di default (centro, non
+			// visibile) per ogni pezzo; le allineo una a una, in ordine, a quelle dell'originale.
+			// Ordine numerico per id: la query restituisce l'id come varchar e lo ordinerebbe come testo
+			var byNumericId          = function( a, b ){ return Sgn( Val( a.getId() ) - Val( b.getId() ) ); };
+			var sourcePlantPositions = getQuotationItemPositionService().list( quotationItemId = quotationItem.getId() );
+			var newPlantPositions    = getQuotationItemPositionService().list( quotationItemId = newItemId );
+			ArraySort( sourcePlantPositions, byNumericId );
+			ArraySort( newPlantPositions, byNumericId );
+			for ( var i = 1; i <= Min( ArrayLen( sourcePlantPositions ), ArrayLen( newPlantPositions ) ); i++ ) {
+				var plantPosition = newPlantPositions[ i ];
+				plantPosition.setCoordinateX( sourcePlantPositions[ i ].getCoordinateX() );
+				plantPosition.setCoordinateY( sourcePlantPositions[ i ].getCoordinateY() );
+				plantPosition.setVisible( sourcePlantPositions[ i ].getVisible() ?: false );
+				plantPosition.setAngle( sourcePlantPositions[ i ].getAngle() ?: 0 );
+				plantPosition.setSizeMultiplier( sourcePlantPositions[ i ].getSizeMultiplier() ?: 100 );
+				getQuotationItemPositionService().update( plantPosition );
+			}
 
 			//file
 			var quotationItemFile = getFileService().search( quotationItemId = quotationItem.getId() ).getData();
