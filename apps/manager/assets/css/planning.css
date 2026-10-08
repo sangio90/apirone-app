@@ -1,0 +1,765 @@
+/*
+   Gantt della pianificazione ( views/planning/gantt.cfm, app-planning-gantt.js ).
+   Colonna delle etichette e intestazione dei giorni restano ferme durante lo
+   scorrimento ( position: sticky ).
+*/
+
+[v-cloak] { display: none; }
+
+.planning-gantt {
+	--pg-border: #e3e8ef;
+	--pg-border-strong: #cfd7e3;
+	--pg-label-bg: #ffffff;
+	--pg-group-bg: #f3f6fa;
+	--pg-weekend-bg: #f4f5f7;
+	--pg-holiday-bg: #fdf0f0;
+	--pg-today: #2771e8;
+	--pg-load: #8fb5f3;
+	--pg-load-over: #e03131;
+	--pg-text-muted: #6b7684;
+
+	display: flex;
+	flex-direction: column;
+	height: calc( 100vh - 130px );
+	min-height: 480px;
+}
+
+/* ---------- barra ---------- */
+
+.pg-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	padding-bottom: 12px;
+}
+
+.pg-toolbar-title h1,
+.pg-toolbar-title h2 {
+	margin: 0;
+}
+
+.pg-period {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.pg-period-label {
+	min-width: 170px;
+	margin-left: 6px;
+	font-size: 15px;
+	text-transform: capitalize;
+}
+
+/* ---------- corpo ---------- */
+
+.pg-body {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	background: #fff;
+	border: 1px solid var( --pg-border-strong );
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+/* ---------- da pianificare ---------- */
+
+.pg-backlog {
+	width: 250px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	border-right: 1px solid var( --pg-border-strong );
+	background: #fafbfd;
+	transition: width .15s ease;
+}
+
+.pg-backlog.collapsed {
+	width: 34px;
+}
+
+.pg-backlog-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 52px;
+	padding: 0 10px;
+	font-weight: 600;
+	border-bottom: 1px solid var( --pg-border-strong );
+	cursor: pointer;
+	user-select: none;
+}
+
+.pg-backlog-list {
+	overflow-y: auto;
+	padding: 8px;
+}
+
+.pg-backlog-quotation {
+	background: #fff;
+	border: 1px solid var( --pg-border );
+	border-radius: 6px;
+	padding: 8px;
+	margin-bottom: 8px;
+}
+
+.pg-backlog-quotation-title {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-weight: 600;
+}
+
+.pg-backlog-customer {
+	color: var( --pg-text-muted );
+	font-size: 12px;
+	margin: 2px 0 6px 16px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pg-backlog-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.pg-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	padding: 2px 8px;
+	background: #fff;
+	border: 1px solid;
+	border-radius: 999px;
+	white-space: nowrap;
+}
+
+.pg-chip-dot,
+.pg-swatch {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+}
+
+.pg-swatch {
+	border-radius: 3px;
+}
+
+/* ---------- griglia ---------- */
+
+.pg-grid {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.pg-scroll {
+	flex: 1;
+	overflow: auto;
+	position: relative;
+}
+
+.pg-canvas {
+	position: relative;
+	min-width: 100%;
+}
+
+.pg-header {
+	position: sticky;
+	top: 0;
+	z-index: 4;
+	display: flex;
+	background: #fff;
+	border-bottom: 1px solid var( --pg-border-strong );
+}
+
+.pg-corner {
+	position: sticky;
+	left: 0;
+	z-index: 5;
+	flex-shrink: 0;
+	display: flex;
+	align-items: flex-end;
+	padding: 0 10px 6px;
+	font-weight: 600;
+	color: var( --pg-text-muted );
+	background: #fff;
+	border-right: 1px solid var( --pg-border-strong );
+}
+
+.pg-header-top,
+.pg-header-bottom {
+	display: flex;
+}
+
+.pg-header-span {
+	flex-shrink: 0;
+	height: 24px;
+	line-height: 24px;
+	padding-left: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	white-space: nowrap;
+	overflow: hidden;
+	border-left: 1px solid var( --pg-border );
+}
+
+.pg-header-day {
+	flex-shrink: 0;
+	height: 28px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	line-height: 1.1;
+	border-left: 1px solid var( --pg-border );
+}
+
+.pg-header-day .pg-dow {
+	color: var( --pg-text-muted );
+	font-size: 10px;
+}
+
+.pg-header-day .pg-dom {
+	font-weight: 600;
+}
+
+.pg-header-day.today {
+	color: #fff;
+	background: var( --pg-today );
+}
+
+.pg-header-day.today .pg-dow {
+	color: rgba( 255, 255, 255, .85 );
+}
+
+/* ---------- righe ---------- */
+
+.pg-group-row,
+.pg-row {
+	display: flex;
+	border-bottom: 1px solid var( --pg-border );
+}
+
+.pg-group-row {
+	height: 30px;
+	cursor: pointer;
+	background: var( --pg-group-bg );
+}
+
+.pg-label {
+	position: sticky;
+	left: 0;
+	z-index: 3;
+	flex-shrink: 0;
+	padding: 4px 10px;
+	background: var( --pg-label-bg );
+	border-right: 1px solid var( --pg-border-strong );
+	overflow: hidden;
+}
+
+.pg-group-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: var( --pg-group-bg );
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.pg-group-title {
+	flex-shrink: 0;
+}
+
+.pg-group-subtitle {
+	color: var( --pg-text-muted );
+	font-weight: 400;
+	font-size: 12px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pg-label-title {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* utente senza accesso all'app: icona discreta accanto al nome */
+.pg-no-access {
+	color: #c3c9d2;
+	font-size: 10px;
+}
+
+.pg-label-subtitle {
+	color: var( --pg-text-muted );
+	font-size: 11px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pg-lane-area {
+	position: relative;
+	display: flex;
+	flex-shrink: 0;
+}
+
+.pg-cell {
+	position: relative;
+	flex-shrink: 0;
+	border-left: 1px solid var( --pg-border );
+}
+
+.pg-cell.week-start,
+.pg-header-day.week-start {
+	border-left-color: var( --pg-border-strong );
+}
+
+.pg-cell.non-working {
+	background: var( --pg-weekend-bg );
+}
+
+.pg-cell.holiday {
+	background: var( --pg-holiday-bg );
+}
+
+.pg-cell.today {
+	background: rgba( 39, 113, 232, .07 );
+	box-shadow: inset 2px 0 0 var( --pg-today );
+}
+
+/* carico del giorno: ore pianificate rispetto alla disponibilità */
+.pg-load {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 3px;
+	background: var( --pg-load );
+}
+
+.pg-load.over {
+	height: 4px;
+	background: var( --pg-load-over );
+}
+
+/* ---------- blocchi ---------- */
+
+.pg-bar {
+	position: absolute;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 0 8px;
+	color: #fff;
+	font-size: 12px;
+	border-radius: 5px;
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, .18 );
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: grab;
+	user-select: none;
+	touch-action: none;
+}
+
+.pg-bar.clipped-start {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.pg-bar.clipped-end {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.pg-bar-top {
+	position: relative;
+	z-index: 1;
+	line-height: 16px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+/* seconda riga: cliente / preventivo */
+.pg-bar-sub {
+	position: relative;
+	z-index: 1;
+	font-size: 11px;
+	line-height: 1.2;
+	opacity: .92;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pg-bar.compact {
+	padding: 0 3px;
+	font-size: 10px;
+}
+
+.pg-bar.compact .pg-bar-top,
+.pg-bar.compact .pg-bar-sub {
+	justify-content: center;
+	text-align: center;
+	font-size: 10px;
+}
+
+.pg-bar.compact .pg-bar-label {
+	text-overflow: clip;
+}
+
+/* scala giornaliera: etichetta in alto, ore dei giorni in basso */
+.pg-bar.with-days {
+	justify-content: flex-start;
+	padding-top: 3px;
+}
+
+.pg-bar-label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-weight: 600;
+}
+
+.pg-bar-hours {
+	flex-shrink: 0;
+	opacity: .9;
+}
+
+/* ore di ogni giorno, nella scala giornaliera */
+.pg-bar-days {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.pg-bar-day {
+	position: absolute;
+	bottom: 3px;
+	line-height: 14px;
+	text-align: center;
+	font-size: 11px;
+	opacity: .9;
+}
+
+.pg-bar-day + .pg-bar-day {
+	border-left: 1px solid rgba( 255, 255, 255, .25 );
+}
+
+.pg-row-empty .pg-label {
+	font-size: 12px;
+	font-style: italic;
+}
+
+.pg-empty {
+	padding: 40px;
+	text-align: center;
+	color: var( --pg-text-muted );
+}
+
+/* ---------- interazioni ---------- */
+
+.pg-chip-draggable {
+	cursor: grab;
+	user-select: none;
+}
+
+.pg-chip-draggable:hover {
+	box-shadow: 0 1px 3px rgba( 0, 0, 0, .15 );
+}
+
+/* righe durante un trascinamento: valide ( stesso tipo ) o no */
+.pg-row.drop-ok .pg-lane-area {
+	background: rgba( 47, 158, 68, .06 );
+}
+
+.pg-row.drop-ok .pg-label {
+	box-shadow: inset 3px 0 0 #2f9e44;
+}
+
+.pg-row.drop-no .pg-lane-area,
+.pg-row.drop-no .pg-label {
+	opacity: .45;
+}
+
+.pg-cell.drop-day {
+	background: rgba( 47, 158, 68, .22 );
+	box-shadow: inset 0 0 0 2px #2f9e44;
+}
+
+.pg-bar.dragging {
+	z-index: 20;
+	opacity: .85;
+	cursor: grabbing;
+	box-shadow: 0 6px 16px rgba( 0, 0, 0, .25 );
+}
+
+.pg-bar.selected {
+	z-index: 2;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d2b3a;
+}
+
+/* giorni attraversati dalla barra senza ore ( non lavorati ): sbiaditi e tratteggiati */
+.pg-bar-gap {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background: repeating-linear-gradient( 135deg, rgba( 255, 255, 255, .62 ) 0 5px, rgba( 255, 255, 255, .48 ) 5px 10px );
+	border-left: 2px dashed rgba( 255, 255, 255, .9 );
+	border-right: 2px dashed rgba( 255, 255, 255, .9 );
+	pointer-events: none;
+}
+
+/* scala giornaliera: pezzi a orario uniti da una linea tratteggiata */
+.pg-bar.timed {
+	box-shadow: none;
+	overflow: visible;
+}
+
+.pg-bar.timed.selected {
+	box-shadow: none;
+}
+
+.pg-bar.timed.selected .pg-bar-piece {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d2b3a;
+}
+
+.pg-bar-link {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	border-top: 2px dashed currentColor;
+	opacity: .5;
+}
+
+.pg-bar-piece {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	padding: 3px 6px 0;
+	color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 1px 2px rgba( 0, 0, 0, .18 );
+	overflow: hidden;
+}
+
+.pg-bar-piece.compact {
+	padding: 3px 3px 0;
+	text-align: center;
+	font-size: 10px;
+}
+
+.pg-bar-time {
+	position: relative;
+	z-index: 1;
+	font-size: 11px;
+	line-height: 14px;
+	opacity: .9;
+}
+
+/* bordo destro: allunga / accorcia */
+.pg-bar-resize {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 8px;
+	cursor: ew-resize;
+}
+
+.pg-bar-resize::after {
+	content: "";
+	position: absolute;
+	top: 30%;
+	bottom: 30%;
+	right: 3px;
+	border-right: 2px solid rgba( 255, 255, 255, .6 );
+}
+
+/* pulsanti del blocco selezionato */
+.pg-block-toolbar {
+	position: absolute;
+	z-index: 10;
+	margin-top: 2px;
+	padding: 4px;
+	background: #fff;
+	border: 1px solid var( --pg-border-strong );
+	border-radius: 6px;
+	box-shadow: 0 6px 18px rgba( 0, 0, 0, .15 );
+	cursor: default;
+}
+
+.pg-block-toolbar-head {
+	padding: 4px 6px 6px;
+	margin-bottom: 4px;
+	font-size: 13px;
+	color: #1d2b3a;
+	background: #fff;
+	border-bottom: 1px solid var( --pg-border );
+	white-space: nowrap;
+}
+
+.pg-block-toolbar-ref {
+	font-size: 12px;
+	color: var( --pg-text-muted );
+}
+
+.pg-block-toolbar-times {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	padding: 0 4px 6px;
+	font-size: 12px;
+}
+
+.pg-block-toolbar-times label {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	text-transform: capitalize;
+}
+
+.pg-block-toolbar-times select {
+	width: 92px;
+}
+
+.pg-block-toolbar-total {
+	padding-bottom: 6px;
+	font-weight: 600;
+}
+
+.pg-block-toolbar-note {
+	padding: 0 4px 6px;
+}
+
+.pg-block-toolbar-note input {
+	min-width: 280px;
+}
+
+.pg-block-toolbar-buttons {
+	display: flex;
+	gap: 4px;
+	white-space: nowrap;
+}
+
+.pg-block-toolbar .btn.active {
+	color: #fff;
+	background: var( --pg-today );
+	border-color: var( --pg-today );
+}
+
+.pg-day-editor {
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid var( --pg-border );
+	max-height: 260px;
+	overflow-y: auto;
+}
+
+.pg-day-editor-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+
+.pg-day-editor-row.current {
+	background: rgba( 39, 113, 232, .08 );
+}
+
+.pg-day-editor-label {
+	width: 90px;
+	font-size: 12px;
+	text-transform: capitalize;
+}
+
+.pg-day-editor input {
+	width: 70px;
+}
+
+/* ---------- attività extra ---------- */
+
+.pg-label-draggable {
+	cursor: grab;
+}
+
+.pg-extra-tag {
+	flex-shrink: 0;
+	padding: 0 4px;
+	font-size: 9px;
+	font-weight: 700;
+	line-height: 14px;
+	letter-spacing: .03em;
+	color: #1d2b3a;
+	background: #ffd43b;
+	border-radius: 3px;
+}
+
+/* blocchi extra: bordo tratteggiato */
+.pg-bar.extra:not( .timed ),
+.pg-bar.extra .pg-bar-piece {
+	outline: 2px dashed #ffd43b;
+	outline-offset: -2px;
+}
+
+/* ---------- legenda ---------- */
+
+.pg-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 6px 10px;
+	font-size: 12px;
+	color: var( --pg-text-muted );
+	border-top: 1px solid var( --pg-border );
+}
+
+.pg-legend > span {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.pg-legend-box {
+	display: inline-block;
+	width: 14px;
+	height: 12px;
+	border: 1px solid var( --pg-border-strong );
+}
+
+.pg-legend-box.non-working { background: var( --pg-weekend-bg ); }
+.pg-legend-box.holiday { background: var( --pg-holiday-bg ); }
+.pg-legend-box.today { background: rgba( 39, 113, 232, .07 ); box-shadow: inset 2px 0 0 var( --pg-today ); }
+
+.pg-legend-load {
+	display: inline-block;
+	width: 18px;
+	height: 3px;
+	background: var( --pg-load );
+}
+
+.pg-legend-load.over {
+	height: 4px;
+	background: var( --pg-load-over );
+}

@@ -15,4 +15,12 @@
         "roles": ["ADM"],
     },
 
+    "PlanningController.*": {
+        "roles": ["ADM"],
+    },
+
+    "PlanningAjaxController.*": {
+        "roles": ["ADM"],
+    },
+
 }

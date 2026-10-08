@@ -322,6 +322,39 @@
 
 
 		/*
+			planning ( Gantt )
+		*/
+		// prima le rotte più specifiche: un pattern più corto cattura anche gli URL più lunghi
+		get( "/ajax/planning/people/:id/costs" ).to( "PlanningAjaxController.listPersonCosts" ).end();
+		post( "/ajax/planning/people/:id/costs" ).to( "PlanningAjaxController.savePersonCost" ).end();
+		delete( "/ajax/planning/costs/:id" ).to( "PlanningAjaxController.deletePersonCost" ).end();
+		get( "/ajax/planning/stats" ).to( "PlanningAjaxController.stats" ).end();
+		post( "/ajax/planning/people/:id" ).to( "PlanningAjaxController.savePerson" ).end();
+		get( "/ajax/planning/people" ).to( "PlanningAjaxController.listPeople" ).end();
+		post( "/ajax/planning/people" ).to( "PlanningAjaxController.createPerson" ).end();
+		delete( "/ajax/planning/closures/:id" ).to( "PlanningAjaxController.deleteClosure" ).end();
+		get( "/ajax/planning/closures" ).to( "PlanningAjaxController.listClosures" ).end();
+		post( "/ajax/planning/closures" ).to( "PlanningAjaxController.saveClosure" ).end();
+		post( "/ajax/planning/blocks/:id/move" ).to( "PlanningAjaxController.moveBlock" ).end();
+		post( "/ajax/planning/blocks/:id/resize" ).to( "PlanningAjaxController.resizeBlock" ).end();
+		post( "/ajax/planning/blocks/:id/split" ).to( "PlanningAjaxController.splitBlock" ).end();
+		post( "/ajax/planning/blocks/:id/day" ).to( "PlanningAjaxController.setBlockDay" ).end();
+		post( "/ajax/planning/blocks/:id/flags" ).to( "PlanningAjaxController.setBlockFlags" ).end();
+		post( "/ajax/planning/blocks/:id/times" ).to( "PlanningAjaxController.setBlockTimes" ).end();
+		post( "/ajax/planning/blocks/:id/note" ).to( "PlanningAjaxController.setBlockNote" ).end();
+		post( "/ajax/planning/blocks/:id/extra" ).to( "PlanningAjaxController.setBlockExtra" ).end();
+		delete( "/ajax/planning/blocks/:id" ).to( "PlanningAjaxController.deleteBlock" ).end();
+		post( "/ajax/planning/blocks" ).to( "PlanningAjaxController.createBlock" ).end();
+		post( "/ajax/planning/projects/:id" ).to( "PlanningAjaxController.saveProject" ).end();
+		get( "/ajax/planning/projects" ).to( "PlanningAjaxController.listProjects" ).end();
+		get( "/ajax/planning/gantt" ).to( "PlanningAjaxController.gantt" ).end();
+		get( "/planning/people" ).to( "PlanningController.people" ).end();
+		get( "/planning/gantt" ).to( "PlanningController.gantt" ).end();
+		get( "/planning/projects" ).to( "PlanningController.projects" ).end();
+		get( "/planning/stats" ).to( "PlanningController.stats" ).end();
+
+
+		/*
 			frames
 		*/
 		get( "/ajax/frames/code-exists" ).to( "FrameAjaxController.codeExists" ).end();

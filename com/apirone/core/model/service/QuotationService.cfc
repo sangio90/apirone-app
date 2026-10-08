@@ -28,6 +28,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="QuotationService" inject="QuotationService";
 	property name="CatalogUsageService" inject="CatalogUsageService";
+	property name="PlanningService" inject="PlanningService";
 
 
 	// TODO capire se questo service esiste ancora dal momento che la tabella sul DB non c'e', viene usato nella clone
@@ -1611,6 +1612,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId, skipItemIds = skipItemIds )
 		}
 
+		getPlanningService().copyQuotationWorkHours( originalQuotation.getId(), clonedQuotationId );
+
 		quotationService.update( originalQuotation );
 
 		return clonedQuotationId;
@@ -1654,6 +1657,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		for ( var quotationZone in quotationZones ) {
 			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId, skipItemIds = skipItemIds );
 		}
+
+		getPlanningService().copyQuotationWorkHours( originalQuotation.getId(), clonedQuotationId );
 
 		return clonedQuotationId;
 	}

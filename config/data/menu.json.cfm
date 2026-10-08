@@ -219,6 +219,38 @@
 
 	{
 		href: "#",
+		icon: "fas fa-calendar-alt",
+		title: "Pianificazione",
+		roles: "ADM",
+		items: [
+			{
+				href: "/manager/planning/gantt",
+				icon: "fas fa-stream",
+				title: "Gantt",
+				roles: "ADM",
+			},
+			{
+				href: "/manager/planning/projects",
+				icon: "fas fa-tasks",
+				title: "Ore progetti",
+				roles: "ADM",
+			},
+			{
+				href: "/manager/planning/people",
+				icon: "fas fa-user-clock",
+				title: "Disponibilità persone",
+				roles: "ADM",
+			},
+			{
+				href: "/manager/planning/stats",
+				icon: "fas fa-chart-bar",
+				title: "Statistiche progetti",
+				roles: "ADM",
+			},
+		]
+	},
+	{
+		href: "#",
 		icon: "fab fa-redhat",
 		title: "Sistema",
 		items: [
