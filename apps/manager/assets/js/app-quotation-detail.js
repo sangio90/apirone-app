@@ -116,6 +116,7 @@ AP.quotation.detail = (function () {
 					NM.util.ajax({
 						method: "POST",
 						url: "/manager/ajax/quotation-items/reorder",
+						loading: false, // in sfondo: niente spinner globale
 						data: JSON.stringify({ ids: ids }),
 						callback: {
 							done: function (xhr) {
@@ -369,7 +370,12 @@ AP.quotation.detail = (function () {
 				errorMessage: "Errore durante l'esportazione del preventivo.",
 				onSuccess: function () {
 					$(".export-button").hide();
-					AP.widget.notify("success", "Preventivo esportato correttamente.");
+					AP.widget.notify("success", "Preventivo esportato e convertito in ordine.");
+					// lo stato è passato a "Convertito in ordine": alla chiusura del
+					// riepilogo si ricarica la pagina ( stato e blocco aggiornati )
+					$(AP.quotation.fields.exportResultModalRoot).one("hidden.bs.modal", function () {
+						window.location.reload();
+					});
 				}
 			});
 		},
@@ -436,6 +442,7 @@ AP.quotation.detail = (function () {
 					["Indirizzo spedizione", header.shippingAddress],
 					["Referente spedizione", header.shippingContact],
 					["Riferimento", header.reference],
+					["PO", header.po],
 					["Data evasione", header.deliveryDate],
 					["Agente", header.agent],
 					["Pagamento", header.paymentMethod],
@@ -733,8 +740,10 @@ AP.quotation.detail = (function () {
 			event.stopPropagation();
 			bootbox.confirm({
 				size: 'large',
-				title: "Modifica preventivo",
-				message: "Questo preventivo " + (AP.page.lockReason || "non è più modificabile") + ". Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?",
+				title: "Crea revisione",
+				message: AP.page.lockReason
+					? "Questo preventivo " + AP.page.lockReason + ". Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?"
+					: "Verrà creata una revisione di questo preventivo con numero di versione incrementato. Procedere?",
 				buttons: {
 					confirm: { label: "Sì, crea revisione", className: "btn-warning" },
 					cancel: { label: "Annulla", className: "btn-secondary" },

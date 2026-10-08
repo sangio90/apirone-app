@@ -48,7 +48,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
-		
+
+		if ( session.user.getRole().getId() != "ADM" ) {
+			var changeError = super.fire( "QuotationStatusHistory.manualChangeError", [ json.quotation.id, json.newStatus.id ] );
+			if ( Len( changeError ) ) {
+				reject( event, changeError );
+				return;
+			}
+		}
+
 		var bean = super.bean( "QuotationStatusHistory" );
 		
 		bean.setQuotationId( json.quotation.id );
@@ -78,10 +86,10 @@ component extends="com.apirone.core.controller.AbsController" {
 
 	function delete( event, rc, prc ){
 		// cancellare una voce dello storico riporta il preventivo allo stato
-		// precedente ( es. da "In approvazione" a "In lavorazione" ): stessa regola
-		// del cambio di stato
-		if ( !super.isQuotationApprover() ) {
-			rejectNotApprover( event );
+		// precedente ( es. da "Confermato da cliente" a "In lavorazione" ),
+		// aggirando le regole del cambio di stato: solo l'ADM
+		if ( session.user.getRole().getId() != "ADM" ) {
+			reject( event, "Solo Admin può cancellare una voce dello storico stati." );
 			return;
 		}
 
@@ -112,9 +120,13 @@ component extends="com.apirone.core.controller.AbsController" {
 	*/
 
 	private void function rejectNotApprover( required any event ){
+		reject( arguments.event, "Solo Admin e Commerciale admin possono cambiare lo stato del preventivo." );
+	}
+
+	private void function reject( required any event, required String message ){
 		var validation = super.getValidationResult();
 		validation.addError( super.getValidationError(
-			message = "Solo Admin e Commerciale admin possono cambiare lo stato del preventivo.",
+			message = arguments.message,
 			field   = "general"
 		) );
 		arguments.event.setValue( "result", validation );

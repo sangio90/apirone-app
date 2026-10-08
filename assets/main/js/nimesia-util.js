@@ -103,6 +103,17 @@ NM.util.ajax = function( setup ) {
         }
     }
 
+    // Spinner globale automatico per le richieste che salvano ( non GET ):
+    // loading: false per quelle di sfondo ( anteprime live, riordini ),
+    // loading: true per mostrarlo anche su una GET.
+    var withLoading = settings.hasOwnProperty( "loading" )
+        ? !!settings.loading
+        : String( settings.method ).toUpperCase() != "GET";
+
+    if ( withLoading ) {
+        AP.loading?.begin?.();
+    }
+
     var data =
 		$.ajax( {
 		    url: settings.url,
@@ -124,6 +135,12 @@ NM.util.ajax = function( setup ) {
 		    .fail( settings.callback.fail )
             */
 		    .always( settings.callback.always );
+
+    if ( withLoading ) {
+        data.always( function() {
+            AP.loading?.end?.();
+        } );
+    }
 
     return data;
 

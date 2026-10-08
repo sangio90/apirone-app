@@ -217,6 +217,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !isNull(json.customerType) ) quotation.setCustomerType( json.customerType );
 		if ( !isNull(json.industry) ) quotation.setIndustry( json.industry );
 		if ( !isNull(json.rifLibero) ) quotation.setRifLibero( json.rifLibero );
+		if ( !isNull(json.po) ) quotation.setPo( json.po );
 		if ( structKeyExists(json, "dataEvasione") && !isNull(json.dataEvasione) && IsDate(json.dataEvasione) ) quotation.setDataEvasione( json.dataEvasione );
 		if ( !isNull(json.codiceSdi) ) quotation.setCodiceSdi( json.codiceSdi );
 
@@ -252,8 +253,7 @@ component extends="com.apirone.core.controller.AbsController" {
 				var quotation = super.fire( 'quotation.get', [ quotationId ] );
 				var userRole = session.user.getRole().getId();
 
-				// Blocca se il preventivo è già in stato "In approvazione":
-				// evita la creazione di revisioni duplicate.
+				// Blocca se il preventivo è già in stato "In approvazione".
 				if ( !IsNull( quotation.getStatusHistory() ) && !IsNull( quotation.getStatusHistory().getStatus() ) && quotation.getStatusHistory().getStatus().getId() == 'PEN' ) {
 					result.setData( { "message" = "Questo preventivo è già in attesa di approvazione.", "error" = {} } );
 					result.setStatus( 'warning' );
@@ -270,7 +270,6 @@ component extends="com.apirone.core.controller.AbsController" {
 						message = "Approvazione rimandata ad un superiore, il prezzo totale del preventivo è " & numberFormat( totalPrice, "999,999.00" ) & " €, ed è maggiore del tuo massimale: " & numberFormat( session.user.getRole().getQuotationMaxAmount(), "999,999.00" ) &  " €";
 
 						history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-						super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 						super.fire('QuotationStatusHistory.create', [ history ] );
 
 						result.setData( { "message" = message, "error" = {} } );
@@ -294,7 +293,6 @@ component extends="com.apirone.core.controller.AbsController" {
 								var message = "C'è almeno un prodotto nel preventivo che sfora le quantità minima o massima. Approvazione rimandata ad un superiore.";
 
 								history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-								super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 								super.fire('QuotationStatusHistory.create', [ history ] );
 
 								result.setData( { "message" = message, "error" = {} } );
@@ -314,7 +312,6 @@ component extends="com.apirone.core.controller.AbsController" {
 								var message = "C'è almeno una riga del preventivo che supera il tuo massimale di sconto. Approvazione rimandata ad un superiore.";
 
 								history.setStatus( super.fire( 'status.get', [ 'PEN' ] ) );
-								super.fire('Quotation.promoteStatus', { 'quotation': quotation });
 								super.fire('QuotationStatusHistory.create', [ history ] );
 
 								result.setData( { "message" = message, "error" = {} } );
@@ -571,14 +568,30 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		params[ "id" ] = rc.id;
 
+		// Solo un preventivo "Approvato" o "Confermato da cliente", anche
+		// chiamando l'endpoint direttamente.
+		var quotation = super.fire( "Quotation.get", [ rc.id ] );
+		if ( !quotation.isExportable() ) {
+			event.setValue( "result", {
+				"success" = false,
+				"error"   = "Si può esportare solo un preventivo in stato ""Approvato"" o ""Confermato da cliente""."
+			} );
+			return;
+		}
+
 		var quotationItems = super.fire( "QuotationItem.list", [ "quotationId" = rc.id ] );
 		var result         = exportProductsAndQuotation( quotationItems );
 
 		if (result.success) {
-			var quotation = super.fire( "Quotation.get",[ rc.id ]);
 			quotation.setExported( true );
 			quotation.setDataConfermaOrdine( Now() );
 			super.fire( "quotation.update", [ quotation ] );
+
+			var history = super.bean( "QuotationStatusHistory" );
+			history.setQuotationId( quotation.getId() );
+			history.setUser( session.user );
+			history.setStatus( super.fire( 'status.get', [ 'CON' ] ) );
+			super.fire( 'QuotationStatusHistory.create', [ history ] );
 		}
 
 		event.setValue( "result", result );

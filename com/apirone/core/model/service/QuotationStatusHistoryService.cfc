@@ -74,6 +74,36 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return outcome;
 	}
 
+	/**
+	 * Regole del cambio di stato manuale ( modale stato del preventivo ); l'ADM
+	 * non è soggetto a queste regole. Restituisce il motivo del rifiuto, stringa
+	 * vuota se il cambio è ammesso.
+	 * - "In approvazione" ( PEN ) non si imposta a mano: ci va solo da
+	 *   approveQuotation, quando il preventivo supera i massimali dell'utente.
+	 * - Una volta raggiunto "Confermato da cliente", "Convertito in ordine",
+	 *   "Perso" o "Estinto" non si torna più a "In lavorazione".
+	 */
+	public String function manualChangeError( required String quotationId, required String newStatusId ){
+		if ( arguments.newStatusId == "PEN" ) {
+			return "Lo stato ""In approvazione"" non si imposta manualmente: viene assegnato quando si conclude un preventivo che supera i propri massimali.";
+		}
+		if ( arguments.newStatusId == "LAV" ) {
+			for ( var history in list( quotationId = arguments.quotationId ) ) {
+				if ( ArrayContains( finalStatusIds(), history.getStatus().getId() ) ) {
+					return "Il preventivo è già stato """ & history.getStatus().getName() & """: non può tornare ""In lavorazione"".";
+				}
+			}
+		}
+		return "";
+	}
+
+	/**
+	 * Stati raggiunti i quali il preventivo non torna più "In lavorazione".
+	 */
+	public Array function finalStatusIds(){
+		return [ "CCN", "CON", "PER", "EST" ];
+	}
+
 	public String function create( required com.apirone.core.model.bean.QuotationStatusHistory quotationStatusHistory ){
 		var newId = getDao().insert( arguments.quotationStatusHistory );
 

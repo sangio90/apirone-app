@@ -99,18 +99,23 @@ component extends="com.apirone.core.controller.AbsController" {
 			)
 		);
 		// Inviato al cliente o convertito in ordine: non si modifica più,
-		// si crea una revisione ( Quotation.lockReason ). La revisione la può creare
-		// anche il proprietario / commerciale, che a stato avanzato perde baseCanEdit.
+		// si crea una revisione ( Quotation.lockReason ). La revisione si può creare
+		// in qualunque stato, anche dal proprietario / commerciale, che a stato
+		// avanzato perde baseCanEdit.
 		var isLocked = quotation.isLocked();
 		var isOwnerOrAgent = quotation.getOwner().getId() == user.getId()
 			|| ( !IsNull( quotation.getSalesAgent() ) && quotation.getSalesAgent().getId() == user.getId() );
 		prc.page[ "canEdit" ] = baseCanEdit && !isLocked;
-		prc.page[ "canRevise" ] = isLocked && (
+		prc.page[ "canRevise" ] = (
 			ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || isOwnerOrAgent
 		);
 		prc.page[ "lockReason" ] = quotation.lockReason();
-		// L'esportazione non dipende dal blocco: un ordine convertito va esportato.
-		prc.page[ "canExport" ] = baseCanEdit;
+		// Si esporta solo un preventivo concluso: "Approvato" o "Confermato da
+		// cliente" ( Quotation.isExportable ). Non dipende dal blocco: un preventivo
+		// inviato al cliente si esporta lo stesso. Esportato, diventa "Convertito in ordine".
+		prc.page[ "canExport" ] = quotation.isExportable() && (
+			ArrayContains(['ADM', 'CMA', 'TCD', 'TCS', 'TCJ'], user.getRole().getId()) || isOwnerOrAgent
+		);
 		prc.page[ "canSee" ] = user.getRole().getId() == 'CMS' || prc.page[ "canEdit" ] == false || user.getRole().getId() == 'PRO';
 
 		prc.jsFiles.add( "app-quotation-header" );

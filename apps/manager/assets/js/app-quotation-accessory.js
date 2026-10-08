@@ -726,6 +726,7 @@ AP.accessory.modal = ( function() {
 								NM.util.ajax({
 										method: "POST",
 										url: '/manager/ajax/combinations/findByListOfProductItemIds',
+										loading: false, // in sfondo: niente spinner globale
 										data: JSON.stringify({productItemIds: selectedProductItemIds}),
 										callback: {
 											done: function (xhr) {

@@ -141,6 +141,7 @@ AP.quotation.header = ( function() {
 			industry: "",
 			industryLabel: "",
 			rifLibero: "",
+			po: "",
 			dataEvasione: null,
 			codiceSdi: "",
         },

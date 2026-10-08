@@ -18,17 +18,55 @@ AP.quotation.status = ( function() {
     var pub = {};
     var fields = AP.quotation.fields;
 
-    var loadHistory = function() {
+    // Stati raggiunti i quali il preventivo non torna più "In lavorazione"
+    // ( QuotationStatusHistoryService.finalStatusIds ).
+    var FINAL_STATUS_IDS = [ "CCN", "CON", "PER", "EST" ];
+
+    // Stati selezionabili a mano, con le stesse regole del server
+    // ( QuotationStatusHistoryService.manualChangeError ); l'ADM li ha tutti.
+    var allowedStatuses = function( history ) {
+        var isAdmin = AP.page.userRole && AP.page.userRole.id === "ADM";
+        if ( isAdmin ) {
+            return AP.page.statuses;
+        }
+        var reachedFinal = ( history || [] ).some( function( row ) {
+            return row.status && FINAL_STATUS_IDS.indexOf( row.status.id ) !== -1;
+        } );
+        return AP.page.statuses.filter( function( status ) {
+            if ( status.id === "PEN" ) return false;
+            if ( status.id === "LAV" && reachedFinal ) return false;
+            return true;
+        } );
+    };
+
+    // Proposto come nuovo stato: il primo selezionabile dopo quello corrente.
+    var setNextStatus = function( statuses ) {
+        var currentStatusId = viewModel.get( "detailForm.data.statusHistory.status.id" );
+        var currentIndex = AP.page.statuses.findIndex( function( status ) {
+            return status.id === currentStatusId;
+        } );
+
+        var nextStatus = "";
+        if ( currentIndex !== -1 ) {
+            nextStatus = AP.page.statuses.slice( currentIndex + 1 ).find( function( status ) {
+                return statuses.some( function( s ) { return s.id === status.id; } );
+            } ) || "";
+        }
+
+        viewModel.set( "detailForm.data.newStatus", nextStatus );
+    };
+
+    var loadHistory = function( onLoad ) {
 
         NM.util.ajax( {
             method: "GET",
             url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/statuses",
             callback: {
                 done: function( xhr ) {
-                    const data = xhr.data;
-                    const parsedData = [];
 
                     viewModel.set( "rows", xhr.data );
+
+                    if ( onLoad ) onLoad( xhr.data );
 
                 }
             }
@@ -269,6 +307,8 @@ AP.quotation.status = ( function() {
 
                             AP.widget.notify( "success", "Stato salvato correttamente." );
 
+                            // spinner fino al ricaricamento della pagina
+                            AP.loading.show();
                             setTimeout( function() {
                                 window.location.reload();
                             }, 1000 );
@@ -291,25 +331,16 @@ AP.quotation.status = ( function() {
                 done: function( xhr ) {
                     viewModel.set( "detailForm.data.statusHistory", xhr.data.statusHistory );
 
-                    // Trova lo stato successivo nell'array
-                    var currentStatusId = viewModel.get( "detailForm.data.statusHistory.status.id" );
-
-                    var currentIndex = AP.page.statuses.findIndex( function( status ) {
-                        return status.id === currentStatusId;
+                    // lo storico serve a capire quali stati sono ancora selezionabili
+                    loadHistory( function( history ) {
+                        var statuses = allowedStatuses( history );
+                        viewModel.set( "statuses", statuses );
+                        setNextStatus( statuses );
                     } );
-
-                    var nextStatus = "";
-                    if ( currentIndex !== -1 && currentIndex < AP.page.statuses.length - 1 ) {
-                        nextStatus = AP.page.statuses[currentIndex + 1];
-                    }
-
-                    viewModel.set( "detailForm.data.newStatus", nextStatus );
 
                 }
             }
         } );
-
-        loadHistory();
 
         NM.util.openModal( fields.statusModalRoot );
 

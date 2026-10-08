@@ -1,0 +1,1 @@
+ALTER TABLE quotations ADD COLUMN po VARCHAR(50) NULL;

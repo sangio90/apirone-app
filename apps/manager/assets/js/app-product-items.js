@@ -1032,6 +1032,7 @@ AP.product.items = ( function() {
         NM.util.ajax( {
             method: "POST",
             url: "/manager/ajax/products/" + AP.page.productId + "/" + entity + "/order",
+            loading: false, // in sfondo: niente spinner globale
             data: JSON.stringify( ids ),
             callback: {
                 done: function( xhr ) {

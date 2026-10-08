@@ -40,6 +40,7 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="customerType" type="String";
 	property name="industry" type="String";
 	property name="rifLibero" type="String";
+	property name="po" type="String";
 	property name="dataEvasione" type="Date";
 	property name="sentToClient" type="Boolean";
 	property name="dataConfermaOrdine" type="Date";
@@ -79,8 +80,8 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	 * Perché il preventivo non è più modificabile ( stringa vuota se lo è ):
 	 * inviato al cliente o convertito in ordine. Da bloccato si modifica solo
 	 * creando una revisione ( createRevision ).
-	 * L'esportazione verso Verticale non blocca: si esporta in qualunque fase,
-	 * anche più volte.
+	 * L'esportazione verso Verticale porta il preventivo in "Convertito in ordine"
+	 * ( vedi isExportable ).
 	 */
 	public String function lockReason(){
 		if ( getSentToClient() ?: false ) {
@@ -95,6 +96,15 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 
 	public Boolean function isLocked(){
 		return Len( lockReason() ) > 0;
+	}
+
+	/**
+	 * Si esporta verso Verticale solo un preventivo concluso: "Approvato" ( APR )
+	 * o "Confermato da cliente" ( CCN ). Esportato, passa a "Convertito in ordine".
+	 */
+	public Boolean function isExportable(){
+		return !IsNull( getStatusHistory() ) && !IsNull( getStatusHistory().getStatus() )
+			&& ArrayContains( [ "APR", "CCN" ], getStatusHistory().getStatus().getId() );
 	}
 
 }

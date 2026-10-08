@@ -27,6 +27,7 @@ AP.quotation.exportCode = (function () {
 			NM.util.ajax({
 				method: "POST",
 				url: "/manager/ajax/quotation-items/export-code-preview",
+				loading: false, // in sfondo: niente spinner globale
 				data: JSON.stringify(payload),
 				callback: {
 					done: function (xhr) {

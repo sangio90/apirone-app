@@ -76,6 +76,14 @@
 					</div>
 
 					<div class="row d-flex align-items-center mb-3">
+						<label class="text-end col-3">PO</label>
+						<div class="col-9">
+							<input type="text" class="form-control" maxlength="50"
+								data-bind="value: detailForm.data.po">
+						</div>
+					</div>
+
+					<div class="row d-flex align-items-center mb-3">
 						<label class="text-end col-3">Settore </label>
 						<div class="col-9">
 							<input type="text" class="form-control" data-bind="value: detailForm.data.industryLabel" readonly>

@@ -48,7 +48,7 @@
                         <i class="fas fa-paper-plane"></i> Inviato a cliente
                     </button>
                     <button type="button" class="btn btn-warning btn-sm" data-bind="click:createRevision, visible:canRevise">
-                        <i class="fas fa-pencil-alt"></i> Modifica preventivo
+                        <i class="fas fa-code-branch"></i> Crea revisione
                     </button>
                 </div>
             </div>

@@ -229,6 +229,7 @@
 				customer_type,
 				industry,
 				rif_libero,
+				po,
 				data_evasione,
 				sent_to_client,
 				data_conferma_ordine,
@@ -339,6 +340,7 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPo() ?: ''#">,
 				<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
 					<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
 				<cfelse>
@@ -548,6 +550,7 @@
 				customer_type = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getCustomerType() ?: ''#">,
 				industry = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
 				rif_libero = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
+				po = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPo() ?: ''#">,
 				data_evasione =
 					<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
 						<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
@@ -733,7 +736,7 @@
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
-				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS, MMANNDET, CFEMAIL, MMANNTES
+				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS, MMANNDET, CFEMAIL, MMANNTES, MMPO123
 				<!--- TODO-MMCODIVA: riattivare (togliere il commento) quando la colonna esiste in ORDINI_APIR --->
 				<!--- , MMCODIVA --->
 			)
@@ -805,7 +808,8 @@
 				<cfqueryparam value="#arguments.data.MMNOTPOS ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMANNDET ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.CFEMAIL ?: ''#" cfsqltype="varchar">,
-				<cfqueryparam value="#arguments.data.MMANNTES ?: ''#" cfsqltype="varchar">
+				<cfqueryparam value="#arguments.data.MMANNTES ?: ''#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.MMPO123 ?: '',50)#" cfsqltype="varchar">
 				<!--- TODO-MMCODIVA: riattivare insieme alla colonna MMCODIVA qui sopra --->
 				<!--- , <cfqueryparam value="#arguments.data.MMCODIVA ?: ''#" cfsqltype="varchar"> --->
 			)

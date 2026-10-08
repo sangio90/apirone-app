@@ -80,6 +80,7 @@ AP.quotation.documents = (function () {
         NM.util.ajax({
             method: "POST",
             url: "/manager/ajax/quotations/" + quotationId + "/documents/reorder",
+            loading: false, // in sfondo: niente spinner globale
             data: JSON.stringify({ items: items }),
             callback: {
                 done: function () {}

@@ -2693,6 +2693,7 @@ AP.plate.modal = ( function() {
                         ajax( {
                             method: "POST",
                             url: BASE + "/combinations/findByListOfProductItemIds",
+                            loading: false, // in sfondo: niente spinner globale
                             data: JSON.stringify( { productItemIds: selectedIds, orientation: "HOR" } ),
                             callback: {
                                 done: function( xhr ) {

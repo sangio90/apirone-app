@@ -186,14 +186,58 @@ AP.deleteUserPref = function( key ) {
     NM.storage.delete( "apirOne:" + user + ":" + key );
 };
 
-AP.loading = {
-    show: function() {
-        $( "#global-loading-spinner" ).css( "display", "flex" );
-    },
-    hide: function() {
-        $( "#global-loading-spinner" ).css( "display", "none" );
-    }
-};
+// Spinner globale. show/hide lo gestiscono a mano i chiamanti; begin/end li usa
+// NM.util.ajax per le richieste di salvataggio ( contatore delle richieste in
+// corso ). Lo spinner resta visibile finché c'è l'uno o l'altro: un hide()
+// non nasconde un salvataggio ancora in corso e viceversa.
+AP.loading = ( function() {
+    var manual  = false;
+    var pending = 0;
+    var timer   = null;
+    // le richieste veloci non fanno lampeggiare lo spinner
+    var DELAY = 150;
+
+    var render = function() {
+        var $spinner = $( "#global-loading-spinner" );
+        if ( manual ) {
+            clearTimeout( timer );
+            timer = null;
+            $spinner.css( "display", "flex" );
+        } else if ( pending > 0 ) {
+            if ( !timer && $spinner.css( "display" ) == "none" ) {
+                timer = setTimeout( function() {
+                    timer = null;
+                    if ( manual || pending > 0 ) {
+                        $spinner.css( "display", "flex" );
+                    }
+                }, DELAY );
+            }
+        } else {
+            clearTimeout( timer );
+            timer = null;
+            $spinner.css( "display", "none" );
+        }
+    };
+
+    return {
+        show: function() {
+            manual = true;
+            render();
+        },
+        hide: function() {
+            manual = false;
+            render();
+        },
+        begin: function() {
+            pending++;
+            render();
+        },
+        end: function() {
+            pending = Math.max( 0, pending - 1 );
+            render();
+        }
+    };
+} () );
 
 AP.toggleCosts = function() {
     var current = AP.getUserPref("showCosts");
