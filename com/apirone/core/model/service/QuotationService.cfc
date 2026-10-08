@@ -1511,7 +1511,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMDATEVA" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
 			"MMEVASIO" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
 			"MMRIFORD" = quotation.getRifLibero() ?: "",
-			"MMPO123" = quotation.getPo() ?: "",
+			"MMPO123" = quotation.getPo() ?: "", // TODO-MMPO123: per ora non scritto su ORDINI_APIR (vedi QuotationDAO.export)
 			"MMNUMLIS" = 1,
 			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
 			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,

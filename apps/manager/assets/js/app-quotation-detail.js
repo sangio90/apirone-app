@@ -442,7 +442,8 @@ AP.quotation.detail = (function () {
 					["Indirizzo spedizione", header.shippingAddress],
 					["Referente spedizione", header.shippingContact],
 					["Riferimento", header.reference],
-					["PO", header.po],
+					// TODO-MMPO123: riattivare quando MMPO123 viene scritto su ORDINI_APIR (QuotationDAO.export)
+					// ["PO", header.po],
 					["Data evasione", header.deliveryDate],
 					["Agente", header.agent],
 					["Pagamento", header.paymentMethod],

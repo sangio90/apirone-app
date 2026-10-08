@@ -736,7 +736,9 @@
 				MMEVASIO, MMNUMDOC, MMNUMLIS, MMQTAMOV, MMRIFORD, MMSCOAR1, MMSCOAR2,
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
-				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS, MMANNDET, CFEMAIL, MMANNTES, MMPO123
+				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS, MMANNDET, CFEMAIL, MMANNTES
+				<!--- TODO-MMPO123: riattivare (togliere il commento) quando la colonna esiste in ORDINI_APIR --->
+				<!--- , MMPO123 --->
 				<!--- TODO-MMCODIVA: riattivare (togliere il commento) quando la colonna esiste in ORDINI_APIR --->
 				<!--- , MMCODIVA --->
 			)
@@ -808,8 +810,9 @@
 				<cfqueryparam value="#arguments.data.MMNOTPOS ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMANNDET ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.CFEMAIL ?: ''#" cfsqltype="varchar">,
-				<cfqueryparam value="#arguments.data.MMANNTES ?: ''#" cfsqltype="varchar">,
-				<cfqueryparam value="#left(arguments.data.MMPO123 ?: '',50)#" cfsqltype="varchar">
+				<cfqueryparam value="#arguments.data.MMANNTES ?: ''#" cfsqltype="varchar">
+				<!--- TODO-MMPO123: riattivare insieme alla colonna MMPO123 qui sopra --->
+				<!--- , <cfqueryparam value="#left(arguments.data.MMPO123 ?: '',50)#" cfsqltype="varchar"> --->
 				<!--- TODO-MMCODIVA: riattivare insieme alla colonna MMCODIVA qui sopra --->
 				<!--- , <cfqueryparam value="#arguments.data.MMCODIVA ?: ''#" cfsqltype="varchar"> --->
 			)
