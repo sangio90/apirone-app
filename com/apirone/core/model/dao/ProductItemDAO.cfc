@@ -42,10 +42,14 @@
 	<!---
 		Query piatta per il profilo treelight: join con attributes_raw_values per evitare
 		un secondo round-trip. Usata da ProductItemService.listForTreelight().
+		È la scelta di attributi / valori nei configuratori dei preventivi: esclude
+		gli elementi eliminati dal catalogo ( CatalogUsageService ), tranne quelli già
+		scelti nella riga di preventivo in modifica ( quotationItemId, frutti compresi ).
 	--->
 	<cffunction name="findForTreelight" returntype="Query" access="public">
 		<cfargument name="productId" type="String" required="true">
 		<cfargument name="originId" type="Numeric">
+		<cfargument name="quotationItemId" type="String">
 
 		<cfquery name="local.q" datasource="apirone">
 			SELECT
@@ -61,7 +65,24 @@
 			FROM product_items pi
 			INNER JOIN attributes_raw_values arv USING ( attribute_raw_value_id )
 			INNER JOIN attributes a ON a.attribute_id = arv.attribute_id
+			LEFT JOIN raw_values rv ON rv.raw_value_id = arv.raw_value_id
 			WHERE pi.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid
+				AND (
+					(
+						pi.deleted_at IS NULL
+						AND arv.deleted_at IS NULL
+						AND a.deleted_at IS NULL
+						AND rv.deleted_at IS NULL
+					)
+					<cfif !IsNull( arguments.quotationItemId )>
+						OR pi.product_item_id IN (
+							SELECT qipi.product_item_id
+							FROM quotation_item_product_items qipi
+							LEFT JOIN quotation_item_fruits qif ON qif.quotation_item_fruit_id = qipi.quotation_item_fruit_id
+							WHERE COALESCE( qipi.quotation_item_id, qif.quotation_item_id ) = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotationItemId#">::uuid
+						)
+					</cfif>
+				)
 				<cfif !IsNull( arguments.originId )>
 					AND pi.origin_id = <cfqueryparam cfsqltype="Integer" value="#arguments.originId#">
 				<cfelse>
@@ -90,6 +111,17 @@
 						INNER JOIN attributes USING ( attribute_id )
 				</cfif>
 			WHERE 1=1
+
+				<!--- eliminati logicamente, anche attraverso attributo / valore ( CatalogUsageService ) --->
+				AND product_items.deleted_at IS NULL
+				AND NOT EXISTS (
+					SELECT 1
+					FROM attributes_raw_values del_arv
+					JOIN attributes del_a ON del_a.attribute_id = del_arv.attribute_id
+					LEFT JOIN raw_values del_rv ON del_rv.raw_value_id = del_arv.raw_value_id
+					WHERE del_arv.attribute_raw_value_id = product_items.attribute_raw_value_id
+						AND ( del_arv.deleted_at IS NOT NULL OR del_a.deleted_at IS NOT NULL OR del_rv.deleted_at IS NOT NULL )
+				)
 
 				<cfif !IsNull( arguments.productId )>
 					AND product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.productId#">::uuid

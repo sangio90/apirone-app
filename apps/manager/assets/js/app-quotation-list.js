@@ -152,38 +152,42 @@ AP.quotation.list = ( function() {
 				return false;
 			}
 
-			bootbox.confirm( {
-				title: "Duplica preventivo",
-				message: "Vuoi duplicare il preventivo <strong>" + num + "</strong>? Verrà creato un nuovo preventivo con tutti i prodotti e le zone.",
-				buttons: {
-					confirm: {
-						label: "Si, duplica",
-						className: "btn-primary",
+			// righe con elementi non più a catalogo: non vengono copiate, si avvisa prima
+			AP.loadNotInCatalog( id, function( labels ) {
+				bootbox.confirm( {
+					title: "Duplica preventivo",
+					message: "Vuoi duplicare il preventivo <strong>" + num + "</strong>? Verrà creato un nuovo preventivo con tutti i prodotti e le zone."
+					+ ( labels.length ? AP.notInCatalogMessage( labels, "Le righe che li usano non verranno copiate." ) : "" ),
+					buttons: {
+						confirm: {
+							label: "Si, duplica",
+							className: "btn-primary",
+						},
+						cancel: {
+							label: "Annulla",
+							className: "btn-danger",
+						},
 					},
-					cancel: {
-						label: "Annulla",
-						className: "btn-danger",
-					},
-				},
-				callback: function( result ) {
-					if ( result ) {
-						AP.loading.show();
-						NM.util.ajax( {
-							method: "POST",
-							url: "/manager/ajax/quotations/" + id + "/clone",
-							callback: {
-								done: function( xhr ) {
-									AP.loading.hide();
-									if ( xhr.status === "ERROR" ) {
-										AP.widget.notify( "error", xhr.data.message );
-										return;
+					callback: function( result ) {
+						if ( result ) {
+							AP.loading.show();
+							NM.util.ajax( {
+								method: "POST",
+								url: "/manager/ajax/quotations/" + id + "/clone",
+								callback: {
+									done: function( xhr ) {
+										AP.loading.hide();
+										if ( xhr.status === "ERROR" ) {
+											AP.widget.notify( "error", xhr.data.message );
+											return;
+										}
+										window.location.href = "/manager/quotations/" + xhr.data.payload.id;
 									}
-									window.location.href = "/manager/quotations/" + xhr.data.payload.id;
 								}
-							}
-						} );
-					}
-				},
+							} );
+						}
+					},
+				} );
 			} );
 		},
 

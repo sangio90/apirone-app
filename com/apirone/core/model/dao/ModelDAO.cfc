@@ -61,6 +61,9 @@
 		<!--- solo modelli il cui bundle ha almeno un prodotto attivo ( configuratori del
 		      preventivo: un bundle senza prodotti non porta a nessuna finitura ) --->
 		<cfargument name="withActiveProducts" type="Boolean" default="false">
+		<!--- con withActiveProducts: il prodotto della riga di preventivo in modifica
+		      conta anche se disattivo o eliminato dal catalogo --->
+		<cfargument name="includeProductId" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="models.code">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -103,7 +106,12 @@
 					AND EXISTS (
 						SELECT 1 FROM products
 						WHERE products.catalog_bundle_id = catalog_bundles.catalog_bundle_id
-							AND products.status_id = 'ACT'
+							AND (
+								( products.status_id = 'ACT' AND products.deleted_at IS NULL )
+								<cfif !IsNull( arguments.includeProductId ) AND Len( arguments.includeProductId )>
+									OR products.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.includeProductId#">::uuid
+								</cfif>
+							)
 					)
 				</cfif>
 

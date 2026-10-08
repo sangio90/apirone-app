@@ -1060,8 +1060,10 @@ AP.signage.modal = ( function() {
         loadModels: async function( event ) {
             if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) && viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" ) != "" ) {
                 let url = "/manager/ajax/quotations/models/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" );
+                // riga in modifica: il suo prodotto conta anche se eliminato dal catalogo
+                url += "?quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" );
                 if ( viewModel.get( "detailForm.data.signageConfig.catalogBundle.category" ) ) {
-                    url += "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" );
+                    url += "&catalogBundleCategoryId=" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" );
                 }
                 await NM.util.ajax( {
                     method: "GET",
@@ -1083,7 +1085,8 @@ AP.signage.modal = ( function() {
                 await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.category.id" ) + "/" + viewModel.get( "detailForm.data.signageConfig.catalogBundle.line.id" )
-                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) ),
+                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) )
+                        + "&quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona" } );
@@ -1135,7 +1138,9 @@ AP.signage.modal = ( function() {
                             "&modelId=" +
                             viewModel.get( "detailForm.data.signageConfig.catalogBundle.model.id" ) +
                             "&finishId=" +
-                            viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+                            viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) +
+                            // riga in modifica: il suo prodotto resta anche se eliminato dal catalogo
+                            "&quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" ),
                         callback: {
                             done: function( xhr ) {
                                 // NOOP
@@ -1298,7 +1303,7 @@ AP.signage.modal = ( function() {
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/product-items?productId=" + productId,
+                url: AP.productItemsUrl( productId, null, quotationItemId ),
                 callback: {
                     done: function( xhr ) {
                         viewModel.set( "detailForm.data.quotationItem.product.items", new kendo.data.DataSource() );
@@ -1417,10 +1422,7 @@ AP.signage.modal = ( function() {
                 };
                 originId = originId || "";
 
-                let url = "/manager/ajax/product-items?productId=" + productId;
-                if ( originId ) {
-                    url += "&originId=" + originId;
-                }
+                let url = AP.productItemsUrl( productId, originId, viewModel.get( "detailForm.data.quotationItem.id" ) );
 
                 // Deselezionamento: originId vuoto
                 if ( originId === "" ) {
@@ -2257,6 +2259,7 @@ AP.signage.modal = ( function() {
         // checkUrlHash in app-quotation-detail.js e window.location.hash in
         // app-quotation-plate-vue.js per lo stesso meccanismo sulle placche).
         window.location.hash = "signage/" + id;
+        AP.warnNotInCatalog( id );
 
         const categoriesResponse = await NM.util.ajax( {
             method: "GET",

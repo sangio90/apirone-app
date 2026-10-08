@@ -59,6 +59,16 @@
 	}
 
 	/*
+		Messaggio per un elemento di catalogo eliminato logicamente perché usato in
+		preventivi chiusi ( CatalogUsageService ).
+	*/
+	public String function deactivatedMessage( required Numeric closedQuotations ){
+		return "Eliminato. È usato in " & arguments.closedQuotations
+			& ( arguments.closedQuotations == 1 ? " preventivo chiuso, dove resta" : " preventivi chiusi, dove resta" )
+			& ": da ora non è più disponibile per i preventivi.";
+	}
+
+	/*
 		Blocca le modifiche a un preventivo non più modificabile ( inviato al
 		cliente, esportato, convertito in ordine: Quotation.lockReason ). La pagina
 		le disabilita già ( canEdit ), ma quello è solo lato client.

@@ -112,6 +112,32 @@ component extends="com.apirone.core.controller.AbsController" {
 	function createProduct( event, rc, prc ){
 		var json = DeserializeJSON( GetHTTPRequestData().content );
 
+		// Prodotto eliminato logicamente ( usato in preventivi chiusi ): torna a
+		// catalogo, con righe attributo-valore e prezzi, invece di crearne un doppione.
+		var deleted = super.service( "Product" ).getByParamsIncludingDeleted(
+			lineId     = rc.id,
+			finishId   = json.finishId,
+			modelId    = json.modelId,
+			categoryId = json.categoryId
+		);
+
+		if ( !IsNull( deleted ) ) {
+			super.service( "Product" ).restore( deleted.getId() );
+
+			event.setValue(
+				"result",
+				{
+					"message" = super.completeMessage( "product.created" ),
+					"payload" = {
+						"productId" = deleted.getId(),
+						"finishId"  = json.finishId,
+						"modelId"   = json.modelId
+					}
+				}
+			);
+			return;
+		}
+
 		var line     = super.bean( "Line" );
 		var model    = super.bean( "Model" );
 		var finish   = super.bean( "Finish" );
@@ -154,25 +180,42 @@ component extends="com.apirone.core.controller.AbsController" {
 		var json   = DeserializeJSON( GetHTTPRequestData().content );
 		var result = super.getResult();
 
-		var outcome = super.fire(
-			"product.deleteByParams",
-			{
-				modelId  = json.modelId,
-				lineId   = rc.id,
-				finishId = json.finishId
-			}
+		var product = super.service( "Product" ).getByParams(
+			lineId   = rc.id,
+			finishId = json.finishId,
+			modelId  = json.modelId
 		);
 
-		if ( outcome.getStatus() == "ERROR" ) {
+		if ( IsNull( product ) ) {
 			result.setStatus( "ERROR" );
-			result.setData( { "message" = outcome.getMessage() } );
+			result.setData( { "message" = "Prodotto non trovato." } );
 			event.setValue( "result", result );
 			return;
 		}
 
-		var message = super.completeMessage( "product.deleted" );
+		// usato in preventivi in corso: bloccato; solo in preventivi chiusi:
+		// eliminato logicamente; mai usato: cancellato ( CatalogUsageService )
+		var removed = super.service( "Product" ).remove( product.getId() );
 
-		result.setData( { "message" = message } );
+		if ( removed.result == "IN_USE" ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "quotations" = removed.quotations } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		if ( removed.result == "ERROR" ) {
+			result.setStatus( "ERROR" );
+			result.setData( { "message" = removed.message } );
+			event.setValue( "result", result );
+			return;
+		}
+
+		var message = removed.result == "DEACTIVATED"
+			? { "text" = deactivatedMessage( removed.closed ) }
+			: super.completeMessage( "product.deleted" );
+
+		result.setData( { "message" = message, "deactivated" = removed.result == "DEACTIVATED" } );
 		event.setValue( "result", result );
 	}
 

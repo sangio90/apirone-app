@@ -738,38 +738,42 @@ AP.quotation.detail = (function () {
 
 		createRevision: function (event) {
 			event.stopPropagation();
-			bootbox.confirm({
-				size: 'large',
-				title: "Crea revisione",
-				message: AP.page.lockReason
-					? "Questo preventivo " + AP.page.lockReason + ". Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?"
-					: "Verrà creata una revisione di questo preventivo con numero di versione incrementato. Procedere?",
-				buttons: {
-					confirm: { label: "Sì, crea revisione", className: "btn-warning" },
-					cancel: { label: "Annulla", className: "btn-secondary" },
-				},
-				callback: function (result) {
-					if (!result) return;
-					AP.loading.show();
-					NM.util.ajax({
-						method: "POST",
-						url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/createrevision",
-						callback: {
-							done: function (xhr) {
-								AP.loading.hide();
-								const status = xhr.status ? xhr.status.toLowerCase() : 'error';
-								if (status === 'success' && xhr.data.payload && xhr.data.payload.id) {
-									AP.widget.notify('success', xhr.data.message);
-									setTimeout(() => {
-										window.location.href = "/manager/quotations/" + xhr.data.payload.id;
-									}, 1500);
-								} else {
-									AP.widget.notify('error', xhr.data.message || 'Errore durante la creazione della revisione.');
+			// righe con elementi non più a catalogo: non vengono copiate, si avvisa prima
+			AP.loadNotInCatalog(AP.page.quotation.id, function (labels) {
+				bootbox.confirm({
+					size: 'large',
+					title: "Crea revisione",
+					message: ( AP.page.lockReason
+						? "Questo preventivo " + AP.page.lockReason + ". Per modificarlo verrà creata una revisione con numero di versione incrementato. Il preventivo originale resterà bloccato. Procedere?"
+						: "Verrà creata una revisione di questo preventivo con numero di versione incrementato. Procedere?" )
+						+ ( labels.length ? AP.notInCatalogMessage( labels, "Le righe che li usano non verranno copiate nella revisione." ) : "" ),
+					buttons: {
+						confirm: { label: "Sì, crea revisione", className: "btn-warning" },
+						cancel: { label: "Annulla", className: "btn-secondary" },
+					},
+					callback: function (result) {
+						if (!result) return;
+						AP.loading.show();
+						NM.util.ajax({
+							method: "POST",
+							url: "/manager/ajax/quotations/" + AP.page.quotation.id + "/createrevision",
+							callback: {
+								done: function (xhr) {
+									AP.loading.hide();
+									const status = xhr.status ? xhr.status.toLowerCase() : 'error';
+									if (status === 'success' && xhr.data.payload && xhr.data.payload.id) {
+										AP.widget.notify('success', xhr.data.message);
+										setTimeout(() => {
+											window.location.href = "/manager/quotations/" + xhr.data.payload.id;
+										}, 1500);
+									} else {
+										AP.widget.notify('error', xhr.data.message || 'Errore durante la creazione della revisione.');
+									}
 								}
 							}
-						}
-					});
-				},
+						});
+					},
+				});
 			});
 			return false;
 		},
@@ -1681,16 +1685,29 @@ AP.quotation.zonesModal = (function () {
 			url: "/manager/ajax/quotations/duplicatezone",
 			data: JSON.stringify(data),
 			callback: {
-				done: () => {
+				done: (xhr) => {
 					AP.loading.hide();
 					$("#duplicateDialog").modal("hide");
 					AP.widget.notify("success", "Zona duplicata con successo");
-					var url = new URL(window.location.href);
-					if (!url.searchParams.has("reset")) {
-						url.searchParams.set("reset", "1");
-						window.location.href = url.toString();
+					var reload = function () {
+						var url = new URL(window.location.href);
+						if (!url.searchParams.has("reset")) {
+							url.searchParams.set("reset", "1");
+							window.location.href = url.toString();
+						} else {
+							window.location.reload();
+						}
+					};
+					// righe non copiate perché usano elementi non più a catalogo
+					var notInCatalog = (xhr && xhr.data && xhr.data.notInCatalog) || [];
+					if (notInCatalog.length) {
+						bootbox.alert({
+							title: "Righe non copiate",
+							message: AP.notInCatalogMessage(notInCatalog, "Le righe che li usano non sono state copiate nella nuova zona."),
+							callback: reload
+						});
 					} else {
-						window.location.reload();
+						reload();
 					}
 				},
 				fail: () => AP.loading.hide()

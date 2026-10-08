@@ -670,6 +670,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 		bean.setPrice( price );
 
+		// includeDeleted: la riga può essere di un prodotto eliminato dopo ( CatalogUsageService )
 		var product = super
 			.fire(
 				"Product.search",
@@ -677,7 +678,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					lineId     = json.quotationItem.product.line.id,
 					modelId    = json.quotationItem.product.model.id,
 					categoryId = json.quotationItem.product.category.id,
-					finishId   = json.quotationItem.product.finish.id
+					finishId   = json.quotationItem.product.finish.id,
+					includeDeleted = true
 				}
 			)
 			.getData();
@@ -844,6 +846,7 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 
+		// includeDeleted: la riga può essere di un prodotto eliminato dopo ( CatalogUsageService )
 		var product = super
 			.fire(
 				"Product.search",
@@ -851,7 +854,8 @@ component extends="com.apirone.core.controller.AbsController" {
 					lineId     = json.signageConfig.catalogBundle.line.id,
 					modelId    = json.signageConfig.catalogBundle.model.id,
 					categoryId = json.signageConfig.catalogBundle.category.id,
-					finishId   = json.quotationItem.product.finish.id
+					finishId   = json.quotationItem.product.finish.id,
+					includeDeleted = true
 				}
 			)
 			.getData();
@@ -1021,12 +1025,14 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		bean.setPrice( pricing );
 		
+		// includeDeleted: la riga può essere di un prodotto eliminato dopo ( CatalogUsageService )
 		var product = super.fire( "Product.search",
 				{
 					categoryId = 22,
 					lineId     = json.item.product.line.id,
 					modelId    = json.item.product.model.id,
-					finishId   = json.item.product.finish.id
+					finishId   = json.item.product.finish.id,
+					includeDeleted = true
 				}
 			).getData();
 
@@ -1264,6 +1270,15 @@ component extends="com.apirone.core.controller.AbsController" {
 		var asInstance = IsBoolean( json.asInstance ?: false ) ? json.asInstance : false;
 		if ( super.rejectIfQuotationLocked( event, quotationIdOfItem( id ) ) ) return;
 
+		// una nuova riga non può usare elementi eliminati dal catalogo
+		var notInCatalog = super.service( "CatalogUsage" ).deletedInQuotationItem( id );
+		if ( notInCatalog.len() ) {
+			result.setStatus( "ERROR" );
+			result.setData( { "message" = "Non si può duplicare: la riga contiene elementi non più a catalogo ( " & ArrayToList( notInCatalog, ", " ) & " )." } );
+			event.setValue( "result", result );
+			return;
+		}
+
 		try {
 			var newId = super.fire( "QuotationItem.clone", { quotationItemId = id, asInstance = asInstance } );
 
@@ -1431,6 +1446,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		}
 
 		result.setData( { "total" = total, "byType" = byType } );
+		event.setValue( "result", result );
+	}
+
+	/**
+	 * Cosa non è più a catalogo nella riga: in modifica la riga si salva così
+	 * com'è, ma l'utente va avvisato.
+	 */
+	function notInCatalog( event, rc, prc ){
+		var result = super.getResult();
+		result.setData( { "labels" = super.service( "CatalogUsage" ).deletedInQuotationItem( rc.id ) } );
 		event.setValue( "result", result );
 	}
 

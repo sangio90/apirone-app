@@ -44,9 +44,12 @@
 					</cfif>
 
 			WHERE 1=1
+				<!--- eliminati logicamente ( CatalogUsageService ) --->
+				AND attributes.deleted_at IS NULL
+
 				<cfif !IsNull( arguments.str )>
-					AND texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
-						OR attributes.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+					AND ( texts.text ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%">
+						OR attributes.code ILIKE <cfqueryparam cfsqltype="varchar" value="%#arguments.str#%"> )
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>

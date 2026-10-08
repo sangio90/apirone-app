@@ -93,7 +93,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	 * e restituisce direttamente un array di struct pronti per la serializzazione JSON.
 	 * Riduce da ~1600 CreateObject() a ~1 per request (new Settings()).
 	 */
-	public Array function listForTreelight( String productId, Numeric originId ) {
+	public Array function listForTreelight( String productId, Numeric originId, String quotationItemId ) {
 		var records = getDao().findForTreelight( argumentCollection = arguments );
 
 		if ( !records.recordCount ) {

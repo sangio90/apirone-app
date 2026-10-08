@@ -134,11 +134,16 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result = super.getResult();
 		var validation = super.getValidationResult();
 		
-		var duplicateResult = super.fire( "QuotationZone.duplicate" , [ 'zoneId' = json.id, 'quotationId' = json.quotation.id, 'duplicaConSottozone' = json.duplicaConSottozone, 'name' = json.name ]);
+		// le righe con elementi non più a catalogo non si copiano
+		var notInCatalog = super.service( "CatalogUsage" ).deletedInQuotation( json.quotation.id );
+
+		var duplicateResult = super.fire( "QuotationZone.duplicate" , [ 'zoneId' = json.id, 'quotationId' = json.quotation.id, 'duplicaConSottozone' = json.duplicaConSottozone, 'name' = json.name, 'skipItemIds' = notInCatalog.itemIds ]);
 		
 		var message = getMessage( duplicateResult.messageId );
 
-		result.setData( { "message" = message }, { "payload" = { id = duplicateResult.zoneId } } );
+		var skippedLabels = super.service( "CatalogUsage" ).labelsOfItems( notInCatalog, duplicateResult.skippedItemIds );
+
+		result.setData( { "message" = message, "notInCatalog" = skippedLabels }, { "payload" = { id = duplicateResult.zoneId } } );
 
 		event.setValue( "result", result );
 	}

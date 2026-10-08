@@ -168,6 +168,13 @@ AP.fruit.list = ( function() {
                     data: ids,
                     callback: {
                         done: function( xhr ) {
+                            // usati in preventivi in corso: non si eliminano
+                            if ( xhr.status == "INVALID" ) {
+                                AP.showCatalogInUse( xhr.data );
+                                viewModel.rows.read();
+                                return;
+                            }
+
                             if ( xhr.data.payload.hasOwnProperty( "errors" ) ) {
                                 AP.widget.notify( "error", "Non riesco a cancellare tutti i frutti" );
                             } else {

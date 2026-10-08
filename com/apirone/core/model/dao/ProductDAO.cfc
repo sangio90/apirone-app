@@ -60,6 +60,14 @@
 		<cfargument name="catalogBundleId" type="String">
 		<cfargument name="categoryModeId" type="String">
 		<cfargument name="str" type="String">
+		<cfargument name="statusId" type="String">
+		<!--- selezione nei preventivi: solo prodotti attivi --->
+		<cfargument name="onlyActive" type="Boolean" default="false">
+		<!--- eliminati logicamente ( CatalogUsageService ): esclusi, tranne per
+			ritrovare il prodotto di una riga di preventivo esistente --->
+		<cfargument name="includeDeleted" type="Boolean" default="false">
+		<!--- il prodotto della riga di preventivo in modifica, anche se eliminato --->
+		<cfargument name="includeProductId" type="String">
 
 		<cfargument name="orderby" required="true" type="String" default="product.product_id">
 		<cfargument name="limit" required="true" type="Numeric" default="15">
@@ -91,6 +99,23 @@
 						</cfif>
 
 			WHERE 1=1
+
+				<cfif !arguments.includeDeleted>
+					AND (
+						products.deleted_at IS NULL
+						<cfif !IsNull( arguments.includeProductId ) AND Len( arguments.includeProductId )>
+							OR products.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.includeProductId#">::uuid
+						</cfif>
+					)
+				</cfif>
+
+				<cfif arguments.onlyActive>
+					AND products.status_id = 'ACT'
+				</cfif>
+
+				<cfif !IsNull( arguments.statusId ) AND Len( arguments.statusId )>
+					AND products.status_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.statusId#">
+				</cfif>
 
 				<cfif !IsNull( arguments.str )>
 					AND

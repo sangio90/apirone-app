@@ -6,13 +6,15 @@
 		var result = super.getResult();
 		var memy   = super.getMementify();
 
+		// il prodotto della riga in modifica resta anche se eliminato dal catalogo
 		var products = super
 			.service( "Product" )
 			.list(
-				modelId    = rc.modelId,
-				lineId     = rc.lineId,
-				finishId   = rc.finishId,
-				categoryId = rc.categoryId
+				modelId          = rc.modelId,
+				lineId           = rc.lineId,
+				finishId         = rc.finishId,
+				categoryId       = rc.categoryId,
+				includeProductId = super.service( "CatalogUsage" ).quotationItemProductId( rc.quotationItemId ?: "" )
 			);
 
 		if ( ArrayLen( products ) GT 1 ) {

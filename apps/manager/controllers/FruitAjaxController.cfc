@@ -104,22 +104,22 @@
 		var list      = GetHTTPRequestData().content;
 		var messageId = "fruit.deletedAllRecords";
 
-		var errors  = [];
 		var payload = "";
 
-		var ids = ListToArray( list );
+		// per ogni prodotto: usato in preventivi in corso, bloccato; solo in
+		// preventivi chiusi, eliminato logicamente; mai usato, cancellato
+		var summary = super.service( "Product" ).removeMany( ListToArray( list ) );
 
-		for ( var id in ids ) {
-			var outcome = super.fire( "product.delete", [ id ] );
-
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
-			}
+		if ( summary.quotations.len() ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "quotations" = summary.quotations } );
+			event.setValue( "result", result );
+			return;
 		}
 
-		if ( errors.len() ) {
+		if ( summary.errors.len() ) {
 			messageId = "product.deletedNotAllRecords"
-			payload   = { "errors" = errors };
+			payload   = { "errors" = summary.errors };
 		}
 
 		var message = super.completeMessage( messageId );
@@ -128,6 +128,7 @@
 
 		event.setValue( "result", result );
 	}
+
 
 	function addItem( event, rc, prc ){
 		var result    = super.getResult();

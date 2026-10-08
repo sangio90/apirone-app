@@ -493,6 +493,7 @@
 		post( "/ajax/quotations/:id/markasSent" ).to( "QuotationAjaxController.markAsSent" ).end();
 		post( "/ajax/quotations/:id/createrevision" ).to( "QuotationAjaxController.createRevision" ).end();
 		post( "/ajax/quotations/:id/clone" ).to( "QuotationAjaxController.clone" ).end();
+		get( "/ajax/quotations/:id/not-in-catalog" ).to( "QuotationAjaxController.notInCatalog" ).end();
 
 		get( "/ajax/quotations/zones/:zoneId/positions" ).to( "QuotationZoneAjaxController.listPositions" ).end();
 		post( "/ajax/quotations/zones" ).to( "QuotationZoneAjaxController.save" ).end();
@@ -585,6 +586,7 @@
 		get( "/ajax/quotation-items/product/by-params" ).to( "QuotationPlateAjaxController.getProductByParams" ).end();
 		get( "/ajax/quotation-items/fruits/:id/product-items" ).to( "QuotationItemAjaxController.fruitProductItems" ).end();
 		get( "/ajax/quotation-items/:id/product-items" ).to( "QuotationItemAjaxController.productItems" ).end();
+		get( "/ajax/quotation-items/:id/not-in-catalog" ).to( "QuotationItemAjaxController.notInCatalog" ).end();
 		post( "/ajax/quotation-items/reorder" ).to( "QuotationItemAjaxController.reorder" ).end();
 		post( "/ajax/quotation-items/:id/duplicate" ).to( "QuotationItemAjaxController.duplicate" ).end();
 		delete( "/ajax/quotation-items" ).to( "QuotationItemAjaxController.delete" ).end();

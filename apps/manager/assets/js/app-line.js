@@ -403,6 +403,13 @@ AP.line.products = ( function() {
                         return;
                     }
 
+                    // usato in preventivi in corso: non si elimina
+                    if ( xhr.status == "INVALID" ) {
+                        status.html( "" );
+                        AP.showCatalogInUse( xhr.data );
+                        return;
+                    }
+
                     if ( xhr.status == "SUCCESS" ) {
                         var button = $( "button[data-values='" + values + "']" );
 
@@ -410,6 +417,11 @@ AP.line.products = ( function() {
                         button.filter( "." + classToHide ).hide();
 
                         status.html( "<span class='green'>" + message + "</span> " );
+
+                        // eliminato logicamente: resta nei preventivi chiusi che lo usano
+                        if ( xhr.data && xhr.data.deactivated ) {
+                            AP.widget.notify( "info", xhr.data.message.text );
+                        }
                     }
                 },
             },

@@ -69,6 +69,9 @@
 		      prodotto attivo, non tutte quelle della linea --->
 		<cfargument name="modelId" type="String">
 		<cfargument name="withActiveProducts" type="Boolean" default="false">
+		<!--- con withActiveProducts: il prodotto della riga di preventivo in modifica
+		      conta anche se disattivo o eliminato dal catalogo --->
+		<cfargument name="includeProductId" type="String">
 		<cfargument name="langId" type="String" default="IT">
 		<cfargument name="orderBy" type="String" default="finishes.code asc, finishes.finish_id">
 
@@ -114,7 +117,12 @@
 				</cfif>
 
 				<cfif arguments.withActiveProducts AND ( !IsNull( arguments.lineId ) OR !IsNull( arguments.modelId ) )>
-					AND products.status_id = 'ACT'
+					AND (
+						( products.status_id = 'ACT' AND products.deleted_at IS NULL )
+						<cfif !IsNull( arguments.includeProductId ) AND Len( arguments.includeProductId )>
+							OR products.product_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.includeProductId#">::uuid
+						</cfif>
+					)
 				</cfif>
 
 				<cfif !IsNull( arguments.statusId )>

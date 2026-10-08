@@ -14,6 +14,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="componentService" inject="ComponentService";
 	property name="componentOverrideService" inject="ComponentOverrideService";
 	property name="attributeService" inject="AttributeService";
+	property name="catalogUsageService" inject="CatalogUsageService";
 
 	public com.apirone.core.model.bean.Product function get( required String productId ){
 		return build( arguments.productId );
@@ -124,6 +125,85 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return outcome;
+	}
+
+	/**
+	 * Eliminazione secondo l'uso nei preventivi ( CatalogUsageService.remove ):
+	 * { result = IN_USE | DEACTIVATED | DELETED | ERROR, quotations, closed, message }.
+	 */
+	public Struct function remove( required String productId ){
+		var productId = arguments.productId;
+		var state     = {};
+
+		var removed = getCatalogUsageService().remove(
+			{ productIds = [ productId ] },
+			function(){
+				state.outcome = this.delete( productId );
+			}
+		);
+
+		if ( state.keyExists( "outcome" ) && state.outcome.getStatus() == "ERROR" ) {
+			removed.result  = "ERROR";
+			removed.message = state.outcome.getMessage();
+		}
+
+		return removed;
+	}
+
+	/**
+	 * remove() su più prodotti: { quotations ( preventivi in corso che usano quelli
+	 * non eliminati ), deactivated ( quanti eliminati logicamente ), errors }.
+	 */
+	public Struct function removeMany( required Array productIds ){
+		var summary = { "quotations" = [], "deactivated" = 0, "errors" = [] };
+		var seen    = {};
+
+		for ( var productId in arguments.productIds ) {
+			var removed = remove( productId );
+
+			if ( removed.result == "IN_USE" ) {
+				for ( var quotation in removed.quotations ) {
+					if ( !seen.keyExists( quotation.id ) ) {
+						seen[ quotation.id ] = true;
+						summary.quotations.append( quotation );
+					}
+				}
+			} else if ( removed.result == "DEACTIVATED" ) {
+				summary.deactivated++;
+			} else if ( removed.result == "ERROR" ) {
+				summary.errors.append( { "message" = removed.message } );
+			}
+		}
+
+		return summary;
+	}
+
+	/**
+	 * Prodotto della matrice linea / modello / finitura, anche se eliminato
+	 * logicamente: riaggiungendolo dalla matrice torna a catalogo invece di
+	 * crearne un doppione.
+	 */
+	public any function getByParamsIncludingDeleted(
+		required String lineId,
+		required String finishId,
+		required String modelId,
+		required Numeric categoryId
+	){
+		var criteria = Duplicate( arguments );
+		criteria.includeDeleted = true;
+		criteria.limit          = -1;
+
+		var records = getDao().find( argumentCollection = criteria );
+
+		if ( records.recordcount ) {
+			return get( records.product_id[ 1 ] );
+		}
+
+		return NullValue();
+	}
+
+	public void function restore( required String productId ){
+		getCatalogUsageService().restoreProduct( arguments.productId );
 	}
 
 	public com.apirone.core.model.bean.Outcome function deleteByParams(

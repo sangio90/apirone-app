@@ -87,6 +87,9 @@
 			FROM
                 attributes_raw_values
 			WHERE 1=1
+				<!--- eliminati logicamente ( CatalogUsageService ) --->
+				AND attributes_raw_values.deleted_at IS NULL
+
 				<cfif !IsNull( arguments.attributeId )>
 					AND attribute_id = <cfqueryparam cfsqltype="Varchar" value="#arguments.attributeId#">::uuid
 				</cfif>

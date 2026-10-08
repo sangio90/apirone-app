@@ -27,6 +27,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	property name="QuotationZoneService" inject="QuotationZoneService";
 	property name="QuotationItemService" inject="QuotationItemService";
 	property name="QuotationService" inject="QuotationService";
+	property name="CatalogUsageService" inject="CatalogUsageService";
 
 
 	// TODO capire se questo service esiste ancora dal momento che la tabella sul DB non c'e', viene usato nella clone
@@ -1592,6 +1593,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return result;
 	}
 
+	/**
+	 * Le righe con elementi non più a catalogo non si copiano
+	 * ( CatalogUsageService.deletedInQuotation ).
+	 */
 	public String function clone( required com.apirone.core.model.bean.Quotation quotation ){
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation = Duplicate( originalQuotation );
@@ -1600,9 +1605,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		var clonedQuotationId = create( clonedQuotation, session.user.getId(), true );
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
+		var skipItemIds    = getCatalogUsageService().deletedInQuotation( originalQuotation.getId() ).itemIds;
 
 		for ( var quotationZone in quotationZones ) {
-			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId )
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId, skipItemIds = skipItemIds )
 		}
 
 		quotationService.update( originalQuotation );
@@ -1626,6 +1632,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		getDao().markAsSent( arguments.quotationId );
 	}
 
+	/**
+	 * Le righe con elementi non più a catalogo non si copiano
+	 * ( CatalogUsageService.deletedInQuotation ).
+	 */
 	public String function createRevision( required com.apirone.core.model.bean.Quotation quotation ){
 		var originalQuotation = arguments.quotation;
 		var clonedQuotation   = Duplicate( originalQuotation );
@@ -1640,8 +1650,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		var quotationZones = getQuotationZoneService().list( quotationId = originalQuotation.getId() );
+		var skipItemIds    = getCatalogUsageService().deletedInQuotation( originalQuotation.getId() ).itemIds;
 		for ( var quotationZone in quotationZones ) {
-			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId );
+			getQuotationZoneService().duplicate( zoneId = quotationZone.getId(), quotationId = clonedQuotationId, skipItemIds = skipItemIds );
 		}
 
 		return clonedQuotationId;

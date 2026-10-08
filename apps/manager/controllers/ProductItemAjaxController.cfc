@@ -87,8 +87,9 @@ component extends="com.apirone.core.controller.AbsController" {
         var result = super.getResult();
 
 		var params = {
-            productId = rc.productId,
-            originId  = StructKeyExists( rc, "originId" ) ? rc.originId : NullValue()
+            productId       = rc.productId,
+            originId        = StructKeyExists( rc, "originId" ) ? rc.originId : NullValue(),
+            quotationItemId = StructKeyExists( rc, "quotationItemId" ) && Len( rc.quotationItemId ) ? rc.quotationItemId : NullValue()
         };
 
 		var data = super.fire( "ProductItem.listForTreelight", params );

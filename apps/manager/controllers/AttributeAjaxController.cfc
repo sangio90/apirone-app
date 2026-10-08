@@ -156,23 +156,29 @@ component extends="com.apirone.core.controller.AbsController" {
 		var result    = super.getResult();
 		var list      = GetHTTPRequestData().content;
 		var messageId = "attribute.deletedAllRecords";
+		var payload   = "";
 
-		var errors  = [];
-		var payload = "";
-
-		var ids = ListToArray( list );
-
-		for ( var id in ids ) {
-			var outcome = super.fire( "attribute.delete", [ id ] );
-
-			if ( outcome.getStatus() == "ERROR" ) {
-				errors.add( { "message" = "Non sono riuscito a cancellare l'Id #id#" } )
+		// per ogni elemento: usato in preventivi in corso, bloccato; solo in
+		// preventivi chiusi, eliminato logicamente; mai usato, cancellato
+		var service = super.service( "Attribute" );
+		var summary = super.service( "CatalogUsage" ).removeMany(
+			"attributeIds",
+			ListToArray( list ),
+			function( id ){
+				return service.delete( id );
 			}
+		);
+
+		if ( summary.quotations.len() ) {
+			result.setStatus( "INVALID" );
+			result.setData( { "quotations" = summary.quotations } );
+			event.setValue( "result", result );
+			return;
 		}
 
-		if ( errors.len() ) {
-			messageId = "attribute.deletedNotAllRecords"
-			payload   = { "errors" = errors };
+		if ( summary.errors.len() ) {
+			messageId = "attribute.deletedNotAllRecords";
+			payload   = { "errors" = summary.errors };
 		}
 
 		var message = super.completeMessage( messageId );

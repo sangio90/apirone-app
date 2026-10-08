@@ -217,7 +217,9 @@ AP.accessory.modal = ( function() {
                     method: "GET",
                     url: "/manager/ajax/quotations/models/"
                         + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
-                        + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ),
+                        + "?catalogBundleCategoryId=" + viewModel.get( "detailForm.data.quotationItem.product.category.id" )
+                        // riga in modifica: il suo prodotto conta anche se eliminato dal catalogo
+                        + "&quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona il Modello" } );
@@ -235,7 +237,8 @@ AP.accessory.modal = ( function() {
                 await NM.util.ajax( {
                     method: "GET",
                     url: "/manager/ajax/quotations/finishes/" + viewModel.get( "detailForm.data.quotationItem.product.category.id" ) + "/" + viewModel.get( "detailForm.data.quotationItem.product.line.id" )
-                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) ),
+                        + "?modelId=" + encodeURIComponent( viewModel.get( "detailForm.data.quotationItem.product.model.id" ) )
+                        + "&quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" ),
                     callback: {
                         done: function( xhr ) {
                             xhr.data.unshift( { id: "", name: "-- Seleziona la Finitura" } );
@@ -388,7 +391,9 @@ AP.accessory.modal = ( function() {
                         viewModel.get( "detailForm.data.quotationItem.product.category.id" ) +
                         "&lineId=" + viewModel.get( "detailForm.data.quotationItem.product.line.id" ) +
                         "&modelId=" + viewModel.get( "detailForm.data.quotationItem.product.model.id" ) +
-                        "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ),
+                        "&finishId=" + viewModel.get( "detailForm.data.quotationItem.product.finish.id" ) +
+                        // riga in modifica: il suo prodotto resta anche se eliminato dal catalogo
+                        "&quotationItemId=" + ( viewModel.get( "detailForm.data.quotationItem.id" ) || "" ),
                     callback: {
                         done: async function( xhr ) {
                             if ( xhr.data && xhr.data.length > 0 ) {
@@ -449,7 +454,7 @@ AP.accessory.modal = ( function() {
             // Chiamata AJAX iniziale per ottenere tutti i product items
             await NM.util.ajax( {
                 method: "GET",
-                url: "/manager/ajax/product-items?productId=" + productId,
+                url: AP.productItemsUrl( productId, null, quotationItemId ),
                 callback: {
                     done: function( xhr ) {
                         if ( xhr.data.length > 0 ) {
@@ -568,10 +573,7 @@ AP.accessory.modal = ( function() {
                 };
                 originId = originId || "";
 
-                let url = "/manager/ajax/product-items?productId=" + productId;
-                if ( originId ) {
-                    url += "&originId=" + originId;
-                }
+                let url = AP.productItemsUrl( productId, originId, viewModel.get( "detailForm.data.quotationItem.id" ) );
 
                 // Deselezionamento: originId vuoto
                 if ( originId === "" ) {
@@ -1268,6 +1270,7 @@ AP.accessory.modal = ( function() {
         // checkUrlHash in app-quotation-detail.js e window.location.hash in
         // app-quotation-plate-vue.js per lo stesso meccanismo sulle placche).
         window.location.hash = "accessory/" + id;
+        AP.warnNotInCatalog( id );
 
         const categoriesResponse = await NM.util.ajax( {
             method: "GET",

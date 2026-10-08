@@ -93,7 +93,12 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		return arguments.zone.getId();
 	}
 
-	public function duplicate( required String zoneId, required quotationId, duplicaConSottozone = true, name = null ) {
+	/**
+	 * skipItemIds: righe da non copiare ( struct id -> true ), es. quelle con
+	 * elementi non più a catalogo ( CatalogUsageService.deletedInQuotation );
+	 * quelle effettivamente saltate tornano in skippedItemIds.
+	 */
+	public function duplicate( required String zoneId, required quotationId, duplicaConSottozone = true, name = null, Struct skipItemIds = {} ) {
 		var quotationZone = super.bean( "QuotationZone" );
 
 		var zoneToDuplicate = get(arguments.zoneId);
@@ -124,6 +129,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			quotationZone.setOrigin( zoneToDuplicate.getOrigin() );
 		}
 
+		// struct: passa per riferimento, duplicateZoneItems ci aggiunge le righe saltate
+		var skipped = { "itemIds" = [] };
+
 		transaction {
 			messageId = "zone.duplicated";
 			thisId    = create( quotationZone )
@@ -132,7 +140,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				getFileService().duplicateForZone( zoneToDuplicate.getImage().getId(), thisId );
 			}
 
-			var duplicatedZone = duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId, quotation: quotation  );
+			var duplicatedZone = duplicateZoneItems( duplicatedZoneId: zoneToDuplicate.getId(), newZoneId: thisId, quotation: quotation, skipItemIds: arguments.skipItemIds, skipped: skipped );
 			if (arguments.duplicaConSottozone) {
 				var sottozone = list( originId = zoneToDuplicate.getId() )
 				for (sottozona in sottozone) {
@@ -147,15 +155,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 					}
 					//in caso di duplica all'interno di un preventivo passare quotation è superfluo, perché sto clonando una zona dentro lo stesso preventivo
 					//in caso però di duplica del preventivo (e.g. approvazione preventivo) il preventivo che passo è quello clonato, quindi i nuovi items che creo dentro duplicateZoneItems, porteranno l'id del quotation clonato
-					duplicateZoneItems( duplicatedZoneId: sottozona.getId(), newZoneId: newSottozonaId, quotation: quotation );
+					duplicateZoneItems( duplicatedZoneId: sottozona.getId(), newZoneId: newSottozonaId, quotation: quotation, skipItemIds: arguments.skipItemIds, skipped: skipped );
 				}
 			}
 		}
 
-		return { 'messageId': messageId, 'zoneId': thisId }
+		return { 'messageId': messageId, 'zoneId': thisId, 'skippedItemIds': skipped.itemIds }
 	}
 
-	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId, required quotation ) {
+	public function duplicateZoneItems( required String duplicatedZoneId, required String newZoneId, required quotation, Struct skipItemIds = {}, Struct skipped = { "itemIds" = [] } ) {
 		var items = getQuotationItemService().list( quotationZoneId = arguments.duplicatedZoneId );
 		var newZone = getQuotationZoneService().get( arguments.newZoneId )
 		// codice posizione -> id della posizione ricreata nella nuova zona (una per codice)
@@ -185,6 +193,10 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		for (var quotationItem in items) {
+			if ( StructKeyExists( arguments.skipItemIds, quotationItem.getId() ) ) {
+				arguments.skipped.itemIds.append( quotationItem.getId() );
+				continue;
+			}
 			var duplicatedItem = Duplicate( quotationItem );
 			duplicatedItem.setQuotationZone( newZone )
 			duplicatedItem.setQuotation( quotation )

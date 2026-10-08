@@ -70,6 +70,9 @@
 						INNER JOIN texts USING ( raw_value_id )
 					</cfif>
 			WHERE 1=1
+				<!--- eliminati logicamente ( CatalogUsageService ) --->
+				AND raw_values.deleted_at IS NULL
+
 				<cfif !IsNull( arguments.str )>
 					AND
 						(

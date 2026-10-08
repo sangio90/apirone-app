@@ -239,6 +239,130 @@ AP.loading = ( function() {
     };
 } () );
 
+// Elementi di catalogo ( prodotti, attributi, valori ) che non si possono
+// eliminare perché usati in preventivi in corso ( CatalogUsageService ): elenca
+// i preventivi con i link alle righe da togliere.
+AP.showCatalogInUse = function( data ) {
+    var quotations = data.quotations || [];
+    var combinations = Number( data.combinations ) || 0;
+    var html = quotations.length
+        ? "<p>Impossibile eliminare: gli elementi selezionati (o i loro figli) sono in uso in preventivi in corso. Toglili dai preventivi e riprova.</p>"
+        : "<p>Impossibile eliminare: gli elementi selezionati (o i loro figli) sono in uso.</p>";
+
+    if ( quotations.length ) {
+        html += "<p class='mb-1'>Usati " + ( quotations.length == 1 ? "nel preventivo" : "nei preventivi" ) + ":</p><ul>";
+
+        // Tipo categoria -> ?tab= gestito da AP.quotation.detail.checkUrlTab
+        var tabByType = { PLA: "plate", SEG: "signage", ACC: "accessory", ART: "article" };
+        var labelByType = { PLA: "Placca", SEG: "Segnaletica", ACC: "Accessorio", ART: "Articolo" };
+
+        quotations.forEach( function( q ) {
+            var url = "/manager/quotations/" + encodeURIComponent( q.id );
+            var label = "n. " + kendo.htmlEncode( q.number ) + ( q.version !== "" && q.version != null ? " (rev. " + kendo.htmlEncode( q.version ) + ")" : "" );
+
+            html += "<li><a href='" + url + "' target='_blank'>" + label + "</a>";
+
+            if ( q.items && q.items.length ) {
+                html += "<ul>";
+
+                q.items.forEach( function( item ) {
+                    var params = new URLSearchParams();
+
+                    if ( tabByType[ item.type ] ) params.set( "tab", tabByType[ item.type ] );
+                    if ( item.zoneId ) params.set( "zone", item.zoneId );
+                    if ( item.itemIds && item.itemIds.length ) params.set( "highlight", item.itemIds.join( "," ) );
+
+                    var itemLabel = kendo.htmlEncode( item.zoneName || "Zona senza nome" )
+                        + " – " + ( labelByType[ item.type ] || "Riga" )
+                        + ( item.count > 1 ? " (" + item.count + " righe)" : "" );
+
+                    html += "<li><a href='" + url + "?" + params.toString() + "' target='_blank'>" + itemLabel + "</a></li>";
+                } );
+
+                html += "</ul>";
+            }
+
+            html += "</li>";
+        } );
+
+        html += "</ul>";
+    }
+
+    if ( combinations ) {
+        html += "<p>Usati in " + combinations + ( combinations == 1 ? " combinazione" : " combinazioni" ) + " del prodotto.</p>";
+    }
+
+    bootbox.alert( { title: "Elementi in uso", message: html } );
+};
+
+// Elenco di elementi non più a catalogo ( CatalogUsageService ) per gli avvisi
+// su revisione, duplica e modifica di righe di preventivo.
+AP.notInCatalogMessage = function( labels, conclusion ) {
+    var html = "<p>Questi elementi non sono più a catalogo:</p><ul>";
+    labels.forEach( function( label ) {
+        html += "<li>" + kendo.htmlEncode( label ) + "</li>";
+    } );
+    html += "</ul>";
+    if ( conclusion ) {
+        html += "<p>" + conclusion + "</p>";
+    }
+    return html;
+};
+
+// Elementi non più a catalogo nelle righe di un preventivo: revisione e duplica
+// non copiano quelle righe, l'avviso va dato prima di confermare.
+AP.loadNotInCatalog = function( quotationId, callback ) {
+    NM.util.ajax( {
+        method: "GET",
+        url: "/manager/ajax/quotations/" + quotationId + "/not-in-catalog",
+        callback: {
+            done: function( xhr ) {
+                callback( ( xhr && xhr.data && xhr.data.labels ) || [] );
+            }
+        }
+    } );
+};
+
+// Riga di preventivo riaperta in modifica che usa elementi non più a catalogo:
+// resta valida così com'è, ma quegli elementi, una volta cambiati, non si
+// possono più scegliere.
+AP.warnNotInCatalog = function( quotationItemId ) {
+    if ( !quotationItemId ) {
+        return;
+    }
+    NM.util.ajax( {
+        method: "GET",
+        url: "/manager/ajax/quotation-items/" + quotationItemId + "/not-in-catalog",
+        callback: {
+            done: function( xhr ) {
+                var labels = ( xhr && xhr.data && xhr.data.labels ) || [];
+                if ( labels.length ) {
+                    // notifica, non una modale: la riga si apre già in una modale
+                    AP.widget.notify(
+                        "warning",
+                        "Non più a catalogo: " + labels.join( ", " ) + ". La riga resta valida così com'è, ma se li cambi non potrai più sceglierli.",
+                        "Elementi non più a catalogo"
+                    );
+                }
+            }
+        }
+    } );
+};
+
+// Albero attributi / valori di un prodotto per i configuratori dei preventivi.
+// Il server esclude gli elementi eliminati dal catalogo, tranne quelli già
+// scelti nella riga di preventivo in modifica ( quotationItemId ).
+AP.productItemsUrl = function( productId, originId, quotationItemId ) {
+    var url = "/manager/ajax/product-items?productId=" + productId;
+    if ( originId ) {
+        url += "&originId=" + originId;
+    }
+    if ( quotationItemId ) {
+        url += "&quotationItemId=" + quotationItemId;
+    }
+    return url;
+};
+
 AP.toggleCosts = function() {
     var current = AP.getUserPref("showCosts");
     var next = !current;

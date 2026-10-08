@@ -57,6 +57,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		// nei configuratori si propongono solo modelli con prodotti attivi: un bundle
 		// vuoto ( es. CARBON / COMPOSIZIONE ) comparirebbe senza portare a nessuna finitura
 		params[ "withActiveProducts" ] = true;
+		params[ "includeProductId" ]   = super.service( "CatalogUsage" ).quotationItemProductId( rc.quotationItemId ?: "" );
+		StructDelete( params, "quotationItemId" );
 
 		var rows = super.fire( "model.list", params );
 
@@ -87,6 +89,9 @@ component extends="com.apirone.core.controller.AbsController" {
 			params[ "modelId" ] = rc.modelId;
 		}
 		params[ "withActiveProducts" ] = true;
+		// riga in modifica: il suo prodotto conta anche se eliminato dal catalogo
+		params[ "includeProductId" ]   = super.service( "CatalogUsage" ).quotationItemProductId( rc.quotationItemId ?: "" );
+		StructDelete( params, "quotationItemId" );
 
 		var rows = super.fire( "finish.list", params );
 		var data = mem.convertList( rows, "list" );
@@ -375,6 +380,16 @@ component extends="com.apirone.core.controller.AbsController" {
 			result.setData( { "message" = "Errore: " & e.Message, "error" = {} } );
 			result.setStatus( 'error' );
 		}
+		event.setValue( "result", result );
+	}
+
+	/**
+	 * Cosa non è più a catalogo nelle righe del preventivo: revisione e duplica
+	 * non copiano quelle righe, l'utente va avvisato prima.
+	 */
+	function notInCatalog( event, rc, prc ) {
+		var result = super.getResult();
+		result.setData( { "labels" = super.service( "CatalogUsage" ).deletedInQuotation( rc.id ).labels } );
 		event.setValue( "result", result );
 	}
 

@@ -641,7 +641,8 @@ AP.plate.modal = ( function() {
                     }
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/quotations/models/" + lineId,
+                        // riga in modifica: il suo prodotto conta anche se eliminato dal catalogo
+                        url: BASE + "/quotations/models/" + lineId + "?quotationItemId=" + ( this.detailForm.data.id || "" ),
                         callback: {
                             done: ( xhr ) => {
                                 this.models = xhr.data;
@@ -664,7 +665,7 @@ AP.plate.modal = ( function() {
                     }
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/quotations/finishes/22/" + lineId + "?modelId=" + encodeURIComponent( modelId ),
+                        url: BASE + "/quotations/finishes/22/" + lineId + "?modelId=" + encodeURIComponent( modelId ) + "&quotationItemId=" + ( this.detailForm.data.id || "" ),
                         callback: {
                             done: ( xhr ) => {
                                 this.finishes = xhr.data;
@@ -823,7 +824,8 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/quotation-items/product/by-params?categoryId=22&lineId=" + lineId + "&modelId=" + modelId + "&finishId=" + finishId,
+                        // riga in modifica: il suo prodotto resta anche se eliminato dal catalogo
+                        url: BASE + "/quotation-items/product/by-params?categoryId=22&lineId=" + lineId + "&modelId=" + modelId + "&finishId=" + finishId + "&quotationItemId=" + ( this.detailForm.data.id || "" ),
                         callback: {
                             done: ( xhr ) => {
                                 if ( !xhr.data || !xhr.data.id ) {
@@ -1102,7 +1104,7 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/product-items?productId=" + productId,
+                        url: AP.productItemsUrl( productId, null, this.detailForm.data.id ),
                         callback: {
                             done: ( xhr ) => {
                                 if ( xhr.count > 0 ) {
@@ -1285,7 +1287,7 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/product-items?productId=" + productId + "&originId=" + originId,
+                        url: AP.productItemsUrl( productId, originId, this.detailForm.data.id ),
                         callback: {
                             done: ( xhr ) => {
                                 let parentIndex = -1;
@@ -1688,7 +1690,7 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/product-items?productId=" + productId,
+                        url: AP.productItemsUrl( productId, null, this.detailForm.data.id ),
                         callback: {
                             done: ( xhr ) => {
                                 if ( xhr.count > 0 ) {
@@ -1925,7 +1927,7 @@ AP.plate.modal = ( function() {
 
                     await ajax( {
                         method: "GET",
-                        url: BASE + "/product-items?productId=" + productId + "&originId=" + originId,
+                        url: AP.productItemsUrl( productId, originId, this.detailForm.data.id ),
                         callback: {
                             done: ( xhr ) => {
                                 let parentIndex = -1;
@@ -3491,6 +3493,7 @@ AP.plate.modal = ( function() {
         const onSave = opts.onSave;
 
         window.location.hash = "plate/" + id;
+        AP.warnNotInCatalog( id );
         window.vm.resetDetailForm();
         window.vm.isEditMode = true;
         window.vm.detailForm.isClone = clone;
