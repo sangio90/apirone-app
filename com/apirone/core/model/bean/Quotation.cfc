@@ -94,6 +94,19 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 		return "";
 	}
 
+	/**
+	 * L'account è uno dei 5 agenti del preventivo ( ruolo Agente: vede solo questi ).
+	 */
+	public Boolean function hasAgent( required String accountId ){
+		var agents = [ getAgente1(), getAgente2(), getAgente3(), getAgente4(), getAgente5() ];
+		for ( var agent in agents ) {
+			if ( !IsNull( agent ) && Len( agent ) && agent == arguments.accountId ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Boolean function isLocked(){
 		return Len( lockReason() ) > 0;
 	}

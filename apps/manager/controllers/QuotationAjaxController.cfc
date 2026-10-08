@@ -113,6 +113,10 @@ component extends="com.apirone.core.controller.AbsController" {
 			if (user.getRole().getId() == 'CMJ') {
 				params['ownerId'] = user.getId();
 			}
+			// Agente: solo i preventivi in cui è uno dei 5 agenti
+			if (user.getRole().getId() == 'AGE') {
+				params['agentAccountId'] = user.getAccount().getId();
+			}
 			if (user.getRole().getId() == 'PRO') {
 				params['statusId'] = 'CON';
 			}

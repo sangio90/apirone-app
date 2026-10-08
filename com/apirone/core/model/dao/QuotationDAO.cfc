@@ -35,6 +35,8 @@
 		<cfargument name="salesAgentId" type="String" required="false">
 		<cfargument name="graphicTechnicianId" type="String" required="false">
 		<cfargument name="ownerId" type="String" required="false">
+		<!--- ruolo Agente: solo i preventivi in cui è uno dei 5 agenti ( id account ) --->
+		<cfargument name="agentAccountId" type="String" required="false">
 		<cfargument name="str" type="String" required="false">
 
 		<!---
@@ -175,6 +177,10 @@
 
 			<cfif !IsNull( arguments.ownerId )>
 				AND owner_id = <cfqueryparam cfsqltype="VARCHAR" value="#arguments.ownerId#">::uuid
+			</cfif>
+
+			<cfif !IsNull( arguments.agentAccountId )>
+				AND <cfqueryparam cfsqltype="VARCHAR" value="#arguments.agentAccountId#"> IN ( agente1, agente2, agente3, agente4, agente5 )
 			</cfif>
 
 			ORDER BY

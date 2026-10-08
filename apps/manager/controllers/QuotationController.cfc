@@ -69,6 +69,11 @@ component extends="com.apirone.core.controller.AbsController" {
         	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
 			return;
 		}
+		// Agente: solo i preventivi in cui è uno dei 5 agenti
+		if (!isNull(user) && !isNull(user.getRole()) && user.getRole().getId() == 'AGE' && !quotation.hasAgent( user.getAccount().getId() )) {
+        	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
+			return;
+		}
 		if (!isNull(user) && !isNull(user.getRole()) && user.getRole().getId() == 'PRO' && quotation.getStatusHistory().getStatus().getId() != 'CON') {
         	relocate( uri="/manager/dashboard", postProcessExempt=false, addToken=false );
 			return;
