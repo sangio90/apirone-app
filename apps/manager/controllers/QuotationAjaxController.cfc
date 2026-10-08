@@ -722,6 +722,7 @@ component extends="com.apirone.core.controller.AbsController" {
 
 		var service = super.service( "QuotationPrice" );
 
+		service.ensure( quotationId );
 		var result = service.calculate( quotationId );
 		var counters = getQuantities( quotationId );
 

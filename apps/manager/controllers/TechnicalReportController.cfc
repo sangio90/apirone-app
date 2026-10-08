@@ -88,6 +88,8 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.title = "Preventivo";
 
 		var quotation = service("Quotation").get(quotationId = idPreventivo);
+		// stampa aperta senza passare dal dettaglio: i totali si calcolano qui
+		service("QuotationPrice").ensure( idPreventivo );
 		var quotationPrice = service("QuotationPrice").getByQuotationId(quotationId = idPreventivo);
 
 		var quoteObj = {

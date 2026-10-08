@@ -351,10 +351,6 @@ AP.quotation.totalPricing = ( function() {
             markDirty
         );
 
-        // Disabilita "Concludi" al caricamento: l'utente deve cliccare "Salva"
-        // almeno una volta per confermare il totale corrente prima di concludere.
-        markDirty();
-
     };
 
     pub.getData = function( itemId ) {

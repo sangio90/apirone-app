@@ -83,6 +83,10 @@ component extends="com.apirone.core.controller.AbsController" {
 		prc.page[ "quotation" ]["exported"] = quotation.getExported();
 		prc.page[ "quotation" ]["sentToClient"] = quotation.getSentToClient() ?: false;
 
+		// I totali si calcolano da subito ( QuotationPriceService.ensure ), senza
+		// aspettare il primo "Salva".
+		super.service( "QuotationPrice" ).ensure( quotation.getId() );
+
 		// Finché il preventivo non è stato calcolato non esiste un QuotationPrice:
 		// le stampe che riportano prezzi e totali non hanno i dati per esistere.
 		// Il modale di stampa usa questo flag per lasciare disponibile la sola

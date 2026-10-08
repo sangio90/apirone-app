@@ -20,6 +20,22 @@
 
 	}
 
+	/**
+	 * Il preventivo ha subito i suoi totali ( sconti e spese a zero ) senza
+	 * aspettare il primo "Salva": senza QuotationPrice il totale merce non si
+	 * calcola e le stampe con i prezzi non sono disponibili. Da lì in poi i
+	 * totali si ricalcolano dalle righe a ogni lettura.
+	 */
+	public void function ensure( required String quotationId ){
+		if ( getDao().find( quotationId = arguments.quotationId, limit = 1 ).recordCount ) {
+			return;
+		}
+
+		var pricing = super.bean( "QuotationPrice" );
+		pricing.setQuotationId( arguments.quotationId );
+		create( pricing );
+	}
+
 	public com.apirone.core.model.bean.QuotationPrice function calculate( required String quotationId ){
 
 		var totalItems = 0;

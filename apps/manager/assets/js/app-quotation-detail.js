@@ -1029,7 +1029,6 @@ AP.quotation.detail = (function () {
 						}
 						$("#item-duplicate-modal").modal("hide");
 						AP.widget.notify("success", "Articolo duplicato correttamente.");
-						AP.quotation.totalPricing.markDirty();
 						// la lista si aggiorna comunque in background; per la copia si apre
 						// subito la modale della riga appena creata, così si può modificarla
 						// senza doverla cercare nell'elenco (l'istanza invece resta com'era)
