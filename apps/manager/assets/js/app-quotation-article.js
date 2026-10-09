@@ -47,6 +47,7 @@ AP.article.modal = ( function() {
 
     var viewModel = kendo.observable( {
         detailForm: defaultDetailForm,
+        canEdit: AP.page.canEdit,
 
         resetForm: function() {
             viewModel.set( "detailForm", defaultDetailForm );
