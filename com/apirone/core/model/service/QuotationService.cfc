@@ -1285,7 +1285,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"shippingAddress"  = Trim( ( arguments.data.DEINDMER ?: "" ) & " " & ( arguments.data.DECAPDES ?: "" ) & " " & ( arguments.data.DELOCMER ?: "" ) & " " & ( arguments.data.DEPROMER ?: "" ) & " " & ( arguments.data.DENAZMER ?: "" ) ),
 			"shippingContact"  = arguments.data.MMRIFSPE ?: "",
 			"reference"        = arguments.data.MMRIFORD ?: "",
-			"po"               = arguments.data.MMPO123 ?: "",
+			"po"               = arguments.data.MMRIF_PO ?: "",
 			"agent"            = arguments.data.MMCODAGE ?: "",
 			"paymentMethod"    = arguments.data.MMCODPAG ?: "",
 			"vatCode"          = arguments.data.MMCODIVA ?: "",
@@ -1511,7 +1511,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMDATEVA" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
 			"MMEVASIO" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
 			"MMRIFORD" = quotation.getRifLibero() ?: "",
-			"MMPO123" = quotation.getPo() ?: "", // TODO-MMPO123: per ora non scritto su ORDINI_APIR (vedi QuotationDAO.export)
+			"MMRIF_PO" = quotation.getPo() ?: "",
 			"MMNUMLIS" = 1,
 			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
 			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,
@@ -1526,7 +1526,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMPERPR5" = !isNull(quotation.getCommission5()) ? quotation.getCommission5() : 0,
 			"MMCODPAG" = quotation.getPaymentMethod().getId(),
 			"MMCODVAL" = quotation.getCurrency().getId(),
-			"MMCODIVA" = !isNull( quotation.getVatCode() ) ? quotation.getVatCode().getId() : "", // aliquota IVA = ivacod di verticale_vat_codes. TODO-MMCODIVA: per ora non scritto su ORDINI_APIR (vedi QuotationDAO.export)
+			"MMCODIVA" = !isNull( quotation.getVatCode() ) ? quotation.getVatCode().getId() : "", // aliquota IVA = ivacod di verticale_vat_codes.
 			"CF_IDCLI" = customer.getId(),
 			"CF___CAP" = customer.getPostalCode(),
 			"CFDESCR1" = customer.getCompany(),

@@ -442,13 +442,11 @@ AP.quotation.detail = (function () {
 					["Indirizzo spedizione", header.shippingAddress],
 					["Referente spedizione", header.shippingContact],
 					["Riferimento", header.reference],
-					// TODO-MMPO123: riattivare quando MMPO123 viene scritto su ORDINI_APIR (QuotationDAO.export)
-					// ["PO", header.po],
+					["PO", header.po],
 					["Data evasione", header.deliveryDate],
 					["Agente", header.agent],
 					["Pagamento", header.paymentMethod],
-					// TODO-MMCODIVA: riattivare quando MMCODIVA viene scritto su ORDINI_APIR (QuotationDAO.export)
-					// ["Aliquota IVA", header.vatCode],
+					["Aliquota IVA", header.vatCode],
 					["Sconti testata", num(header.discount1) + " + " + num(header.discount2) + " %"],
 					["Spese trasporto", num(header.shippingCost)]
 				];
