@@ -536,6 +536,29 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 	}
 
 	/**
+	 * Riga product_hashes dell'hash della voce. Se l'hash della voce è orfano ( nessuna
+	 * riga: succedeva risalvando una placca con configurazione cambiata, bug corretto in
+	 * QuotationItemService.update il 2026-10-09 ) lo rigenera dalla configurazione attuale
+	 * della voce e lo riscrive, così export articoli ed export preventivo non si bloccano.
+	 */
+	private function resolveProductHash( required quotationItem ){
+		var productHash = getProductHashService().getByHash( arguments.quotationItem.getHash() );
+		if ( !IsNull( productHash ) ) {
+			return productHash;
+		}
+
+		var hash = getProductHashService().createHash( arguments.quotationItem.getId() );
+		if ( IsNull( hash ) || !Len( hash ) ) {
+			return NullValue();
+		}
+
+		getQuotationItemService().updateHash( arguments.quotationItem.getId(), hash );
+		arguments.quotationItem.setHash( hash );
+
+		return getProductHashService().getByHash( hash );
+	}
+
+	/**
 	 * Mappa hash della voce di preventivo -> codice export calcolato al volo,
 	 * per le stampe di preventivi non ancora esportati. Non scrive nulla.
 	 * Gli hash che non si riescono a comporre (configurazione incompleta)
@@ -710,7 +733,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 						continue;
 					}
 
-					var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+					var productHash = resolveProductHash( quotationItem );
 					if ( IsNull( productHash ) ) {
 						continue;
 					}
@@ -1172,7 +1195,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 							result.error = 'Hash riga preventivo non trovata.';
 							return result;
 						}
-						var productHash = getProductHashService().getByHash( quotationItem.getHash() );
+						var productHash = resolveProductHash( quotationItem );
 						if ( isNull(productHash) ) {
 							result.success = false;
 							result.error = 'Hash prodotto non trovato.';

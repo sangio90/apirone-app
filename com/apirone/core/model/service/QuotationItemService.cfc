@@ -333,9 +333,15 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				// lo stesso hash di un reload completo.
 				// Con doSkipFruits l'impronta salvata coincide già (configurazione invariata):
 				// niente UPDATE dell'hash, il valore su DB è già quello giusto.
-				var hash = IsNull( newHash ) ? getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem ) : newHash;
-				if ( !IsNull( hash ) && !doSkipFruits ) {
-					updateHash( arguments.quotationItem.getId(), hash );
+				// newHash ( computeOnly ) è solo l'MD5 per il confronto: non crea la riga su
+				// product_hashes, quindi a configurazione cambiata serve la createHash vera,
+				// altrimenti l'item resta con un hash orfano e l'export verso Verticale fallisce
+				// ( "Hash prodotto non trovato" ).
+				if ( !doSkipFruits ) {
+					var hash = getProductHashService().createHash( arguments.quotationItem.getId(), arguments.quotationItem );
+					if ( !IsNull( hash ) ) {
+						updateHash( arguments.quotationItem.getId(), hash );
+					}
 				}
 
 				var quotationItemQuantity = arguments.quotationItem.getQuantity();
