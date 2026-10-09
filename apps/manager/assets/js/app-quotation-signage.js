@@ -583,13 +583,13 @@ AP.signage.modal = ( function() {
                 // delle maiuscole (~0.7em sopra la baseline), non a metà x-height come
                 // fa vertical-align: middle (che lo fa sembrare appoggiato in basso).
                 // vertical-align in lunghezza alza il bordo inferiore dell'img dalla baseline.
-                // object-fit: cover - larghezza e altezza configurate descrivono il disegno,
-                // non la tavola dell'SVG: se la tavola ha margini vuoti (es. <man> più stretto
-                // della tavola condivisa con <wom>) il default "contain" adatterebbe la tavola
-                // al box e il disegno uscirebbe più basso del previsto. Con cover la tavola
-                // riempie il box sul lato che combacia e si tagliano solo i margini vuoti.
+                // object-fit: contain - il disegno sta sempre tutto nel box configurato: se le
+                // proporzioni configurate non coincidono con quelle dell'SVG resta spazio vuoto
+                // sul lato in eccesso invece di tagliare il disegno (con cover, es. <man> 26×73
+                // su un SVG più stretto, si perdevano ~2px sopra e sotto). Le tavole SVG vanno
+                // caricate aderenti al disegno, senza margini vuoti.
                 const imgSizeCss = ( hasDim
-                    ? "width: " + dim.width + "px; height: " + dim.height + "px; object-fit: cover;"
+                    ? "width: " + dim.width + "px; height: " + dim.height + "px; object-fit: contain;"
                     : "height: " + pictogramHeightPx + "px;" ) +
                     " vertical-align: calc(0.35em - " + ( imgHeightPx / 2 ) + "px);";
                 const imgHtml =
