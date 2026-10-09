@@ -443,6 +443,7 @@ AP.quotation.detail = (function () {
 					["Referente spedizione", header.shippingContact],
 					["Riferimento", header.reference],
 					["PO", header.po],
+					["Fattura reclamo", header.claim],
 					["Data evasione", header.deliveryDate],
 					["Agente", header.agent],
 					["Pagamento", header.paymentMethod],

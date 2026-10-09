@@ -1286,6 +1286,7 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"shippingContact"  = arguments.data.MMRIFSPE ?: "",
 			"reference"        = arguments.data.MMRIFORD ?: "",
 			"po"               = arguments.data.MMRIF_PO ?: "",
+			"claim"            = Trim( ( arguments.data.MMESEREC ?: "" ) & " " & ( Val( arguments.data.MMDOCREC ?: 0 ) ? arguments.data.MMDOCREC : "" ) & " " & ( arguments.data.MMALFREC ?: "" ) ),
 			"agent"            = arguments.data.MMCODAGE ?: "",
 			"paymentMethod"    = arguments.data.MMCODPAG ?: "",
 			"vatCode"          = arguments.data.MMCODIVA ?: "",
@@ -1512,6 +1513,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			"MMEVASIO" = !isNull(quotation.getDataEvasione()) ? quotation.getDataEvasione() : javaCast("null", ""),
 			"MMRIFORD" = quotation.getRifLibero() ?: "",
 			"MMRIF_PO" = quotation.getPo() ?: "",
+			"MMESEREC" = quotation.getReclamoAnno() ?: "", // reclamo: anno fattura
+			"MMDOCREC" = quotation.getReclamoNumero() ?: 0, // reclamo: numero fattura
+			"MMALFREC" = quotation.getReclamoAlfa() ?: "", // reclamo: alfa fattura
 			"MMNUMLIS" = 1,
 			"CFLINGUA" = !isNull(quotation.getLang()) ? UCase(quotation.getLang().getId()) : "IT",
 			"MMCODAGE" = (!isNull(quotation.getAgente1()) && Len(quotation.getAgente1())) ? getAccountService().get(quotation.getAgente1()).getIdAgenteVerticale() : null,
@@ -1810,6 +1814,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 			if ( Len( r.industry ) ) bean.setIndustry( r.industry );
 			if ( Len( r.rif_libero ) ) bean.setRifLibero( r.rif_libero );
 			if ( Len( r.po ) ) bean.setPo( r.po );
+			if ( Len( r.reclamo_anno ) ) bean.setReclamoAnno( r.reclamo_anno );
+			if ( !IsNull( r.reclamo_numero ) ) bean.setReclamoNumero( r.reclamo_numero );
+			if ( Len( r.reclamo_alfa ) ) bean.setReclamoAlfa( r.reclamo_alfa );
 			if ( IsDate( r.data_evasione ) ) bean.setDataEvasione( r.data_evasione );
 			if ( !IsNull( r.sent_to_client ) ) bean.setSentToClient( r.sent_to_client );
 			if ( !IsNull( r.data_conferma_ordine ) && IsDate( r.data_conferma_ordine ) ) bean.setDataConfermaOrdine( r.data_conferma_ordine );
@@ -1908,6 +1915,9 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		if ( Len( arguments.record.industry ) ) bean.setIndustry( arguments.record.industry );
 		if ( Len( arguments.record.rif_libero ) ) bean.setRifLibero( arguments.record.rif_libero );
 		if ( Len( arguments.record.po ) ) bean.setPo( arguments.record.po );
+		if ( Len( arguments.record.reclamo_anno ) ) bean.setReclamoAnno( arguments.record.reclamo_anno );
+		if ( !IsNull( arguments.record.reclamo_numero ) ) bean.setReclamoNumero( arguments.record.reclamo_numero );
+		if ( Len( arguments.record.reclamo_alfa ) ) bean.setReclamoAlfa( arguments.record.reclamo_alfa );
 		if ( IsDate( arguments.record.data_evasione ) ) bean.setDataEvasione( arguments.record.data_evasione );
 		if ( !IsNull( arguments.record.sent_to_client ) ) bean.setSentToClient( arguments.record.sent_to_client );
 		if ( !IsNull( arguments.record.data_conferma_ordine ) && IsDate( arguments.record.data_conferma_ordine ) ) bean.setDataConfermaOrdine( arguments.record.data_conferma_ordine );

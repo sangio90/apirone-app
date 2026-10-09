@@ -10,6 +10,7 @@
 				<button class="nav-link" id="nav-fiscal-tab" data-bs-toggle="tab" data-bs-target="##nav-fiscal" type="button" role="tab">Dati fiscali</button>
 				<!--- <button class="nav-link" id="nav-discount-tab" data-bs-toggle="tab" data-bs-target="##nav-discount" type="button" role="tab">Sconti/Costi</button> --->
 				<button class="nav-link" id="nav-assignment-tab" data-bs-toggle="tab" data-bs-target="##nav-assignment" type="button" role="tab">Assegnatari</button>
+				<button class="nav-link" id="nav-claim-tab" data-bs-toggle="tab" data-bs-target="##nav-claim" type="button" role="tab">Reclamo</button>
 				<!--- <button class="nav-link" id="nav-plan-tab" data-bs-toggle="tab" data-bs-target="##nav-plan" type="button" role="tab" hidden>Planimentria</button> --->
 				<!--- <button class="nav-link" id="nav-shippings-tab" data-bs-toggle="tab" data-bs-target="##nav-shippings" type="button" role="tab" hidden>Spedizioni</button> --->
 			</div>
@@ -377,6 +378,45 @@
 									data-value-field="id"
 									data-text-field="name">
 								</select>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+			<!---
+				claim ( fattura del reclamo )
+			--->
+			<div class="tab-pane fade" id="nav-claim" role="tabpanel">
+
+				<div class="row mb-3">
+
+					<div class="col-6">
+
+						<div class="form-group row mb-3">
+							<label class="col-3 control-label text-sm-end pt-2">Anno fattura</label>
+							<div class="col-9">
+								<input type="text" class="form-control" maxlength="4"
+									data-bind="value: detailForm.data.reclamoAnno">
+							</div>
+						</div>
+
+						<div class="form-group row mb-3">
+							<label class="col-3 control-label text-sm-end pt-2">Numero fattura</label>
+							<div class="col-9">
+								<input type="number" class="form-control" min="0" max="999999" step="1"
+									data-bind="value: detailForm.data.reclamoNumero">
+							</div>
+						</div>
+
+						<div class="form-group row mb-3">
+							<label class="col-3 control-label text-sm-end pt-2">Alfa fattura</label>
+							<div class="col-9">
+								<input type="text" class="form-control" maxlength="2"
+									data-bind="value: detailForm.data.reclamoAlfa">
 							</div>
 						</div>
 

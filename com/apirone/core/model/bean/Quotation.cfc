@@ -41,6 +41,9 @@ component extends="com.apirone.core.model.bean.AbsBean" accessors="true" {
 	property name="industry" type="String";
 	property name="rifLibero" type="String";
 	property name="po" type="String";
+	property name="reclamoAnno" type="String";
+	property name="reclamoNumero" type="Numeric";
+	property name="reclamoAlfa" type="String";
 	property name="dataEvasione" type="Date";
 	property name="sentToClient" type="Boolean";
 	property name="dataConfermaOrdine" type="Date";

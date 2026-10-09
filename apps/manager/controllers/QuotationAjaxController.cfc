@@ -227,6 +227,9 @@ component extends="com.apirone.core.controller.AbsController" {
 		if ( !isNull(json.industry) ) quotation.setIndustry( json.industry );
 		if ( !isNull(json.rifLibero) ) quotation.setRifLibero( json.rifLibero );
 		if ( !isNull(json.po) ) quotation.setPo( json.po );
+		if ( !isNull(json.reclamoAnno) ) quotation.setReclamoAnno( Left( Trim( json.reclamoAnno ), 4 ) );
+		if ( !isNull(json.reclamoNumero) && IsNumeric(json.reclamoNumero) ) quotation.setReclamoNumero( Int( json.reclamoNumero ) );
+		if ( !isNull(json.reclamoAlfa) ) quotation.setReclamoAlfa( Left( Trim( json.reclamoAlfa ), 2 ) );
 		if ( structKeyExists(json, "dataEvasione") && !isNull(json.dataEvasione) && IsDate(json.dataEvasione) ) quotation.setDataEvasione( json.dataEvasione );
 		if ( !isNull(json.codiceSdi) ) quotation.setCodiceSdi( json.codiceSdi );
 

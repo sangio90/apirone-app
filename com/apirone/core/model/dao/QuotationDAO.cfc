@@ -236,6 +236,9 @@
 				industry,
 				rif_libero,
 				po,
+				reclamo_anno,
+				reclamo_numero,
+				reclamo_alfa,
 				data_evasione,
 				sent_to_client,
 				data_conferma_ordine,
@@ -347,6 +350,9 @@
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
 				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPo() ?: ''#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReclamoAnno() ?: ''#">,
+				<cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getReclamoNumero() ?: ''#" null="#isNull(arguments.quotation.getReclamoNumero())#">,
+				<cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReclamoAlfa() ?: ''#">,
 				<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
 					<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
 				<cfelse>
@@ -557,6 +563,9 @@
 				industry = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getIndustry() ?: ''#">,
 				rif_libero = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getRifLibero() ?: ''#">,
 				po = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getPo() ?: ''#">,
+				reclamo_anno = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReclamoAnno() ?: ''#">,
+				reclamo_numero = <cfqueryparam cfsqltype="Integer" value="#arguments.quotation.getReclamoNumero() ?: ''#" null="#isNull(arguments.quotation.getReclamoNumero())#">,
+				reclamo_alfa = <cfqueryparam cfsqltype="Varchar" value="#arguments.quotation.getReclamoAlfa() ?: ''#">,
 				data_evasione =
 					<cfif !isNull(arguments.quotation.getDataEvasione()) && IsDate(arguments.quotation.getDataEvasione())>
 						<cfqueryparam cfsqltype="Date" value="#arguments.quotation.getDataEvasione()#">
@@ -743,7 +752,8 @@
 				MMSERIAL, MMVALUNI, MMUTECOM, MMUTETEC,
 				MMPERPRO, MMPERPR2, MMPERPR3, MMPERPR4, MMPERPR5,
 				MMRIFSPE, CFTIPCLF, CFCODDES, MMORDPRO, MMNOTPOS, MMANNDET, CFEMAIL, MMANNTES,
-				MMRIF_PO, MMCODIVA
+				MMRIF_PO, MMCODIVA,
+				MMESEREC, MMDOCREC, MMALFREC
 			)
 			VALUES (
 				<cfqueryparam value="#left(arguments.data.CF_IDCLI,36)#" cfsqltype="varchar">,
@@ -815,7 +825,10 @@
 				<cfqueryparam value="#arguments.data.CFEMAIL ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#arguments.data.MMANNTES ?: ''#" cfsqltype="varchar">,
 				<cfqueryparam value="#left(arguments.data.MMRIF_PO ?: '',50)#" cfsqltype="varchar">,
-				<cfqueryparam value="#arguments.data.MMCODIVA ?: ''#" cfsqltype="varchar">
+				<cfqueryparam value="#arguments.data.MMCODIVA ?: ''#" cfsqltype="varchar">,
+				<cfqueryparam value="#left(arguments.data.MMESEREC ?: '',4)#" cfsqltype="varchar">,
+				<cfqueryparam value="#arguments.data.MMDOCREC ?: 0#" cfsqltype="integer">,
+				<cfqueryparam value="#left(arguments.data.MMALFREC ?: '',2)#" cfsqltype="varchar">
 			)
 		</cfquery>
 
