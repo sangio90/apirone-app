@@ -289,6 +289,53 @@
 	</cffunction>
 
 	<!---
+		Fatture soggette a reclamo: fatture ( MMCODDOC = 'FI' ) con partita aperta
+		( importo dare > 0, non saldata, non sospesa ). Query fornita da Verticale;
+		cast/trim perché le colonne sono a larghezza fissa e l'alfa può essere NULL.
+	--->
+	<cffunction name="syncClaimInvoices" access="public" returntype="void">
+		<cfquery name="local.q" datasource="verticale">
+			SELECT
+				LTRIM(RTRIM(CAST(DATDOC.MMANNREG AS VARCHAR(4)))) AS anno,
+				CAST(DATDOC.MMNUMDOC AS INT) AS numero,
+				LTRIM(RTRIM(ISNULL(DATDOC.MMALFDOC, ''))) AS alfa
+			FROM
+				AZAPI_DATDOC DATDOC,
+				AZAPI_PARTIT PARTIT
+			WHERE
+				DATDOC.MMSERIAL = PARTIT.SCSERDOC
+				AND DATDOC.MMCODDOC = 'FI'
+				AND PARTIT.SCIMPDAR > 0
+				AND PARTIT.SCSALDAT <> 'S'
+				AND PARTIT.SCSOSPES <> 'S'
+			GROUP BY
+				LTRIM(RTRIM(CAST(DATDOC.MMANNREG AS VARCHAR(4)))),
+				CAST(DATDOC.MMNUMDOC AS INT),
+				LTRIM(RTRIM(ISNULL(DATDOC.MMALFDOC, '')))
+		</cfquery>
+
+		<cfset replaceLocalTable(
+			tableName = "verticale_claim_invoices",
+			columns = [
+				{ name = "anno", cfsqltype = "varchar" },
+				{ name = "numero", cfsqltype = "integer" },
+				{ name = "alfa", cfsqltype = "varchar" }
+			],
+			sourceQuery = local.q
+		)>
+	</cffunction>
+
+	<cffunction name="listClaimInvoices" access="public" returntype="Array">
+		<cfquery name="local.q" datasource="apirone" returntype="array">
+			SELECT anno, numero, alfa
+			FROM verticale_claim_invoices
+			ORDER BY anno DESC, numero DESC, alfa
+		</cfquery>
+
+		<cfreturn local.q>
+	</cffunction>
+
+	<!---
 		private methods
 	--->
 

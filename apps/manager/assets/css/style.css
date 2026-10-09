@@ -1118,3 +1118,15 @@ h2 {
 .qt-readonly .k-input {
     background-color: #e9ecef;
 }
+
+/*
+   Tendine del tab Reclamo ( testata preventivo ): sfondo bianco come gli altri campi
+   del form. Il fill "solid" di Kendo le rende grigie e sembrano disabilitate.
+*/
+.k-picker.qt-claim-ddl:not(.k-disabled) {
+    background-color: #fff;
+    background-image: none;
+}
+.k-picker.qt-claim-ddl:not(.k-disabled):hover {
+    background-color: #f8f9fa;
+}

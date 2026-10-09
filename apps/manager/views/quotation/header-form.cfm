@@ -396,27 +396,48 @@
 
 					<div class="col-6">
 
+						<!---
+							Tendine a cascata ( anno -> numero -> alfa ) sulle fatture con partita
+							aperta copiate da Verticale ( verticale_claim_invoices ): popolate in
+							app-quotation-header.js ( refreshClaimLists ).
+						--->
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Anno fattura</label>
 							<div class="col-9">
-								<input type="text" class="form-control" maxlength="4"
-									data-bind="value: detailForm.data.reclamoAnno">
+								<select id="qt-claim-anno" class="form-control qt-claim-ddl"
+									data-role="dropdownlist"
+									data-bind="source: claimAnni, value: detailForm.data.reclamoAnno"
+									data-value-field="id"
+									data-text-field="name"
+									data-value-primitive="true">
+								</select>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Numero fattura</label>
 							<div class="col-9">
-								<input type="number" class="form-control" min="0" max="999999" step="1"
-									data-bind="value: detailForm.data.reclamoNumero">
+								<select id="qt-claim-numero" class="form-control qt-claim-ddl"
+									data-role="dropdownlist"
+									data-bind="source: claimNumeri, value: detailForm.data.reclamoNumero"
+									data-value-field="id"
+									data-text-field="name"
+									data-value-primitive="true"
+									data-filter="startswith">
+								</select>
 							</div>
 						</div>
 
 						<div class="form-group row mb-3">
 							<label class="col-3 control-label text-sm-end pt-2">Alfa fattura</label>
 							<div class="col-9">
-								<input type="text" class="form-control" maxlength="2"
-									data-bind="value: detailForm.data.reclamoAlfa">
+								<select id="qt-claim-alfa" class="form-control qt-claim-ddl"
+									data-role="dropdownlist"
+									data-bind="source: claimAlfa, value: detailForm.data.reclamoAlfa"
+									data-value-field="id"
+									data-text-field="name"
+									data-value-primitive="true">
+								</select>
 							</div>
 						</div>
 

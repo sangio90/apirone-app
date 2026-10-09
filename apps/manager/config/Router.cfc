@@ -17,6 +17,7 @@
 
 		post( "/ajax/verticale-sync/run" ).to( "VerticaleSyncAjaxController.run" ).end();
 		get( "/ajax/verticale-sync/status" ).to( "VerticaleSyncAjaxController.status" ).end();
+		get( "/ajax/verticale/claim-invoices" ).to( "VerticaleSyncAjaxController.claimInvoices" ).end();
 
 		post( "/ajax/crm-sync/run" ).to( "CrmSyncAjaxController.run" ).end();
 		get( "/ajax/crm-sync/status" ).to( "CrmSyncAjaxController.status" ).end();

@@ -143,7 +143,7 @@ AP.quotation.header = ( function() {
 			rifLibero: "",
 			po: "",
 			reclamoAnno: "",
-			reclamoNumero: null,
+			reclamoNumero: "",
 			reclamoAlfa: "",
 			dataEvasione: null,
 			codiceSdi: "",
@@ -169,6 +169,10 @@ AP.quotation.header = ( function() {
         quotationItems: new kendo.data.DataSource(),
         saleUsers: new kendo.data.DataSource(),
         techUsers: new kendo.data.DataSource(),
+        // Tendine a cascata del tab Reclamo ( vedi refreshClaimLists )
+        claimAnni: [],
+        claimNumeri: [],
+        claimAlfa: [],
         canEdit: AP.page.canEdit,
         canSee: AP.page.canSee,
         agente2Enabled: false,
@@ -505,6 +509,70 @@ AP.quotation.header = ( function() {
         }
     }
 
+    // Fatture soggette a reclamo ( copia locale di Verticale ): [ { anno, numero, alfa } ]
+    var claimInvoices = [];
+    var claimRefreshing = false;
+
+    function claimValue( field ) {
+        var v = viewModel.get( "detailForm.data." + field );
+        return v === null || v === undefined ? "" : String( v );
+    }
+
+    function uniqueValues( list ) {
+        return list.filter( function( v, i ) { return list.indexOf( v ) === i; } );
+    }
+
+    // Ricostruisce le tendine anno -> numero -> alfa e riallinea i valori scelti.
+    // Imperativo e non con binding calcolati: il bulk set di detailForm.data al caricamento
+    // non scatena i change annidati. La fattura già salvata resta selezionabile anche se
+    // nel frattempo è stata saldata ( non è più fra quelle con partita aperta ).
+    function refreshClaimLists() {
+        if ( claimRefreshing ) return;
+        claimRefreshing = true;
+
+        var anno = claimValue( "reclamoAnno" );
+        var numero = claimValue( "reclamoNumero" );
+        var alfa = claimValue( "reclamoAlfa" );
+
+        var rows = claimInvoices.map( function( r ) {
+            return { anno: String( r.anno ), numero: String( r.numero ), alfa: r.alfa || "" };
+        } );
+        if ( anno && numero && !rows.some( function( r ) { return r.anno === anno && r.numero === numero && r.alfa === alfa; } ) ) {
+            rows.push( { anno: anno, numero: numero, alfa: alfa } );
+        }
+
+        var anni = uniqueValues( rows.map( function( r ) { return r.anno; } ) ).sort().reverse();
+        if ( anno && anni.indexOf( anno ) < 0 ) anno = "";
+
+        var numeri = uniqueValues( rows.filter( function( r ) { return anno && r.anno === anno; } )
+            .map( function( r ) { return r.numero; } ) )
+            .sort( function( a, b ) { return Number( b ) - Number( a ); } );
+        if ( numero && numeri.indexOf( numero ) < 0 ) numero = "";
+
+        var alfas = uniqueValues( rows.filter( function( r ) { return numero && r.anno === anno && r.numero === numero; } )
+            .map( function( r ) { return r.alfa; } ) ).sort();
+        if ( alfas.indexOf( alfa ) < 0 ) alfa = "";
+
+        viewModel.set( "claimAnni", [ { id: "", name: "-- seleziona" } ].concat( anni.map( function( a ) { return { id: a, name: a }; } ) ) );
+        viewModel.set( "claimNumeri", [ { id: "", name: "-- seleziona" } ].concat( numeri.map( function( n ) { return { id: n, name: n }; } ) ) );
+        // Alfa vuoto è un valore valido ( "(nessuno)" ) e prende il posto del placeholder,
+        // che ha lo stesso id "".
+        viewModel.set( "claimAlfa", ( alfas.indexOf( "" ) < 0 ? [ { id: "", name: "-- seleziona" } ] : [] )
+            .concat( alfas.map( function( a ) { return { id: a, name: a || "(nessuno)" }; } ) ) );
+
+        viewModel.set( "detailForm.data.reclamoAnno", anno );
+        viewModel.set( "detailForm.data.reclamoNumero", numero );
+        viewModel.set( "detailForm.data.reclamoAlfa", alfa );
+
+        // Il cambio di source può far scegliere al widget il primo elemento: riallinea.
+        [ [ "#qt-claim-anno", anno ], [ "#qt-claim-numero", numero ], [ "#qt-claim-alfa", alfa ] ].forEach( function( pair ) {
+            var ddl = $( pair[ 0 ] ).data( "kendoDropDownList" );
+            if ( ddl ) ddl.value( pair[ 1 ] );
+        } );
+
+        claimRefreshing = false;
+    }
+
     pub.config = function() {
         return viewModel.get( "detailForm.data" );
     };
@@ -570,6 +638,7 @@ AP.quotation.header = ( function() {
 
                     setTimeout( function() {
                         syncAgentiEnabled();
+                        refreshClaimLists();
 
                         if ( xhr.data.customer.id ) {
                             var customerAc = $( "#qt-customer" ).data( "kendoAutoComplete" );
@@ -664,7 +733,27 @@ AP.quotation.header = ( function() {
 			},
 		} );
 
+		NM.util.ajax( {
+			method: "GET",
+			url: "/manager/ajax/verticale/claim-invoices",
+			callback: {
+				done: function( xhr ) {
+					claimInvoices = xhr.data || [];
+					refreshClaimLists();
+				},
+			},
+		} );
+
 		viewModel.bind("change", function(e) {
+
+			// Cambiando un campo del reclamo si puliscono quelli sotto ( anno -> numero -> alfa ).
+			if ( !claimRefreshing && ( e.field === "detailForm.data.reclamoAnno" || e.field === "detailForm.data.reclamoNumero" ) ) {
+				claimRefreshing = true;
+				if ( e.field === "detailForm.data.reclamoAnno" ) viewModel.set( "detailForm.data.reclamoNumero", "" );
+				viewModel.set( "detailForm.data.reclamoAlfa", "" );
+				claimRefreshing = false;
+				refreshClaimLists();
+			}
 
 			if (e.field === "detailForm.data.customer") {
 				var customer = viewModel.get("detailForm.data.customer");

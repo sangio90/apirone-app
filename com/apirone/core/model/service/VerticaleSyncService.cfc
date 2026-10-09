@@ -50,7 +50,8 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 				"valute"               = function(){ attributes.dao.syncCurrencies(); },
 				"aliquote IVA"         = function(){ attributes.dao.syncVatCodes(); },
 				"metodi di pagamento"  = function(){ attributes.dao.syncPaymentMethods(); },
-				"nazioni"              = function(){ attributes.dao.syncCountries(); }
+				"nazioni"              = function(){ attributes.dao.syncCountries(); },
+				"fatture reclamo"      = function(){ attributes.dao.syncClaimInvoices(); }
 			};
 
 			for ( var stepName in steps ) {
@@ -74,6 +75,14 @@ component extends="com.apirone.core.model.service.AbsService" accessors="true" {
 		}
 
 		return { started = true, alreadyRunning = false };
+	}
+
+	/**
+	 * Fatture soggette a reclamo ( copia locale di Verticale ) per le tendine
+	 * del tab "Reclamo" della testata preventivo.
+	 */
+	public Array function listClaimInvoices(){
+		return getDao().listClaimInvoices();
 	}
 
 	public Struct function getStatus(){

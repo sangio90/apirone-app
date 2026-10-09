@@ -10,6 +10,17 @@ component extends="com.apirone.core.controller.AbsController" {
 		event.setValue( "result", result );
 	}
 
+	function claimInvoices( event, rc, prc ){
+		var result = super.getResult();
+
+		var data = super.service( "VerticaleSync" ).listClaimInvoices();
+
+		result.setTotal( data.len() );
+		result.setData( data );
+
+		event.setValue( "result", result );
+	}
+
 	function status( event, rc, prc ){
 		var result = super.getResult();
 
